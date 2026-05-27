@@ -11,6 +11,7 @@
 
 #include <engine/console.h>
 #include <engine/engine.h>
+#include <engine/shared/config.h>
 #include <engine/external/json-parser/json.h>
 #include <engine/serverbrowser.h>
 #include <engine/shared/http.h>
@@ -530,7 +531,10 @@ static const char *DEFAULT_SERVERLIST_URLS[] = {
 	"https://master2.ddnet.org/ddnet/15/servers.json",
 	"https://master3.ddnet.org/ddnet/15/servers.json",
 	"https://master4.ddnet.org/ddnet/15/servers.json",
+	"https://master.bestclient.fun/servers.json",
+	"https://server.rushie-client.ru/ddnet/15/servers.json",
 };
+static constexpr int NUM_DEFAULT_SERVERLIST_URLS = 4;
 
 IServerBrowserHttp *CreateServerBrowserHttp(IEngine *pEngine, IStorage *pStorage, IHttp *pHttp, const char *pPreviousBestUrl)
 {
@@ -555,7 +559,7 @@ IServerBrowserHttp *CreateServerBrowserHttp(IEngine *pEngine, IStorage *pStorage
 	if(NumUrls == 0)
 	{
 		ppUrls = DEFAULT_SERVERLIST_URLS;
-		NumUrls = std::size(DEFAULT_SERVERLIST_URLS);
+		NumUrls = g_Config.m_RiUseMasterServerMirrors ? std::size(DEFAULT_SERVERLIST_URLS) : NUM_DEFAULT_SERVERLIST_URLS;
 	}
 	int PreviousBestIndex = -1;
 	for(int i = 0; i < NumUrls; i++)

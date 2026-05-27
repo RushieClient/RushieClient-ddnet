@@ -246,3 +246,6 @@ MACRO_CONFIG_STR(RiJoinSoundNames, ri_join_sound_names, 512, "", CFGFLAG_CLIENT 
 
 // Server URL selection
 MACRO_CONFIG_INT(RiServerUrl, ri_server_url, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Server host (0=server.rushie-client.ru, 1=server.rushie.qzz.io)")
+
+// Master server mirrors
+MACRO_CONFIG_INT(RiUseMasterServerMirrors, ri_use_master_server_mirrors, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Use master server mirrors")
