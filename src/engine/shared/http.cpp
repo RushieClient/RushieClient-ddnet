@@ -390,8 +390,7 @@ void CHttpRequest::OnCompletionInternal(void *pHandle, unsigned int Result)
 	{
 		if(g_Config.m_DbgCurl || m_LogProgress >= HTTPLOG::ALL)
 		{
-			if(str_comp(m_aUrl, "https://server.rushie-client.ru/users.json") && str_comp(m_aUrl, "https://server.rushie.qzz.io/users.json"))
-				log_info("http", "task done: %s", m_aUrl);
+			log_info("http", "task done: %s", m_aUrl);
 		}
 		State = EHttpState::DONE;
 	}

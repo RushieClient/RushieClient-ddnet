@@ -1,4 +1,4 @@
-#include "rclient_indicator.h"
+﻿#include "rclient_indicator.h"
 
 #include <base/system.h>
 
@@ -36,7 +36,9 @@ static bool ShouldIgnoreIndicatorErrors()
 
 static HTTPLOG GetIndicatorHttpLogLevel()
 {
-	return ShouldIgnoreIndicatorErrors() ? HTTPLOG::NONE : HTTPLOG::FAILURE;
+	if(ShouldIgnoreIndicatorErrors())
+		return HTTPLOG::NONE;
+	return g_Config.m_ConsoleOutputLevel >= 1 ? HTTPLOG::ALL : HTTPLOG::NONE;
 }
 
 static unsigned char BuildIndicatorDataMask(int Index)
@@ -278,10 +280,17 @@ void CRClientIndicator::OnInit()
 void CRClientIndicator::OnRender()
 {
 	auto HandleTaskDone = [&](std::shared_ptr<CHttpRequest> &pTask, auto &&Finish, auto &&Reset) {
-		if(!pTask || pTask->State() != EHttpState::DONE)
+		if(!pTask)
 			return;
-		Finish();
-		Reset();
+		if(pTask->State() == EHttpState::DONE)
+		{
+			Finish();
+			Reset();
+		}
+		else if(pTask->State() == EHttpState::ERROR || pTask->State() == EHttpState::ABORTED)
+		{
+			Reset();
+		}
 	};
 
 	HandleTaskDone(m_pRClientUsersTask, [this]() { FinishRClientUsers(); }, [this]() { ResetRClientUsers(); });
