@@ -184,7 +184,7 @@ static constexpr uint32_t VOICE_MODE_SHIFT = 30;
 static constexpr uint32_t VOICE_MODE_MASK = 0x3u;
 static constexpr uint8_t VOICE_FLAG_VAD = 1 << 0;
 static constexpr uint8_t VOICE_FLAG_LOOPBACK = 1 << 1;
-static constexpr int VOICE_AUTH_CACHE_MAX_AGE_SECONDS = 45;
+static constexpr int VOICE_AUTH_CACHE_MAX_AGE_SECONDS = 3000;
 static constexpr int VOICE_AUDIO_RETRY_SECONDS = 10;
 #if defined(CONF_RNNOISE)
 static constexpr int RNNOISE_FRAME_SAMPLES = 480;
