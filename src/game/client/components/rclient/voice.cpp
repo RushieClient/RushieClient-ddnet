@@ -2227,7 +2227,15 @@ void CRClientVoice::LogHeartbeat()
 	const int LocalId = m_LocalClientIdSnap;
 	const uint32_t ContextHash = m_ContextHash.load();
 	const uint32_t TokenHash = Config.m_RiVoiceTokenHash;
-	const bool AuthValid = VoiceAuthValid();
+	uint32_t TmpAuthTs = 0;
+	uint64_t TmpAuthHash = 0;
+	int64_t TmpAuthReceived = 0;
+	bool AuthValid = false;
+	if(m_pGameClient)
+	{
+		m_pGameClient->m_RClientIndicator.GetCachedVoiceAuth(TmpAuthTs, TmpAuthHash, TmpAuthReceived);
+		AuthValid = TmpAuthHash != 0 && VoiceAuthCacheFresh(TmpAuthReceived);
+	}
 	const int PingMs = m_PingMs.load();
 	const bool PttActive = m_PttActive.load();
 	const bool CaptureOk = m_CaptureDevice != 0;
@@ -2562,6 +2570,7 @@ void CRClientVoice::WorkerLoop()
 		DecodeJitter();
 		UpdateEncoderParams();
 		ProcessCapture();
+		LogHeartbeat();
 
 		std::this_thread::sleep_for(2ms);
 	}
