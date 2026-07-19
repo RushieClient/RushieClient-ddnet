@@ -609,6 +609,8 @@ void CRClientVoice::OnShutdown()
 void CRClientVoice::SetPttActive(bool Active)
 {
 	const bool WasActive = m_PttActive.exchange(Active);
+	if(g_Config.m_RiVoiceDebug && WasActive != Active)
+		log_info("voice", "ptt %s", Active ? "pressed" : "released");
 	if(Active)
 	{
 		m_PttReleaseDeadline.store(0);
@@ -820,8 +822,10 @@ bool CRClientVoice::EnsureAudio()
 		return true;
 	}
 
-	const char *pInputName = FindDeviceName(true, m_aInputDeviceName);
-	const char *pOutputName = FindDeviceName(false, m_aOutputDeviceName);
+	char aInputName[256] = {0};
+	char aOutputName[256] = {0};
+	const bool HasInputName = FindDeviceName(true, m_aInputDeviceName, aInputName, sizeof(aInputName));
+	const bool HasOutputName = FindDeviceName(false, m_aOutputDeviceName, aOutputName, sizeof(aOutputName));
 
 	if(!m_pEncoder)
 	{
@@ -847,7 +851,7 @@ bool CRClientVoice::EnsureAudio()
 
 	if(!m_OutputDevice)
 	{
-		const bool OutputMissing = m_aOutputDeviceName[0] != '\0' && pOutputName == nullptr;
+		const bool OutputMissing = m_aOutputDeviceName[0] != '\0' && !HasOutputName;
 		const bool NoOutputDevices = SDL_GetNumAudioDevices(0) <= 0;
 
 		if(OutputMissing)
@@ -869,8 +873,8 @@ bool CRClientVoice::EnsureAudio()
 		else
 		{
 			if(VoiceDebugLoggingEnabled())
-				log_info("voice", "attempting to open output device '%s'", pOutputName ? pOutputName : "<default>");
-			m_OutputDevice = SDL_OpenAudioDevice(pOutputName, 0, &WantOutput, &m_OutputSpec, 0);
+				log_info("voice", "attempting to open output device '%s'", HasOutputName ? aOutputName : "<default>");
+			m_OutputDevice = SDL_OpenAudioDevice(HasOutputName ? aOutputName : nullptr, 0, &WantOutput, &m_OutputSpec, 0);
 			if(!m_OutputDevice)
 			{
 				if(!m_OutputUnavailable && VoiceDebugLoggingEnabled())
@@ -887,7 +891,7 @@ bool CRClientVoice::EnsureAudio()
 				if(VoiceDebugLoggingEnabled())
 				{
 					log_info("voice", "output device opened '%s' %dch@%d",
-						pOutputName ? pOutputName : "<default>",
+						HasOutputName ? aOutputName : "<default>",
 						Channels,
 						m_OutputSpec.freq);
 				}
@@ -914,7 +918,7 @@ bool CRClientVoice::EnsureAudio()
 		else
 #endif
 		{
-		const bool InputMissing = m_aInputDeviceName[0] != '\0' && pInputName == nullptr;
+		const bool InputMissing = m_aInputDeviceName[0] != '\0' && !HasInputName;
 		const bool NoCaptureDevices = SDL_GetNumAudioDevices(1) <= 0;
 
 		if(InputMissing)
@@ -936,8 +940,8 @@ bool CRClientVoice::EnsureAudio()
 		else
 		{
 			if(VoiceDebugLoggingEnabled())
-				log_info("voice", "attempting to open capture device '%s'", pInputName ? pInputName : "<default>");
-			m_CaptureDevice = SDL_OpenAudioDevice(pInputName, 1, &WantCapture, &m_CaptureSpec, 0);
+				log_info("voice", "attempting to open capture device '%s'", HasInputName ? aInputName : "<default>");
+			m_CaptureDevice = SDL_OpenAudioDevice(HasInputName ? aInputName : nullptr, 1, &WantCapture, &m_CaptureSpec, 0);
 			if(!m_CaptureDevice)
 			{
 				if(!m_CaptureUnavailable && VoiceDebugLoggingEnabled())
@@ -953,7 +957,7 @@ bool CRClientVoice::EnsureAudio()
 				if(VoiceDebugLoggingEnabled())
 				{
 					log_info("voice", "capture device opened '%s' %dch@%d",
-						pInputName ? pInputName : "<default>",
+						HasInputName ? aInputName : "<default>",
 						m_CaptureSpec.channels,
 						m_CaptureSpec.freq);
 				}
@@ -972,8 +976,8 @@ bool CRClientVoice::EnsureAudio()
 	{
 		const char *pInputReq = m_aInputDeviceName[0] ? m_aInputDeviceName : "<default>";
 		const char *pOutputReq = m_aOutputDeviceName[0] ? m_aOutputDeviceName : "<default>";
-		const char *pInputResolved = pInputName ? pInputName : "<default>";
-		const char *pOutputResolved = pOutputName ? pOutputName : "<default>";
+		const char *pInputResolved = HasInputName ? aInputName : "<default>";
+		const char *pOutputResolved = HasOutputName ? aOutputName : "<default>";
 		if(VoiceDebugLoggingEnabled())
 		{
 			log_info("voice", "audio devices set input='%s' resolved='%s' output='%s' resolved='%s' capture=%dch@%d output=%dch@%d",
@@ -1163,19 +1167,24 @@ void CRClientVoice::ResetPeer(SVoicePeer &Peer)
 		SDL_UnlockAudioDevice(m_OutputDevice);
 }
 
-const char *CRClientVoice::FindDeviceName(bool Capture, const char *pDesired) const
+bool CRClientVoice::FindDeviceName(bool Capture, const char *pDesired, char *pOut, size_t OutSize) const
 {
-	if(!pDesired || pDesired[0] == '\0')
-		return nullptr;
+	if(pOut && OutSize > 0)
+		pOut[0] = '\0';
+	if(!pDesired || pDesired[0] == '\0' || !pOut || OutSize == 0)
+		return false;
 
 	const int Num = SDL_GetNumAudioDevices(Capture ? 1 : 0);
 	for(int i = 0; i < Num; i++)
 	{
 		const char *pName = SDL_GetAudioDeviceName(i, Capture ? 1 : 0);
 		if(pName && str_comp_nocase(pName, pDesired) == 0)
-			return pName;
+		{
+			str_copy(pOut, pName, OutSize);
+			return true;
+		}
 	}
-	return nullptr;
+	return false;
 }
 
 void CRClientVoice::ListDevices()
@@ -1291,6 +1300,8 @@ void CRClientVoice::Shutdown()
 	m_aTxBlockLog[0] = '\0';
 	m_aRxBlockLog[0] = '\0';
 	m_aAuthBlockLog[0] = '\0';
+	m_TxStallSince = 0;
+	m_aTxStallLog[0] = '\0';
 	m_AudioSubsystemInitializedByVoice = false;
 	m_PingMs.store(-1);
 	m_MicLevel.store(0.0f);
@@ -1453,6 +1464,7 @@ void CRClientVoice::ProcessCapture()
 
 	if(m_pClient && m_pClient->State() == IClient::STATE_ONLINE && VoiceIsLoopbackAddr(m_pClient->ServerAddress()))
 	{
+		VoiceLogDebugOnce(m_aTxBlockLog, sizeof(m_aTxBlockLog), "voice tx blocked: game server is loopback/local");
 		m_PingMs.store(-1);
 		return;
 	}
@@ -1468,7 +1480,15 @@ void CRClientVoice::ProcessCapture()
 			LocalPos = m_aClientPosSnap[LocalClientId];
 	}
 	if(!Online || LocalClientId < 0 || LocalClientId >= MAX_CLIENTS)
+	{
+		if(VoiceDebugLoggingEnabled())
+		{
+			char aReason[256];
+			str_format(aReason, sizeof(aReason), "voice tx blocked: online=%d local_id=%d", Online ? 1 : 0, LocalClientId);
+			VoiceLogDebugOnce(m_aTxBlockLog, sizeof(m_aTxBlockLog), aReason);
+		}
 		return;
+	}
 	int AuthClientId = LocalClientId;
 	if(m_pGameClient)
 	{
@@ -1480,10 +1500,28 @@ void CRClientVoice::ProcessCapture()
 	char aGameServerIp[VOICE_MAX_SERVER_IP_BYTES];
 	int GameServerPort = 0;
 	if(!GetCurrentGameServerIdentity(m_pClient, aGameServerIp, sizeof(aGameServerIp), GameServerPort))
+	{
+		if(VoiceDebugLoggingEnabled())
+		{
+			CServerInfo DebugServerInfo;
+			m_pClient->GetServerInfo(&DebugServerInfo);
+			char aReason[256];
+			str_format(aReason, sizeof(aReason), "voice tx blocked: failed to parse game server address '%s'", DebugServerInfo.m_aAddress);
+			VoiceLogDebugOnce(m_aTxBlockLog, sizeof(m_aTxBlockLog), aReason);
+		}
 		return;
+	}
 	const int GameServerIpLen = str_length(aGameServerIp);
 	if(GameServerIpLen <= 0 || GameServerIpLen > VOICE_MAX_SERVER_IP_BYTES)
+	{
+		if(VoiceDebugLoggingEnabled())
+		{
+			char aReason[256];
+			str_format(aReason, sizeof(aReason), "voice tx blocked: bad game server ip length %d", GameServerIpLen);
+			VoiceLogDebugOnce(m_aTxBlockLog, sizeof(m_aTxBlockLog), aReason);
+		}
 		return;
+	}
 
 	const int64_t Now = time_get();
 	const bool UseVad = Config.m_RiVoiceVadEnable != 0;
@@ -1656,10 +1694,12 @@ void CRClientVoice::ProcessCapture()
 	uint8_t aPayload[VOICE_MAX_PAYLOAD];
 
 	bool UpdatedMicLevel = false;
+	bool ProcessedAnyFrame = false;
 	while(SDL_GetQueuedAudioSize(m_CaptureDevice) >= VOICE_FRAME_BYTES)
 	{
 		int16_t aPcm[VOICE_FRAME_SAMPLES];
 		SDL_DequeueAudio(m_CaptureDevice, aPcm, VOICE_FRAME_BYTES);
+		ProcessedAnyFrame = true;
 		ApplyMicGain(Config, aPcm, VOICE_FRAME_SAMPLES);
 		ApplyNoiseSuppressor(Config, aPcm, VOICE_FRAME_SAMPLES, m_NsNoiseFloor, m_NsGain, m_pNoiseSuppress);
 		ApplyHpfCompressor(Config, aPcm, VOICE_FRAME_SAMPLES, m_HpfPrevIn, m_HpfPrevOut, m_CompEnv, m_CompGain);
@@ -1706,6 +1746,8 @@ void CRClientVoice::ProcessCapture()
 		}
 		if(!m_TxWasActive)
 		{
+			if(Config.m_RiVoiceDebug)
+				log_info("voice", "tx started (ptt/vad active, auth ok)");
 			if(m_pEncoder)
 				opus_encoder_ctl(m_pEncoder, OPUS_RESET_STATE);
 			m_HpfPrevIn = 0.0f;
@@ -1773,6 +1815,7 @@ void CRClientVoice::ProcessCapture()
 		}
 		net_udp_send(m_Socket, &ServerAddrLocal, aPacket, (int)Offset);
 		m_aLastHeard[ClientId].store(Now);
+		m_HbTx++;
 		if(Config.m_RiVoiceDebug)
 		{
 			m_TxPackets++;
@@ -1783,6 +1826,24 @@ void CRClientVoice::ProcessCapture()
 				m_TxPackets = 0;
 			}
 		}
+	}
+
+	if(!ProcessedAnyFrame)
+	{
+		if(m_TxStallSince == 0)
+			m_TxStallSince = Now;
+		else if(Now - m_TxStallSince > time_freq() * 2 && VoiceDebugLoggingEnabled())
+		{
+			char aReason[256];
+			str_format(aReason, sizeof(aReason), "voice capture stalled: device open but no audio data for 2s (queued=%u bytes)",
+				SDL_GetQueuedAudioSize(m_CaptureDevice));
+			VoiceLogDebugOnce(m_aTxStallLog, sizeof(m_aTxStallLog), aReason);
+		}
+	}
+	else
+	{
+		m_TxStallSince = 0;
+		m_aTxStallLog[0] = '\0';
 	}
 
 	if(ShowMicLevel)
@@ -1832,6 +1893,7 @@ void CRClientVoice::ProcessIncoming()
 		int Bytes = net_udp_recv(m_Socket, &Addr, &pData);
 		if(Bytes <= 0 || !pData)
 			break;
+		m_HbRxRaw++;
 
 		NETADDR ServerAddrLocal = NETADDR_ZEROED;
 		{
@@ -1839,22 +1901,37 @@ void CRClientVoice::ProcessIncoming()
 			ServerAddrLocal = m_ServerAddr;
 		}
 		if(net_addr_comp(&Addr, &ServerAddrLocal) != 0)
+		{
+			m_HbRxDropAddr++;
 			continue;
+		}
 
 		if(Bytes < VOICE_HEADER_FIXED_SIZE)
+		{
+			m_HbRxDropHeader++;
 			continue;
+		}
 
 		size_t Offset = 0;
 		if(mem_comp(pData, VOICE_MAGIC, sizeof(VOICE_MAGIC)) != 0)
+		{
+			m_HbRxDropHeader++;
 			continue;
+		}
 		Offset += sizeof(VOICE_MAGIC);
 
 		const uint8_t Version = pData[Offset++];
 		const uint8_t Type = pData[Offset++];
 		if(Version != ProtocolVersion)
+		{
+			m_HbRxDropHeader++;
 			continue;
+		}
 		if(Type != VOICE_TYPE_AUDIO && Type != VOICE_TYPE_PING && Type != VOICE_TYPE_PONG)
+		{
+			m_HbRxDropHeader++;
 			continue;
+		}
 		const uint16_t PayloadSize = ReadU16(pData + Offset);
 		Offset += sizeof(uint16_t);
 		const uint32_t ContextHash = ReadU32(pData + Offset);
@@ -1888,6 +1965,7 @@ void CRClientVoice::ProcessIncoming()
 		if(ContextHash == 0 || ContextHash != LocalContextHash)
 		{
 			m_RxDropContext++;
+			m_HbRxDropCtx++;
 			continue;
 		}
 		if(Type == VOICE_TYPE_PING || Type == VOICE_TYPE_PONG)
@@ -1896,13 +1974,17 @@ void CRClientVoice::ProcessIncoming()
 			(void)VoiceAuthHash;
 			(void)ServerPort;
 			if(TokenHash != 0 && TokenHash != Config.m_RiVoiceTokenHash)
+			{
+				m_HbRxDropToken++;
 				continue;
+			}
 			if(m_LastPingSentTime != 0 && Sequence == m_LastPingSeq)
 			{
 				const int64_t Now = time_get();
 				const int RttMs = (int)std::clamp((Now - m_LastPingSentTime) * 1000 / time_freq(), (int64_t)0, (int64_t)9999);
 				m_PingMs.store(RttMs);
 			}
+			m_HbRxPong++;
 			continue;
 		}
 		if(Type != VOICE_TYPE_AUDIO)
@@ -1913,9 +1995,15 @@ void CRClientVoice::ProcessIncoming()
 		const uint32_t SenderGroup = VoiceTokenGroup(TokenHash);
 		const uint32_t SenderMode = VoiceTokenMode(TokenHash);
 		if(!VoiceShouldHear(SenderGroup, SenderMode, LocalGroup, LocalMode))
+		{
+			m_HbRxDropToken++;
 			continue;
+		}
 		if(SenderId >= MAX_CLIENTS)
+		{
+			m_HbRxDropHeader++;
 			continue;
+		}
 
 		int LocalId = -1;
 		vec2 LocalPos = vec2(0.0f, 0.0f);
@@ -1946,7 +2034,10 @@ void CRClientVoice::ProcessIncoming()
 
 		const bool IsSelf = SenderId == LocalId;
 		if(IsSelf && !TestServer)
+		{
+			m_HbRxDropSelf++;
 			continue;
+		}
 
 		const bool SameGroup = LocalGroup != 0 && SenderGroup == LocalGroup;
 		const bool IgnoreDistance = Config.m_RiVoiceIgnoreDistance || (Config.m_RiVoiceGroupGlobal && SameGroup);
@@ -1957,23 +2048,41 @@ void CRClientVoice::ProcessIncoming()
 			if(Config.m_RiVoiceVisibilityMode == 0)
 			{
 				if(!IgnoreDistance && !SenderActive && !AllowObserver)
+				{
+					m_HbRxDropFilter++;
 					continue;
+				}
 			}
 			else if(Config.m_RiVoiceVisibilityMode == 1)
 			{
 				if(SenderOtherTeam && !AllowObserver)
+				{
+					m_HbRxDropFilter++;
 					continue;
+				}
 			}
 
 			if(VoiceListMatch(Config.m_aRiVoiceMute, pSenderName))
+			{
+				m_HbRxDropFilter++;
 				continue;
+			}
 			if(Config.m_RiVoiceListMode == 1 && !VoiceListMatch(Config.m_aRiVoiceWhitelist, pSenderName))
+			{
+				m_HbRxDropFilter++;
 				continue;
+			}
 			if(Config.m_RiVoiceListMode == 2 && VoiceListMatch(Config.m_aRiVoiceBlacklist, pSenderName))
+			{
+				m_HbRxDropFilter++;
 				continue;
+			}
 			const bool SenderUsesVad = (Flags & VOICE_FLAG_VAD) != 0;
 			if(SenderUsesVad && !Config.m_RiVoiceHearVad && !VoiceListMatch(Config.m_aRiVoiceVadAllow, pSenderName))
+			{
+				m_HbRxDropFilter++;
 				continue;
+			}
 		}
 		m_aLastHeard[SenderId].store(time_get());
 
@@ -1988,20 +2097,27 @@ void CRClientVoice::ProcessIncoming()
 		if(!IgnoreDistance && Dist > Radius)
 		{
 			m_RxDropRadius++;
+			m_HbRxDropRadius++;
 			continue;
 		}
 
 		const float RadiusFactor = IgnoreDistance ? 1.0f : (1.0f - (Dist / Radius));
 		float Volume = std::clamp(RadiusFactor * (Config.m_RiVoiceVolume / 100.0f), 0.0f, 4.0f);
 		if(Volume <= 0.0f)
+		{
+			m_HbRxDropVolume++;
 			continue;
+		}
 
 		int NameVolume = 100;
 		if(VoiceNameVolume(Config.m_aRiVoiceNameVolumes, pSenderName, NameVolume))
 		{
 			Volume *= (NameVolume / 100.0f);
 			if(Volume <= 0.0f)
+			{
+				m_HbRxDropVolume++;
 				continue;
+			}
 		}
 
 		const bool StereoEnabled = Config.m_RiVoiceStereo != 0;
@@ -2076,6 +2192,7 @@ void CRClientVoice::ProcessIncoming()
 		if(Config.m_RiVoiceDebug)
 		{
 			m_RxPackets++;
+			m_HbRxOk++;
 			if(Now - m_RxLastLog > time_freq())
 			{
 				log_info("voice", "rx packets=%d drop_ctx=%d drop_radius=%d", m_RxPackets, m_RxDropContext, m_RxDropRadius);
@@ -2085,7 +2202,54 @@ void CRClientVoice::ProcessIncoming()
 				m_RxDropRadius = 0;
 			}
 		}
+		else
+		{
+			m_HbRxOk++;
+		}
 	}
+}
+
+void CRClientVoice::LogHeartbeat()
+{
+	const int64_t Now = time_get();
+	if(Now - m_LastHeartbeatLog < time_freq() * 5)
+		return;
+	m_LastHeartbeatLog = Now;
+
+	SRClientVoiceConfigSnapshot Config;
+	GetConfigSnapshot(Config);
+	if(!Config.m_RiVoiceDebug)
+		return;
+
+	const bool ServerValid = m_ServerAddrValid.load();
+	const bool SocketOk = m_Socket != nullptr;
+	const bool Online = m_OnlineSnap;
+	const int LocalId = m_LocalClientIdSnap;
+	const uint32_t ContextHash = m_ContextHash.load();
+	const uint32_t TokenHash = Config.m_RiVoiceTokenHash;
+	const bool AuthValid = VoiceAuthValid();
+	const int PingMs = m_PingMs.load();
+	const bool PttActive = m_PttActive.load();
+	const bool CaptureOk = m_CaptureDevice != 0;
+	const bool OutputOk = m_OutputDevice != 0;
+
+	log_info("voice", "heartbeat: tx=%d rx_raw=%d rx_ok=%d rx_pong=%d | drops: addr=%d hdr=%d ctx=%d tok=%d self=%d filt=%d rad=%d vol=%d | state: relay=%s sock=%s online=%d id=%d ctx=0x%08x tok=0x%08x auth=%s ping=%d ptt=%d cap=%d out=%d",
+		m_HbTx, m_HbRxRaw, m_HbRxOk, m_HbRxPong,
+		m_HbRxDropAddr, m_HbRxDropHeader, m_HbRxDropCtx, m_HbRxDropToken, m_HbRxDropSelf, m_HbRxDropFilter, m_HbRxDropRadius, m_HbRxDropVolume,
+		ServerValid ? "ok" : "unresolved", SocketOk ? "ok" : "none", Online ? 1 : 0, LocalId, ContextHash, TokenHash, AuthValid ? "ok" : "invalid", PingMs, PttActive ? 1 : 0, CaptureOk ? 1 : 0, OutputOk ? 1 : 0);
+
+	m_HbTx = 0;
+	m_HbRxRaw = 0;
+	m_HbRxOk = 0;
+	m_HbRxPong = 0;
+	m_HbRxDropAddr = 0;
+	m_HbRxDropHeader = 0;
+	m_HbRxDropCtx = 0;
+	m_HbRxDropToken = 0;
+	m_HbRxDropSelf = 0;
+	m_HbRxDropFilter = 0;
+	m_HbRxDropRadius = 0;
+	m_HbRxDropVolume = 0;
 }
 
 void CRClientVoice::UpdateConfigSnapshot()

@@ -194,6 +194,23 @@ class CRClientVoice
 	int m_RxPackets = 0;
 	int m_RxDropContext = 0;
 	int m_RxDropRadius = 0;
+	int64_t m_TxStallSince = 0;
+	char m_aTxStallLog[256] = {0};
+
+	// Heartbeat debug state (worker thread only)
+	int64_t m_LastHeartbeatLog = 0;
+	int m_HbTx = 0;
+	int m_HbRxRaw = 0;
+	int m_HbRxOk = 0;
+	int m_HbRxPong = 0;
+	int m_HbRxDropAddr = 0;
+	int m_HbRxDropHeader = 0;
+	int m_HbRxDropCtx = 0;
+	int m_HbRxDropToken = 0;
+	int m_HbRxDropSelf = 0;
+	int m_HbRxDropFilter = 0;
+	int m_HbRxDropRadius = 0;
+	int m_HbRxDropVolume = 0;
 
 	std::thread m_Worker;
 	std::atomic<bool> m_WorkerStop = false;
@@ -235,7 +252,8 @@ class CRClientVoice
 	void ClearPeerFrames();
 	void ResetPeer(SVoicePeer &Peer);
 	static void SDLAudioCallback(void *pUserData, Uint8 *pStream, int Len);
-	const char *FindDeviceName(bool Capture, const char *pDesired) const;
+	bool FindDeviceName(bool Capture, const char *pDesired, char *pOut, size_t OutSize) const;
+	void LogHeartbeat();
 	void StartWorker();
 	void StopWorker();
 	void WorkerLoop();
