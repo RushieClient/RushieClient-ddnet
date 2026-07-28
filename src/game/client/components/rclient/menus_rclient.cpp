@@ -485,7 +485,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	static std::vector<CButtonContainer> s_vButtonContainersNonActive = {{}, {}, {}};
 	DoLine_RadioMenu(Column, TCLocalize("Choose sound non active"),
 		   s_vButtonContainersNonActive,
-		   {Localize("Wake up"), Localize("Granade"), Localize("Tag")},
+		   {Localize("Wake up"), Localize("Grenade"), Localize("Tag")},
 		   {0, 1, 2},
 		   g_Config.m_RcSoundOnMoveNonInactive);
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcNotifyOnMoveInSpec, RCLocalize("Notify when moved in spec"), &g_Config.m_RcNotifyOnMoveInSpec, &Column, LineSize);
@@ -495,7 +495,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		static std::vector<CButtonContainer> s_vButtonContainersInSpec = {{}, {}, {}};
 		DoLine_RadioMenu(Column, TCLocalize("Choose sound in spec"),
 			   s_vButtonContainersInSpec,
-			   {Localize("Wake up"), Localize("Granade"), Localize("Tag")},
+			   {Localize("Wake up"), Localize("Grenade"), Localize("Tag")},
 			   {0, 1, 2},
 			   g_Config.m_RcSoundOnMoveInSpec);
 	}
@@ -629,7 +629,7 @@ void CMenus::RenderSettingsRClientInfo(CUIRect MainView)
 	Ui()->DoLabel(&Label, RCLocalize("RClient Links"), HeadlineFontSize, TEXTALIGN_ML);
 	LeftView.HSplitTop(MarginSmall, nullptr, &LeftView);
 
-	static CButtonContainer s_DiscordButton, s_WebsiteButton, s_GithubButton, s_SupportButton;
+	static CButtonContainer s_DiscordButton, s_WebsiteButton, s_GithubButton;
 	CUIRect ButtonLeft, ButtonRight;
 
 	LeftView.HSplitTop(LineSize * 2.0f, &Button, &LeftView);

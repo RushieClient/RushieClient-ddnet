@@ -115,7 +115,7 @@ public:
 	void DoTranslateWork(CTranslateResponse &TranslatedClass, CLineTranslate &LineForTranslate);
 
 
-	// Verison
+	// Version
 	std::shared_ptr<CHttpRequest> m_pRClientInfoTask = nullptr;
 	void FetchRClientInfo();
 	void FinishRClientInfo();
