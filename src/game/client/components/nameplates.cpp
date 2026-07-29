@@ -760,6 +760,10 @@ protected:
 			case CUSTOM_CLIENT_ID_KAIZO_NETWORK:
 				m_Texture = g_pData->m_aImages[IMAGE_RCKAZIOICON].m_Id;
 				break;
+			case CUSTOM_CLIENT_ID_RUSHIECLIENT:
+				m_Texture = g_pData->m_aImages[IMAGE_RCRUSHIEWHITEICON].m_Id;
+				m_Color = ColorRGBA(0.0f, 165.0f / 255.0f, 250.0f / 255.0f, Data.m_Color.a);
+				break;
 			case CUSTOM_CLIENT_ID_CHILLERBOTUX:
 				m_Texture = g_pData->m_aImages[IMAGE_RCCHILLERICON].m_Id;
 				break;
@@ -819,6 +823,7 @@ private:
 			return;
 		m_Inited = true;
 
+		AddPart<CNamePlatePartCustomClients>(This); // RClient
 		AddPart<CNamePlatePartCountry>(This); // TClient
 		AddPart<CNamePlatePartPing>(This); // TClient
 		AddPart<CNamePlatePartIgnoreMark>(This); // TClient
@@ -832,7 +837,6 @@ private:
 
 		AddPart<CNamePlatePartHookDetection>(This); // RClient
 		AddPart<CNamePlatePartFireDetection>(This); // RClient
-		AddPart<CNamePlatePartCustomClients>(This); // RClient
 		AddPart<CNamePlatePartNewLine>(This); // RClient
 
 		AddPart<CNamePlatePartReason>(This); // TClient
@@ -1170,7 +1174,26 @@ void CNamePlates::RenderNamePlateGame(vec2 Position, const CNetObj_PlayerInfo *p
 
 	// RClient
 	Data.m_FontSizeCustomClient = 18.0f + 20.0f * g_Config.m_RcNamePlatesHookSize / 100.0f;
-	Data.m_ShowCustomClient = g_Config.m_RcCustomClientsInNameplates ? ClientData.m_CustomClient : 0;
+	int ShowCustomClient = g_Config.m_RcCustomClientsInNameplates && g_Config.m_RcCustomClientsCollectClientType ? g_Config.m_RcCustomClientsInNameplates : 0;
+	switch(ShowCustomClient)
+	{
+	case 0: // Off
+		Data.m_ShowCustomClient = false;
+		break;
+	case 1: // Others
+		Data.m_ShowCustomClient = !pPlayerInfo->m_Local;
+		break;
+	case 2: // Everyone
+		Data.m_ShowCustomClient = true;
+		break;
+	case 3: // Only self
+		Data.m_ShowCustomClient = pPlayerInfo->m_Local;
+		break;
+	default:
+		dbg_assert_failed("ShowFireDetectionConfig invalid");
+	}
+	if(Data.m_ShowCustomClient)
+		Data.m_ShowCustomClient = ClientData.m_CustomClient;
 
 	// TClient
 	if(g_Config.m_TcWarList && g_Config.m_TcWarListShowClan && GameClient()->m_WarList.GetWarData(pPlayerInfo->m_ClientId).m_WarClan)
@@ -1243,7 +1266,7 @@ void CNamePlates::RenderNamePlatePreview(vec2 Position, int Dummy)
 	Data.m_FontSizeHookDetection = FontSizeHookDetection;
 	Data.m_FontSizeFireDetection = FontSizeFireDetection;
 	Data.m_FontSizeCustomClient = FontSizeHookDetection;
-	Data.m_ShowCustomClient = CUSTOM_CLIENT_ID_KAIZO_NETWORK;
+	Data.m_ShowCustomClient = (g_Config.m_RcCustomClientsInNameplates && g_Config.m_RcCustomClientsCollectClientType) ? CUSTOM_CLIENT_ID_RUSHIECLIENT : 0;
 
 	// TClient
 	Data.m_Local = false;

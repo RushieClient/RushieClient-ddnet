@@ -98,5 +98,5 @@ MACRO_CONFIG_INT(RcSoundOnMoveInSpec, rc_sound_on_move_in_spec, 0, 0, 2, CFGFLAG
 // Custom Client
 MACRO_CONFIG_INT(RcCustomClientsCollectClientType, rc_custom_clients_collect_client_type, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Collect client types on server")
 MACRO_CONFIG_INT(RcCustomClientsSendClientType, rc_custom_clients_send_client_type, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Send client type on server")
-MACRO_CONFIG_INT(RcCustomClientsInNameplates, rc_custom_clients_in_nameplates, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show custom client icons on nameplates")
+MACRO_CONFIG_INT(RcCustomClientsInNameplates, rc_custom_clients_in_nameplates, 1, 0, 3, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show custom client icons on nameplates")
 MACRO_CONFIG_INT(RcCustomClientsInScoreboard, rc_custom_clients_in_scoreboard, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show custom client icons on scoreboard")

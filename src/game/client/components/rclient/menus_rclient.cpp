@@ -27,7 +27,6 @@ const float FontSize = 14.0f;
 const float EditBoxFontSize = 12.0f;
 const float LineSize = 20.0f;
 const float HeadlineFontSize = 20.0f;
-const float StandardFontSize = 14.0f;
 
 const float HeadlineHeight = HeadlineFontSize + 0.0f;
 const float Margin = 10.0f;
@@ -501,6 +500,26 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	}
 	else
 		Column.HSplitTop(LineSize * 2 + 2.0f, nullptr, &Column); // 2.0f for radio menu
+
+	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
+	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;
+
+	// ***** Custom Clients ***** //
+	Column.HSplitTop(MarginBetweenSections, nullptr, &Column);
+	s_SectionBoxes.push_back(Column);
+	Column.HSplitTop(HeadlineHeight, &Label, &Column);
+	Ui()->DoLabel(&Label, RCLocalize("Client Indicator"), HeadlineFontSize, TEXTALIGN_ML);
+	Column.HSplitTop(MarginSmall, nullptr, &Column);
+
+	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcCustomClientsSendClientType, RCLocalize("Send to server that u use RClient"), &g_Config.m_RcCustomClientsSendClientType, &Column, LineSize);
+	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcCustomClientsCollectClientType, RCLocalize("Detect other clients"), &g_Config.m_RcCustomClientsCollectClientType, &Column, LineSize);
+	static std::vector<CButtonContainer> s_vButtonContainersCustomInNameplates = {{}, {}, {}, {}};
+	DoLine_RadioMenu(Column, TCLocalize("Show client type in nameplates"),
+		   s_vButtonContainersCustomInNameplates,
+		   {Localize("Off"), Localize("Others"), Localize("Everyone"), Localize("Only you")},
+		   {0, 1, 2, 3},
+		   g_Config.m_RcCustomClientsInNameplates);
+	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcCustomClientsInScoreboard, RCLocalize("Show client type in scoreboard"), &g_Config.m_RcCustomClientsInScoreboard, &Column, LineSize);
 
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
 	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;

@@ -2,6 +2,9 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include "scoreboard.h"
 
+#include "generated/client_data.h"
+#include "rclient/external/ddnet-custom-clients/custom_clients_ids.h"
+
 #include <base/time.h>
 
 #include <engine/console.h>
@@ -748,6 +751,44 @@ void CScoreboard::RenderScoreboard(CUIRect Scoreboard, int Team, int CountStart,
 				Cursor.m_FontSize = FontSize;
 				Cursor.m_Flags |= TEXTFLAG_ELLIPSIS_AT_END;
 				Cursor.m_LineWidth = NameLength;
+
+				// RClient custom clients
+				if(g_Config.m_RcCustomClientsInScoreboard && g_Config.m_RcCustomClientsCollectClientType)
+				{
+					int Type = ClientData.m_CustomClient;
+					if(Type != 0)
+					{
+						int m_Texture = 0;
+						switch(Type)
+						{
+						case CUSTOM_CLIENT_ID_KAIZO_NETWORK:
+							m_Texture = IMAGE_RCKAZIOICON;
+							break;
+						case CUSTOM_CLIENT_ID_RUSHIECLIENT:
+							m_Texture = IMAGE_RCRUSHIEICON;
+							break;
+						case CUSTOM_CLIENT_ID_CHILLERBOTUX:
+							m_Texture = IMAGE_RCCHILLERICON;
+							break;
+						case CUSTOM_CLIENT_ID_DUCK_N_INFCLASS_CLIENT:
+							m_Texture = IMAGE_RCDUCKICON;
+							break;
+						default:
+							break;
+						}
+						const float IconSize = FontSize;
+						const float OriginalY = Cursor.m_Y;
+						Cursor.m_Y = Row.y + (Row.h - IconSize) / 2.0f;
+						Graphics()->BlendNormal();
+						Graphics()->TextureSet(g_pData->m_aImages[m_Texture].m_Id);
+						Graphics()->QuadsBegin();
+						IGraphics::CQuadItem QuadItem(Cursor.m_X, Cursor.m_Y, IconSize, IconSize);
+						Graphics()->QuadsDrawTL(&QuadItem, 1);
+						Graphics()->QuadsEnd();
+						Cursor.m_X += IconSize;
+						Cursor.m_Y = OriginalY;
+					}
+				}
 
 				// RClient Heart
 				if(pInfo->m_ClientId >= 0 && (GameClient()->m_aClients[pInfo->m_ClientId].m_Friend) && g_Config.m_RcShowHeartInScoreboard)
