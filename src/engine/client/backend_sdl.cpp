@@ -1694,7 +1694,7 @@ void CGraphicsBackend_SDL_GL::SetWindowScreenCaptureProtect(int Type)
 		log_error("gfx", "SetWindowDisplayAffinity failed: %lu", GetLastError());
 	}
 #else
-	(void)Enabled;
+	(void)Type;
 #endif
 }
 
