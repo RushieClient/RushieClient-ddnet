@@ -70,6 +70,9 @@ class CRClient : public CComponent
 	// FindHours
 	static void ConPlayerFindHours(IConsole::IResult *pResult, void *pUserData);
 	bool FindHoursWriteInChat = false;
+
+	// Streamer mod
+	bool ScreenSharePrivacyOld = false;
 public:
 	CRClient();
 	int Sizeof() const override { return sizeof(*this); }

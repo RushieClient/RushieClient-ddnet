@@ -300,6 +300,9 @@ public:
 	std::optional<int> ShowMessageBox(const IGraphics::CMessageBox &MessageBox) override;
 
 	static bool IsModernAPI(EBackendType BackendType);
+
+	// RClient
+	void SetWindowScreenCaptureProtect(int Type) override;
 };
 
 #endif // ENGINE_CLIENT_BACKEND_SDL_H

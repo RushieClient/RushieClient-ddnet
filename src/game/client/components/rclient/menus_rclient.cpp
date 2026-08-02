@@ -404,6 +404,25 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
 	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;
 
+	// ***** Streamer mode ***** //
+	Column.HSplitTop(MarginBetweenSections, nullptr, &Column);
+	s_SectionBoxes.push_back(Column);
+	Column.HSplitTop(HeadlineHeight, &Label, &Column);
+	Ui()->DoLabel(&Label, RCLocalize("Streamer mode"), HeadlineFontSize, TEXTALIGN_ML);
+	Column.HSplitTop(MarginSmall, nullptr, &Column);
+
+	Column.HSplitTop(FontSize, &Label, &Column);
+	Ui()->DoLabel(&Label, RCLocalize("Only windows"), FontSize, TEXTALIGN_ML);
+	static std::vector<CButtonContainer> s_vButtonContainersScreenShare = {{}, {}, {}};
+	DoLine_RadioMenu(Column, TCLocalize("Hide window from capture when RCON opened"),
+		   s_vButtonContainersScreenShare,
+		   {Localize("Off"), Localize("Monitor(win7-11)"), Localize("Exclude(win10-11)")},
+		   {0, 1, 2},
+		   g_Config.m_RcRconSteamerMode);
+
+	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
+	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;
+
 	// ***** Edge info ***** //
 	Column.HSplitTop(MarginBetweenSections, nullptr, &Column);
 	s_SectionBoxes.push_back(Column);

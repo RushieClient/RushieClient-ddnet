@@ -614,6 +614,9 @@ protected:
 public:
 	// TClient
 	virtual void SetForcedAspect(bool Force) = 0;
+
+	// RClient
+	virtual void SetWindowScreenCaptureProtect(int Type) = 0;
 };
 
 class IEngineGraphics : public IGraphics

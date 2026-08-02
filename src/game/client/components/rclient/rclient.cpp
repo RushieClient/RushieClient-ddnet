@@ -63,6 +63,26 @@ void CRClient::OnRender()
 		FinishRclientDDstatsFindHours();
 		ResetRclientDDstatsFindHours();
 	}
+
+	if(g_Config.m_RcRconSteamerMode)
+	{
+		if(GameClient()->m_GameConsole.IsActive() && GameClient()->m_GameConsole.GetConsoleType() == CGameConsole::CONSOLETYPE_REMOTE)
+		{
+			if(!ScreenSharePrivacyOld)
+			{
+				GameClient()->Graphics()->SetWindowScreenCaptureProtect(g_Config.m_RcRconSteamerMode);
+				ScreenSharePrivacyOld = true;
+			}
+		}
+		else
+		{
+			if(ScreenSharePrivacyOld)
+			{
+				GameClient()->Graphics()->SetWindowScreenCaptureProtect(0);
+				ScreenSharePrivacyOld = false;
+			}
+		}
+	}
 }
 
 void CRClient::OnConsoleInit()

@@ -3948,8 +3948,8 @@ foreach(target ${TARGETS_OWN})
     target_compile_definitions(${target} PRIVATE NOGDI) # wingdi.h shouldn't define the name ERROR
     # 0x0501 (Windows XP) is required for mingw to get getaddrinfo to work
     # 0x0600 (Windows Vista) is required to use RegGetValueW and RegDeleteTreeW
-    target_compile_definitions(${target} PRIVATE NTDDI_VERSION=0x06000000) # Minimum OS version (new macro, since Vista)
-    target_compile_definitions(${target} PRIVATE _WIN32_WINNT=0x0600) # Minimum OS version (old macro, both must be defined)
+    target_compile_definitions(${target} PRIVATE NTDDI_VERSION=0x06010000) # Minimum OS version (new macro, since Vista)
+    target_compile_definitions(${target} PRIVATE _WIN32_WINNT=0x0601) # Minimum OS version (old macro, both must be defined)
     target_compile_definitions(${target} PRIVATE UNICODE) # Windows headers
     target_compile_definitions(${target} PRIVATE _UNICODE) # C-runtime
   endif()

@@ -2767,6 +2767,12 @@ void CGraphics_Threaded::SetWindowGrab(bool Grab)
 	m_pBackend->SetWindowGrab(Grab);
 }
 
+// RClient
+void CGraphics_Threaded::SetWindowScreenCaptureProtect(int Type)
+{
+	m_pBackend->SetWindowScreenCaptureProtect(Type);
+}
+
 void CGraphics_Threaded::NotifyWindow()
 {
 	m_pBackend->NotifyWindow();

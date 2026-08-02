@@ -736,6 +736,9 @@ public:
 	 * @see IGraphics::ShowMessageBox
 	 */
 	virtual std::optional<int> ShowMessageBox(const IGraphics::CMessageBox &MessageBox) = 0;
+
+	// RClient
+	virtual void SetWindowScreenCaptureProtect(int Type) = 0;
 };
 
 class CGraphics_Threaded : public IEngineGraphics
@@ -1274,6 +1277,9 @@ public:
 
 	// TClient
 	void SetForcedAspect(bool Force) override;
+
+	// RClient
+	void SetWindowScreenCaptureProtect(int Type) override;
 };
 
 extern bool g_GraphicsForcedAspect;

@@ -46,6 +46,12 @@
 #include <algorithm>
 #include <cstdlib>
 
+// RClient
+#if defined(CONF_FAMILY_WINDOWS)
+#include <SDL_syswm.h>
+#include <windows.h>
+#endif
+
 class IStorage;
 
 // ------------ CGraphicsBackend_Threaded
@@ -1651,6 +1657,45 @@ void CGraphicsBackend_SDL_GL::SetWindowParams(int FullscreenMode, bool IsBorderl
 		SDL_SetWindowBordered(m_pWindow, SDL_bool(!IsBorderless));
 		SDL_SetWindowResizable(m_pWindow, SDL_TRUE);
 	}
+}
+
+// RClient
+void CGraphicsBackend_SDL_GL::SetWindowScreenCaptureProtect(int Type)
+{
+#if defined(CONF_FAMILY_WINDOWS)
+	SDL_SysWMinfo WmInfo;
+	SDL_VERSION(&WmInfo.version);
+
+	if(!SDL_GetWindowWMInfo(m_pWindow, &WmInfo))
+	{
+		log_error("gfx", "SDL_GetWindowWMInfo failed: %s", SDL_GetError());
+		return;
+	}
+
+	DWORD Affinity;
+	switch(Type)
+	{
+	case 0:
+		Affinity = WDA_NONE;
+		break;
+	case 1:
+		Affinity = WDA_MONITOR;
+		break;
+	case 2:
+		Affinity = WDA_EXCLUDEFROMCAPTURE;
+		break;
+	default:
+		Affinity = WDA_NONE;
+		break;
+	}
+
+	if(!SetWindowDisplayAffinity(WmInfo.info.win.window, Affinity))
+	{
+		log_error("gfx", "SetWindowDisplayAffinity failed: %lu", GetLastError());
+	}
+#else
+	(void)Enabled;
+#endif
 }
 
 bool CGraphicsBackend_SDL_GL::SetWindowScreen(int Index, bool MoveToCenter)
