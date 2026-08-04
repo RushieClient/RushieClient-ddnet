@@ -157,6 +157,10 @@ void CChat::Reset()
 void CChat::OnRelease()
 {
 	m_Show = false;
+	if(m_MouseUnlocked)
+	{
+		LockMouse();
+	}
 }
 
 void CChat::OnStateChange(int NewState, int OldState)
@@ -530,6 +534,36 @@ void CChat::EnableMode(int Team)
 
 	if(m_Mode == MODE_NONE)
 	{
+		GameClient()->m_Spectator.OnRelease();
+		GameClient()->m_Emoticon.OnRelease();
+		GameClient()->m_Scoreboard.OnRelease();
+
+		if(!IsActive() && m_MouseUnlocked)
+		{
+			LockMouse();
+		}
+
+		if(!(GameClient()->m_Menus.IsActive() ||
+			GameClient()->m_Scoreboard.IsActive() ||
+			Client()->State() == IClient::STATE_DEMOPLAYBACK))
+		{
+			const vec2 OldMousePos = Ui()->MousePos();
+
+			m_MouseUnlocked = true;
+			if(m_LastMousePos == std::nullopt)
+			{
+				vec2 MouseCenter = Ui()->Screen()->Center();
+				MouseCenter = {MouseCenter.x / 2.0f, MouseCenter.y / 2.0f};
+				SetUiMousePos(MouseCenter);
+			}
+			else
+			{
+				SetUiMousePos(m_LastMousePos.value());
+			}
+
+			m_LastMousePos = OldMousePos;
+		}
+
 		if(Team)
 			m_Mode = MODE_TEAM;
 		else
@@ -548,6 +582,10 @@ void CChat::DisableMode()
 	{
 		m_Mode = MODE_NONE;
 		m_Input.Deactivate();
+	}
+	if(m_MouseUnlocked)
+	{
+		LockMouse();
 	}
 }
 
@@ -1256,6 +1294,7 @@ void CChat::OnPrepareLines(float y)
 			}
 			Graphics()->SetColor(1, 1, 1, 1);
 			Line.m_QuadContainerIndex = Graphics()->CreateRectQuadContainer(Begin, y, FullWidth, Line.m_aYOffset[OffsetType], MessageRounding(), IGraphics::CORNER_ALL);
+			Line.m_LineWidth = FullWidth;
 		}
 
 		TextRender()->SetRenderFlags(CurRenderFlags);
@@ -1392,6 +1431,15 @@ void CChat::OnRender()
 		RealMsgPaddingY = 0;
 	}
 
+	CUIRect Row;
+
+	if(m_Mode != MODE_NONE &&
+	!GameClient()->m_Menus.IsActive() && !GameClient()->m_Scoreboard.IsActive())
+	{
+		Ui()->StartCheck();
+		Ui()->Update();
+	}
+
 	for(int i = 0; i < MAX_LINES; i++)
 	{
 		CLine &Line = m_aLines[((m_CurrentLine - i) + MAX_LINES) % MAX_LINES];
@@ -1402,11 +1450,54 @@ void CChat::OnRender()
 
 		y -= Line.m_aYOffset[OffsetType];
 
+		Row.x = x;
+		Row.y = y;
+		Row.w = Line.m_LineWidth ? Line.m_LineWidth : g_Config.m_ClChatWidth;
+		Row.h = Line.m_aYOffset[OffsetType];
+
 		// cut off if msgs waste too much space
 		if(y < HeightLimit)
 			break;
 
 		float Blend = Now > Line.m_Time + 14 * time_freq() && !m_PrevShowChat ? 1.0f - (Now - Line.m_Time - 14 * time_freq()) / (2.0f * time_freq()) : 1.0f;
+
+		if(m_MouseUnlocked)
+		{
+			const int ButtonResult = Ui()->DoButtonLogic(&Line.m_ButtonId, 0, &Row, BUTTONFLAG_LEFT | BUTTONFLAG_RIGHT);
+			if(ButtonResult != 0)
+			{
+				m_ChatPopupContext.m_pChat = this;
+				m_ChatPopupContext.m_ClientId = Line.m_ClientId;
+				m_ChatPopupContext.m_ButtonId = &Line.m_ButtonId;
+				str_copy(m_ChatPopupContext.m_aText, Line.m_aText);
+				str_copy(m_ChatPopupContext.m_aName, Line.m_aName);
+				m_ChatPopupContext.m_Time = time_timestamp() - (time() - Line.m_Time) / time_freq();;
+				if(Line.m_Whisper)
+					m_ChatPopupContext.m_From = "chat/whisper";
+				else if(Line.m_Team)
+					m_ChatPopupContext.m_From = "chat/team";
+				else if(Line.m_ClientId == SERVER_MSG)
+					m_ChatPopupContext.m_From = "chat/server";
+				else if(Line.m_ClientId == CLIENT_MSG)
+					m_ChatPopupContext.m_From = "chat/client";
+				else
+					m_ChatPopupContext.m_From = "chat/all";
+
+				SPopupMenuProperties Props;
+				Props.m_NeedBorder = false;
+				Props.m_NeedMainMargin = false;
+				float m_Height = GameClient()->m_RClient.GetChatHeight(Line.m_ClientId);
+				float MouseY = Ui()->MouseY();
+				Ui()->DoPopupMenu(&m_ChatPopupContext, Ui()->MouseX(), 300.0f - MouseY < m_Height ? 300 - m_Height : MouseY, 55.0f, GameClient()->m_RClient.GetChatHeight(Line.m_ClientId),
+					&m_ChatPopupContext, CChatPopupContext::Render, Props);
+			}
+
+			if(Ui()->HotItem() == &Line.m_ButtonId ||
+				(Ui()->IsPopupOpen(&m_ChatPopupContext) && m_ChatPopupContext.m_ButtonId == &Line.m_ButtonId))
+			{
+				Row.Draw(ColorRGBA(0.7f, 0.7f, 0.7f, 0.4f), IGraphics::CORNER_ALL, Line.m_LineWidth ? MessageRounding() : MessageRounding() / 2.0f);
+			}
+		}
 
 		// Draw backgrounds for messages in one batch
 		if(!g_Config.m_ClChatOld)
@@ -1442,6 +1533,19 @@ void CChat::OnRender()
 			const ColorRGBA TextOutlineColor = TextRender()->DefaultTextOutlineColor().WithMultipliedAlpha(Blend);
 			TextRender()->RenderTextContainer(Line.m_TextContainerIndex, TextColor, TextOutlineColor, 0, (y + RealMsgPaddingY / 2.0f) - Line.m_TextYOffset);
 		}
+	}
+
+	if(m_Mode != MODE_NONE &&
+		!GameClient()->m_Menus.IsActive() && !GameClient()->m_Scoreboard.IsActive())
+	{
+		Ui()->RenderPopupMenus();
+
+		if(m_MouseUnlocked)
+			RenderTools()->RenderCursor(Ui()->MousePos(), 12.0f);
+
+		Ui()->FinishCheck();
+
+		m_Input.Activate(EInputPriority::CHAT);
 	}
 }
 
@@ -1551,7 +1655,7 @@ void CChat::SendChatQueued(const char *pLine)
 	}
 }
 
-// Rclient chat bubbles
+// Rclient
 bool CChat::LineHighlighted(int ClientId, const char *pLine)
 {
 	bool Highlighted = false;
@@ -1575,4 +1679,138 @@ bool CChat::LineHighlighted(int ClientId, const char *pLine)
 
 	return Highlighted;
 }
+bool CChat::OnCursorMove(float x, float y, IInput::ECursorType CursorType)
+{
+	if(!IsActive() || !m_MouseUnlocked)
+		return false;
 
+	Ui()->ConvertMouseMove(&x, &y, CursorType);
+	Ui()->OnCursorMove(x, y);
+
+	return true;
+}
+void CChat::SetUiMousePos(vec2 Pos)
+{
+	const vec2 WindowSize = vec2(Graphics()->WindowWidth(), Graphics()->WindowHeight());
+	const CUIRect *pScreen = Ui()->Screen();
+
+	const vec2 UpdatedMousePos = Ui()->UpdatedMousePos();
+	Pos = Pos / vec2(pScreen->w, pScreen->h) * WindowSize;
+	Ui()->OnCursorMove(Pos.x - UpdatedMousePos.x, Pos.y - UpdatedMousePos.y);
+}
+void CChat::LockMouse()
+{
+	Ui()->ClosePopupMenus();
+	m_MouseUnlocked = false;
+	if(m_LastMousePos == std::nullopt)
+	{
+		vec2 MouseCenter = Ui()->Screen()->Center();
+		MouseCenter = {MouseCenter.x / 2.0f, MouseCenter.y / 2.0f};
+		SetUiMousePos(MouseCenter);
+	}
+	else
+	{
+		SetUiMousePos(m_LastMousePos.value());
+	}
+	m_LastMousePos = Ui()->MousePos();
+}
+
+void CChat::OnReset()
+{
+	m_MouseUnlocked = false;
+	m_LastMousePos = std::nullopt;
+}
+
+CUi::EPopupMenuFunctionResult CChat::CChatPopupContext::Render(void *pContext, CUIRect View, bool Active)
+{
+	CChatPopupContext *pPopupContext = static_cast<CChatPopupContext *>(pContext);
+	CChat *pChat = pPopupContext->m_pChat;
+	CUi *pUi = pPopupContext->m_pChat->Ui();
+
+	CGameClient::CClientData &Client = pChat->GameClient()->m_aClients[pPopupContext->m_ClientId];
+
+	bool IsServer = false;
+	if(pPopupContext->m_ClientId < 0)
+		IsServer = true;
+
+	CUIRect Label, Container;
+	const float ItemSpacing = 1.0f;
+	const float FontSize = 6.0f;
+
+	View.Margin(2.0f, &View);
+
+	char NicknameId[80];
+	str_format(NicknameId, sizeof(NicknameId), "%i: %s", pPopupContext->m_ClientId, IsServer ? "Server" : pPopupContext->m_aName);
+	View.HSplitTop(FontSize, &Label, &View);
+	pUi->DoLabel(&Label, NicknameId, FontSize, TEXTALIGN_TL);
+
+	const float ButtonSize = 17.5f / 2.0f;
+
+	View.HSplitTop(ItemSpacing, nullptr, &View);
+	View.HSplitTop(ButtonSize, &Container, &View);
+	ColorRGBA CopyMsgButtonColor = ColorRGBA(1.0f, 1.0f, 1.0f, 0.5f * pUi->ButtonColorMul(&pPopupContext->m_CopyMessage));
+	if(pUi->DoButton_PopupMenu(&pPopupContext->m_CopyMessage, Localize("Copy msg"), &Container, FontSize, TEXTALIGN_MC, 0.0f, false, true, CopyMsgButtonColor))
+	{
+		pChat->Input()->SetClipboardText(pPopupContext->m_aText);
+	}
+
+	View.HSplitTop(ItemSpacing, nullptr, &View);
+	View.HSplitTop(ButtonSize, &Container, &View);
+	ColorRGBA CopyLineButtonColor = ColorRGBA(1.0f, 1.0f, 1.0f, 0.5f * pUi->ButtonColorMul(&pPopupContext->m_CopyLine));
+	if(pUi->DoButton_PopupMenu(&pPopupContext->m_CopyLine, Localize("Copy line"), &Container, FontSize, TEXTALIGN_MC, 0.0f, false, true, CopyLineButtonColor))
+	{
+		char aBuf[MAX_LINE_LENGTH];
+		str_format(aBuf, sizeof(aBuf), "%s: %s", pPopupContext->m_aName, pPopupContext->m_aText);
+		pChat->Input()->SetClipboardText(aBuf);
+	}
+
+	View.HSplitTop(ItemSpacing, nullptr, &View);
+	View.HSplitTop(ButtonSize, &Container, &View);
+	ColorRGBA CopyFullButtonColor = ColorRGBA(1.0f, 1.0f, 1.0f, 0.5f * pUi->ButtonColorMul(&pPopupContext->m_CopyFull));
+	if(pUi->DoButton_PopupMenu(&pPopupContext->m_CopyFull, Localize("Copy Full"), &Container, FontSize, TEXTALIGN_MC, 0.0f, false, true, CopyFullButtonColor))
+	{
+		char aBuf[MAX_LINE_LENGTH];
+		char m_aTimeStamp[80];
+		str_timestamp_ex(pPopupContext->m_Time, m_aTimeStamp, sizeof(m_aTimeStamp), TimestampFormat::SPACE);
+		if(IsServer)
+			str_format(aBuf, sizeof(aBuf), "%s | %s: %s%s", m_aTimeStamp, pPopupContext->m_From, pPopupContext->m_aName, pPopupContext->m_aText);
+		else
+			str_format(aBuf, sizeof(aBuf), "%s | %s: %s: %s", m_aTimeStamp, pPopupContext->m_From, pPopupContext->m_aName, pPopupContext->m_aText);
+		pChat->Input()->SetClipboardText(aBuf);
+	}
+
+	if(!IsServer)
+	{
+		View.HSplitTop(ItemSpacing, nullptr, &View);
+		View.HSplitTop(ButtonSize, &Container, &View);
+		ColorRGBA ReplyActionButtonColor = ColorRGBA(1.0f, 1.0f, 1.0f, 0.5f * pUi->ButtonColorMul(&pPopupContext->m_ReplyAction));
+		if(pUi->DoButton_PopupMenu(&pPopupContext->m_ReplyAction, Localize("Reply"), &Container, FontSize, TEXTALIGN_MC, 0.0f, false, true, ReplyActionButtonColor))
+		{
+			char aBuf[MAX_LINE_LENGTH];
+			str_format(aBuf, sizeof(aBuf), "chat all \"%s: \"", pPopupContext->m_aName);
+			pChat->Console()->ExecuteLine(aBuf, IConsole::CLIENT_ID_UNSPECIFIED);
+		}
+
+		View.HSplitTop(ItemSpacing, nullptr, &View);
+		View.HSplitTop(ButtonSize, &Container, &View);
+		ColorRGBA CopyNicknameButtonColor = ColorRGBA(1.0f, 1.0f, 1.0f, 0.5f * pUi->ButtonColorMul(&pPopupContext->m_CopyNickname));
+		if(pUi->DoButton_PopupMenu(&pPopupContext->m_CopyNickname, Localize("Copy nick"), &Container, FontSize, TEXTALIGN_MC, 0.0f, false, true, CopyNicknameButtonColor))
+		{
+			pChat->Input()->SetClipboardText(Client.m_aName);
+		}
+
+		View.HSplitTop(ItemSpacing, nullptr, &View);
+		View.HSplitTop(ButtonSize, &Container, &View);
+		ColorRGBA WhisperActionButtonColor = ColorRGBA(1.0f, 1.0f, 1.0f, 0.5f * pUi->ButtonColorMul(&pPopupContext->m_WhisperAction));
+		if(pUi->DoButton_PopupMenu(&pPopupContext->m_WhisperAction, Localize("Whisper"), &Container, FontSize, TEXTALIGN_MC, 0.0f, false, true, WhisperActionButtonColor))
+		{
+			char aWhisperBuf[512];
+			str_format(aWhisperBuf, sizeof(aWhisperBuf), "chat all /whisper %s ", Client.m_aName);
+			pChat->Console()->ExecuteLine(aWhisperBuf, IConsole::CLIENT_ID_UNSPECIFIED);
+		}
+	}
+
+
+
+	return CUi::POPUP_KEEP_OPEN;
+}

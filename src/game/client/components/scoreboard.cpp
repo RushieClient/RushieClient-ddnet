@@ -54,6 +54,7 @@ void CScoreboard::ConKeyScoreboard(IConsole::IResult *pResult, void *pUserData)
 
 	pSelf->GameClient()->m_Spectator.OnRelease();
 	pSelf->GameClient()->m_Emoticon.OnRelease();
+	pSelf->GameClient()->m_Chat.OnRelease();
 
 	pSelf->m_Active = pResult->GetInteger(0) != 0;
 

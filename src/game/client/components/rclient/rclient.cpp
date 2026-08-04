@@ -1313,7 +1313,7 @@ void CRClient::ResetRclientDDstatsFindHours()
 	}
 }
 
-// Scoreboard
+// Scoreboard/Chat height
 float CRClient::GetScoreboardHeight(bool IsDefaultRender ,bool IsBigger, int ClientId)
 {
 	// Default: m_ScoreboardPopupContext.m_IsLocal ? 30.0f : 60.0f
@@ -1357,6 +1357,26 @@ float CRClient::GetScoreboardHeight(bool IsDefaultRender ,bool IsBigger, int Cli
 		ScoreboardHeight += ItemSpacing * 4.0f;
 
 	return ScoreboardHeight;
+}
+
+float CRClient::GetChatHeight(int ClientId)
+{
+	constexpr float PopupMargin = 2.0f;
+	constexpr float FontSize = 6.0f;
+	constexpr float ItemSpacing = 1.0f;
+	constexpr float ButtonSize = 17.5f / 2.0f;
+
+	const bool IsServer = ClientId < 0;
+	const int ButtonsCount = IsServer ? 3 : 6;
+	float ResultSize = 0.0f;
+	ResultSize += PopupMargin * 2;
+	ResultSize += FontSize;
+	for(int i = 0; i < ButtonsCount; i++)
+	{
+		ResultSize += ItemSpacing + ButtonSize;
+	}
+
+	return ResultSize;
 }
 
 int CRClient::GetCheckpointId()

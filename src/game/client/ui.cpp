@@ -1734,10 +1734,14 @@ void CUi::RenderPopupMenus()
 		}
 
 		CUIRect PopupRect = PopupMenu.m_Rect;
-		PopupRect.Draw(PopupMenu.m_Props.m_BorderColor, PopupMenu.m_Props.m_Corners, 3.0f);
-		PopupRect.Margin(SPopupMenu::POPUP_BORDER, &PopupRect);
+		if(PopupMenu.m_Props.m_NeedBorder)
+		{
+			PopupRect.Draw(PopupMenu.m_Props.m_BorderColor, PopupMenu.m_Props.m_Corners, 3.0f);
+			PopupRect.Margin(SPopupMenu::POPUP_BORDER, &PopupRect);
+		}
 		PopupRect.Draw(PopupMenu.m_Props.m_BackgroundColor, PopupMenu.m_Props.m_Corners, 3.0f);
-		PopupRect.Margin(SPopupMenu::POPUP_MARGIN, &PopupRect);
+		if(PopupMenu.m_Props.m_NeedMainMargin)
+			PopupRect.Margin(SPopupMenu::POPUP_MARGIN, &PopupRect);
 
 		// The popup render function can open/close popups, which may resize the vector and thus
 		// invalidate the variable PopupMenu. We therefore store pId in a separate variable.

@@ -3,6 +3,8 @@
 #ifndef GAME_CLIENT_COMPONENTS_CHAT_H
 #define GAME_CLIENT_COMPONENTS_CHAT_H
 
+#include "game/client/ui.h"
+
 #include <base/str.h>
 
 #include <engine/console.h>
@@ -71,6 +73,9 @@ class CChat : public CComponent
 		int m_TimesRepeated;
 
 		std::shared_ptr<CTranslateResponse> m_pTranslateResponse;
+
+		CButtonContainer m_ButtonId;
+		float m_LineWidth;
 	};
 
 	bool m_PrevScoreBoardShowed;
@@ -170,6 +175,33 @@ class CChat : public CComponent
 	bool LineShouldHighlight(const char *pLine, const char *pName);
 	void StoreSave(const char *pText);
 
+	//RClient
+	std::optional<vec2> m_LastMousePos;
+	bool m_MouseUnlocked = false;
+	void SetUiMousePos(vec2 Pos);
+	void LockMouse();
+
+	class CChatPopupContext : public SPopupMenuId
+	{
+	public:
+		CChat *m_pChat = nullptr;
+		CButtonContainer m_CopyMessage;
+		CButtonContainer m_CopyLine;
+		CButtonContainer m_CopyFull;
+		CButtonContainer m_ReplyAction;
+		CButtonContainer m_CopyNickname;
+		CButtonContainer m_WhisperAction;
+
+		int m_ClientId;
+		const void *m_ButtonId = nullptr;
+		char m_aName[64];
+		char m_aText[MAX_LINE_LENGTH];
+		int64_t m_Time;
+		const char *m_From;
+
+		static CUi::EPopupMenuFunctionResult Render(void *pContext, CUIRect View, bool Active);
+	} m_ChatPopupContext;
+
 	friend class CBindChat;
 	friend class CTranslate;
 	friend class CTClient;
@@ -197,8 +229,10 @@ public:
 	void Reset();
 	void OnRelease() override;
 	void OnMessage(int MsgType, void *pRawMsg) override;
+	bool OnCursorMove(float x, float y, IInput::ECursorType CursorType) override;
 	bool OnInput(const IInput::CEvent &Event) override;
 	void OnInit() override;
+	void OnReset() override;
 
 	void RebuildChat();
 	void ClearLines();
@@ -229,7 +263,8 @@ public:
 	// It uses team or public chat depending on m_Mode.
 	void SendChatQueued(const char *pLine);
 
-	//Rclient chatbubbles
+	//Rclient
 	bool LineHighlighted(int ClientId, const char *pLine);
+	bool HasMouseCursor() const { return IsActive() && m_MouseUnlocked; }
 };
 #endif

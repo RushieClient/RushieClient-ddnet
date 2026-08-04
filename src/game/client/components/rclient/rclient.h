@@ -140,8 +140,9 @@ public:
 	void FinishRclientDDstatsFindHours();
 	void ResetRclientDDstatsFindHours();
 
-	// Scoreboard
+	// Scoreboard/Chat height
 	float GetScoreboardHeight(bool IsDefaultRender ,bool IsBigger, int ClientId = -1);
+	float GetChatHeight(int ClientId);
 
 	// Hud
 	int GetCheckpointId();
