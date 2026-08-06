@@ -75,7 +75,12 @@ MACRO_CONFIG_INT(RcNamePlatesFireSize, rc_nameplates_fire_size, 30, -50, 100, CF
 MACRO_CONFIG_INT(RcNamePlatesFireShiftOnInvis, rc_nameplates_fire_shift_on_invis, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Fire when not visible will still take up space")
 MACRO_CONFIG_INT(RcNamePlatesFirePreInput, rc_nameplates_fire_preinput, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Use preinput to see fire")
 MACRO_CONFIG_INT(RcNamePlatesWeapons, rc_nameplates_weapons, 0, 0, 3, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show weapons in nameplates (1 = other players', 2 = everyone, 3 = dummy")
+MACRO_CONFIG_INT(RcNamePlatesWeaponsSize, rc_nameplates_weapons_size, 30, -50, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Size of weapons icons")
 MACRO_CONFIG_INT(RcNamePlatesWeaponsOwn, rc_nameplates_weapons_own, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show own weapons in nameplates")
+MACRO_CONFIG_INT(RcNamePlatesWeaponsShotgun, rc_nameplates_weapons_shotgun, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show shotgun in nameplates")
+MACRO_CONFIG_INT(RcNamePlatesWeaponsGrenade, rc_nameplates_weapons_grenade, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show grenade in nameplates")
+MACRO_CONFIG_INT(RcNamePlatesWeaponsNinja, rc_nameplates_weapons_ninja, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show ninja in nameplates")
+MACRO_CONFIG_INT(RcNamePlatesWeaponsLaser, rc_nameplates_weapons_laser, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show laser in nameplates")
 
 // Commands
 MACRO_CONFIG_INT(RcCommandsFixLayout, rc_commands_fix_layout, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "checkpoint and hud will be oneline")

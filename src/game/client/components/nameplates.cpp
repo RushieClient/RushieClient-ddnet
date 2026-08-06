@@ -61,6 +61,12 @@ public:
 	float m_FontSizeFireDetection;
 	int m_ShowCustomClient;
 	float m_FontSizeCustomClient;
+	bool m_RcShowWeapons;
+	bool m_RcHasShotgun;
+	bool m_RcHasGrenade;
+	bool m_RcHasNinja;
+	bool m_RcHasLaser;
+	float m_RcFontSizeWeapons;
 };
 
 // Part Types
@@ -786,6 +792,67 @@ public:
 	}
 };
 
+class CNamePlatePartWeapons : public CNamePlatePartSprite
+{
+private:
+	int m_Weapon;
+
+public:
+	CNamePlatePartWeapons(CGameClient &This, int Weapon) :
+		CNamePlatePartSprite(This)
+	{
+		m_Texture = g_pData->m_aImages[IMAGE_RCWEAPONS].m_Id;
+		m_Weapon = Weapon;
+		switch(m_Weapon)
+		{
+		case WEAPON_SHOTGUN:
+			m_Sprite = SPRITE_RC_WEAPONS_SHOTGUN;
+			break;
+		case WEAPON_GRENADE:
+			m_Sprite = SPRITE_RC_WEAPONS_GRENADE;
+			break;
+		case WEAPON_NINJA:
+			m_Sprite = SPRITE_RC_WEAPONS_NINJA;
+			break;
+		case WEAPON_LASER:
+			m_Sprite = SPRITE_RC_WEAPONS_LASER;
+			break;
+		}
+	}
+	void Update(CGameClient &This, const CNamePlateData &Data) override
+	{
+		if(!Data.m_RcShowWeapons)
+		{
+			m_ShiftOnInvis = false;
+			m_Visible = false;
+			return;
+		}
+		m_ShiftOnInvis = true; // Only shift (horizontally) the other parts if directions as a whole is visible
+		m_Size = vec2(Data.m_RcFontSizeWeapons, Data.m_RcFontSizeWeapons);
+		m_Padding.y = m_Size.y / 2.0f;
+		switch(m_Weapon)
+		{
+		case WEAPON_SHOTGUN:
+			m_Visible = Data.m_RcHasShotgun;
+			m_ShiftOnInvis = g_Config.m_RcNamePlatesWeaponsShotgun;
+			break;
+		case WEAPON_GRENADE:
+			m_Visible = Data.m_RcHasGrenade;
+			m_ShiftOnInvis = g_Config.m_RcNamePlatesWeaponsGrenade;
+			break;
+		case WEAPON_NINJA:
+			m_Visible = Data.m_RcHasNinja;
+			m_ShiftOnInvis = g_Config.m_RcNamePlatesWeaponsNinja;
+			break;
+		case WEAPON_LASER:
+			m_Visible = Data.m_RcHasLaser;
+			m_ShiftOnInvis = g_Config.m_RcNamePlatesWeaponsLaser;
+			break;
+		}
+		m_Color.a = Data.m_Color.a;
+	}
+};
+
 // ***** Name Plates *****
 
 class CNamePlate
@@ -854,6 +921,12 @@ private:
 		AddPart<CNamePlatePartDirection>(This, DIRECTION_LEFT);
 		AddPart<CNamePlatePartDirection>(This, DIRECTION_UP);
 		AddPart<CNamePlatePartDirection>(This, DIRECTION_RIGHT);
+		AddPart<CNamePlatePartNewLine>(This);
+
+		AddPart<CNamePlatePartWeapons>(This, WEAPON_SHOTGUN);
+		AddPart<CNamePlatePartWeapons>(This, WEAPON_GRENADE);
+		AddPart<CNamePlatePartWeapons>(This, WEAPON_NINJA);
+		AddPart<CNamePlatePartWeapons>(This, WEAPON_LASER);
 	}
 
 public:
@@ -1114,12 +1187,12 @@ void CNamePlates::RenderNamePlateGame(vec2 Position, const CNetObj_PlayerInfo *p
 		if(Client()->State() != IClient::STATE_DEMOPLAYBACK &&
 			pPlayerInfo->m_ClientId == GameClient()->m_aLocalIds[!g_Config.m_ClDummy])
 		{
-			const auto &InputData = GameClient()->m_Controls.m_aInputData[!g_Config.m_ClDummy];
+			const CNetObj_PlayerInput &InputData = GameClient()->m_Controls.m_aInputData[!g_Config.m_ClDummy];
 			Data.m_ShowHookDetection = InputData.m_Hook || (g_Config.m_ClDummyHook && g_Config.m_ClDummyControl);
 		}
 		else if(Client()->State() != IClient::STATE_DEMOPLAYBACK && pPlayerInfo->m_Local) // Always render local input when not in demo playback
 		{
-			const auto &InputData = GameClient()->m_Controls.m_aInputData[g_Config.m_ClDummy];
+			const CNetObj_PlayerInput &InputData = GameClient()->m_Controls.m_aInputData[g_Config.m_ClDummy];
 			Data.m_ShowHookDetection = InputData.m_Hook;
 		}
 		else
@@ -1157,12 +1230,12 @@ void CNamePlates::RenderNamePlateGame(vec2 Position, const CNetObj_PlayerInfo *p
 		if(Client()->State() != IClient::STATE_DEMOPLAYBACK &&
 			pPlayerInfo->m_ClientId == GameClient()->m_aLocalIds[!g_Config.m_ClDummy])
 		{
-			const auto &InputData = GameClient()->m_Controls.m_aInputData[!g_Config.m_ClDummy];
+			const CNetObj_PlayerInput &InputData = GameClient()->m_Controls.m_aInputData[!g_Config.m_ClDummy];
 			Data.m_ShowFireDetection = InputData.m_Fire & 1 || g_Config.m_ClDummyHammer || (g_Config.m_ClDummyFire && g_Config.m_ClDummyControl);
 		}
 		else if(Client()->State() != IClient::STATE_DEMOPLAYBACK && pPlayerInfo->m_Local) // Always render local input when not in demo playback
 		{
-			const auto &InputData = GameClient()->m_Controls.m_aInputData[g_Config.m_ClDummy];
+			const CNetObj_PlayerInput &InputData = GameClient()->m_Controls.m_aInputData[g_Config.m_ClDummy];
 			Data.m_ShowFireDetection = InputData.m_Fire & 1;
 		}
 		else
@@ -1206,6 +1279,37 @@ void CNamePlates::RenderNamePlateGame(vec2 Position, const CNetObj_PlayerInfo *p
 	if(Data.m_ShowCustomClient)
 		Data.m_ShowCustomClient = ClientData.m_CustomClient;
 
+	Data.m_RcFontSizeWeapons = 18.0f + 20.0f * g_Config.m_RcNamePlatesWeaponsSize / 100.0f;
+	Data.m_RcHasShotgun = Data.m_RcHasGrenade = Data.m_RcHasNinja = Data.m_RcHasLaser = false;
+	int ShowWeaponsConfig = g_Config.m_RcNamePlatesWeapons;
+	switch(ShowWeaponsConfig)
+	{
+	case 0: // Off
+		Data.m_RcShowWeapons = false;
+		break;
+	case 1: // Others
+		Data.m_RcShowWeapons = !pPlayerInfo->m_Local;
+		break;
+	case 2: // Everyone
+		Data.m_RcShowWeapons = true;
+		break;
+	case 3: // Only dummy
+		Data.m_RcShowWeapons = pPlayerInfo->m_ClientId == GameClient()->m_aLocalIds[!g_Config.m_ClDummy];
+		break;
+	default:
+		dbg_assert_failed("ShowWeaponConfig invalid");
+	}
+	if(ShowWeaponsConfig && g_Config.m_RcNamePlatesWeaponsOwn && pPlayerInfo->m_Local)
+		Data.m_RcShowWeapons = true;
+	if(Data.m_RcShowWeapons)
+	{
+		const CCharacterCore &Predicted = GameClient()->m_aClients[pPlayerInfo->m_ClientId].m_RegularPredicted;
+		Data.m_RcHasShotgun = Predicted.m_aWeapons[WEAPON_SHOTGUN].m_Got && g_Config.m_RcNamePlatesWeaponsShotgun;
+		Data.m_RcHasGrenade = Predicted.m_aWeapons[WEAPON_GRENADE].m_Got && g_Config.m_RcNamePlatesWeaponsGrenade;
+		Data.m_RcHasNinja = Predicted.m_aWeapons[WEAPON_NINJA].m_Got && g_Config.m_RcNamePlatesWeaponsNinja;
+		Data.m_RcHasLaser = Predicted.m_aWeapons[WEAPON_LASER].m_Got && g_Config.m_RcNamePlatesWeaponsLaser;
+	}
+
 	// TClient
 	if(g_Config.m_TcWarList && g_Config.m_TcWarListShowClan && GameClient()->m_WarList.GetWarData(pPlayerInfo->m_ClientId).m_WarClan)
 		Data.m_ShowClan = true;
@@ -1227,6 +1331,7 @@ void CNamePlates::RenderNamePlatePreview(vec2 Position, int Dummy)
 
 	const float FontSizeHookDetection = 18.0f + 20.0f * g_Config.m_RcNamePlatesHookSize / 100.0f;
 	const float FontSizeFireDetection = 18.0f + 20.0f * g_Config.m_RcNamePlatesFireSize / 100.0f;
+	const float RcFontSizeWeapons = 18.0f + 20.0f * g_Config.m_RcNamePlatesWeaponsSize / 100.0f;
 
 	CNamePlateData Data;
 
@@ -1276,6 +1381,7 @@ void CNamePlates::RenderNamePlatePreview(vec2 Position, int Dummy)
 	// RClient
 	Data.m_FontSizeHookDetection = FontSizeHookDetection;
 	Data.m_FontSizeFireDetection = FontSizeFireDetection;
+	Data.m_RcFontSizeWeapons = RcFontSizeWeapons;
 	Data.m_FontSizeCustomClient = FontSizeHookDetection;
 	Data.m_ShowCustomClient = (g_Config.m_RcCustomClientsInNameplates && g_Config.m_RcCustomClientsCollectClientType) ? CUSTOM_CLIENT_ID_RUSHIECLIENT : 0;
 
