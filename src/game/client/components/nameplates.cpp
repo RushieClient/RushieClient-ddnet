@@ -1379,9 +1379,12 @@ void CNamePlates::RenderNamePlatePreview(vec2 Position, int Dummy)
 	}
 
 	// RClient
+	Data.m_ShowFireDetection = g_Config.m_RcNamePlatesFire != 0;
+	Data.m_ShowHookDetection = g_Config.m_RcNamePlatesHook != 0;
 	Data.m_FontSizeHookDetection = FontSizeHookDetection;
 	Data.m_FontSizeFireDetection = FontSizeFireDetection;
 	Data.m_RcFontSizeWeapons = RcFontSizeWeapons;
+	Data.m_RcShowWeapons = g_Config.m_RcNamePlatesWeapons != 0;
 	Data.m_FontSizeCustomClient = FontSizeHookDetection;
 	Data.m_ShowCustomClient = (g_Config.m_RcCustomClientsInNameplates && g_Config.m_RcCustomClientsCollectClientType) ? CUSTOM_CLIENT_ID_RUSHIECLIENT : 0;
 

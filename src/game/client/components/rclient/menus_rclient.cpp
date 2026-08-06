@@ -490,13 +490,13 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcNamePlatesFireShiftOnInvis, RCLocalize("Fire shift on invis"), &g_Config.m_RcNamePlatesFireShiftOnInvis, &Column, LineSize);
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcNamePlatesFirePreInput, RCLocalize("Use preinput for fire"), &g_Config.m_RcNamePlatesFirePreInput, &Column, LineSize);
 	static std::vector<CButtonContainer> s_vButtonContainersWeaponsShow = {{}, {}, {}, {}};
-	DoLine_RadioMenu(Column, TCLocalize("Fire Detection"),
-		   s_vButtonContainersFireDetection,
+	DoLine_RadioMenu(Column, TCLocalize("Weapons in nameplates"),
+		   s_vButtonContainersWeaponsShow,
 		   {Localize("Off"), Localize("Others"), Localize("All"), "Dummy"},
 		   {0, 1, 2, 3},
 		   g_Config.m_RcNamePlatesWeapons);
 	Column.HSplitTop(LineSize, &Button, &Column);
-	Ui()->DoScrollbarOption(&g_Config.m_RcNamePlatesWeaponsSize, &g_Config.m_RcNamePlatesWeaponsSize, &Button, RCLocalize("Fire size"), -50, 100, &CUi::ms_LinearScrollbarScale, 0);
+	Ui()->DoScrollbarOption(&g_Config.m_RcNamePlatesWeaponsSize, &g_Config.m_RcNamePlatesWeaponsSize, &Button, RCLocalize("Weapons size"), -50, 100, &CUi::ms_LinearScrollbarScale, 0);
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcNamePlatesWeaponsOwn, RCLocalize("Show own weapons"), &g_Config.m_RcNamePlatesWeaponsOwn, &Column, LineSize);
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcNamePlatesWeaponsShotgun, RCLocalize("Show shotgun"), &g_Config.m_RcNamePlatesWeaponsShotgun, &Column, LineSize);
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcNamePlatesWeaponsGrenade, RCLocalize("Show grenade"), &g_Config.m_RcNamePlatesWeaponsGrenade, &Column, LineSize);
