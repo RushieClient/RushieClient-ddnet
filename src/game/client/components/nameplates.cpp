@@ -1167,8 +1167,19 @@ void CNamePlates::RenderNamePlateGame(vec2 Position, const CNetObj_PlayerInfo *p
 		}
 		else
 		{
-			const auto &Character = GameClient()->m_Snap.m_aCharacters[pPlayerInfo->m_ClientId];
-			Data.m_ShowFireDetection = (Client()->GameTick(g_Config.m_ClDummy) - Character.m_Cur.m_AttackTick) < (Client()->GameTickSpeed() / 5);
+			if(g_Config.m_RcNamePlatesFirePreInput && Client()->State() != IClient::STATE_DEMOPLAYBACK)
+			{
+				const CNetMsg_Sv_PreInput &PreInput = GameClient()->m_aClients[pPlayerInfo->m_ClientId].m_aLatestPreInputs;
+				if(PreInput.m_IntendedTick != -1)
+					Data.m_ShowFireDetection = PreInput.m_Fire & 1;
+				else
+					Data.m_ShowFireDetection = false;
+			}
+			else
+			{
+				const CNetObj_Character &Character = GameClient()->m_Snap.m_aCharacters[pPlayerInfo->m_ClientId].m_Cur;
+				Data.m_ShowFireDetection = (Client()->GameTick(g_Config.m_ClDummy) - Character.m_AttackTick) < (Client()->GameTickSpeed() * 0.2f);
+			}
 		}
 	}
 

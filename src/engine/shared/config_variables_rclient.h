@@ -73,6 +73,9 @@ MACRO_CONFIG_INT(RcNamePlatesHookShiftOnInvis, rc_nameplates_hook_shift_on_invis
 MACRO_CONFIG_INT(RcNamePlatesFire, rc_nameplates_fire, 0, 0, 4, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show fire detection in name plates (1 = other players'(fake), 2 = everyone(fake), 3 = only your own, 4 = your and dummy")
 MACRO_CONFIG_INT(RcNamePlatesFireSize, rc_nameplates_fire_size, 30, -50, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Size of fire detection icons")
 MACRO_CONFIG_INT(RcNamePlatesFireShiftOnInvis, rc_nameplates_fire_shift_on_invis, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Fire when not visible will still take up space")
+MACRO_CONFIG_INT(RcNamePlatesFirePreInput, rc_nameplates_fire_preinput, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Use preinput to see fire")
+MACRO_CONFIG_INT(RcNamePlatesWeapons, rc_nameplates_weapons, 0, 0, 3, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show weapons in nameplates (1 = other players', 2 = everyone, 3 = dummy")
+MACRO_CONFIG_INT(RcNamePlatesWeaponsOwn, rc_nameplates_weapons_own, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show own weapons in nameplates")
 
 // Commands
 MACRO_CONFIG_INT(RcCommandsFixLayout, rc_commands_fix_layout, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "checkpoint and hud will be oneline")

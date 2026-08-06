@@ -613,6 +613,7 @@ public:
 
 		// RClient
 		int m_CustomClient = 0;
+		CNetMsg_Sv_PreInput m_aLatestPreInputs;
 	};
 
 	CClientData m_aClients[MAX_CLIENTS];

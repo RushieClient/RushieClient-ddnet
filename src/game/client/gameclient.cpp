@@ -1263,6 +1263,7 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker, int Conn, bool Dumm
 	{
 		CNetMsg_Sv_PreInput *pMsg = (CNetMsg_Sv_PreInput *)pRawMsg;
 		m_aClients[pMsg->m_Owner].m_aPreInputs[pMsg->m_IntendedTick % 200] = *pMsg;
+		m_aClients[pMsg->m_Owner].m_aLatestPreInputs = *pMsg;
 	}
 	else if(MsgId == NETMSGTYPE_SV_SAVECODE)
 	{
@@ -2183,6 +2184,12 @@ void CGameClient::OnNewSnapshot()
 		{
 			m_aClients[i].Reset();
 			m_aStats[i].Reset();
+		}
+
+		//RClient
+		if(!m_Snap.m_aCharacters[i].m_Active)
+		{
+			m_aClients[i].m_aLatestPreInputs.m_IntendedTick = -1;
 		}
 	}
 
@@ -3443,6 +3450,8 @@ void CGameClient::CClientData::Reset()
 	{
 		PreInput.m_IntendedTick = -1;
 	}
+	// RClient
+	m_aLatestPreInputs.m_IntendedTick = -1;
 
 	m_RenderCur.m_Tick = -1;
 	m_RenderPrev.m_Tick = -1;

@@ -482,12 +482,13 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	static std::vector<CButtonContainer> s_vButtonContainersFireDetection = {{}, {}, {}, {}, {}};
 	DoLine_RadioMenu(Column, TCLocalize("Fire Detection"),
 		   s_vButtonContainersFireDetection,
-		   {Localize("Off"), Localize("Others"), Localize("All"), Localize("Own"), "Dummy"},
+		   {Localize("Off"), Localize("Others(fake)"), Localize("All(fake)"), Localize("Own"), "Dummy"},
 		   {0, 1, 2, 3, 4},
 		   g_Config.m_RcNamePlatesFire);
 	Column.HSplitTop(LineSize, &Button, &Column);
 	Ui()->DoScrollbarOption(&g_Config.m_RcNamePlatesFireSize, &g_Config.m_RcNamePlatesFireSize, &Button, RCLocalize("Fire size"), -50, 100, &CUi::ms_LinearScrollbarScale, 0);
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcNamePlatesFireShiftOnInvis, RCLocalize("Fire shift on invis"), &g_Config.m_RcNamePlatesFireShiftOnInvis, &Column, LineSize);
+	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcNamePlatesFirePreInput, RCLocalize("Use preinput for fire"), &g_Config.m_RcNamePlatesFirePreInput, &Column, LineSize);
 
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
 	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;
