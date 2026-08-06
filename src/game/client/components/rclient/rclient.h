@@ -71,6 +71,10 @@ class CRClient : public CComponent
 	static void ConPlayerFindHours(IConsole::IResult *pResult, void *pUserData);
 	bool FindHoursWriteInChat = false;
 
+	// Find time
+	static void ConPlayerFindTime(IConsole::IResult *pResult, void *pUserData);
+	char MapNameH[256];
+
 	// Streamer mod
 	bool ScreenSharePrivacyOld = false;
 public:
@@ -140,6 +144,12 @@ public:
 	void FinishRclientDDstatsFindHours();
 	void ResetRclientDDstatsFindHours();
 
+	// Find Time
+	std::shared_ptr<CHttpRequest> m_pRClientDDstatsTaskFindTime = nullptr;
+	void FetchRclientDDstatsFindTime(const char *PlayerNickname, const char *MapName);
+	void FinishRclientDDstatsFindTime();
+	void ResetRclientDDstatsFindTime();
+
 	// Scoreboard/Chat height
 	float GetScoreboardHeight(bool IsDefaultRender ,bool IsBigger, int ClientId = -1);
 	float GetChatHeight(int ClientId);
@@ -156,6 +166,10 @@ public:
 		std::string m_FixedMessage;
 	};
 	std::vector<SFixLayoutListCache> m_FixLayoutListCache;
+
+	// Reset RClient ChatBinds
+	void ResetRClientChatBinds();
+	bool RemoveChatBindCommand(const char *pCommand);
 };
 
 #endif //GAME_CLIENT_COMPONENTS_RCLIENT_RCLIENT_H

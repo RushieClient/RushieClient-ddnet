@@ -657,6 +657,15 @@ void CMenus::RenderSettingsRClientChatBinds(CUIRect MainView)
 		Size += vBindDefaults.size() * (MarginSmall + LineSize) + HeadlineHeight + HeadlineFontSize + MarginSmall * 2.0f;
 	}
 
+	MainView.y = maximum(LeftView.y, RightView.y);
+	CUIRect ResetBindsChat;
+	MainView.HSplitTop(FontSize * 1.25f, &ResetBindsChat, &MainView);
+	static CButtonContainer s_ResetBindsChat;
+	if(GameClient()->m_Menus.DoButton_Menu(&s_ResetBindsChat, Localize("Reset RClient chatbinds"), 0, &ResetBindsChat, BUTTONFLAG_LEFT, 0, IGraphics::CORNER_ALL, 5.0f, 0.0f, ColorRGBA(1.0f, 0.0f, 0.0f, 0.75f)))
+	{
+		GameClient()->m_RClient.ResetRClientChatBinds();
+	}
+
 	// Scroll
 	CUIRect ScrollRegion;
 	ScrollRegion.x = MainView.x;

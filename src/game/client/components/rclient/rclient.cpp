@@ -64,6 +64,12 @@ void CRClient::OnRender()
 		ResetRclientDDstatsFindHours();
 	}
 
+	if(m_pRClientDDstatsTaskFindTime && m_pRClientDDstatsTaskFindTime->State() == EHttpState::DONE)
+	{
+		FinishRclientDDstatsFindTime();
+		ResetRclientDDstatsFindTime();
+	}
+
 	if(g_Config.m_RcRconSteamerMode)
 	{
 		if(GameClient()->m_GameConsole.IsActive() && GameClient()->m_GameConsole.GetConsoleType() == CGameConsole::CONSOLETYPE_REMOTE)
@@ -106,6 +112,7 @@ void CRClient::OnConsoleInit()
 	Console()->Register("rc_message_filter_remove_word", "s[word]", CFGFLAG_CLIENT, ConRemoveCensorWord, this, "Remove word from censor list");
 	Console()->Register("rc_message_filter_print_words", "", CFGFLAG_CLIENT, ConPrintCensorList, this, "Print censor list");
 	Console()->Register("rc_find_hours", "s[player]", CFGFLAG_CLIENT, ConPlayerFindHours, this, "Find hours");
+	Console()->Register("rc_find_time", "s[player] s[map] ?s[map1] ?s[map2] ?s[map3] ?s[map4] ?s[map5]", CFGFLAG_CLIENT, ConPlayerFindTime, this, "Find hours");
 	Console()->Chain("rc_message_filter_mode", ConchainResetCensorListCache, this);
 	Console()->Chain("rc_message_filter_multiply_change_word_on_full_match", ConchainResetCensorListCache, this);
 	Console()->Chain("rc_message_filter_word_on_full_match", ConchainResetCensorListCache, this);
@@ -1313,6 +1320,102 @@ void CRClient::ResetRclientDDstatsFindHours()
 	}
 }
 
+// FindHours
+void CRClient::ConPlayerFindTime(IConsole::IResult *pResult, void *pUserData)
+{
+	CRClient *pSelf = static_cast<CRClient *>(pUserData);
+	int Args = pResult->NumArguments();
+	char aBuf[256];
+	for(int i = 0; i < Args - 1; i++)
+	{
+		if(!i)
+			str_copy(aBuf, pResult->GetString(1));
+		else
+			str_format(aBuf, sizeof(aBuf), "%s %s", aBuf, pResult->GetString(i + 1));
+	}
+	pSelf->FetchRclientDDstatsFindTime(TrimRight(pResult->GetString(0)).c_str(), aBuf);
+}
+
+void CRClient::FetchRclientDDstatsFindTime(const char *PlayerNickname, const char *MapName)
+{
+	if(m_pRClientDDstatsTaskFindTime && !m_pRClientDDstatsTaskFindTime->Done())
+		return;
+	char aUrl[256];
+	char Nickname[256];
+	EscapeUrl(Nickname, sizeof(Nickname), PlayerNickname);
+	str_copy(MapNameH, MapName);
+	str_format(aUrl, sizeof(aUrl), "https://ddstats.tw/player/json?player=%s", Nickname);
+	m_pRClientDDstatsTaskFindTime = HttpGet(aUrl);
+	m_pRClientDDstatsTaskFindTime->Timeout(CTimeout{10000, 0, 500, 10});
+	m_pRClientDDstatsTaskFindTime->IpResolve(IPRESOLVE::V4);
+	Http()->Run(m_pRClientDDstatsTaskFindTime);
+}
+
+void CRClient::FinishRclientDDstatsFindTime()
+{
+	json_value *pJson = m_pRClientDDstatsTaskFindTime->ResultJson();
+	if(!pJson)
+		return;
+	const json_value Json = *pJson;
+	const json_value *Finishes = json_object_get(&Json, "finishes");
+	const json_value *PlayerNickname = json_object_get(json_object_get(&Json, "profile"), "name");
+	if(Finishes->type == json_array && PlayerNickname->type == json_string)
+	{
+		bool FoundFinish = false;
+		for(size_t i = 0; i < json_array_length(Finishes); i++)
+		{
+			const json_value *Finish = json_array_get(Finishes, i);
+			const json_value *MapInfo = json_object_get(Finish, "map");
+			if(MapInfo->type == json_object && json_object_get(MapInfo, "map")->type == json_string)
+			{
+				const char *MapNameStr = json_object_get(MapInfo, "map")->u.string.ptr;
+				if(str_find_nocase(MapNameStr, MapNameH))
+				{
+					const json_value *Time = json_object_get(Finish, "time");
+					const json_value *Rank = json_object_get(Finish, "rank");
+					if(Time->type == json_double && Rank->type == json_integer)
+					{
+						int TimeInCentiSeconds = Time->u.dbl * 100;
+						int Hours = TimeInCentiSeconds / 360000;
+						int Minutes = TimeInCentiSeconds % 360000 / 6000;
+						int Seconds = TimeInCentiSeconds % 6000 / 100;
+						int Centi = TimeInCentiSeconds % 100;
+						int Rankint = Rank->u.integer;
+						char aBuf[128];
+						str_format(aBuf, sizeof(aBuf), "%s finished %s for %02i:%02i:%02i.%02i. Global rank: %i", PlayerNickname->u.string.ptr, MapNameStr, Hours, Minutes, Seconds, Centi, Rankint);
+						GameClient()->Echo(aBuf);
+						Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "FindTime", aBuf);
+						FoundFinish = true;
+						break;
+					}
+				}
+			}
+		}
+		if(!FoundFinish)
+		{
+			char aBuf[128];
+			str_format(aBuf, sizeof(aBuf), "Map %s not found for %s", MapNameH, PlayerNickname->u.string.ptr);
+			GameClient()->Echo(aBuf);
+			Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "FindTime", aBuf);
+		}
+	}
+	else
+	{
+		GameClient()->Echo("Player or finishes not found");
+		Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "FindTime", "Player or finishes not found");
+	}
+	json_value_free(pJson);
+}
+
+void CRClient::ResetRclientDDstatsFindTime()
+{
+	if(m_pRClientDDstatsTaskFindTime)
+	{
+		m_pRClientDDstatsTaskFindTime->Abort();
+		m_pRClientDDstatsTaskFindTime = NULL;
+	}
+}
+
 // Scoreboard/Chat height
 float CRClient::GetScoreboardHeight(bool IsDefaultRender ,bool IsBigger, int ClientId)
 {
@@ -1453,4 +1556,28 @@ const char *CRClient::FixLayoutLine(const char *Line)
 			m_FixLayoutListCache.erase(m_FixLayoutListCache.cbegin());
 	}
 	return m_LineLayoutFix;
+}
+
+void CRClient::ResetRClientChatBinds()
+{
+	for(const auto &[_, vBindDefaults] : CBindChat::BIND_DEFAULTS_RCLIENT)
+		for(const CBindChat::CBindDefault &BindDefault : vBindDefaults)
+		{
+			GameClient()->m_BindChat.RemoveBind(BindDefault.m_Bind.m_aName);
+			RemoveChatBindCommand(BindDefault.m_Bind.m_aCommand);
+			GameClient()->m_BindChat.AddBind(BindDefault.m_Bind);
+		}
+}
+
+bool CRClient::RemoveChatBindCommand(const char *pCommand)
+{
+	for(auto It = GameClient()->m_BindChat.m_vBinds.begin(); It != GameClient()->m_BindChat.m_vBinds.end(); ++It)
+	{
+		if(str_comp(It->m_aCommand, pCommand) == 0)
+		{
+			GameClient()->m_BindChat.m_vBinds.erase(It);
+			return true;
+		}
+	}
+	return false;
 }

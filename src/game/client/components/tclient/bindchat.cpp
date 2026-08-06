@@ -56,6 +56,7 @@ decltype(CBindChat::BIND_DEFAULTS) CBindChat::BIND_DEFAULTS = {
 
 decltype(CBindChat::BIND_DEFAULTS_RCLIENT) CBindChat::BIND_DEFAULTS_RCLIENT = {
 	{TCLocalizable("Player Inspector"), {
+		{TCLocalizable("Find time:"), {"!findtime", "rc_find_time"}},
 		{TCLocalizable("Find hours:"), {"!findhours", "rc_find_hours"}},
 		{TCLocalizable("Find Player:"), {"!findplayer", "rc_find_player"}},
 		{TCLocalizable("Find Skin:"), {"!findskin", "rc_find_skin"}},
