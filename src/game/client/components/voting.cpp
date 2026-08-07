@@ -413,6 +413,7 @@ void CVoting::RenderBars(CUIRect Bars) const
 	CUIRect Splitter;
 	Bars.VMargin((Bars.w - 2.0f) / 2.0f, &Splitter);
 	Splitter.Draw(ColorRGBA(0.4f, 0.4f, 0.4f, 0.5f), IGraphics::CORNER_NONE, 0.0f);
+	char PercentChar[32];
 
 	if(m_Total)
 	{
@@ -421,6 +422,11 @@ void CVoting::RenderBars(CUIRect Bars) const
 			CUIRect YesArea;
 			Bars.VSplitLeft(Bars.w * m_Yes / m_Total, &YesArea, nullptr);
 			YesArea.Draw(ColorRGBA(0.2f, 0.9f, 0.2f, 0.85f), IGraphics::CORNER_ALL, YesArea.h / 2.0f);
+			if(g_Config.m_RcShowhudVotingPercent)
+			{
+				str_format(PercentChar, sizeof(PercentChar), "%i%%", m_Yes * 100 / m_Total);
+				Ui()->DoLabel(&YesArea, PercentChar, YesArea.h, TEXTALIGN_MC);
+			}
 		}
 
 		if(m_No)
@@ -428,6 +434,11 @@ void CVoting::RenderBars(CUIRect Bars) const
 			CUIRect NoArea;
 			Bars.VSplitRight(Bars.w * m_No / m_Total, nullptr, &NoArea);
 			NoArea.Draw(ColorRGBA(0.9f, 0.2f, 0.2f, 0.85f), IGraphics::CORNER_ALL, NoArea.h / 2.0f);
+			if(g_Config.m_RcShowhudVotingPercent)
+			{
+				str_format(PercentChar, sizeof(PercentChar), "%i%%", m_No * 100 / m_Total); 
+				Ui()->DoLabel(&NoArea, PercentChar, NoArea.h, TEXTALIGN_MC);
+			}
 		}
 	}
 }
