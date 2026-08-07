@@ -236,6 +236,9 @@ int CControls::SnapInput(int *pData)
 		if(!GameClient()->m_GameInfo.m_BugDDRaceInput)
 			ResetInput(g_Config.m_ClDummy);
 
+		if(FreezeInput)
+			m_aInputData[g_Config.m_ClDummy].m_Hook = m_aLastData[g_Config.m_ClDummy].m_Hook;
+
 		mem_copy(pData, &m_aInputData[g_Config.m_ClDummy], sizeof(m_aInputData[0]));
 
 		// set the target anyway though so that we can keep seeing our surroundings,
