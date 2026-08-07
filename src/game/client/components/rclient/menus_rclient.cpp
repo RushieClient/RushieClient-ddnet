@@ -314,6 +314,12 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcShowAfkTextureInSpec, TCLocalize("Show texture instead emote in spec"), &g_Config.m_RcShowAfkTextureInSpec, &RightSide, LineSize);
 		Column.HSplitTop(LineSize, nullptr, &Column);
 	}
+	static std::vector<CButtonContainer> s_vButtonContainersPlayersHitbox = {{}, {}, {}, {}};
+	DoLine_RadioMenu(Column, TCLocalize("Show player hitbox"),
+		   s_vButtonContainersPlayersHitbox,
+		   {Localize("Off"), Localize("Others"), Localize("Everyone"), Localize("Own")},
+		   {0, 1, 2, 3},
+		   g_Config.m_RcShowHitbox);
 
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
 	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;

@@ -92,6 +92,7 @@ MACRO_CONFIG_INT(RcShowAfkEmoteInMenu, rc_show_afk_emote_menu, 0, 0, 1, CFGFLAG_
 MACRO_CONFIG_INT(RcShowAfkTextureInMenu, rc_show_afk_texture_in_menu, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Shows afk texture when player in menu (only client)")
 MACRO_CONFIG_INT(RcShowAfkEmoteInSpec, rc_show_afk_emote_spec, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Shows afk emote when player in spec (only client)")
 MACRO_CONFIG_INT(RcShowAfkTextureInSpec, rc_show_afk_texture_in_spec, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Shows spec texture when player in spec (only client)")
+MACRO_CONFIG_INT(RcShowHitbox, rc_show_hitbox, 0, 0, 3, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show hitbox (1-other's 2-everyone 3-self)")
 
 // Menus flags
 MACRO_CONFIG_INT(RcRClientSettingsTabs, rc_rclient_settings_tabs, 0, 0, 65536, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Bit flags to disable settings tabs")

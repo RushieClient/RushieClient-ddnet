@@ -1069,6 +1069,37 @@ void CPlayers::RenderPlayer(
 		Graphics()->QuadsSetRotation(0);
 	}
 
+	if(g_Config.m_RcShowHitbox)
+	{
+		bool ShowHitbox = false;
+		switch(g_Config.m_RcShowHitbox)
+		{
+		case 0:
+			ShowHitbox = false;
+			break;
+		case 1:
+			ShowHitbox = GameClient()->m_Snap.m_LocalClientId != ClientId;
+			break;
+		case 2:
+			ShowHitbox = true;
+			break;
+		case 3:
+			ShowHitbox = GameClient()->m_Snap.m_LocalClientId == ClientId;
+			break;
+		default:
+			ShowHitbox = false;
+			break;
+		}
+		if(ShowHitbox)
+		{
+			Graphics()->TextureClear();
+			Graphics()->QuadsBegin();
+			Graphics()->SetColor(1.0f, 1.0f, 1.0f, Alpha);
+			Graphics()->DrawCircle(BodyPos.x, BodyPos.y, 2.0f, 8);
+			Graphics()->QuadsEnd();
+		}
+	}
+
 	if(g_Config.m_ClShowEmotes && !GameClient()->m_aClients[ClientId].m_EmoticonIgnore && GameClient()->m_aClients[ClientId].m_EmoticonStartTick != -1)
 	{
 		float SinceStart = (Client()->GameTick(g_Config.m_ClDummy) - GameClient()->m_aClients[ClientId].m_EmoticonStartTick) + (Client()->IntraGameTickSincePrev(g_Config.m_ClDummy) - GameClient()->m_aClients[ClientId].m_EmoticonStartFraction);
