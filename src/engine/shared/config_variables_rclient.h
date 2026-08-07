@@ -100,8 +100,11 @@ MACRO_CONFIG_INT(RcRClientSettingsTabs, rc_rclient_settings_tabs, 0, 0, 65536, C
 MACRO_CONFIG_INT(RcPlayOnMoveNonInactive, rc_play_on_move_nonactive, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Play sound when someone moves u when u inactive")
 MACRO_CONFIG_INT(RcSoundOnMoveNonInactive, rc_sound_on_move_nonactive, 0, 0, 2, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Choose sound when inactive (0-WakeUp, 1-Grenade boom, 2-msg tag")
 MACRO_CONFIG_INT(RcNotifyOnMoveInSpec, rc_notify_on_move_in_spec, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show when someone moves u when u spectate")
+MACRO_CONFIG_INT(RcTextOnMoveInSpec, rc_text_on_move_in_spec, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show text when someone moves u when u spectate")
 MACRO_CONFIG_INT(RcPlayOnMoveInSpec, rc_play_on_move_in_spec, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Play sound when someone moves u when u spectate")
 MACRO_CONFIG_INT(RcSoundOnMoveInSpec, rc_sound_on_move_in_spec, 0, 0, 2, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Choose sound when spectate (0-WakeUp, 1-Grenade boom, 2-msg tag")
+MACRO_CONFIG_INT(RcTextOnMoveInSpecPosX, rc_text_on_move_in_spec_pos_x, 50, 0, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show text when someone moves u when u spectate")
+MACRO_CONFIG_INT(RcTextOnMoveInSpecPosY, rc_text_on_move_in_spec_pos_y, 50, 0, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show text when someone moves u when u spectate")
 
 // Custom Client
 MACRO_CONFIG_INT(RcCustomClientsCollectClientType, rc_custom_clients_collect_client_type, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Collect client types on server")

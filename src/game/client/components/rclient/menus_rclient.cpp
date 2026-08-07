@@ -514,12 +514,17 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	Column.HSplitTop(MarginSmall, nullptr, &Column);
 
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcPlayOnMoveNonInactive, RCLocalize("Play sound when moved and window non active"), &g_Config.m_RcPlayOnMoveNonInactive, &Column, LineSize);
-	static std::vector<CButtonContainer> s_vButtonContainersNonActive = {{}, {}, {}};
-	DoLine_RadioMenu(Column, TCLocalize("Choose sound non active"),
-		   s_vButtonContainersNonActive,
-		   {Localize("Wake up"), Localize("Grenade"), Localize("Tag")},
-		   {0, 1, 2},
-		   g_Config.m_RcSoundOnMoveNonInactive);
+	if(g_Config.m_RcPlayOnMoveNonInactive)
+	{
+		static std::vector<CButtonContainer> s_vButtonContainersNonActive = {{}, {}, {}};
+		DoLine_RadioMenu(Column, TCLocalize("Choose sound non active"),
+			   s_vButtonContainersNonActive,
+			   {Localize("Wake up"), Localize("Grenade"), Localize("Tag")},
+			   {0, 1, 2},
+			   g_Config.m_RcSoundOnMoveNonInactive);
+	}
+	else
+		Column.HSplitTop(LineSize + 2.0f, nullptr, &Column);
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcNotifyOnMoveInSpec, RCLocalize("Notify when moved in spec"), &g_Config.m_RcNotifyOnMoveInSpec, &Column, LineSize);
 	if(g_Config.m_RcNotifyOnMoveInSpec)
 	{
@@ -530,9 +535,14 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 			   {Localize("Wake up"), Localize("Grenade"), Localize("Tag")},
 			   {0, 1, 2},
 			   g_Config.m_RcSoundOnMoveInSpec);
+		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcTextOnMoveInSpec, RCLocalize("Show text when moved in spec"), &g_Config.m_RcTextOnMoveInSpec, &Column, LineSize);
+		Column.HSplitTop(LineSize, &Button, &Column);
+		Ui()->DoScrollbarOption(&g_Config.m_RcTextOnMoveInSpecPosX, &g_Config.m_RcTextOnMoveInSpecPosX, &Button, RCLocalize("Text pos x"), 0, 100, &CUi::ms_LinearScrollbarScale, 0);
+		Column.HSplitTop(LineSize, &Button, &Column);
+		Ui()->DoScrollbarOption(&g_Config.m_RcTextOnMoveInSpecPosY, &g_Config.m_RcTextOnMoveInSpecPosY, &Button, RCLocalize("Text pos y"), 0, 100, &CUi::ms_LinearScrollbarScale, 0);
 	}
 	else
-		Column.HSplitTop(LineSize * 2 + 2.0f, nullptr, &Column); // 2.0f for radio menu
+		Column.HSplitTop(LineSize * 5 + 2.0f, nullptr, &Column); // 2.0f for radio menu
 
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
 	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;

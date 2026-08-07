@@ -94,7 +94,7 @@ void CNotifyOnMove::OnRender()
 			m_SoundPlayedSpec = false;
 		}
 
-		if(m_SpecNotifyMoved || m_SpecNotifyAnim > 0.0f)
+		if((m_SpecNotifyMoved || m_SpecNotifyAnim > 0.0f) && g_Config.m_RcTextOnMoveInSpec)
 		{
 			const float AnimSpeed = 0.1f;
 			if(m_SpecNotifyMoved)
@@ -108,18 +108,18 @@ void CNotifyOnMove::OnRender()
 				float T = m_SpecNotifyAnim;
 				float Phase = (T < 0.5f) ? (2.0f * T * T) : (1.0f - std::pow(-2.0f * T + 2.0f, 2) / 2.0f);
 
-				int m_Height = Graphics()->ScreenHeight();
+				int m_Height = 300.0f;
 				int m_Width = m_Height * Graphics()->ScreenAspect();
 				Graphics()->MapScreen(0.0f, 0.0f, (float)m_Width, (float)m_Height);
 				CUIRect NotifyBox;
-				NotifyBox.w = 200.0f;
-				NotifyBox.h = 40.0f;
-				NotifyBox.x = (m_Width - NotifyBox.w) / 2.0f;
-				NotifyBox.y = (m_Height - NotifyBox.h) / 2.0f;
+				NotifyBox.w = 60.0f;
+				NotifyBox.h = 12.0f;
+				NotifyBox.x = (m_Width - NotifyBox.w) / 100.0f * g_Config.m_RcTextOnMoveInSpecPosX;
+				NotifyBox.y = (m_Height - NotifyBox.h) / 100.0f * g_Config.m_RcTextOnMoveInSpecPosY;
 				NotifyBox.Draw(ColorRGBA(0.0f, 0.0f, 0.0f, 0.6f * Phase), IGraphics::CORNER_ALL, 5.0f);
-				NotifyBox.Margin(15.0f, &NotifyBox);
+				NotifyBox.Margin(1.0f, &NotifyBox);
 				TextRender()->TextColor(ColorRGBA(1.0f, 0.0f, 0.0f, Phase));
-				Ui()->DoLabel(&NotifyBox, "Moved in game", 14.0f, TEXTALIGN_MC);
+				Ui()->DoLabel(&NotifyBox, "Moved in game", 5.0f, TEXTALIGN_MC);
 				TextRender()->TextColor(TextRender()->DefaultTextColor());
 			}
 		}
