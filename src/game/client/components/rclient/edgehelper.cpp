@@ -163,8 +163,8 @@ void CEdgeHelper::RenderEdgeHelperEdgeInfo(CUIRect *pBase)
 	RightZone.VSplitLeft(ActionSpacing + 2, nullptr, &RightZone);
 	LeftZone.Margin(SEdgeHelperProperties::ms_ItemSpacing, &LeftZone);
 	RightZone.Margin(SEdgeHelperProperties::ms_ItemSpacing, &RightZone);
-	LeftZone.Draw(m_Pos_x >= 44 ? color_cast<ColorRGBA>(ColorHSLA(g_Config.m_RcEdgeInfoColorFreeze)) : m_Pos_x >= 28 ? color_cast<ColorRGBA>(ColorHSLA(g_Config.m_RcEdgeInfoColorSafe)) : color_cast<ColorRGBA>(ColorHSLA(g_Config.m_RcEdgeInfoColorKill)), IGraphics::CORNER_ALL, SEdgeHelperProperties::ms_Rounding);
-	RightZone.Draw(m_Pos_x <= 53 ? color_cast<ColorRGBA>(ColorHSLA(g_Config.m_RcEdgeInfoColorFreeze)) : m_Pos_x <= 69 ? color_cast<ColorRGBA>(ColorHSLA(g_Config.m_RcEdgeInfoColorSafe)) : color_cast<ColorRGBA>(ColorHSLA(g_Config.m_RcEdgeInfoColorKill)), IGraphics::CORNER_ALL, SEdgeHelperProperties::ms_Rounding);
+	LeftZone.Draw(m_Pos_x >= 44 ? color_cast<ColorRGBA>(ColorHSLA(g_Config.m_RcEdgeInfoColorKill)) : m_Pos_x >= 28 ? color_cast<ColorRGBA>(ColorHSLA(g_Config.m_RcEdgeInfoColorSafe)) : color_cast<ColorRGBA>(ColorHSLA(g_Config.m_RcEdgeInfoColorFreeze)), IGraphics::CORNER_ALL, SEdgeHelperProperties::ms_Rounding);
+	RightZone.Draw(m_Pos_x <= 53 ? color_cast<ColorRGBA>(ColorHSLA(g_Config.m_RcEdgeInfoColorKill)) : m_Pos_x <= 69 ? color_cast<ColorRGBA>(ColorHSLA(g_Config.m_RcEdgeInfoColorSafe)) : color_cast<ColorRGBA>(ColorHSLA(g_Config.m_RcEdgeInfoColorFreeze)), IGraphics::CORNER_ALL, SEdgeHelperProperties::ms_Rounding);
 	CenterZone.VSplitLeft(SEdgeHelperProperties::ms_WallWidth + ActionSpacing, &LeftZone, &CenterZone);
 	CenterZone.VSplitRight(SEdgeHelperProperties::ms_WallWidth + ActionSpacing, &CenterZone, &RightZone);
 	LeftZone.VSplitRight(ActionSpacing - 3, &LeftZone, nullptr);
@@ -258,13 +258,19 @@ void CEdgeHelper::RenderEdgeHelperJumpInfo(CUIRect *pBase)
 	Ui()->DoLabel(&CenterZone, aBuf, 12, TEXTALIGN_MC);
 	TextRender()->TextColor(TextRender()->DefaultTextColor());
 
-	str_format(aBuf, sizeof(aBuf), "%s |", (lower == std::numeric_limits<int>::min()) ? "-" : std::to_string(lower).c_str());
+	if(!lower)
+		str_copy(aBuf, "- |");
+	else
+		str_format(aBuf, sizeof(aBuf), "%i |", lower);
 	if(m_Pos_x == lower || m_Pos_x == upper)
 		TextRender()->TextColor(SEdgeHelperProperties::ActionActiveButtonColor());
 	Ui()->DoLabel(&LeftZone, aBuf, 12, TEXTALIGN_MC);
 	TextRender()->TextColor(TextRender()->DefaultTextColor());
 
-	str_format(aBuf, sizeof(aBuf), "| %s", (upper == std::numeric_limits<int>::max()) ? "-" : std::to_string(upper).c_str());
+	if(!upper)
+		str_copy(aBuf, "| -");
+	else
+		str_format(aBuf, sizeof(aBuf), "| %i", upper);
 	if(m_Pos_x == upper)
 		TextRender()->TextColor(SEdgeHelperProperties::ActionActiveButtonColor());
 	Ui()->DoLabel(&RightZone, aBuf, 12, TEXTALIGN_MC);

@@ -451,7 +451,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
 	DoButton_ColorPickerAutoVMargin(&s_EdgeInfoKillColor, Localize("Above Kill color"), &g_Config.m_RcEdgeInfoColorKill, color_cast<ColorRGBA>(ColorHSLA(DefaultConfig::RcEdgeInfoColorKill)), &Column, LineSize, false);
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
-	DoButton_ColorPickerAutoVMargin(&s_EdgeInfoSafeColor, Localize("Above Freeze color"), &g_Config.m_RcEdgeInfoColorSafe, color_cast<ColorRGBA>(ColorHSLA(DefaultConfig::RcEdgeInfoColorSafe)), &Column, LineSize, false);
+	DoButton_ColorPickerAutoVMargin(&s_EdgeInfoSafeColor, Localize("Above Save color"), &g_Config.m_RcEdgeInfoColorSafe, color_cast<ColorRGBA>(ColorHSLA(DefaultConfig::RcEdgeInfoColorSafe)), &Column, LineSize, false);
 
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
 	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;
