@@ -138,11 +138,11 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	Column.HSplitTop(Margin, nullptr, &Column);
 	s_SectionBoxes.push_back(Column);
 	Column.HSplitTop(HeadlineHeight, &Label, &Column);
-	Ui()->DoLabel(&Label, RCLocalize("Player Inspector/Tracker"), HeadlineFontSize, TEXTALIGN_ML);
+	Ui()->DoLabel(&Label, RCLocalize("Player Inspector/Tracker"), HeadlineFontSize, TEXTALIGN_MC);
 	Column.HSplitTop(MarginSmall, nullptr, &Column);
 
 	Column.HSplitTop(LineSize, &Label, &Column);
-	Ui()->DoLabel(&Label, RCLocalize("Now in bindchat"), FontSize, TEXTALIGN_ML);
+	Ui()->DoLabel(&Label, RCLocalize("Now in bindchat"), FontSize, TEXTALIGN_MC);
 
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
 	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;
@@ -151,7 +151,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	Column.HSplitTop(MarginBetweenSections, nullptr, &Column);
 	s_SectionBoxes.push_back(Column);
 	Column.HSplitTop(HeadlineHeight, &Label, &Column);
-	Ui()->DoLabel(&Label, RCLocalize("Dummy Change Clan"), HeadlineFontSize, TEXTALIGN_ML);
+	Ui()->DoLabel(&Label, RCLocalize("Dummy Change Clan"), HeadlineFontSize, TEXTALIGN_MC);
 
 	Column.HSplitTop(MarginSmall, nullptr, &Column);
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcPlayerClanAutoChange, RCLocalize("Auto change clan"), &g_Config.m_RcPlayerClanAutoChange, &Column, LineSize);
@@ -160,7 +160,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		CUIRect Box;
 		Column.HSplitTop(LineSize + MarginExtraSmall, &Box, &Column);
 		Box.VSplitMid(&Label, &Button);
-		Ui()->DoLabel(&Label, RCLocalize("With Dummy"), FontSize, TEXTALIGN_ML);
+		Ui()->DoLabel(&Label, RCLocalize("With Dummy"), FontSize, TEXTALIGN_MC);
 		static CLineInput s_LineInput(g_Config.m_RcPlayerClanWithDummy, sizeof(g_Config.m_RcPlayerClanWithDummy));
 		s_LineInput.SetEmptyText(RCLocalize("#YESDUMMY"));
 		Ui()->DoEditBox(&s_LineInput, &Button, EditBoxFontSize);
@@ -170,7 +170,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		CUIRect Box;
 		Column.HSplitTop(LineSize + MarginExtraSmall, &Box, &Column);
 		Box.VSplitMid(&Label, &Button);
-		Ui()->DoLabel(&Label, RCLocalize("Without Dummy"), FontSize, TEXTALIGN_ML);
+		Ui()->DoLabel(&Label, RCLocalize("Without Dummy"), FontSize, TEXTALIGN_MC);
 		static CLineInput s_LineInput(g_Config.m_RcPlayerClanNoDummy, sizeof(g_Config.m_RcPlayerClanNoDummy));
 		s_LineInput.SetEmptyText(RCLocalize("#NODUMMY"));
 		Ui()->DoEditBox(&s_LineInput, &Button, EditBoxFontSize);
@@ -183,7 +183,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	Column.HSplitTop(MarginBetweenSections, nullptr, &Column);
 	s_SectionBoxes.push_back(Column);
 	Column.HSplitTop(HeadlineHeight, &Label, &Column);
-	Ui()->DoLabel(&Label, RCLocalize("Dummy"), HeadlineFontSize, TEXTALIGN_ML);
+	Ui()->DoLabel(&Label, RCLocalize("Dummy"), HeadlineFontSize, TEXTALIGN_MC);
 	Column.HSplitTop(MarginSmall, nullptr, &Column);
 
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_TcShowhudDummyPosition, TCLocalize("Show dummy position"), &g_Config.m_TcShowhudDummyPosition, &Column, LineSize);
@@ -198,7 +198,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	Column.HSplitTop(MarginBetweenSections, nullptr, &Column);
 	s_SectionBoxes.push_back(Column);
 	Column.HSplitTop(HeadlineHeight, &Label, &Column);
-	Ui()->DoLabel(&Label, RCLocalize("Master Servers"), HeadlineFontSize, TEXTALIGN_ML);
+	Ui()->DoLabel(&Label, RCLocalize("Master Servers"), HeadlineFontSize, TEXTALIGN_MC);
 	Column.HSplitTop(MarginSmall, nullptr, &Column);
 
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcUseRushieMasterServerMirrors, TCLocalize("Use Rushie master server mirror"), &g_Config.m_RcUseRushieMasterServerMirrors, &Column, LineSize);
@@ -214,7 +214,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	Column.HSplitTop(MarginBetweenSections, nullptr, &Column);
 	s_SectionBoxes.push_back(Column);
 	Column.HSplitTop(HeadlineHeight, &Label, &Column);
-	Ui()->DoLabel(&Label, RCLocalize("Auto translate"), HeadlineFontSize, TEXTALIGN_ML);
+	Ui()->DoLabel(&Label, RCLocalize("Auto translate"), HeadlineFontSize, TEXTALIGN_MC);
 	Column.HSplitTop(MarginSmall, nullptr, &Column);
 
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_TcTranslateAuto, TCLocalize("Use auto translate"), &g_Config.m_TcTranslateAuto, &Column, LineSize);
@@ -245,7 +245,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	Column.HSplitTop(MarginBetweenSections, nullptr, &Column);
 	s_SectionBoxes.push_back(Column);
 	Column.HSplitTop(HeadlineHeight, &Label, &Column);
-	Ui()->DoLabel(&Label, RCLocalize("Scoreboard"), HeadlineFontSize, TEXTALIGN_ML);
+	Ui()->DoLabel(&Label, RCLocalize("Scoreboard"), HeadlineFontSize, TEXTALIGN_MC);
 	Column.HSplitTop(MarginSmall, nullptr, &Column);
 
 	static CButtonContainer s_ReaderButtonScoreboardMouse, s_ClearButtonScoreboardmouse;
@@ -263,7 +263,9 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	Column.HSplitTop(MarginBetweenSections, nullptr, &Column);
 	s_SectionBoxes.push_back(Column);
 	Column.HSplitTop(HeadlineHeight, &Label, &Column);
-	Ui()->DoLabel(&Label, RCLocalize("Chat Bubbles (Entity)"), HeadlineFontSize, TEXTALIGN_ML);
+	Ui()->DoLabel(&Label, RCLocalize("Chat Bubbles"), HeadlineFontSize, TEXTALIGN_MC);
+	Column.HSplitTop(Margin, &Label, &Column);
+	Ui()->DoLabel(&Label, RCLocalize("by qxdFox/Entity Client"), Margin, TEXTALIGN_MC);
 	Column.HSplitTop(MarginSmall, nullptr, &Column);
 
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcChatBubbles, RCLocalize("Enable Chat Bubbles"), &g_Config.m_RcChatBubbles, &Column, LineSize);
@@ -283,7 +285,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	Column.HSplitTop(MarginBetweenSections, nullptr, &Column);
 	s_SectionBoxes.push_back(Column);
 	Column.HSplitTop(HeadlineHeight, &Label, &Column);
-	Ui()->DoLabel(&Label, RCLocalize("Chat Features"), HeadlineFontSize, TEXTALIGN_ML);
+	Ui()->DoLabel(&Label, RCLocalize("Chat Features"), HeadlineFontSize, TEXTALIGN_MC);
 	Column.HSplitTop(MarginSmall, nullptr, &Column);
 
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcCommandsFixLayout, RCLocalize("Fix layout"), &g_Config.m_RcCommandsFixLayout, &Column, LineSize);
@@ -295,7 +297,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	Column.HSplitTop(MarginBetweenSections, nullptr, &Column);
 	s_SectionBoxes.push_back(Column);
 	Column.HSplitTop(HeadlineHeight, &Label, &Column);
-	Ui()->DoLabel(&Label, RCLocalize("Players"), HeadlineFontSize, TEXTALIGN_ML);
+	Ui()->DoLabel(&Label, RCLocalize("Players"), HeadlineFontSize, TEXTALIGN_MC);
 	Column.HSplitTop(MarginSmall, nullptr, &Column);
 
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcHideFrozenFlakesEffect, RCLocalize("Hide frozen flakes"), &g_Config.m_RcHideFrozenFlakesEffect, &Column, LineSize);
@@ -332,7 +334,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	Column.HSplitTop(Margin, nullptr, &Column);
 	s_SectionBoxes.push_back(Column);
 	Column.HSplitTop(HeadlineHeight, &Label, &Column);
-	Ui()->DoLabel(&Label, RCLocalize("Binds"), HeadlineFontSize, TEXTALIGN_ML);
+	Ui()->DoLabel(&Label, RCLocalize("Binds"), HeadlineFontSize, TEXTALIGN_MC);
 	Column.HSplitTop(MarginSmall, nullptr, &Column);
 
 	static CButtonContainer s_ReaderButtonDeepfly, s_ClearButtonDeepfly,
@@ -369,7 +371,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	Column.HSplitTop(MarginBetweenSections, nullptr, &Column);
 	s_SectionBoxes.push_back(Column);
 	Column.HSplitTop(HeadlineHeight, &Label, &Column);
-	Ui()->DoLabel(&Label, RCLocalize("Chat Filter"), HeadlineFontSize, TEXTALIGN_ML);
+	Ui()->DoLabel(&Label, RCLocalize("Chat Filter"), HeadlineFontSize, TEXTALIGN_MC);
 	Column.HSplitTop(MarginSmall, nullptr, &Column);
 
 	static std::vector<CButtonContainer> s_vButtonContainersChatFilter = {{}, {}, {}, {}};
@@ -414,7 +416,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	Column.HSplitTop(MarginBetweenSections, nullptr, &Column);
 	s_SectionBoxes.push_back(Column);
 	Column.HSplitTop(HeadlineHeight, &Label, &Column);
-	Ui()->DoLabel(&Label, RCLocalize("Streamer mode"), HeadlineFontSize, TEXTALIGN_ML);
+	Ui()->DoLabel(&Label, RCLocalize("Streamer mode"), HeadlineFontSize, TEXTALIGN_MC);
 	Column.HSplitTop(MarginSmall, nullptr, &Column);
 
 	Column.HSplitTop(FontSize, &Label, &Column);
@@ -433,7 +435,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	Column.HSplitTop(MarginBetweenSections, nullptr, &Column);
 	s_SectionBoxes.push_back(Column);
 	Column.HSplitTop(HeadlineHeight, &Label, &Column);
-	Ui()->DoLabel(&Label, RCLocalize("Edge info"), HeadlineFontSize, TEXTALIGN_ML);
+	Ui()->DoLabel(&Label, RCLocalize("Edge info"), HeadlineFontSize, TEXTALIGN_MC);
 	Column.HSplitTop(MarginSmall, nullptr, &Column);
 
 	static CButtonContainer s_ReaderButtonEdgeInfo, s_ClearButtonEdgeInfo;
@@ -458,7 +460,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	Column.HSplitTop(MarginBetweenSections, nullptr, &Column);
 	s_SectionBoxes.push_back(Column);
 	Column.HSplitTop(HeadlineHeight, &Label, &Column);
-	Ui()->DoLabel(&Label, RCLocalize("Hud"), HeadlineFontSize, TEXTALIGN_ML);
+	Ui()->DoLabel(&Label, RCLocalize("Hud"), HeadlineFontSize, TEXTALIGN_MC);
 	Column.HSplitTop(MarginSmall, nullptr, &Column);
 
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcShowhudPlayerCheckpoint, RCLocalize("Show checkpoint"), &g_Config.m_RcShowhudPlayerCheckpoint, &Column, LineSize);
@@ -473,7 +475,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	Column.HSplitTop(MarginBetweenSections, nullptr, &Column);
 	s_SectionBoxes.push_back(Column);
 	Column.HSplitTop(HeadlineHeight, &Label, &Column);
-	Ui()->DoLabel(&Label, RCLocalize("Nameplates"), HeadlineFontSize, TEXTALIGN_ML);
+	Ui()->DoLabel(&Label, RCLocalize("Nameplates"), HeadlineFontSize, TEXTALIGN_MC);
 	Column.HSplitTop(MarginSmall, nullptr, &Column);
 
 	static std::vector<CButtonContainer> s_vButtonContainersHookDetection = {{}, {}, {}, {}, {}};
@@ -516,7 +518,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	Column.HSplitTop(MarginBetweenSections, nullptr, &Column);
 	s_SectionBoxes.push_back(Column);
 	Column.HSplitTop(HeadlineHeight, &Label, &Column);
-	Ui()->DoLabel(&Label, RCLocalize("Anti AFK"), HeadlineFontSize, TEXTALIGN_ML);
+	Ui()->DoLabel(&Label, RCLocalize("Anti AFK"), HeadlineFontSize, TEXTALIGN_MC);
 	Column.HSplitTop(MarginSmall, nullptr, &Column);
 
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcPlayOnMoveNonInactive, RCLocalize("Play sound when moved and window non active"), &g_Config.m_RcPlayOnMoveNonInactive, &Column, LineSize);
@@ -557,7 +559,9 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	Column.HSplitTop(MarginBetweenSections, nullptr, &Column);
 	s_SectionBoxes.push_back(Column);
 	Column.HSplitTop(HeadlineHeight, &Label, &Column);
-	Ui()->DoLabel(&Label, RCLocalize("Client Indicator"), HeadlineFontSize, TEXTALIGN_ML);
+	Ui()->DoLabel(&Label, RCLocalize("Client Indicator"), HeadlineFontSize, TEXTALIGN_MC);
+	Column.HSplitTop(Margin, &Label, &Column);
+	Ui()->DoLabel(&Label, RCLocalize("by +KZ"), Margin, TEXTALIGN_MC);
 	Column.HSplitTop(MarginSmall, nullptr, &Column);
 
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcCustomClientsSendClientType, RCLocalize("Send to server that u use RClient"), &g_Config.m_RcCustomClientsSendClientType, &Column, LineSize);
@@ -577,7 +581,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	Column.HSplitTop(MarginBetweenSections, nullptr, &Column);
 	s_SectionBoxes.push_back(Column);
 	Column.HSplitTop(HeadlineHeight, &Label, &Column);
-	Ui()->DoLabel(&Label, RCLocalize("Chat"), HeadlineFontSize, TEXTALIGN_ML);
+	Ui()->DoLabel(&Label, RCLocalize("Chat"), HeadlineFontSize, TEXTALIGN_MC);
 	Column.HSplitTop(MarginSmall, nullptr, &Column);
 
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcChatShowMouse, RCLocalize("Show mouse when open chat"), &g_Config.m_RcChatShowMouse, &Column, LineSize);
