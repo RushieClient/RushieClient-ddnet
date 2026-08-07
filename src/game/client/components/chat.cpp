@@ -545,7 +545,7 @@ void CChat::EnableMode(int Team)
 
 		if(!(GameClient()->m_Menus.IsActive() ||
 			GameClient()->m_Scoreboard.IsActive() ||
-			Client()->State() == IClient::STATE_DEMOPLAYBACK))
+			Client()->State() == IClient::STATE_DEMOPLAYBACK) && g_Config.m_RcChatShowMouse)
 		{
 			const vec2 OldMousePos = Ui()->MousePos();
 

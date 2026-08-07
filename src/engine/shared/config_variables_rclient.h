@@ -115,3 +115,6 @@ MACRO_CONFIG_INT(RcCustomClientsInScoreboard, rc_custom_clients_in_scoreboard, 1
 
 // Streamer Mode
 MACRO_CONFIG_INT(RcRconSteamerMode, rc_rcon_streamer_mode, 0, 0, 2, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Hide ddnet from stream when rcon opened")
+
+// Chat
+MACRO_CONFIG_INT(RcChatShowMouse, rc_chat_show_mouse, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show mouse when chat")
