@@ -1362,7 +1362,7 @@ void CRClient::FinishRclientDDstatsFindTime()
 	if(Finishes->type == json_array && PlayerNickname->type == json_string)
 	{
 		bool FoundFinish = false;
-		for(size_t i = 0; i < json_array_length(Finishes); i++)
+		for(int i = 0; i < json_array_length(Finishes); i++)
 		{
 			const json_value *Finish = json_array_get(Finishes, i);
 			const json_value *MapInfo = json_object_get(Finish, "map");
