@@ -15,10 +15,21 @@ class CSteam : public ISteam
 	char m_aPlayerName[16];
 	bool m_GotConnectAddr;
 	NETADDR m_ConnectAddr;
+	bool m_Initialized = false;
+	bool m_InitTried = false;
 
-public:
-	CSteam()
+	bool Init()
 	{
+		if(m_Initialized)
+			return true;
+		if(m_InitTried)
+			return false;
+		m_InitTried = true;
+		if(!g_Config.m_RcSteam)
+			return false;
+		if(!SteamAPI_Init())
+			return false;
+
 		SteamAPI_ManualDispatch_Init();
 		m_SteamPipe = SteamAPI_GetHSteamPipe();
 		m_pSteamApps = SteamAPI_SteamApps_v008();
@@ -26,10 +37,18 @@ public:
 
 		ReadLaunchCommandLine();
 		str_copy(m_aPlayerName, SteamAPI_ISteamFriends_GetPersonaName(m_pSteamFriends));
+		m_Initialized = true;
+		return true;
+	}
+
+public:
+	CSteam()
+	{
 	}
 	~CSteam() override
 	{
-		SteamAPI_Shutdown();
+		if(m_Initialized)
+			SteamAPI_Shutdown();
 	}
 
 	void ParseConnectString(const char *pConnect)
@@ -69,12 +88,15 @@ public:
 
 	const char *GetPlayerName() override
 	{
-		return m_aPlayerName;
+		if(Init())
+			return m_aPlayerName;
+		else
+			return nullptr;
 	}
 
 	const NETADDR *GetConnectAddress() override
 	{
-		if(m_GotConnectAddr)
+		if(Init() && m_GotConnectAddr)
 		{
 			return &m_ConnectAddr;
 		}
@@ -85,11 +107,14 @@ public:
 	}
 	void ClearConnectAddress() override
 	{
-		m_GotConnectAddr = false;
+		if(Init())
+			m_GotConnectAddr = false;
 	}
 
 	void Update() override
 	{
+		if(!Init())
+			return;
 		SteamAPI_ManualDispatch_RunFrame(m_SteamPipe);
 		CallbackMsg_t Callback;
 		while(SteamAPI_ManualDispatch_GetNextCallback(m_SteamPipe, &Callback))
@@ -113,10 +138,14 @@ public:
 	}
 	void ClearGameInfo() override
 	{
-		SteamAPI_ISteamFriends_ClearRichPresence(m_pSteamFriends);
+		if(Init())
+			SteamAPI_ISteamFriends_ClearRichPresence(m_pSteamFriends);
 	}
 	void SetGameInfo(const NETADDR &ServerAddr, const char *pMapName, bool AnnounceAddr) override
 	{
+		if(!Init())
+			return;
+
 		if(AnnounceAddr)
 		{
 			char aServerAddr[NETADDR_MAXSTRSIZE];
@@ -143,9 +172,5 @@ class CSteamStub : public ISteam
 
 ISteam *CreateSteam()
 {
-	if(!SteamAPI_Init())
-	{
-		return new CSteamStub();
-	}
 	return new CSteam();
 }

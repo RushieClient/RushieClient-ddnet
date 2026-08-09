@@ -119,3 +119,6 @@ MACRO_CONFIG_INT(RcRconSteamerMode, rc_rcon_streamer_mode, 0, 0, 2, CFGFLAG_CLIE
 
 // Chat
 MACRO_CONFIG_INT(RcChatShowMouse, rc_chat_show_mouse, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show mouse when chat")
+
+// Integration
+MACRO_CONFIG_INT(RcSteam, rc_steam, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Enable steam integration")
