@@ -122,3 +122,9 @@ MACRO_CONFIG_INT(RcChatShowMouse, rc_chat_show_mouse, 1, 0, 1, CFGFLAG_CLIENT | 
 
 // Integration
 MACRO_CONFIG_INT(RcSteam, rc_steam, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Enable steam integration")
+
+// Aspect Ratio
+MACRO_CONFIG_INT(RcCustomAspectEnabled, rc_custom_aspect_enabled, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Enable custom aspect ratio")
+MACRO_CONFIG_INT(RcCustomAspectX, rc_custom_aspect_x, 1920, 1, 10000, CFGFLAG_CLIENT | CFGFLAG_SAVE, "X for aspect ratio")
+MACRO_CONFIG_INT(RcCustomAspectY, rc_custom_aspect_y, 1080, 1, 10000, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Y for aspect ratio")
+MACRO_CONFIG_INT(RcCustomAspectDisable, rc_custom_aspect_disable, 0, 0, 65536, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Enable custom aspect ratio for all ui")

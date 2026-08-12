@@ -41,6 +41,8 @@
 #include <cmath>
 #include <vector>
 
+#include "rclient/rclient_include.h"
+
 using namespace std::chrono_literals;
 
 ColorRGBA CMenus::ms_GuiColor;
@@ -2548,6 +2550,8 @@ void CMenus::OnRender()
 		}
 	}
 
+	Ui()->m_RcForceRealAspect = g_Config.m_RcCustomAspectDisable & RcAspectDisable::MENUS;
+
 	Ui()->StartCheck();
 	UpdateColors();
 
@@ -2569,6 +2573,8 @@ void CMenus::OnRender()
 
 	Ui()->FinishCheck();
 	Ui()->ClearHotkeys();
+
+	Ui()->m_RcForceRealAspect = false;
 }
 
 void CMenus::UpdateColors()

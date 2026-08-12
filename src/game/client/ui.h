@@ -300,6 +300,8 @@ struct SPopupMenuProperties
 	bool m_NeedBorder = true;
 	ColorRGBA m_BackgroundColor = ColorRGBA(0.0f, 0.0f, 0.0f, 0.75f);
 	bool m_NeedMainMargin = true;
+	bool m_CloseAtClickOutside = true;
+	bool m_CloseAtEscape = true;
 };
 
 class CUi
@@ -577,6 +579,7 @@ public:
 	const CUIRect *Screen();
 	void MapScreen();
 	float PixelSize();
+	bool m_RcForceRealAspect = false;
 
 	void ClipEnable(const CUIRect *pRect);
 	void ClipDisable();

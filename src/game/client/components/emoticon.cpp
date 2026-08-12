@@ -13,6 +13,8 @@
 #include <game/client/gameclient.h>
 #include <game/client/ui.h>
 
+#include "rclient/rclient_include.h"
+
 CEmoticon::CEmoticon()
 {
 	OnReset();
@@ -156,6 +158,7 @@ void CEmoticon::OnRender()
 		m_WasActive = false;
 	}
 
+	Ui()->m_RcForceRealAspect = g_Config.m_RcCustomAspectDisable & RcAspectDisable::WHEELS;
 	const CUIRect Screen = *Ui()->Screen();
 
 	const bool WasTouchPressed = m_TouchState.m_AnyPressed;
@@ -280,6 +283,8 @@ void CEmoticon::OnRender()
 		m_SelectedEyeEmote = -1;
 
 	RenderTools()->RenderCursor(ScreenCenter + m_SelectorMouse, 24.0f, aAnimationPhase[0]);
+
+	Ui()->m_RcForceRealAspect = false;
 }
 
 void CEmoticon::Emote(int Emoticon)

@@ -77,6 +77,9 @@ class CRClient : public CComponent
 
 	// Streamer mod
 	bool ScreenSharePrivacyOld = false;
+
+	//Aspect Ratio
+	static void ConForceAspect(IConsole::IResult *pResult, void *pUserData);
 public:
 	CRClient();
 	int Sizeof() const override { return sizeof(*this); }
@@ -87,6 +90,7 @@ public:
 	void OnReset() override;
 	void OnStateChange(int NewState, int OldState) override;
 	void OnShutdown() override;
+	void OnNewSnapshot() override;
 
 	//Tracker
 	struct SPlayerList
@@ -170,6 +174,9 @@ public:
 	// Reset RClient ChatBinds
 	void ResetRClientChatBinds();
 	bool RemoveChatBindCommand(const char *pCommand);
+
+	// Aspect Ratio
+	void SetForcedAspectRatio();
 };
 
 #endif //GAME_CLIENT_COMPONENTS_RCLIENT_RCLIENT_H

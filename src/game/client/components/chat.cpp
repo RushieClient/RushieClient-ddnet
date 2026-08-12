@@ -26,6 +26,8 @@
 #include <game/client/gameclient.h>
 #include <game/localization.h>
 
+#include <game/client/components/rclient/rclient_include.h>
+
 char CChat::ms_aDisplayText[MAX_LINE_LENGTH] = "";
 
 CChat::CLine::CLine()
@@ -1326,7 +1328,7 @@ void CChat::OnRender()
 	}
 
 	const float Height = 300.0f;
-	const float Width = Height * Graphics()->ScreenAspect();
+	const float Width = Height * (g_Config.m_RcCustomAspectDisable & RcAspectDisable::CHAT ? Graphics()->ScreenAspectReal() : Graphics()->ScreenAspect());
 	Graphics()->MapScreen(0.0f, 0.0f, Width, Height);
 
 	float x = 5.0f;

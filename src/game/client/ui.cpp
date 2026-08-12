@@ -18,6 +18,8 @@
 
 #include <limits>
 
+#include "components/rclient/rclient_include.h"
+
 void CUIElement::Init(CUi *pUI, int RequestedRectCount)
 {
 	m_pUI = pUI;
@@ -445,7 +447,7 @@ float CUi::ButtonColorMul(const void *pId)
 const CUIRect *CUi::Screen()
 {
 	m_Screen.h = 600.0f;
-	m_Screen.w = Graphics()->ScreenAspect() * m_Screen.h;
+	m_Screen.w = (m_RcForceRealAspect || g_Config.m_RcCustomAspectDisable & RcAspectDisable::ALL ? Graphics()->ScreenAspectReal() : Graphics()->ScreenAspect()) * m_Screen.h;
 	return &m_Screen;
 }
 
@@ -1712,7 +1714,7 @@ void CUi::RenderPopupMenus()
 		{
 			if(!MouseButton(0))
 			{
-				if(!Inside)
+				if(!Inside && PopupMenu.m_Props.m_CloseAtClickOutside)
 				{
 					ClosePopupMenu(pId);
 					--i;
@@ -1746,7 +1748,7 @@ void CUi::RenderPopupMenus()
 		// The popup render function can open/close popups, which may resize the vector and thus
 		// invalidate the variable PopupMenu. We therefore store pId in a separate variable.
 		EPopupMenuFunctionResult Result = PopupMenu.m_pfnFunc(PopupMenu.m_pContext, PopupRect, Active);
-		if(Result != POPUP_KEEP_OPEN || (Active && ConsumeHotkey(HOTKEY_ESCAPE)))
+		if(Result != POPUP_KEEP_OPEN || (Active && ConsumeHotkey(HOTKEY_ESCAPE) && PopupMenu.m_Props.m_CloseAtEscape))
 			ClosePopupMenu(pId, Result == POPUP_CLOSE_CURRENT_AND_DESCENDANTS);
 	}
 }

@@ -37,6 +37,7 @@ void CRClient::OnReset()
 void CRClient::OnInit()
 {
 	FetchRClientInfo();
+	SetForcedAspectRatio();
 }
 
 void CRClient::OnRender()
@@ -113,6 +114,7 @@ void CRClient::OnConsoleInit()
 	Console()->Register("rc_message_filter_print_words", "", CFGFLAG_CLIENT, ConPrintCensorList, this, "Print censor list");
 	Console()->Register("rc_find_hours", "s[player]", CFGFLAG_CLIENT, ConPlayerFindHours, this, "Find hours");
 	Console()->Register("rc_find_time", "s[player] s[map] ?s[map1] ?s[map2] ?s[map3] ?s[map4] ?s[map5]", CFGFLAG_CLIENT, ConPlayerFindTime, this, "Find hours");
+	Console()->Register("rc_force_aspect", "", CFGFLAG_CLIENT, ConForceAspect, this, "Force aspect ratio(useless)");
 	Console()->Chain("rc_message_filter_mode", ConchainResetCensorListCache, this);
 	Console()->Chain("rc_message_filter_multiply_change_word_on_full_match", ConchainResetCensorListCache, this);
 	Console()->Chain("rc_message_filter_word_on_full_match", ConchainResetCensorListCache, this);
@@ -133,6 +135,11 @@ void CRClient::OnStateChange(int NewState, int OldState)
 void CRClient::OnShutdown()
 {
 
+}
+
+void CRClient::OnNewSnapshot()
+{
+	SetForcedAspectRatio();
 }
 
 void CRClient::ConfigSaveCallback(IConfigManager *pConfigManager, void *pUserData)
@@ -1580,4 +1587,20 @@ bool CRClient::RemoveChatBindCommand(const char *pCommand)
 		}
 	}
 	return false;
+}
+
+// Aspect Ratio
+void CRClient::ConForceAspect(IConsole::IResult *pResult, void *pUserData)
+{
+	CRClient *pSelf = static_cast<CRClient *>(pUserData);
+	pSelf->SetForcedAspectRatio();
+}
+
+void CRClient::SetForcedAspectRatio()
+{
+	int State = Client()->State();
+	bool Allow = g_Config.m_RcCustomAspectEnabled;
+	if(State == CClient::EClientState::STATE_ONLINE && !GameClient()->m_GameInfo.m_AllowZoom)
+		Allow = false;
+	Graphics()->SetForcedAspectRatio(g_Config.m_RcCustomAspectX, g_Config.m_RcCustomAspectY, Allow);
 }

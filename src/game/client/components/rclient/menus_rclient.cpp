@@ -15,6 +15,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include "rclient_include.h"
+
 enum
 {
 	RCLIENT_TAB_SETTINGS = 0,
@@ -22,6 +24,19 @@ enum
 	RCLIENT_TAB_INFO,
 	NUMBER_OF_RCLIENT_TABS
 };
+
+static class CMenusRClientConfirmAspect : public SPopupMenuId
+{
+public:
+	CUi *m_pUi = nullptr;
+	CGameClient *m_pGameClient = nullptr;
+	CButtonContainer m_ConfirmButton;
+	CButtonContainer m_DenyButton;
+	int m_OldAspectX;
+	int m_OldAspectY;
+	int64_t m_Timeout;
+	static CUi::EPopupMenuFunctionResult Render(void *pContext, CUIRect View, bool Active);
+} s_AspectConfirmPopupContext;
 
 const float FontSize = 14.0f;
 const float EditBoxFontSize = 12.0f;
@@ -160,7 +175,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		CUIRect Box;
 		Column.HSplitTop(LineSize + MarginExtraSmall, &Box, &Column);
 		Box.VSplitMid(&Label, &Button);
-		Ui()->DoLabel(&Label, RCLocalize("With Dummy"), FontSize, TEXTALIGN_MC);
+		Ui()->DoLabel(&Label, RCLocalize("With Dummy"), FontSize, TEXTALIGN_ML);
 		static CLineInput s_LineInput(g_Config.m_RcPlayerClanWithDummy, sizeof(g_Config.m_RcPlayerClanWithDummy));
 		s_LineInput.SetEmptyText(RCLocalize("#YESDUMMY"));
 		Ui()->DoEditBox(&s_LineInput, &Button, EditBoxFontSize);
@@ -170,7 +185,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		CUIRect Box;
 		Column.HSplitTop(LineSize + MarginExtraSmall, &Box, &Column);
 		Box.VSplitMid(&Label, &Button);
-		Ui()->DoLabel(&Label, RCLocalize("Without Dummy"), FontSize, TEXTALIGN_MC);
+		Ui()->DoLabel(&Label, RCLocalize("Without Dummy"), FontSize, TEXTALIGN_ML);
 		static CLineInput s_LineInput(g_Config.m_RcPlayerClanNoDummy, sizeof(g_Config.m_RcPlayerClanNoDummy));
 		s_LineInput.SetEmptyText(RCLocalize("#NODUMMY"));
 		Ui()->DoEditBox(&s_LineInput, &Button, EditBoxFontSize);
@@ -334,6 +349,104 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_TcDiscordRPC, RCLocalize("Discord RPC"), &g_Config.m_TcDiscordRPC, &Column, LineSize);
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcSteam, RCLocalize("Steam"), &g_Config.m_RcSteam, &Column, LineSize);
+
+	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
+	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;
+
+	Column.HSplitTop(MarginBetweenSections, nullptr, &Column);
+	s_SectionBoxes.push_back(Column);
+	Column.HSplitTop(HeadlineHeight, &Label, &Column);
+	Ui()->DoLabel(&Label, RCLocalize("Aspect Ratio"), HeadlineFontSize, TEXTALIGN_MC);
+	Column.HSplitTop(MarginSmall, nullptr, &Column);
+
+	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcCustomAspectEnabled, RCLocalize("Enable custom aspect ratio"), &g_Config.m_RcCustomAspectEnabled, &Column, LineSize);
+	float BoxSize = (Column.w - Margin * 2) / 3;
+	CUIRect Box, ToolTipsLabel;
+	Column.HSplitTop(LineSize, &Box, &Column);
+	Column.HSplitTop(Margin, &ToolTipsLabel, &Column);
+	Box.VSplitLeft(BoxSize, &Button, &Box);
+	ToolTipsLabel.VSplitLeft(BoxSize, &Label, &ToolTipsLabel);
+	Ui()->DoLabel(&Label, RCLocalize("Width"), Margin, TEXTALIGN_MC);
+	static int s_ScreenWidthAspect = g_Config.m_RcCustomAspectX;
+	static CLineInputNumber s_LineInputAspectWidth(s_ScreenWidthAspect);
+	s_LineInputAspectWidth.SetEmptyText("16");
+	if(!s_LineInputAspectWidth.IsActive())
+		s_LineInputAspectWidth.SetInteger(s_ScreenWidthAspect);
+	if(Ui()->DoEditBox(&s_LineInputAspectWidth, &Button, EditBoxFontSize))
+		s_ScreenWidthAspect = std::clamp(s_LineInputAspectWidth.GetInteger(), 1, 10000);
+	Box.VSplitLeft(Margin, &Button, &Box);
+	Ui()->DoLabel(&Button, "/", LineSize, TEXTALIGN_MC);
+	Box.VSplitLeft(BoxSize, &Button, &Box);
+	ToolTipsLabel.VSplitLeft(Margin, nullptr, &ToolTipsLabel);
+	ToolTipsLabel.VSplitLeft(BoxSize, &Label, &ToolTipsLabel);
+	Ui()->DoLabel(&Label, RCLocalize("Height"), Margin, TEXTALIGN_MC);
+	static int s_ScreenHeightAspect = g_Config.m_RcCustomAspectY;
+	static CLineInputNumber s_LineInputAspectHeight(s_ScreenHeightAspect);
+	s_LineInputAspectHeight.SetEmptyText("9");
+	if(!s_LineInputAspectHeight.IsActive())
+		s_LineInputAspectHeight.SetInteger(s_ScreenHeightAspect);
+	if(Ui()->DoEditBox(&s_LineInputAspectHeight, &Button, EditBoxFontSize))
+		s_ScreenHeightAspect = std::clamp(s_LineInputAspectHeight.GetInteger(), 1, 10000);
+	Box.VSplitLeft(Margin, &Button, &Box);
+	Ui()->DoLabel(&Button, "→", LineSize, TEXTALIGN_MC);
+	Box.VSplitLeft(BoxSize, &Button, &Box);
+	static CButtonContainer s_ApplyBtnAspect;
+	const float AspectConfirmTimeoutSec = 10.0f;
+	if(DoButton_Menu(&s_ApplyBtnAspect, RCLocalize("Apply"), 0, &Button))
+	{
+		s_AspectConfirmPopupContext.m_pUi = Ui();
+		s_AspectConfirmPopupContext.m_pGameClient = GameClient();
+		s_AspectConfirmPopupContext.m_OldAspectX = g_Config.m_RcCustomAspectX;
+		s_AspectConfirmPopupContext.m_OldAspectY = g_Config.m_RcCustomAspectY;
+		g_Config.m_RcCustomAspectX = s_ScreenWidthAspect;
+		g_Config.m_RcCustomAspectY = s_ScreenHeightAspect;
+		GameClient()->m_RClient.SetForcedAspectRatio();
+		s_AspectConfirmPopupContext.m_Timeout = time_get() + (int64_t)(AspectConfirmTimeoutSec * time_freq());
+
+		const CUIRect *pScreen = Ui()->Screen();
+		const float PopupW = 300.0f;
+		const float PopupH = 120.0f;
+
+		SPopupMenuProperties m_Props;
+		m_Props.m_CloseAtClickOutside = false;
+		m_Props.m_CloseAtEscape = false;
+		Ui()->DoPopupMenu(&s_AspectConfirmPopupContext, pScreen->w / 2.0f - PopupW / 2.0f, pScreen->h / 2.0f - PopupH / 2.0f, PopupW, PopupH, &s_AspectConfirmPopupContext, CMenusRClientConfirmAspect::Render, m_Props);
+	}
+
+	Column.HSplitTop(LineSize, &Button, &Column);
+	static int s_AspectDisableAll = 0;
+	if(DoButton_CheckBox(&s_AspectDisableAll, RCLocalize("Disable for almost all UI"), g_Config.m_RcCustomAspectDisable & RcAspectDisable::ALL, &Button))
+		g_Config.m_RcCustomAspectDisable ^= RcAspectDisable::ALL;
+	if(!(g_Config.m_RcCustomAspectDisable & RcAspectDisable::ALL))
+	{
+		Column.HSplitTop(LineSize, &Button, &Column);
+		static int s_AspectDisableWheels = 0;
+		if(DoButton_CheckBox(&s_AspectDisableWheels, RCLocalize("Disable for Wheels"), g_Config.m_RcCustomAspectDisable & RcAspectDisable::WHEELS, &Button))
+			g_Config.m_RcCustomAspectDisable ^= RcAspectDisable::WHEELS;
+
+		Column.HSplitTop(LineSize, &Button, &Column);
+		static int s_AspectDisableMenus = 0;
+		if(DoButton_CheckBox(&s_AspectDisableMenus, RCLocalize("Disable for Menus"), g_Config.m_RcCustomAspectDisable & RcAspectDisable::MENUS, &Button))
+			g_Config.m_RcCustomAspectDisable ^= RcAspectDisable::MENUS;
+
+		Column.HSplitTop(LineSize, &Button, &Column);
+		static int s_AspectDisableScoreboard = 0;
+		if(DoButton_CheckBox(&s_AspectDisableScoreboard, RCLocalize("Disable for Scoreboard"), g_Config.m_RcCustomAspectDisable & RcAspectDisable::SCOREBOARD, &Button))
+			g_Config.m_RcCustomAspectDisable ^= RcAspectDisable::SCOREBOARD;
+	}
+	else
+		Column.HSplitTop(LineSize * 3, nullptr, &Column);
+
+	Column.HSplitTop(LineSize, &Button, &Column);
+	static int s_AspectDisableHud = 0;
+	if(DoButton_CheckBox(&s_AspectDisableHud, RCLocalize("Disable for Hud"), g_Config.m_RcCustomAspectDisable & RcAspectDisable::HUD, &Button))
+		g_Config.m_RcCustomAspectDisable ^= RcAspectDisable::HUD;
+
+	Column.HSplitTop(LineSize, &Button, &Column);
+	static int s_AspectDisableChat = 0;
+	if(DoButton_CheckBox(&s_AspectDisableChat, RCLocalize("Disable for Chat"), g_Config.m_RcCustomAspectDisable & RcAspectDisable::CHAT, &Button))
+		g_Config.m_RcCustomAspectDisable ^= RcAspectDisable::CHAT;
+
 
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
 	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;
@@ -820,4 +933,43 @@ void CMenus::RenderSettingsRClientInfo(CUIRect MainView)
 	// Ui()->DoLabel(&Label, RCLocalize("Integration"), HeadlineFontSize, TEXTALIGN_ML);
 	// RightView.HSplitTop(MarginSmall, nullptr, &RightView);
 	// DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_TcDiscordRPC, RCLocalize("Enable Discord Integration"), &g_Config.m_TcDiscordRPC, &RightView, LineSize);
+}
+
+CUi::EPopupMenuFunctionResult CMenusRClientConfirmAspect::Render(void *pContext, CUIRect View, bool Active)
+{
+	CMenusRClientConfirmAspect *pPopupContext = static_cast<CMenusRClientConfirmAspect *>(pContext);
+	CUi *pUi = pPopupContext->m_pUi;
+	CGameClient *pGameClient = pPopupContext->m_pGameClient;
+
+	CUIRect Label, Countdown, Buttons, ConfirmButton, DenyButton;
+	View.HSplitMid(&Label, &Buttons, Margin);
+	Label.HSplitMid(&Label, &Countdown, MarginSmall);
+
+	pUi->DoLabel(&Label, RCLocalize("Keep this settings?"), HeadlineFontSize, TEXTALIGN_MC);
+
+	char aBuf[32];
+	str_format(aBuf, sizeof(aBuf), "Reset in %.2f", (pPopupContext->m_Timeout - time_get()) / (float)time_freq());
+	pUi->DoLabel(&Countdown, aBuf, HeadlineFontSize / 2.0f, TEXTALIGN_MC);
+
+	Buttons.VSplitMid(&DenyButton, &ConfirmButton, Margin);
+	if(pUi->DoButton_PopupMenu(&pPopupContext->m_ConfirmButton, RCLocalize("Confirm"), &ConfirmButton, FontSize, TEXTALIGN_MC))
+		return CUi::POPUP_CLOSE_CURRENT;
+
+	if(pUi->DoButton_PopupMenu(&pPopupContext->m_DenyButton, RCLocalize("Deny"), &DenyButton, FontSize, TEXTALIGN_MC))
+	{
+		g_Config.m_RcCustomAspectX = pPopupContext->m_OldAspectX;
+		g_Config.m_RcCustomAspectY = pPopupContext->m_OldAspectY;
+		pGameClient->m_RClient.SetForcedAspectRatio();
+		return CUi::POPUP_CLOSE_CURRENT;
+	}
+
+	if(time_get() > pPopupContext->m_Timeout)
+	{
+		g_Config.m_RcCustomAspectX = pPopupContext->m_OldAspectX;
+		g_Config.m_RcCustomAspectY = pPopupContext->m_OldAspectY;
+		pGameClient->m_RClient.SetForcedAspectRatio();
+		return CUi::POPUP_CLOSE_CURRENT;
+	}
+
+	return CUi::POPUP_KEEP_OPEN;
 }

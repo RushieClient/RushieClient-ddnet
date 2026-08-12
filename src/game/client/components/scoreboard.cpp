@@ -4,6 +4,7 @@
 
 #include "generated/client_data.h"
 #include "rclient/external/ddnet-custom-clients/custom_clients_ids.h"
+#include "rclient/rclient_include.h"
 
 #include <base/time.h>
 
@@ -943,6 +944,8 @@ void CScoreboard::OnRender()
 		return;
 	}
 
+	Ui()->m_RcForceRealAspect = g_Config.m_RcCustomAspectDisable & RcAspectDisable::SCOREBOARD;
+
 	if(!GameClient()->m_Menus.IsActive() && !GameClient()->m_Chat.IsActive())
 	{
 		Ui()->StartCheck();
@@ -1103,6 +1106,8 @@ void CScoreboard::OnRender()
 
 		Ui()->FinishCheck();
 	}
+
+	Ui()->m_RcForceRealAspect = false;
 }
 
 bool CScoreboard::IsActive() const

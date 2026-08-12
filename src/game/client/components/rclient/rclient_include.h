@@ -1,0 +1,17 @@
+#ifndef GAME_CLIENT_COMPONENTS_RCLIENT_RCLIENTINCLUDE_H
+#define GAME_CLIENT_COMPONENTS_RCLIENT_RCLIENTINCLUDE_H
+
+namespace RcAspectDisable
+{
+	enum
+	{
+		ALL = 1 << 0,
+		WHEELS = 1 << 1,
+		MENUS = 1 << 2,
+		HUD = 1 << 3,
+		SCOREBOARD = 1 << 4,
+		CHAT = 1 << 5,
+	};
+}
+
+#endif //RCLIENT_RCLIENT_INCLUDE_H

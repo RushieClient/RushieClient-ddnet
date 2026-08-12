@@ -2621,6 +2621,7 @@ if(CLIENT)
     components/rclient/notify_on_move.h
     components/rclient/rclient.cpp
     components/rclient/rclient.h
+    components/rclient/rclient_include.h
     components/scoreboard.cpp
     components/scoreboard.h
     components/skins.cpp

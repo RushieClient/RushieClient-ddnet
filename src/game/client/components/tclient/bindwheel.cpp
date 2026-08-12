@@ -8,6 +8,8 @@
 #include <game/client/render.h>
 #include <game/client/ui.h>
 
+#include "../rclient/rclient_include.h"
+
 CBindWheel::CBindWheel()
 {
 	OnReset();
@@ -215,6 +217,7 @@ void CBindWheel::OnRender()
 		m_WasActive = true;
 	}
 
+	Ui()->m_RcForceRealAspect = g_Config.m_RcCustomAspectDisable & RcAspectDisable::WHEELS;
 	const CUIRect Screen = *Ui()->Screen();
 
 	const bool WasTouchPressed = GameClient()->m_Emoticon.m_TouchState.m_AnyPressed;
@@ -314,6 +317,8 @@ void CBindWheel::OnRender()
 	// Graphics()->QuadsEnd();
 
 	RenderTools()->RenderCursor(GameClient()->m_Emoticon.m_SelectorMouse + vec2(Screen.w, Screen.h) / 2.0f, 24.0f, aAnimationPhase[0]);
+
+	Ui()->m_RcForceRealAspect = false;
 }
 
 void CBindWheel::ExecuteBind(int Bind)

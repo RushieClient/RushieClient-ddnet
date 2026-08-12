@@ -1280,6 +1280,7 @@ public:
 
 	// RClient
 	void SetWindowScreenCaptureProtect(int Type) override;
+	void SetForcedAspectRatio(int AspectX, int AspectY, bool Allowed) override;
 };
 
 extern bool g_GraphicsForcedAspect;

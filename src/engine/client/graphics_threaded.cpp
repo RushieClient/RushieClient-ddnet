@@ -123,6 +123,7 @@ CGraphics_Threaded::CGraphics_Threaded()
 	m_ScreenWidth = -1;
 	m_ScreenHeight = -1;
 	m_ScreenRefreshRate = -1;
+	m_ScreenAspect = 0.0f;
 
 	m_Rotation = 0;
 	m_Drawing = EDrawing::NONE;
@@ -2255,6 +2256,31 @@ void CGraphics_Threaded::SetForcedAspect(bool Force)
 
 	for(auto &ResizeListener : m_vResizeListeners)
 		ResizeListener();
+}
+
+void CGraphics_Threaded::SetForcedAspectRatio(int AspectX, int AspectY, bool Allowed)
+{
+	if(!IsBackendInitialized())
+		return;
+	float Ratio = (float)AspectX / (float)AspectY;
+	if((m_ScreenAspect == Ratio && Allowed) || (m_ScreenAspect == 0.0f && !Allowed))
+		return;
+
+	if(Allowed)
+	{
+		m_ScreenAspect = Ratio;
+	}
+	else
+	{
+		m_ScreenAspect = 0.0f;
+	}
+
+	// // kick the command buffer and wait
+	// KickCommandBuffer();
+	// WaitForIdle();
+	//
+	// for(auto &ResizeListener : m_vResizeListeners)
+	// 	ResizeListener();
 }
 
 void CGraphics_Threaded::AdjustViewport(bool SendViewportChangeToBackend)
