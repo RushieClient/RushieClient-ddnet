@@ -11,6 +11,7 @@ namespace RcAspectDisable
 		HUD = 1 << 3,
 		SCOREBOARD = 1 << 4,
 		CHAT = 1 << 5,
+		CONSOLE = 1 << 6,
 	};
 }
 

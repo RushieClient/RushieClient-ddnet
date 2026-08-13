@@ -433,9 +433,14 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		static int s_AspectDisableScoreboard = 0;
 		if(DoButton_CheckBox(&s_AspectDisableScoreboard, RCLocalize("Disable for Scoreboard"), g_Config.m_RcCustomAspectDisable & RcAspectDisable::SCOREBOARD, &Button))
 			g_Config.m_RcCustomAspectDisable ^= RcAspectDisable::SCOREBOARD;
+
+		Column.HSplitTop(LineSize, &Button, &Column);
+		static int s_AspectDisableConsole = 0;
+		if(DoButton_CheckBox(&s_AspectDisableConsole, RCLocalize("Disable for Console"), g_Config.m_RcCustomAspectDisable & RcAspectDisable::CONSOLE, &Button))
+			g_Config.m_RcCustomAspectDisable ^= RcAspectDisable::CONSOLE;
 	}
 	else
-		Column.HSplitTop(LineSize * 3, nullptr, &Column);
+		Column.HSplitTop(LineSize * 4, nullptr, &Column);
 
 	Column.HSplitTop(LineSize, &Button, &Column);
 	static int s_AspectDisableHud = 0;
@@ -941,6 +946,9 @@ CUi::EPopupMenuFunctionResult CMenusRClientConfirmAspect::Render(void *pContext,
 	CUi *pUi = pPopupContext->m_pUi;
 	CGameClient *pGameClient = pPopupContext->m_pGameClient;
 
+	ColorRGBA Red(1.0f, 0.4f, 0.4f);
+	ColorRGBA Green(0.4f, 1.0f, 0.4f);
+
 	CUIRect Label, Countdown, Buttons, ConfirmButton, DenyButton;
 	View.HSplitMid(&Label, &Buttons, Margin);
 	Label.HSplitMid(&Label, &Countdown, MarginSmall);
@@ -952,10 +960,10 @@ CUi::EPopupMenuFunctionResult CMenusRClientConfirmAspect::Render(void *pContext,
 	pUi->DoLabel(&Countdown, aBuf, HeadlineFontSize / 2.0f, TEXTALIGN_MC);
 
 	Buttons.VSplitMid(&DenyButton, &ConfirmButton, Margin);
-	if(pUi->DoButton_PopupMenu(&pPopupContext->m_ConfirmButton, RCLocalize("Confirm"), &ConfirmButton, FontSize, TEXTALIGN_MC))
+	if(pUi->DoButton_PopupMenu(&pPopupContext->m_ConfirmButton, RCLocalize("Confirm"), &ConfirmButton, FontSize, TEXTALIGN_MC, 0, false, true, Green))
 		return CUi::POPUP_CLOSE_CURRENT;
 
-	if(pUi->DoButton_PopupMenu(&pPopupContext->m_DenyButton, RCLocalize("Deny"), &DenyButton, FontSize, TEXTALIGN_MC))
+	if(pUi->DoButton_PopupMenu(&pPopupContext->m_DenyButton, RCLocalize("Deny"), &DenyButton, FontSize, TEXTALIGN_MC, 0, false, true, Red))
 	{
 		g_Config.m_RcCustomAspectX = pPopupContext->m_OldAspectX;
 		g_Config.m_RcCustomAspectY = pPopupContext->m_OldAspectY;

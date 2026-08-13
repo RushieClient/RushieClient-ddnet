@@ -21,6 +21,7 @@
 #include <generated/client_data.h>
 
 #include <game/client/components/tclient/colored_parts.h>
+#include <game/client/components/rclient/rclient_include.h>
 #include <game/client/gameclient.h>
 #include <game/client/ui.h>
 #include <game/localization.h>
@@ -1144,8 +1145,10 @@ void CGameConsole::Prompt(char (&aPrompt)[32])
 
 void CGameConsole::OnRender()
 {
+	Ui()->m_RcForceRealAspect = g_Config.m_RcCustomAspectDisable & RcAspectDisable::CONSOLE;
 	CUIRect Screen = *Ui()->Screen();
 	CInstance *pConsole = CurrentConsole();
+	Ui()->m_RcForceRealAspect = false;
 
 	const float MaxConsoleHeight = Screen.h * 3 / 5.0f;
 	float Progress = (Client()->GlobalTime() - (m_StateChangeEnd - m_StateChangeDuration)) / m_StateChangeDuration;
@@ -1190,6 +1193,7 @@ void CGameConsole::OnRender()
 	const ColorRGBA aBackgroundColors[NUM_CONSOLETYPES] = {ColorRGBA(0.2f, 0.2f, 0.2f, 0.9f), ColorRGBA(0.4f, 0.2f, 0.2f, 0.9f)};
 	const ColorRGBA aBorderColors[NUM_CONSOLETYPES] = {ColorRGBA(0.1f, 0.1f, 0.1f, 0.9f), ColorRGBA(0.2f, 0.1f, 0.1f, 0.9f)};
 
+	Ui()->m_RcForceRealAspect = g_Config.m_RcCustomAspectDisable & RcAspectDisable::CONSOLE;
 	Ui()->MapScreen();
 
 	// background
@@ -1621,6 +1625,8 @@ void CGameConsole::OnRender()
 		const char *pClientVersion = CLIENT_NAME " " CLIENT_RELEASE_VERSION;
 		TextRender()->Text(Screen.w - TextRender()->TextWidth(FONT_SIZE, pClientVersion) - 10.0f, FONT_SIZE / 2.0f + FONT_SIZE * 1.5f, FONT_SIZE, pClientVersion);
 	}
+
+	Ui()->m_RcForceRealAspect = false;
 }
 
 void CGameConsole::OnMessage(int MsgType, void *pRawMsg)
