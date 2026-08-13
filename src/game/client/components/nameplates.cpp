@@ -776,6 +776,9 @@ protected:
 			case CUSTOM_CLIENT_ID_PDUCKCLIENT:
 				m_Texture = g_pData->m_aImages[IMAGE_RCDUCKICON].m_Id;
 				break;
+			case CUSTOM_CLIENT_ID_ASCENDCLIENT:
+				m_Texture = g_pData->m_aImages[IMAGE_RCASCENDICON].m_Id;
+				break;
 			default:
 				break;
 			}

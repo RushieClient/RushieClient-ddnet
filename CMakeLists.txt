@@ -1648,9 +1648,11 @@ set(EXPECTED_DATA
   particles.png
   race_flag.png
   rclient/audio/nonactive_wakeup.wv
+  rclient/icons/ascendclient_size.png
   rclient/icons/chillerbotux_size.png
   rclient/icons/duckicon_size.png
   rclient/icons/kazioicon_size.png
+  rclient/icons/license.txt
   rclient/languages/index.txt
   rclient/languages/russian.txt
   rclient/menu_afk.png

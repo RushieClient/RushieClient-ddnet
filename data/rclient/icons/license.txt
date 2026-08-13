@@ -1,0 +1,44 @@
+Licenses for the files inside this folder:
+
+chillerbotux.png:
+    author: +KZ
+    license: CC BY-SA 4.0
+    source: https://github.com/M0REKZ/kaizo-client/blob/client/data/kz/chillerbotux.png
+
+duckicon.png:
+    author: Pointer
+    license: CC BY 4.0
+    source: https://github.com/Pointer31/ddnet_client/blob/infclass-based-19.7-ugly/data/clienticons/duckicon.png
+
+fclient.png:
+    author: remake by +KZ, originally by fokkonaut
+    license: CC BY-SA 3.0
+    source: https://github.com/M0REKZ/kaizo-client/blob/client/data/kz/fclient.png
+    original source: https://github.com/fokkonaut/F-Client/blob/F-Client/datasrc/client_icons.png
+
+gamer.png:
+    remake by +KZ, originally by Dune
+    license: CC BY-SA 3.0
+    source: https://github.com/M0REKZ/kaizo-client/blob/client/data/kz/gamer.png
+    original source: https://github.com/Dune-jr/teeworlds/blob/gamer/datasrc/client_icons.png
+
+kaizoicon.png:
+    author: by +KZ
+    license: CC BY-SA 4.0
+    source: https://github.com/M0REKZ/kaizo-client/blob/client/data/kz/kaizoicon.png
+
+zillywoods.png:
+    author: remake by +KZ, originally by ChillerDragon
+    license: CC BY-SA 3.0
+    source: https://github.com/M0REKZ/kaizo-client/blob/client/data/kz/zillywoods.png
+    original source: https://github.com/ZillyWoods/ZillyWoods/blob/zilly/datasrc/client_icons.png
+
+rushieicon.png:
+    author: Voix
+    license: CC BY-SA 3.0
+    source: https://github.com/RushieClient/RushieClient-ddnet/blob/master/data/rclient/rclient_icon.png
+
+ascendclient.png:
+    author: WarHammer
+    license: CC BY-ND 4.0
+    source: https://github.com/WarHammer-z/AscendClientLib/blob/main/ascendclient.png

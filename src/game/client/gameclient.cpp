@@ -1818,6 +1818,8 @@ void CGameClient::OnNewSnapshot()
 							pClient->m_CustomClient = CUSTOM_CLIENT_ID_CHILLERBOTUX;
 						else if(MACRO_IS_SKIN_COLOR_CCID(pClient->m_ColorBody, pClient->m_ColorFeet, CCID_COLOR_BODY_PDUCKCLIENT, CCID_COLOR_FEET_PDUCKCLIENT))
 							pClient->m_CustomClient = CUSTOM_CLIENT_ID_DUCK_N_INFCLASS_CLIENT;
+						else if(MACRO_IS_SKIN_COLOR_CCID(pClient->m_ColorBody, pClient->m_ColorFeet, CCID_COLOR_BODY_ASCENDCLIENT, CCID_COLOR_FEET_ASCENDCLIENT))
+							pClient->m_CustomClient = CUSTOM_CLIENT_ID_ASCENDCLIENT;
 						else
 							pClient->m_CustomClient = 0;
 					}

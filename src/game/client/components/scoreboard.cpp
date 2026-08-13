@@ -775,6 +775,9 @@ void CScoreboard::RenderScoreboard(CUIRect Scoreboard, int Team, int CountStart,
 						case CUSTOM_CLIENT_ID_DUCK_N_INFCLASS_CLIENT:
 							m_Texture = IMAGE_RCDUCKICON;
 							break;
+						case CUSTOM_CLIENT_ID_ASCENDCLIENT:
+							m_Texture = IMAGE_RCASCENDICON;
+							break;
 						default:
 							break;
 						}
