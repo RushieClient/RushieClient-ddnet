@@ -361,10 +361,10 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcCustomAspectEnabled, RCLocalize("Enable custom aspect ratio"), &g_Config.m_RcCustomAspectEnabled, &Column, LineSize);
 	float BoxSize = (Column.w - Margin * 2) / 3;
-	CUIRect Box, ToolTipsLabel;
-	Column.HSplitTop(LineSize, &Box, &Column);
+	CUIRect Boxes, ToolTipsLabel;
+	Column.HSplitTop(LineSize, &Boxes, &Column);
 	Column.HSplitTop(Margin, &ToolTipsLabel, &Column);
-	Box.VSplitLeft(BoxSize, &Button, &Box);
+	Boxes.VSplitLeft(BoxSize, &Button, &Boxes);
 	ToolTipsLabel.VSplitLeft(BoxSize, &Label, &ToolTipsLabel);
 	Ui()->DoLabel(&Label, RCLocalize("Width"), Margin, TEXTALIGN_MC);
 	static int s_ScreenWidthAspect = g_Config.m_RcCustomAspectX;
@@ -374,9 +374,9 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		s_LineInputAspectWidth.SetInteger(s_ScreenWidthAspect);
 	if(Ui()->DoEditBox(&s_LineInputAspectWidth, &Button, EditBoxFontSize))
 		s_ScreenWidthAspect = std::clamp(s_LineInputAspectWidth.GetInteger(), 1, 10000);
-	Box.VSplitLeft(Margin, &Button, &Box);
+	Boxes.VSplitLeft(Margin, &Button, &Boxes);
 	Ui()->DoLabel(&Button, "/", LineSize, TEXTALIGN_MC);
-	Box.VSplitLeft(BoxSize, &Button, &Box);
+	Boxes.VSplitLeft(BoxSize, &Button, &Boxes);
 	ToolTipsLabel.VSplitLeft(Margin, nullptr, &ToolTipsLabel);
 	ToolTipsLabel.VSplitLeft(BoxSize, &Label, &ToolTipsLabel);
 	Ui()->DoLabel(&Label, RCLocalize("Height"), Margin, TEXTALIGN_MC);
@@ -387,9 +387,9 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		s_LineInputAspectHeight.SetInteger(s_ScreenHeightAspect);
 	if(Ui()->DoEditBox(&s_LineInputAspectHeight, &Button, EditBoxFontSize))
 		s_ScreenHeightAspect = std::clamp(s_LineInputAspectHeight.GetInteger(), 1, 10000);
-	Box.VSplitLeft(Margin, &Button, &Box);
+	Boxes.VSplitLeft(Margin, &Button, &Boxes);
 	Ui()->DoLabel(&Button, "→", LineSize, TEXTALIGN_MC);
-	Box.VSplitLeft(BoxSize, &Button, &Box);
+	Boxes.VSplitLeft(BoxSize, &Button, &Boxes);
 	static CButtonContainer s_ApplyBtnAspect;
 	const float AspectConfirmTimeoutSec = 10.0f;
 	if(DoButton_Menu(&s_ApplyBtnAspect, RCLocalize("Apply"), 0, &Button))
