@@ -12,6 +12,8 @@ namespace RcAspectDisable
 		SCOREBOARD = 1 << 4,
 		CHAT = 1 << 5,
 		CONSOLE = 1 << 6,
+		EDGEINFO = 1 << 7,
+		INFOMESSAGES = 1 << 8,
 	};
 }
 

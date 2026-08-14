@@ -18,6 +18,8 @@
 #include <game/client/prediction/gameworld.h>
 #include <game/localization.h>
 
+#include <game/client/components/rclient/rclient_include.h>
+
 static constexpr float ROW_HEIGHT = 46.0f;
 static constexpr float FONT_SIZE = 36.0f;
 static constexpr float RACE_FLAG_SIZE = 52.0f;
@@ -448,7 +450,7 @@ void CInfoMessages::OnRender()
 		return;
 
 	const float Height = 1.5f * 400.0f * 3.0f;
-	const float Width = Height * Graphics()->ScreenAspect();
+	const float Width = Height * (g_Config.m_RcCustomAspectDisable & RcAspectDisable::INFOMESSAGES ? Graphics()->ScreenAspectReal() : Graphics()->ScreenAspect());
 
 	Graphics()->MapScreen(0, 0, Width, Height);
 	Graphics()->SetColor(1.0f, 1.0f, 1.0f, 1.0f);

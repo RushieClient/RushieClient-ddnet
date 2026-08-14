@@ -16,8 +16,6 @@ class CEdgeHelper : public CComponent
 
 	std::vector<int> values = {41, 31, 28, 25, 16, 13, 56, 62, 63, 66, 69, 72, 81, 84};
 
-	CUIRect m_Rect;
-
 	void RIReset()
 	{
 	}

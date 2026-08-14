@@ -452,6 +452,16 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	if(DoButton_CheckBox(&s_AspectDisableChat, RCLocalize("Disable for Chat"), g_Config.m_RcCustomAspectDisable & RcAspectDisable::CHAT, &Button))
 		g_Config.m_RcCustomAspectDisable ^= RcAspectDisable::CHAT;
 
+	Column.HSplitTop(LineSize, &Button, &Column);
+	static int s_AspectDisableEdgeinfo = 0;
+	if(DoButton_CheckBox(&s_AspectDisableEdgeinfo, RCLocalize("Disable for Edge info"), g_Config.m_RcCustomAspectDisable & RcAspectDisable::EDGEINFO, &Button))
+		g_Config.m_RcCustomAspectDisable ^= RcAspectDisable::EDGEINFO;
+
+	Column.HSplitTop(LineSize, &Button, &Column);
+	static int s_AspectDisableInfoMessages = 0;
+	if(DoButton_CheckBox(&s_AspectDisableInfoMessages, RCLocalize("Disable for Info messages"), g_Config.m_RcCustomAspectDisable & RcAspectDisable::INFOMESSAGES, &Button))
+		g_Config.m_RcCustomAspectDisable ^= RcAspectDisable::INFOMESSAGES;
+
 
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
 	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;

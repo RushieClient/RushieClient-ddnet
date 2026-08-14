@@ -15,6 +15,9 @@
 #include <game/client/components/menus.h>
 #include <game/client/gameclient.h>
 #include <game/client/ui.h>
+
+#include <game/client/components/rclient/rclient_include.h>
+
 struct SEdgeHelperProperties
 {
 	static constexpr float ms_Padding = 3.0f;
@@ -95,24 +98,17 @@ void CEdgeHelper::RenderEdgeHelper()
 {
 	CUIRect Base, EdgeInfo, JumpInfo;
 
-	Base.h = 100.0f * 3.0f / (g_Config.m_RcEdgeInfoJump && g_Config.m_RcEdgeInfoCords ? 6 : 12);
-	Base.w = 100.0f * 3.0f * Graphics()->ScreenAspect() / 5;
-	Base.x = (100.0f * 3.0f * Graphics()->ScreenAspect() / 2 - Base.w / 2) * (g_Config.m_RcEdgeInfoPosX / 50.0f);
-	Base.y = ((100.0f * 3.0f) / 2) * (g_Config.m_RcEdgeInfoPosY / 50.0f);
+	float m_Height = 300.0f;
+	float m_Width = m_Height * (g_Config.m_RcCustomAspectDisable & RcAspectDisable::EDGEINFO ? Graphics()->ScreenAspectReal() : Graphics()->ScreenAspect());
 
-	vec2 ScreenTL, ScreenBR;
-	Graphics()->GetScreen(&ScreenTL.x, &ScreenTL.y, &ScreenBR.x, &ScreenBR.y);
+	Ui()->m_RcForceRealAspect = g_Config.m_RcCustomAspectDisable & RcAspectDisable::EDGEINFO;
+	Base.h = m_Height / (g_Config.m_RcEdgeInfoJump && g_Config.m_RcEdgeInfoCords ? 6 : 12);
+	Base.w = m_Width / 5;
+	Base.x = (m_Width - Base.w) * (g_Config.m_RcEdgeInfoPosX / 100.0f);
+	Base.y = (m_Height - Base.h) * (g_Config.m_RcEdgeInfoPosY / 100.0f);
 
-	if(Base.y + Base.h > ScreenBR.y)
-	{
-		Base.y -= Base.y + Base.h - ScreenBR.y;
-	}
-	if(Base.x + Base.w > ScreenBR.x)
-	{
-		Base.x -= Base.x + Base.w - ScreenBR.x;
-	}
 
-	m_Rect = Base;
+	Graphics()->MapScreen(0.0f, 0.0f, m_Width, m_Height);
 
 	Base.Draw(SEdgeHelperProperties::WindowColorDark(), IGraphics::CORNER_ALL, SEdgeHelperProperties::ms_Rounding);
 	Base.Margin(SEdgeHelperProperties::ms_Padding, &Base);
