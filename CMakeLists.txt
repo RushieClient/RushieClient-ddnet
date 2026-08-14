@@ -2615,6 +2615,8 @@ if(CLIENT)
     components/players.h
     components/race_demo.cpp
     components/race_demo.h
+    components/rclient/adminpanel.cpp
+    components/rclient/adminpanel.h
     components/rclient/edgehelper.cpp
     components/rclient/edgehelper.h
     components/rclient/external/ddnet-custom-clients/custom_clients_ids.h
