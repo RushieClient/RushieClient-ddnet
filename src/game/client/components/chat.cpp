@@ -1405,6 +1405,22 @@ void CChat::OnRender()
 				}
 			}
 		}
+
+		if(m_MouseUnlocked)
+		{
+			float HistoryBottomY = y - ScaledFontSize;
+			float LineWidth = g_Config.m_ClChatWidth;
+			float Margin = 2.5f;
+			CUIRect TranslateYour, TranslateOthers;
+			CUIRect Settings = {LineWidth, HistoryBottomY - 10.0f, 75.0f, 10.0f}; // W - Settings 10, Others - 30, 30
+			Settings.VSplitLeft(30.0f, &TranslateYour, &Settings);
+			Settings.VSplitLeft(Margin, nullptr, &Settings);
+			Settings.VSplitLeft(30.0f, &TranslateOthers, &Settings);
+			Settings.VSplitRight(10.0f, nullptr, &Settings);
+			Settings.Draw(ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f), IGraphics::CORNER_ALL, 2.0f);
+			TranslateYour.Draw(ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f), IGraphics::CORNER_ALL, 2.0f);
+			TranslateOthers.Draw(ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f), IGraphics::CORNER_ALL, 2.0f);
+		}
 	}
 
 #if defined(CONF_VIDEORECORDER)
@@ -1436,10 +1452,12 @@ void CChat::OnRender()
 	CUIRect Row;
 
 	if(m_Mode != MODE_NONE &&
-	!GameClient()->m_Menus.IsActive() && !GameClient()->m_Scoreboard.IsActive())
+	!GameClient()->m_Menus.IsActive() && !GameClient()->m_Scoreboard.IsActive() && m_MouseUnlocked)
 	{
 		Ui()->StartCheck();
+		Ui()->m_RcUpdateInputs = false;
 		Ui()->Update();
+		Ui()->m_RcUpdateInputs = true;
 	}
 
 	for(int i = 0; i < MAX_LINES; i++)
@@ -1538,7 +1556,7 @@ void CChat::OnRender()
 	}
 
 	if(m_Mode != MODE_NONE &&
-		!GameClient()->m_Menus.IsActive() && !GameClient()->m_Scoreboard.IsActive())
+		!GameClient()->m_Menus.IsActive() && !GameClient()->m_Scoreboard.IsActive() && m_MouseUnlocked)
 	{
 		Ui()->RenderPopupMenus();
 
@@ -1546,8 +1564,6 @@ void CChat::OnRender()
 			RenderTools()->RenderCursor(Ui()->MousePos(), 12.0f);
 
 		Ui()->FinishCheck();
-
-		m_Input.Activate(EInputPriority::CHAT);
 	}
 }
 

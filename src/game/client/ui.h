@@ -579,7 +579,10 @@ public:
 	const CUIRect *Screen();
 	void MapScreen();
 	float PixelSize();
+
+	// RClient
 	bool m_RcForceRealAspect = false;
+	bool m_RcUpdateInputs = true;
 
 	void ClipEnable(const CUIRect *pRect);
 	void ClipDisable();

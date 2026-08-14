@@ -251,9 +251,12 @@ void CUi::Update(vec2 MouseWorldPos)
 
 	if(Enabled())
 	{
-		CLineInput *pActiveInput = CLineInput::GetActiveInput();
-		if(pActiveInput && m_pLastActiveItem && pActiveInput != m_pLastActiveItem)
-			pActiveInput->Deactivate();
+		if(m_RcUpdateInputs)
+		{
+			CLineInput *pActiveInput = CLineInput::GetActiveInput();
+			if(pActiveInput && m_pLastActiveItem && pActiveInput != m_pLastActiveItem)
+				pActiveInput->Deactivate();
+		}
 	}
 	else
 	{
