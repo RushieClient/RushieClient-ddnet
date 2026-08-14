@@ -753,7 +753,7 @@ void CTranslate::AutoTranslate(CChat::CLine &Line)
 {
 	if(!g_Config.m_TcTranslateAuto)
 		return;
-	if(Line.m_ClientId == CChat::CLIENT_MSG)
+	if(Line.m_ClientId == CChat::CLIENT_MSG || (!g_Config.m_RcTranslateServerMessages && Line.m_ClientId == CChat::SERVER_MSG))
 		return;
 	for(const int Id : GameClient()->m_aLocalIds)
 	{

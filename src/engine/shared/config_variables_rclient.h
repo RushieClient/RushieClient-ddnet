@@ -36,6 +36,7 @@ MACRO_CONFIG_COL(RcMessageFilterPrintBlockedMessageColor, rc_message_filter_prin
 // Translate
 MACRO_CONFIG_INT(RcTranslateSend, rc_translate_send, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Translate sending message")
 MACRO_CONFIG_STR(RcTranslateSendTarget, rc_translate_send_target, 16, "en", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Sending message translate target language (must be 2 character ISO 639 code)")
+MACRO_CONFIG_INT(RcTranslateServerMessages, rc_translate_server_messages, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Translate server message")
 
 // Heart
 MACRO_CONFIG_INT(RcShowHeartInScoreboard, rc_show_heart_in_scoreboard, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show heart in scoreboard")
@@ -119,6 +120,7 @@ MACRO_CONFIG_INT(RcRconSteamerMode, rc_rcon_streamer_mode, 0, 0, 2, CFGFLAG_CLIE
 
 // Chat
 MACRO_CONFIG_INT(RcChatShowMouse, rc_chat_show_mouse, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show mouse when chat")
+MACRO_CONFIG_INT(RcChatShowTranslateFastSettings, rc_chat_show_translate_fast_settings, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show translate settings when chat")
 
 // Integration
 MACRO_CONFIG_INT(RcSteam, rc_steam, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Enable steam integration")
