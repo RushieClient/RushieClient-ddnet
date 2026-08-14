@@ -32,6 +32,12 @@
 static constexpr float FONT_SIZE = 10.0f;
 static constexpr float LINE_SPACING = 1.0f;
 
+namespace ScrollBar
+{
+	static constexpr float SCROLLBAR_WIDTH = 10.0f;
+	static constexpr float SCROLLBAR_MARGIN = 3.0f;
+}
+
 class CConsoleLogger : public ILogger
 {
 	CGameConsole *m_pConsole;
@@ -304,6 +310,7 @@ void CGameConsole::CInstance::PumpBacklogPending()
 
 	// Update text attributes and count number of added lines
 	m_pGameConsole->Ui()->MapScreen();
+	RcBacklogTotalLines = 0;
 	for(CBacklogEntry *pEntry = m_Backlog.First(); pEntry; pEntry = m_Backlog.Next(pEntry))
 	{
 		if(pEntry->m_LineCount == -1)
@@ -311,6 +318,7 @@ void CGameConsole::CInstance::PumpBacklogPending()
 			UpdateEntryTextAttributes(pEntry);
 			m_NewLineCounter += pEntry->m_LineCount;
 		}
+		RcBacklogTotalLines += pEntry->m_LineCount;
 	}
 }
 
@@ -828,7 +836,7 @@ void CGameConsole::CInstance::UpdateEntryTextAttributes(CBacklogEntry *pEntry) c
 	CTextCursor Cursor;
 	Cursor.m_FontSize = FONT_SIZE;
 	Cursor.m_Flags = 0;
-	Cursor.m_LineWidth = m_pGameConsole->Ui()->Screen()->w - 10;
+	Cursor.m_LineWidth = m_pGameConsole->Ui()->Screen()->w - 10 - ScrollBar::SCROLLBAR_WIDTH - ScrollBar::SCROLLBAR_MARGIN;
 	Cursor.m_MaxLines = 10;
 	Cursor.m_LineSpacing = LINE_SPACING;
 	m_pGameConsole->TextRender()->TextEx(&Cursor, pEntry->m_aText, -1);
@@ -897,7 +905,7 @@ void CGameConsole::CInstance::UpdateSearch()
 	}
 
 	ITextRender *pTextRender = m_pGameConsole->Ui()->TextRender();
-	const int LineWidth = m_pGameConsole->Ui()->Screen()->w - 10.0f;
+	const int LineWidth = m_pGameConsole->Ui()->Screen()->w - 10.0f - ScrollBar::SCROLLBAR_WIDTH - ScrollBar::SCROLLBAR_MARGIN;
 
 	CBacklogEntry *pEntry = m_Backlog.Last();
 	int EntryLine = 0, LineToScrollStart = 0, LineToScrollEnd = 0;
@@ -1440,6 +1448,29 @@ void CGameConsole::OnRender()
 		if(pConsole->m_BacklogLastActiveLine < 0)
 			pConsole->m_BacklogLastActiveLine = pConsole->m_BacklogCurLine;
 
+		// RClient
+		float TotalLines = pConsole->RcBacklogTotalLines - pConsole->m_LinesRendered;
+		const CUIRect Rail = {Screen.w - ScrollBar::SCROLLBAR_MARGIN - ScrollBar::SCROLLBAR_WIDTH, 6.0f, ScrollBar::SCROLLBAR_WIDTH, ConsoleHeight - 12.0f};
+		const float MaxY = std::max(0.0f, Rail.h - 30.0f);
+		const float Value = 1.0f - pConsole->m_BacklogCurLine / TotalLines;
+		const CUIRect Handle = {Rail.x, Rail.y + Value * MaxY, Rail.w, 30.0f};
+		const bool ScrollbarActive = m_ConsoleState == CONSOLE_OPEN && pConsole->m_MouseIsPress && pConsole->m_MousePress.x >= Rail.x && pConsole->m_MousePress.x <= Rail.x + Rail.w;
+
+		if(ScrollbarActive)
+		{
+			pConsole->m_HasSelection = false;
+			pConsole->m_CurSelStart = -1;
+			pConsole->m_CurSelEnd = -1;
+			const float ClickedValue = std::clamp((pConsole->m_MouseRelease.y - Rail.y - Handle.h / 2) / MaxY, 0.0f, 1.0f);
+			pConsole->m_BacklogCurLine = std::round((1.0f - ClickedValue) * TotalLines);
+		}
+
+		if(TotalLines > 1.0f)
+		{
+			Rail.Draw(ColorRGBA(1.0f, 1.0f, 1.0f, 0.25f), IGraphics::CORNER_ALL, Rail.w / 2.0f);
+			Handle.Draw(Handle.Inside(GetMousePosition()) || ScrollbarActive ? ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f) : ColorRGBA(0.8f, 0.8f, 0.8f, 1.0f), IGraphics::CORNER_ALL, Handle.w / 2.0f);
+		}
+
 		int LineNum = -1;
 		pConsole->m_LinesRendered = 0;
 
@@ -1494,10 +1525,10 @@ void CGameConsole::OnRender()
 			CTextCursor EntryCursor;
 			EntryCursor.SetPosition(vec2(0.0f, y - OffsetY));
 			EntryCursor.m_FontSize = FONT_SIZE;
-			EntryCursor.m_LineWidth = Screen.w - 10.0f;
+			EntryCursor.m_LineWidth = Screen.w - 10.0f - ScrollBar::SCROLLBAR_WIDTH - ScrollBar::SCROLLBAR_MARGIN;
 			EntryCursor.m_MaxLines = pEntry->m_LineCount;
 			EntryCursor.m_LineSpacing = LINE_SPACING;
-			EntryCursor.m_CalculateSelectionMode = (m_ConsoleState == CONSOLE_OPEN && pConsole->m_MousePress.y < pConsole->m_BoundingBox.m_Y && (pConsole->m_MouseIsPress || (pConsole->m_CurSelStart != pConsole->m_CurSelEnd) || pConsole->m_HasSelection)) ? TEXT_CURSOR_SELECTION_MODE_CALCULATE : TEXT_CURSOR_SELECTION_MODE_NONE;
+			EntryCursor.m_CalculateSelectionMode = (m_ConsoleState == CONSOLE_OPEN && !ScrollbarActive && pConsole->m_MousePress.y < pConsole->m_BoundingBox.m_Y && (pConsole->m_MouseIsPress || (pConsole->m_CurSelStart != pConsole->m_CurSelEnd) || pConsole->m_HasSelection)) ? TEXT_CURSOR_SELECTION_MODE_CALCULATE : TEXT_CURSOR_SELECTION_MODE_NONE;
 			EntryCursor.m_PressMouse = pConsole->m_MousePress;
 			EntryCursor.m_ReleaseMouse = pConsole->m_MouseRelease;
 

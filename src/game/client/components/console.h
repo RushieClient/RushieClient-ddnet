@@ -141,6 +141,9 @@ class CGameConsole : public CComponent
 		bool IsInputHidden() const;
 		void UpdateCompletionSuggestions();
 
+		//RClient
+		int RcBacklogTotalLines = 0;
+
 	private:
 		void SetSearching(bool Searching);
 		void ClearSearch();
