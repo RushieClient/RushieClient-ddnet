@@ -1679,8 +1679,8 @@ void CRClient::AddNewLanguage(ChatThings::STranslateLangs Lang)
 		m_LatestLangsList.erase(m_LatestLangsList.cbegin());
 
 	s_LangDropDownNames.clear();
-	for(const auto &Lang : m_LatestLangsList)
-		s_LangDropDownNames.push_back(Lang.m_LangName);
+	for(ChatThings::STranslateLangs Item : m_LatestLangsList)
+		s_LangDropDownNames.push_back(Item.m_LangName);
 }
 
 ChatThings::STranslateLangs CRClient::GetLanguageName(const char *pCode)
