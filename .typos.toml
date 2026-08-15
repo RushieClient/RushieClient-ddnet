@@ -35,4 +35,7 @@ extend-ignore-re = [
 	'I\*\*nteger',
 	's\*\*tring',
 	'Dum',
+	'ND',
+	'fo',
+	'nd',
 ]
