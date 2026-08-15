@@ -3,6 +3,8 @@
 
 #include "chat.h"
 
+#include "engine/font_icons.h"
+
 #include <base/io.h>
 #include <base/time.h>
 
@@ -19,14 +21,13 @@
 
 #include <game/client/animstate.h>
 #include <game/client/components/censor.h>
+#include <game/client/components/rclient/rclient_include.h>
 #include <game/client/components/scoreboard.h>
 #include <game/client/components/skins.h>
 #include <game/client/components/sounds.h>
 #include <game/client/components/tclient/colored_parts.h>
 #include <game/client/gameclient.h>
 #include <game/localization.h>
-
-#include <game/client/components/rclient/rclient_include.h>
 
 char CChat::ms_aDisplayText[MAX_LINE_LENGTH] = "";
 
@@ -554,9 +555,7 @@ void CChat::EnableMode(int Team)
 			m_MouseUnlocked = true;
 			if(m_LastMousePos == std::nullopt)
 			{
-				vec2 MouseCenter = Ui()->Screen()->Center();
-				MouseCenter = {MouseCenter.x / 2.0f, MouseCenter.y / 2.0f};
-				SetUiMousePos(MouseCenter);
+				SetUiMousePos(Ui()->Screen()->Center());
 			}
 			else
 			{
@@ -588,6 +587,7 @@ void CChat::DisableMode()
 	if(m_MouseUnlocked)
 	{
 		LockMouse();
+		m_SettingsOpened = false;
 	}
 }
 
@@ -1405,22 +1405,6 @@ void CChat::OnRender()
 				}
 			}
 		}
-
-		if(m_MouseUnlocked)
-		{
-			float HistoryBottomY = y - ScaledFontSize;
-			float LineWidth = g_Config.m_ClChatWidth;
-			float Margin = 2.5f;
-			CUIRect TranslateYour, TranslateOthers;
-			CUIRect Settings = {LineWidth, HistoryBottomY - 10.0f, 75.0f, 10.0f}; // W - Settings 10, Others - 30, 30
-			Settings.VSplitLeft(30.0f, &TranslateYour, &Settings);
-			Settings.VSplitLeft(Margin, nullptr, &Settings);
-			Settings.VSplitLeft(30.0f, &TranslateOthers, &Settings);
-			Settings.VSplitRight(10.0f, nullptr, &Settings);
-			Settings.Draw(ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f), IGraphics::CORNER_ALL, 2.0f);
-			TranslateYour.Draw(ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f), IGraphics::CORNER_ALL, 2.0f);
-			TranslateOthers.Draw(ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f), IGraphics::CORNER_ALL, 2.0f);
-		}
 	}
 
 #if defined(CONF_VIDEORECORDER)
@@ -1460,6 +1444,114 @@ void CChat::OnRender()
 		Ui()->m_RcUpdateInputs = true;
 	}
 
+	if(m_Mode != MODE_NONE)
+	{
+		if(m_MouseUnlocked && g_Config.m_RcChatShowTranslateFastSettings)
+		{
+			const float HistoryBottomY = y - ScaledFontSize;
+			const float LineWidth = g_Config.m_ClChatWidth;
+			const float MarginSmall = 4.0f;
+			CUIRect TranslateYour, TranslateOthers;
+			CUIRect Settings = {LineWidth, HistoryBottomY - 10.0f, 75.0f, 10.0f}; // W - Settings 10, Others - 30, 30
+			Settings.VSplitLeft(30.0f, &TranslateYour, &Settings);
+			Settings.VSplitLeft(MarginSmall, nullptr, &Settings);
+			Settings.VSplitLeft(30.0f, &TranslateOthers, &Settings);
+			Settings.VSplitRight(10.0f, nullptr, &Settings);
+			Settings.Draw(Settings.Inside(Ui()->MousePos() / 2.0f) ? ColorRGBA(0.5f, 0.5f, 0.5f, 0.5f) : ColorRGBA(0.3f, 0.3f, 0.3f, 0.5f), IGraphics::CORNER_ALL, 3.0f);
+			if(TranslateYour.Inside(Ui()->MousePos() / 2.0f))
+				TranslateYour.Draw(g_Config.m_RcTranslateSend ? ColorRGBA(1.0f, 0.1f, 0.1f, 0.5f * 1.5f) : ColorRGBA(0.1f, 1.0f, 0.1f, 0.5f * 1.5f), IGraphics::CORNER_ALL, 3.0f);
+			else
+				TranslateYour.Draw(g_Config.m_RcTranslateSend ? ColorRGBA(0.1f, 1.0f, 0.1f, 0.5f) : ColorRGBA(1.0f, 0.1f, 0.1f, 0.5f), IGraphics::CORNER_ALL, 3.0f);
+
+			if(TranslateOthers.Inside(Ui()->MousePos() / 2.0f))
+				TranslateOthers.Draw(g_Config.m_TcTranslateAuto ? ColorRGBA(1.0f, 0.1f, 0.1f, 0.5f * 1.5f) : ColorRGBA(0.1f, 1.0f, 0.1f, 0.5f * 1.5f), IGraphics::CORNER_ALL, 3.0f);
+			else
+				TranslateOthers.Draw(g_Config.m_TcTranslateAuto ? ColorRGBA(0.1f, 1.0f, 0.1f, 0.5f) : ColorRGBA(1.0f, 0.1f, 0.1f, 0.5f), IGraphics::CORNER_ALL, 3.0f);
+
+			Ui()->DoLabel(&TranslateYour, "Your", TranslateYour.h / 2.0f, TEXTALIGN_MC);
+			Ui()->DoLabel(&TranslateOthers, "Others", TranslateYour.h / 2.0f, TEXTALIGN_MC);
+
+			if(TranslateYour.Inside(Ui()->MousePos() / 2.0f) && Ui()->MouseButtonClicked(0))
+				g_Config.m_RcTranslateSend = !g_Config.m_RcTranslateSend;
+
+			if(TranslateOthers.Inside(Ui()->MousePos() / 2.0f) && Ui()->MouseButtonClicked(0))
+				g_Config.m_TcTranslateAuto = !g_Config.m_TcTranslateAuto;
+
+			TextRender()->SetFontPreset(EFontPreset::ICON_FONT);
+			TextRender()->SetRenderFlags(ETextRenderFlags::TEXT_RENDER_FLAG_ONLY_ADVANCE_WIDTH | ETextRenderFlags::TEXT_RENDER_FLAG_NO_X_BEARING | ETextRenderFlags::TEXT_RENDER_FLAG_NO_Y_BEARING);
+			TextRender()->TextColor(TextRender()->DefaultTextColor());
+			Ui()->DoLabel(&Settings, FontIcon::GEAR, Settings.h / 2.0f, TEXTALIGN_MC);
+			TextRender()->SetRenderFlags(0);
+			TextRender()->SetFontPreset(EFontPreset::DEFAULT_FONT);
+
+			if(Settings.Inside(Ui()->MousePos() / 2.0f) && Ui()->MouseButtonClicked(0))
+				m_SettingsOpened = !m_SettingsOpened;
+
+			if(m_SettingsOpened)
+			{
+				Ui()->MapScreen();
+
+				const float Scale = 2.0f;
+				const float LineSize = 16.0f;
+				const float WindowSize = LineSize * 5.0f + 4.0f * 2.0f;
+				Settings = {LineWidth * Scale, (HistoryBottomY - 10.0f - MarginSmall) * Scale - WindowSize, 75.0f * Scale, WindowSize};
+				Settings.Draw(ColorRGBA(0.3f, 0.3f, 0.3f, 0.5f), IGraphics::CORNER_ALL, 6.0f);
+				Settings.Margin(4.0f, &Settings);
+
+				GameClient()->m_Menus.DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_TcTranslateAuto, "Translate Others Msgs", &g_Config.m_TcTranslateAuto, &Settings, LineSize);
+				GameClient()->m_Menus.DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcTranslateServerMessages, "Translate server messages", &g_Config.m_RcTranslateServerMessages, &Settings, LineSize);
+				{
+					static CUi::SDropDownState s_StateTranslateOthers;
+					static CScrollRegion s_ScrollRegionTranslateOthers;
+					s_StateTranslateOthers.m_SelectionPopupContext.m_pScrollRegion = &s_ScrollRegionTranslateOthers;
+					int LangSelectedOld = -1;
+					for(size_t i = 0; i < GameClient()->m_RClient.m_LatestLangsList.size(); ++i)
+					{
+						if(!str_utf8_comp_nocase(GameClient()->m_RClient.m_LatestLangsList[i].m_LangCode, g_Config.m_TcTranslateTarget))
+						{
+							LangSelectedOld = i;
+							break;
+						}
+					}
+					CUIRect DropDownRect;
+					Settings.HSplitTop(LineSize, &DropDownRect, &Settings);
+					const int LangSelectedNew = Ui()->DoDropDown(&DropDownRect, LangSelectedOld,
+						GameClient()->m_RClient.s_LangDropDownNames.data(), GameClient()->m_RClient.s_LangDropDownNames.size(), s_StateTranslateOthers);
+					if(LangSelectedOld != LangSelectedNew)
+					{
+						str_copy(g_Config.m_TcTranslateTarget, GameClient()->m_RClient.m_LatestLangsList[LangSelectedNew].m_LangCode);
+					}
+				}
+				GameClient()->m_Menus.DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcTranslateSend, "Translate Your Msg", &g_Config.m_RcTranslateSend, &Settings, LineSize);
+
+				{
+					static CUi::SDropDownState s_StateTranslateYour;
+					static CScrollRegion s_ScrollRegionTranslateYour;
+					s_StateTranslateYour.m_SelectionPopupContext.m_pScrollRegion = &s_ScrollRegionTranslateYour;
+					int LangSelectedOldYour = -1;
+					for(size_t i = 0; i < GameClient()->m_RClient.m_LatestLangsList.size(); ++i)
+					{
+						if(!str_utf8_comp_nocase(GameClient()->m_RClient.m_LatestLangsList[i].m_LangCode, g_Config.m_RcTranslateSendTarget))
+						{
+							LangSelectedOldYour = i;
+							break;
+						}
+					}
+					CUIRect DropDownRect;
+					Settings.HSplitTop(LineSize, &DropDownRect, &Settings);
+					const int LangSelectedNew = Ui()->DoDropDown(&DropDownRect, LangSelectedOldYour,
+						GameClient()->m_RClient.s_LangDropDownNames.data(), GameClient()->m_RClient.s_LangDropDownNames.size(), s_StateTranslateYour);
+					if(LangSelectedOldYour != LangSelectedNew)
+					{
+						str_copy(g_Config.m_RcTranslateSendTarget, GameClient()->m_RClient.m_LatestLangsList[LangSelectedNew].m_LangCode);
+					}
+				}
+
+				Graphics()->MapScreen(0.0f, 0.0f, Width, Height);
+			}
+		}
+	}
+
 	for(int i = 0; i < MAX_LINES; i++)
 	{
 		CLine &Line = m_aLines[((m_CurrentLine - i) + MAX_LINES) % MAX_LINES];
@@ -1483,7 +1575,8 @@ void CChat::OnRender()
 
 		if(m_MouseUnlocked)
 		{
-			const int ButtonResult = Ui()->DoButtonLogic(&Line.m_ButtonId, 0, &Row, BUTTONFLAG_LEFT | BUTTONFLAG_RIGHT);
+			const CUIRect RowUi = {Row.x * 2.0f, Row.y * 2.0f, Row.w * 2.0f, Row.h * 2.0f};
+			const int ButtonResult = Ui()->DoButtonLogic(&Line.m_ButtonId, 0, &RowUi, BUTTONFLAG_LEFT | BUTTONFLAG_RIGHT);
 			if(ButtonResult != 0)
 			{
 				m_ChatPopupContext.m_pChat = this;
@@ -1506,9 +1599,9 @@ void CChat::OnRender()
 				SPopupMenuProperties Props;
 				Props.m_NeedBorder = false;
 				Props.m_NeedMainMargin = false;
-				float m_Height = GameClient()->m_RClient.GetChatHeight(Line.m_ClientId);
-				float MouseY = Ui()->MouseY();
-				Ui()->DoPopupMenu(&m_ChatPopupContext, Ui()->MouseX(), 300.0f - MouseY < m_Height ? 300 - m_Height : MouseY, 55.0f, GameClient()->m_RClient.GetChatHeight(Line.m_ClientId),
+				const float PopupHeight = GameClient()->m_RClient.GetChatHeight(Line.m_ClientId) * 2.0f;
+				const float MouseY = Ui()->MouseY();
+				Ui()->DoPopupMenu(&m_ChatPopupContext, Ui()->MouseX(), 600.0f - MouseY < PopupHeight ? 600.0f - PopupHeight : MouseY, 110.0f, PopupHeight,
 					&m_ChatPopupContext, CChatPopupContext::Render, Props);
 			}
 
@@ -1558,12 +1651,13 @@ void CChat::OnRender()
 	if(m_Mode != MODE_NONE &&
 		!GameClient()->m_Menus.IsActive() && !GameClient()->m_Scoreboard.IsActive() && m_MouseUnlocked)
 	{
+		Ui()->MapScreen();
 		Ui()->RenderPopupMenus();
+		Ui()->FinishCheck();
+		Graphics()->MapScreen(0.0f, 0.0f, Width, Height);
 
 		if(m_MouseUnlocked)
-			RenderTools()->RenderCursor(Ui()->MousePos(), 12.0f);
-
-		Ui()->FinishCheck();
+			RenderTools()->RenderCursor(Ui()->MousePos() / 2.0f, 12.0f);
 	}
 }
 
@@ -1722,9 +1816,7 @@ void CChat::LockMouse()
 	m_MouseUnlocked = false;
 	if(m_LastMousePos == std::nullopt)
 	{
-		vec2 MouseCenter = Ui()->Screen()->Center();
-		MouseCenter = {MouseCenter.x / 2.0f, MouseCenter.y / 2.0f};
-		SetUiMousePos(MouseCenter);
+		SetUiMousePos(Ui()->Screen()->Center());
 	}
 	else
 	{
@@ -1752,17 +1844,17 @@ CUi::EPopupMenuFunctionResult CChat::CChatPopupContext::Render(void *pContext, C
 		IsServer = true;
 
 	CUIRect Label, Container;
-	const float ItemSpacing = 1.0f;
-	const float FontSize = 6.0f;
+	const float ItemSpacing = 2.0f;
+	const float FontSize = 12.0f;
 
-	View.Margin(2.0f, &View);
+	View.Margin(4.0f, &View);
 
 	char NicknameId[80];
 	str_format(NicknameId, sizeof(NicknameId), "%i: %s", pPopupContext->m_ClientId, IsServer ? "Server" : pPopupContext->m_aName);
 	View.HSplitTop(FontSize, &Label, &View);
 	pUi->DoLabel(&Label, NicknameId, FontSize, TEXTALIGN_TL);
 
-	const float ButtonSize = 17.5f / 2.0f;
+	const float ButtonSize = 17.5f;
 
 	View.HSplitTop(ItemSpacing, nullptr, &View);
 	View.HSplitTop(ButtonSize, &Container, &View);

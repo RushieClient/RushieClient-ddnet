@@ -235,24 +235,102 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_TcTranslateAuto, TCLocalize("Use auto translate"), &g_Config.m_TcTranslateAuto, &Column, LineSize);
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcTranslateServerMessages, TCLocalize("Translate server messages"), &g_Config.m_RcTranslateServerMessages, &Column, LineSize);
 	{
+		static CUi::SDropDownState s_StateTranslateOthers;
+		static CScrollRegion s_ScrollRegionTranslateOthers;
+		s_StateTranslateOthers.m_SelectionPopupContext.m_pScrollRegion = &s_ScrollRegionTranslateOthers;
+		int LangSelectedOld = -1;
+		for(size_t i = 0; i < GameClient()->m_RClient.m_LatestLangsList.size(); ++i)
+		{
+			if(!str_utf8_comp_nocase(GameClient()->m_RClient.m_LatestLangsList[i].m_LangCode, g_Config.m_TcTranslateTarget))
+			{
+				LangSelectedOld = i;
+				break;
+			}
+		}
+		CUIRect DropDownRect;
+		Column.HSplitTop(LineSize, &DropDownRect, &Column);
+		DropDownRect.VSplitMid(&Label, &DropDownRect);
+		Ui()->DoLabel(&Label, RCLocalize("Latest languages"), FontSize, TEXTALIGN_ML);
+		const int LangSelectedNew = Ui()->DoDropDown(&DropDownRect, LangSelectedOld,
+			GameClient()->m_RClient.s_LangDropDownNames.data(), GameClient()->m_RClient.s_LangDropDownNames.size(), s_StateTranslateOthers);
+		if(LangSelectedOld != LangSelectedNew)
+		{
+			str_copy(g_Config.m_TcTranslateTarget, GameClient()->m_RClient.m_LatestLangsList[LangSelectedNew].m_LangCode);
+		}
+
+		Column.HSplitTop(MarginSmall, nullptr, &Column);
 		CUIRect Box;
 		Column.HSplitTop(LineSize + MarginExtraSmall, &Box, &Column);
-		Box.VSplitMid(&Label, &Button);
-		Ui()->DoLabel(&Label, RCLocalize("Your language target (in ISO 639 code)"), FontSize, TEXTALIGN_ML);
+		Box.VSplitLeft(Box.w / 4 * 3, &Label, &Button);
+		Ui()->DoLabel(&Label, RCLocalize("Your language target (in ISO 639-1 code)"), FontSize, TEXTALIGN_ML);
 		static CLineInput s_LineInput(g_Config.m_TcTranslateTarget, sizeof(g_Config.m_TcTranslateTarget));
 		s_LineInput.SetEmptyText(RCLocalize("ru"));
-		Ui()->DoEditBox(&s_LineInput, &Button, EditBoxFontSize);
+		if(Ui()->DoEditBox(&s_LineInput, &Button, EditBoxFontSize))
+		{
+			const ChatThings::STranslateLangs pLang = GameClient()->m_RClient.GetLanguageName(g_Config.m_TcTranslateTarget);
+			if(pLang.m_LangCode[0] != '\0')
+			{
+				GameClient()->m_RClient.AddNewLanguage(pLang);
+			}
+		}
+		if(LangSelectedOld == -1)
+		{
+			SLabelProperties Props;
+			Props.SetColor(ColorRGBA(1.0f, 0.0f, 0.0f, 1.0f));
+			Column.HSplitTop(LineSize / 1.5f, &Label, &Column);
+			Ui()->DoLabel(&Label, RCLocalize("Unknown language"), FontSize / 1.5f, TEXTALIGN_MR, Props);
+		}
 	}
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcTranslateSend, TCLocalize("Translate your messages"), &g_Config.m_RcTranslateSend, &Column, LineSize);
+
 	{
+		static CUi::SDropDownState s_StateTranslateYour;
+		static CScrollRegion s_ScrollRegionTranslateYour;
+		s_StateTranslateYour.m_SelectionPopupContext.m_pScrollRegion = &s_ScrollRegionTranslateYour;
+		int LangSelectedOldYour = -1;
+		for(size_t i = 0; i < GameClient()->m_RClient.m_LatestLangsList.size(); ++i)
+		{
+			if(!str_utf8_comp_nocase(GameClient()->m_RClient.m_LatestLangsList[i].m_LangCode, g_Config.m_RcTranslateSendTarget))
+			{
+				LangSelectedOldYour = i;
+				break;
+			}
+		}
+		CUIRect DropDownRect;
+		Column.HSplitTop(LineSize, &DropDownRect, &Column);
+		DropDownRect.VSplitMid(&Label, &DropDownRect);
+		Ui()->DoLabel(&Label, RCLocalize("Latest languages"), FontSize, TEXTALIGN_ML);
+		const int LangSelectedNew = Ui()->DoDropDown(&DropDownRect, LangSelectedOldYour,
+			GameClient()->m_RClient.s_LangDropDownNames.data(), GameClient()->m_RClient.s_LangDropDownNames.size(), s_StateTranslateYour);
+		if(LangSelectedOldYour != LangSelectedNew)
+		{
+			str_copy(g_Config.m_RcTranslateSendTarget, GameClient()->m_RClient.m_LatestLangsList[LangSelectedNew].m_LangCode);
+		}
+
+		Column.HSplitTop(MarginSmall, nullptr, &Column);
 		CUIRect Box;
 		Column.HSplitTop(LineSize + MarginExtraSmall, &Box, &Column);
-		Box.VSplitMid(&Label, &Button);
-		Ui()->DoLabel(&Label, RCLocalize("Send language target (in ISO 639 code)"), FontSize, TEXTALIGN_ML);
+		Box.VSplitLeft(Box.w / 4 * 3, &Label, &Button);
+		Ui()->DoLabel(&Label, RCLocalize("Send language target (in ISO 639-1 code)"), FontSize, TEXTALIGN_ML);
 		static CLineInput s_LineInput(g_Config.m_RcTranslateSendTarget, sizeof(g_Config.m_RcTranslateSendTarget));
 		s_LineInput.SetEmptyText(RCLocalize("en"));
-		Ui()->DoEditBox(&s_LineInput, &Button, EditBoxFontSize);
+		if(Ui()->DoEditBox(&s_LineInput, &Button, EditBoxFontSize))
+		{
+			const ChatThings::STranslateLangs pLang = GameClient()->m_RClient.GetLanguageName(g_Config.m_RcTranslateSendTarget);
+			if(pLang.m_LangCode[0] != '\0')
+			{
+				GameClient()->m_RClient.AddNewLanguage(pLang);
+			}
+		}
+		if(LangSelectedOldYour == -1)
+		{
+			SLabelProperties Props;
+			Props.SetColor(ColorRGBA(1.0f, 0.0f, 0.0f, 1.0f));
+			Column.HSplitTop(LineSize / 1.5f, &Label, &Column);
+			Ui()->DoLabel(&Label, RCLocalize("Unknown language"), FontSize / 1.5f, TEXTALIGN_MR, Props);
+		}
 	}
+	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcChatShowTranslateFastSettings, TCLocalize("Fast settings in chat"), &g_Config.m_RcChatShowTranslateFastSettings, &Column, LineSize);
 
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
 	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;

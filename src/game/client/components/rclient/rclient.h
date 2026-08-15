@@ -6,6 +6,15 @@
 #include <game/client/component.h>
 #include <game/client/components/chat.h>
 
+namespace ChatThings
+{
+	struct STranslateLangs
+	{
+		const char *m_LangCode;
+		const char *m_LangName;
+	};
+}
+
 class CRClient : public CComponent
 {
 	//Find/Copy Skin
@@ -80,6 +89,10 @@ class CRClient : public CComponent
 
 	//Aspect Ratio
 	static void ConForceAspect(IConsole::IResult *pResult, void *pUserData);
+
+	//Translate
+	static void ConAddLanguage(IConsole::IResult *pResult, void *pUserData);
+	static void ConResetLanguages(IConsole::IResult *pResult, void *pUserData);
 public:
 	CRClient();
 	int Sizeof() const override { return sizeof(*this); }
@@ -177,6 +190,14 @@ public:
 
 	// Aspect Ratio
 	void SetForcedAspectRatio();
+
+	// Translate
+	std::vector<ChatThings::STranslateLangs> m_LatestLangsList;
+	std::vector<const char *> s_LangDropDownNames;
+	void AddNewLanguage(ChatThings::STranslateLangs Lang);
+	ChatThings::STranslateLangs GetLanguageName(const char *pCode);
+	ChatThings::STranslateLangs GetLatestLanguageNameById(int Id);
+	void ResetLanguages();
 };
 
 #endif //GAME_CLIENT_COMPONENTS_RCLIENT_RCLIENT_H

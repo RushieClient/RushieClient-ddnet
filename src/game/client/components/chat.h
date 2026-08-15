@@ -180,6 +180,7 @@ class CChat : public CComponent
 	bool m_MouseUnlocked = false;
 	void SetUiMousePos(vec2 Pos);
 	void LockMouse();
+	bool m_SettingsOpened = false;
 
 	class CChatPopupContext : public SPopupMenuId
 	{

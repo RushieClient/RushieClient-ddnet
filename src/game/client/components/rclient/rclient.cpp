@@ -9,7 +9,7 @@
 
 static constexpr const char *RCLIENT_INFO_URL = "https://server.rushie-client.ru/version";
 
-namespace ChatLayoutFix
+namespace ChatThings
 {
 	struct SChatLetter
 	{
@@ -22,6 +22,56 @@ namespace ChatLayoutFix
 		{"ф",'a'}, {"ы", 's'}, {"в", 'd'}, {"а", 'f'}, {"п", 'g'}, {"р", 'h'}, {"о", 'j'}, {"л", 'k'}, {"д", 'l'}, {"ж", ';'}, {"э", '\''},
 		{"я",'z'}, {"ч", 'x'}, {"с", 'c'}, {"м", 'v'}, {"и", 'b'}, {"т", 'n'}, {"ь", 'm'}, {"б", ','}, {"ю", '.'}, {"ё", '`'}
 	};
+	static const STranslateLangs g_LangsList[] = {
+	    {"aa", "Afar"}, {"ab", "Abkhazian"}, {"ae", "Avestan"}, {"af", "Afrikaans"},
+	    {"ak", "Akan"}, {"am", "Amharic"}, {"an", "Aragonese"}, {"ar", "Arabic"},
+	    {"as", "Assamese"}, {"av", "Avaric"}, {"ay", "Aymara"}, {"az", "Azerbaijani"},
+	    {"ba", "Bashkir"}, {"be", "Belarusian"}, {"bg", "Bulgarian"}, {"bi", "Bislama"},
+	    {"bm", "Bambara"}, {"bn", "Bengali"}, {"bo", "Tibetan"}, {"br", "Breton"},
+	    {"bs", "Bosnian"}, {"ca", "Catalan"}, {"ce", "Chechen"}, {"ch", "Chamorro"},
+	    {"co", "Corsican"}, {"cr", "Cree"}, {"cs", "Czech"}, {"cu", "Church Slavic"},
+	    {"cv", "Chuvash"}, {"cy", "Welsh"}, {"da", "Danish"}, {"de", "German"},
+	    {"dv", "Divehi"}, {"dz", "Dzongkha"}, {"ee", "Ewe"}, {"el", "Greek"},
+	    {"en", "English"}, {"eo", "Esperanto"}, {"es", "Spanish"}, {"et", "Estonian"},
+	    {"eu", "Basque"}, {"fa", "Persian"}, {"ff", "Fulah"}, {"fi", "Finnish"},
+	    {"fj", "Fijian"}, {"fo", "Faroese"}, {"fr", "French"}, {"fy", "Western Frisian"},
+	    {"ga", "Irish"}, {"gd", "Gaelic"}, {"gl", "Galician"}, {"gn", "Guarani"},
+	    {"gu", "Gujarati"}, {"gv", "Manx"}, {"ha", "Hausa"}, {"he", "Hebrew"},
+	    {"hi", "Hindi"}, {"ho", "Hiri Motu"}, {"hr", "Croatian"}, {"ht", "Haitian"},
+	    {"hu", "Hungarian"}, {"hy", "Armenian"}, {"hz", "Herero"}, {"ia", "Interlingua"},
+	    {"id", "Indonesian"}, {"ie", "Interlingue"}, {"ig", "Igbo"}, {"ii", "Sichuan Yi"},
+	    {"ik", "Inupiaq"}, {"io", "Ido"}, {"is", "Icelandic"}, {"it", "Italian"},
+	    {"iu", "Inuktitut"}, {"ja", "Japanese"}, {"jv", "Javanese"}, {"ka", "Georgian"},
+	    {"kg", "Kongo"}, {"ki", "Kikuyu"}, {"kj", "Kuanyama"}, {"kk", "Kazakh"},
+	    {"kl", "Kalaallisut"}, {"km", "Central Khmer"}, {"kn", "Kannada"}, {"ko", "Korean"},
+	    {"kr", "Kanuri"}, {"ks", "Kashmiri"}, {"ku", "Kurdish"}, {"kv", "Komi"},
+	    {"kw", "Cornish"}, {"ky", "Kirghiz"}, {"la", "Latin"}, {"lb", "Luxembourgish"},
+	    {"lg", "Ganda"}, {"li", "Limburgan"}, {"ln", "Lingala"}, {"lo", "Lao"},
+	    {"lt", "Lithuanian"}, {"lu", "Luba-Katanga"}, {"lv", "Latvian"}, {"mg", "Malagasy"},
+	    {"mh", "Marshallese"}, {"mi", "Maori"}, {"mk", "Macedonian"}, {"ml", "Malayalam"},
+	    {"mn", "Mongolian"}, {"mr", "Marathi"}, {"ms", "Malay"}, {"mt", "Maltese"},
+	    {"my", "Burmese"}, {"na", "Nauru"}, {"nb", "Bokmål, Norwegian"}, {"nd", "Ndebele, North"},
+	    {"ne", "Nepali"}, {"ng", "Ndonga"}, {"nl", "Dutch"}, {"nn", "Norwegian Nynorsk"},
+	    {"no", "Norwegian"}, {"nr", "Ndebele, South"}, {"nv", "Navajo"}, {"ny", "Chichewa"},
+	    {"oc", "Occitan"}, {"oj", "Ojibwa"}, {"om", "Oromo"}, {"or", "Oriya"},
+	    {"os", "Ossetian"}, {"pa", "Panjabi"}, {"pi", "Pali"}, {"pl", "Polish"},
+	    {"ps", "Pushto"}, {"pt", "Portuguese"}, {"qu", "Quechua"}, {"rm", "Romansh"},
+	    {"rn", "Rundi"}, {"ro", "Romanian"}, {"ru", "Russian"}, {"rw", "Kinyarwanda"},
+	    {"sa", "Sanskrit"}, {"sc", "Sardinian"}, {"sd", "Sindhi"}, {"se", "Northern Sami"},
+	    {"sg", "Sango"}, {"si", "Sinhala"}, {"sk", "Slovak"}, {"sl", "Slovenian"},
+	    {"sm", "Samoan"}, {"sn", "Shona"}, {"so", "Somali"}, {"sq", "Albanian"},
+	    {"sr", "Serbian"}, {"ss", "Swati"}, {"st", "Sotho, Southern"}, {"su", "Sundanese"},
+	    {"sv", "Swedish"}, {"sw", "Swahili"}, {"ta", "Tamil"}, {"te", "Telugu"},
+	    {"tg", "Tajik"}, {"th", "Thai"}, {"ti", "Tigrinya"}, {"tk", "Turkmen"},
+	    {"tl", "Tagalog"}, {"tn", "Tswana"}, {"to", "Tonga"}, {"tr", "Turkish"},
+	    {"ts", "Tsonga"}, {"tt", "Tatar"}, {"tw", "Twi"}, {"ty", "Tahitian"},
+	    {"ug", "Uighur"}, {"uk", "Ukrainian"}, {"ur", "Urdu"}, {"uz", "Uzbek"},
+	    {"ve", "Venda"}, {"vi", "Vietnamese"}, {"vo", "Volapük"}, {"wa", "Walloon"},
+	    {"wo", "Wolof"}, {"xh", "Xhosa"}, {"yi", "Yiddish"}, {"yo", "Yoruba"},
+	    {"za", "Zhuang"}, {"zh", "Chinese"}, {"zu", "Zulu"}
+	};
+	static const STranslateLangs g_EmptyLang = {"", ""};
+	static const char *g_LangsListDefaultCodes[] = {"ru", "en", "kk", "de", "uk"};
 }
 
 CRClient::CRClient()
@@ -38,6 +88,8 @@ void CRClient::OnInit()
 {
 	FetchRClientInfo();
 	SetForcedAspectRatio();
+	if(m_LatestLangsList.empty())
+		ResetLanguages();
 }
 
 void CRClient::OnRender()
@@ -115,6 +167,8 @@ void CRClient::OnConsoleInit()
 	Console()->Register("rc_find_hours", "s[player]", CFGFLAG_CLIENT, ConPlayerFindHours, this, "Find hours");
 	Console()->Register("rc_find_time", "s[player] s[map] ?s[map1] ?s[map2] ?s[map3] ?s[map4] ?s[map5]", CFGFLAG_CLIENT, ConPlayerFindTime, this, "Find hours");
 	Console()->Register("rc_force_aspect", "", CFGFLAG_CLIENT, ConForceAspect, this, "Force aspect ratio(useless)");
+	Console()->Register("rc_translate_add_language", "s[langcode]", CFGFLAG_CLIENT, ConAddLanguage, this, "Add new language for translate (use ISO 639-1)");
+	Console()->Register("rc_translate_reset_languages", "", CFGFLAG_CLIENT, ConResetLanguages, this, "Reset languages");
 	Console()->Chain("rc_message_filter_mode", ConchainResetCensorListCache, this);
 	Console()->Chain("rc_message_filter_multiply_change_word_on_full_match", ConchainResetCensorListCache, this);
 	Console()->Chain("rc_message_filter_word_on_full_match", ConchainResetCensorListCache, this);
@@ -175,6 +229,11 @@ void CRClient::ConfigSaveCallback(IConfigManager *pConfigManager, void *pUserDat
 	{
 		str_format(aBuf, sizeof(aBuf), "rc_message_filter_add_word %s", pSelf->CensorWordsList[i].c_str());
 		pConfigManager->WriteLine(aBuf, ConfigDomain::RCLIENTCENSORLIST);
+	}
+	for(ChatThings::STranslateLangs Item : pSelf->m_LatestLangsList)
+	{
+		str_format(aBuf, sizeof(aBuf), "rc_translate_add_language %s", Item.m_LangCode);
+		pConfigManager->WriteLine(aBuf, ConfigDomain::RCLIENT);
 	}
 }
 
@@ -1531,8 +1590,8 @@ const char *CRClient::FixLayoutLine(const char *Line)
 
 	while(*pIn != '\0' && *pIn != ' ')
 	{
-		const ChatLayoutFix::SChatLetter *pKey = nullptr;
-		for(const ChatLayoutFix::SChatLetter &Key : ChatLayoutFix::s_aLineLayout)
+		const ChatThings::SChatLetter *pKey = nullptr;
+		for(const ChatThings::SChatLetter &Key : ChatThings::s_aLineLayout)
 		{
 			if(str_utf8_comp_nocase_num(pIn, Key.m_pWrongLetter, str_length(Key.m_pWrongLetter)) == 0)
 			{
@@ -1604,3 +1663,63 @@ void CRClient::SetForcedAspectRatio()
 		Allow = false;
 	Graphics()->SetForcedAspectRatio(g_Config.m_RcCustomAspectX, g_Config.m_RcCustomAspectY, Allow);
 }
+
+// Translate
+void CRClient::AddNewLanguage(ChatThings::STranslateLangs Lang)
+{
+	for(ChatThings::STranslateLangs Item : m_LatestLangsList)
+	{
+		if(!str_utf8_comp_nocase(Lang.m_LangCode, Item.m_LangCode))
+		{
+			return;
+		}
+	}
+	m_LatestLangsList.push_back(Lang);
+	if(m_LatestLangsList.size() > 5)
+		m_LatestLangsList.erase(m_LatestLangsList.cbegin());
+
+	s_LangDropDownNames.clear();
+	for(const auto &Lang : m_LatestLangsList)
+		s_LangDropDownNames.push_back(Lang.m_LangName);
+}
+
+ChatThings::STranslateLangs CRClient::GetLanguageName(const char *pCode)
+{
+	for(ChatThings::STranslateLangs item : ChatThings::g_LangsList)
+	{
+		if(!str_utf8_comp_nocase(pCode, item.m_LangCode))
+		{
+			return item;
+		}
+	}
+	return ChatThings::g_EmptyLang;
+}
+
+void CRClient::ResetLanguages()
+{
+	m_LatestLangsList.clear();
+	for(const char *LangCode : ChatThings::g_LangsListDefaultCodes)
+	{
+		AddNewLanguage(GetLanguageName(LangCode));
+	}
+}
+
+void CRClient::ConAddLanguage(IConsole::IResult *pResult, void *pUserData)
+{
+	CRClient *pThis = static_cast<CRClient *>(pUserData);
+	const char *pLangCode = pResult->GetString(0);
+	const ChatThings::STranslateLangs pLang = pThis->GetLanguageName(pLangCode);
+	if(pLang.m_LangCode[0] == '\0')
+	{
+		pThis->GameClient()->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "Translate", "Unknown language code. Use ISO 639-1 (e.g. ru, en, de)");
+	}
+	else
+		pThis->AddNewLanguage(pLang);
+}
+
+void CRClient::ConResetLanguages(IConsole::IResult *pResult, void *pUserData)
+{
+	CRClient *pThis = static_cast<CRClient *>(pUserData);
+	pThis->ResetLanguages();
+}
+
