@@ -234,8 +234,8 @@ void CEdgeHelper::RenderEdgeHelperJumpInfo(CUIRect *pBase)
 	RightZone.VSplitRight(3, &RightZone, nullptr);
 	std::sort(values.begin(), values.end());
 
-	int lower = 0;
-	int upper = 0;
+	int lower = -1;
+	int upper = -1;
 
 	for (int v : values)
 	{
@@ -254,7 +254,7 @@ void CEdgeHelper::RenderEdgeHelperJumpInfo(CUIRect *pBase)
 	Ui()->DoLabel(&CenterZone, aBuf, 12, TEXTALIGN_MC);
 	TextRender()->TextColor(TextRender()->DefaultTextColor());
 
-	if(!lower)
+	if(lower == -1)
 		str_copy(aBuf, "- |");
 	else
 		str_format(aBuf, sizeof(aBuf), "%i |", lower);
@@ -263,7 +263,7 @@ void CEdgeHelper::RenderEdgeHelperJumpInfo(CUIRect *pBase)
 	Ui()->DoLabel(&LeftZone, aBuf, 12, TEXTALIGN_MC);
 	TextRender()->TextColor(TextRender()->DefaultTextColor());
 
-	if(!upper)
+	if(upper == -1)
 		str_copy(aBuf, "| -");
 	else
 		str_format(aBuf, sizeof(aBuf), "| %i", upper);
