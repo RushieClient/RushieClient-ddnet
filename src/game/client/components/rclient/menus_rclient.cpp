@@ -262,6 +262,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		{
 			PLAYERS_TAB_EFFECTS = 0,
 			PLAYERS_TAB_AFK,
+			PLAYERS_TAB_HITBOX,
 			NUMBER_OF_PLAYERS_TABS
 		};
 
@@ -269,7 +270,8 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		static CButtonContainer s_aPageTabs[NUMBER_OF_PLAYERS_TABS] = {};
 		const char *apTabNames[NUMBER_OF_PLAYERS_TABS] = {
 			RCLocalize("Effects"),
-			RCLocalize("AFK")
+			RCLocalize("AFK"),
+			RCLocalize("Hitbox")
 		};
 		DoTabBar(&Column, apTabNames, NUMBER_OF_PLAYERS_TABS, s_aPageTabs, s_CurPlayersCustomTab, LineSize);
 		Column.HSplitTop(MarginSmall, nullptr, &Column);
@@ -278,12 +280,6 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		{
 			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcHideFrozenFlakesEffect, RCLocalize("Hide frozen flakes"), &g_Config.m_RcHideFrozenFlakesEffect, &Column, LineSize);
 			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcShowSparkleEffect, RCLocalize("Always show sparkles"), &g_Config.m_RcShowSparkleEffect, &Column, LineSize);
-			static std::vector<CButtonContainer> s_vButtonContainersPlayersHitbox = {{}, {}, {}, {}};
-			DoLine_RadioMenu(Column, TCLocalize("Show player hitbox"),
-				   s_vButtonContainersPlayersHitbox,
-				   {Localize("Off"), Localize("Others"), Localize("Everyone"), Localize("Own")},
-				   {0, 1, 2, 3},
-				   g_Config.m_RcShowHitbox);
 		}
 		if(s_CurPlayersCustomTab == PLAYERS_TAB_AFK)
 		{
@@ -301,6 +297,21 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 				DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcShowAfkTextureInSpec, TCLocalize("Show texture instead emote in spec"), &g_Config.m_RcShowAfkTextureInSpec, &RightSide, LineSize);
 				Column.HSplitTop(LineSize, nullptr, &Column);
 			}
+		}
+		if(s_CurPlayersCustomTab == PLAYERS_TAB_HITBOX)
+		{
+			static std::vector<CButtonContainer> s_vButtonContainersPlayersHitbox = {{}, {}, {}, {}};
+			DoLine_RadioMenu(Column, TCLocalize("Show player hitbox"),
+				   s_vButtonContainersPlayersHitbox,
+				   {Localize("Off"), Localize("Others"), Localize("Everyone"), Localize("Own")},
+				   {0, 1, 2, 3},
+				   g_Config.m_RcShowHitbox);
+			Column.HSplitTop(LineSize, &Button, &Column);
+			Ui()->DoScrollbarOption(&g_Config.m_RcShowHitboxSize, &g_Config.m_RcShowHitboxSize, &Button, RCLocalize("Size of hitbox"), 1, 100, &CUi::ms_LinearScrollbarScale, 0);
+			Column.HSplitTop(LineSize, &Button, &Column);
+			Ui()->DoScrollbarOption(&g_Config.m_RcShowHitboxQuality, &g_Config.m_RcShowHitboxQuality, &Button, RCLocalize("Quality of hitbox"), 1, 32, &CUi::ms_LinearScrollbarScale, 0);
+			static CButtonContainer s_HitboxColor;
+			DoButton_ColorPickerAutoVMargin(&s_HitboxColor, Localize("Hitbox color"), &g_Config.m_RcShowHitboxColor, color_cast<ColorRGBA>(ColorHSLA(DefaultConfig::RcShowHitboxColor)), &Column, LineSize, true);
 		}
 	}
 

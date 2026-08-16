@@ -1094,8 +1094,8 @@ void CPlayers::RenderPlayer(
 		{
 			Graphics()->TextureClear();
 			Graphics()->QuadsBegin();
-			Graphics()->SetColor(1.0f, 1.0f, 1.0f, Alpha);
-			Graphics()->DrawCircle(BodyPos.x, BodyPos.y, 2.0f, 8);
+			Graphics()->SetColor(color_cast<ColorRGBA>(ColorHSLA(g_Config.m_RcShowHitboxColor)));
+			Graphics()->DrawCircle(BodyPos.x, BodyPos.y, 2.0f * g_Config.m_RcShowHitboxSize / 50.0f, g_Config.m_RcShowHitboxQuality);
 			Graphics()->QuadsEnd();
 		}
 	}
