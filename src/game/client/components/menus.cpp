@@ -2815,3 +2815,21 @@ void CMenus::JoinTutorial()
 	m_JoinTutorial.m_LocalServerState = CJoinTutorial::ELocalServerState::NOT_TRIED;
 	m_JoinTutorial.m_StateChange = time_get_nanoseconds();
 }
+
+//RClient
+int CMenus::DoTabBar(CUIRect *pRect, const char *const *apTabNames, int TabCount, CButtonContainer *apPageTabs, int &CurTab, float TabHeight)
+{
+	CUIRect TabBar, Button;
+	pRect->HSplitTop(TabHeight, &TabBar, pRect);
+	const float TabWidth = TabBar.w / TabCount;
+	for(int Tab = 0; Tab < TabCount; ++Tab)
+	{
+		TabBar.VSplitLeft(TabWidth, &Button, &TabBar);
+		const int Corners = Tab == 0 ? IGraphics::CORNER_L :
+				   Tab == TabCount - 1 ? IGraphics::CORNER_R : IGraphics::CORNER_NONE;
+		if(DoButton_MenuTab(&apPageTabs[Tab], apTabNames[Tab], CurTab == Tab,
+				    &Button, Corners, nullptr, nullptr, nullptr, nullptr, 4.0f))
+			CurTab = Tab;
+	}
+	return CurTab;
+}

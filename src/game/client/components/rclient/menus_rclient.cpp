@@ -149,188 +149,62 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	// ***** LeftView ***** //
 	Column = LeftView;
 
-	// ***** Visual Miscellaneous ***** //
-	Column.HSplitTop(Margin, nullptr, &Column);
-	s_SectionBoxes.push_back(Column);
-	Column.HSplitTop(HeadlineHeight, &Label, &Column);
-	Ui()->DoLabel(&Label, RCLocalize("Player Inspector/Tracker"), HeadlineFontSize, TEXTALIGN_MC);
-	Column.HSplitTop(MarginSmall, nullptr, &Column);
-
-	Column.HSplitTop(LineSize, &Label, &Column);
-	Ui()->DoLabel(&Label, RCLocalize("Now in bindchat"), FontSize, TEXTALIGN_MC);
-
-	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
-	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;
-
-	// ***** Dummy Change Clan ***** //
-	Column.HSplitTop(MarginBetweenSections, nullptr, &Column);
-	s_SectionBoxes.push_back(Column);
-	Column.HSplitTop(HeadlineHeight, &Label, &Column);
-	Ui()->DoLabel(&Label, RCLocalize("Dummy Change Clan"), HeadlineFontSize, TEXTALIGN_MC);
-
-	Column.HSplitTop(MarginSmall, nullptr, &Column);
-	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcPlayerClanAutoChange, RCLocalize("Auto change clan"), &g_Config.m_RcPlayerClanAutoChange, &Column, LineSize);
-	Column.HSplitTop(MarginSmall, nullptr, &Column);
-	{
-		CUIRect Box;
-		Column.HSplitTop(LineSize + MarginExtraSmall, &Box, &Column);
-		Box.VSplitMid(&Label, &Button);
-		Ui()->DoLabel(&Label, RCLocalize("With Dummy"), FontSize, TEXTALIGN_ML);
-		static CLineInput s_LineInput(g_Config.m_RcPlayerClanWithDummy, sizeof(g_Config.m_RcPlayerClanWithDummy));
-		s_LineInput.SetEmptyText(RCLocalize("#YESDUMMY"));
-		Ui()->DoEditBox(&s_LineInput, &Button, EditBoxFontSize);
-	}
-	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
-	{
-		CUIRect Box;
-		Column.HSplitTop(LineSize + MarginExtraSmall, &Box, &Column);
-		Box.VSplitMid(&Label, &Button);
-		Ui()->DoLabel(&Label, RCLocalize("Without Dummy"), FontSize, TEXTALIGN_ML);
-		static CLineInput s_LineInput(g_Config.m_RcPlayerClanNoDummy, sizeof(g_Config.m_RcPlayerClanNoDummy));
-		s_LineInput.SetEmptyText(RCLocalize("#NODUMMY"));
-		Ui()->DoEditBox(&s_LineInput, &Button, EditBoxFontSize);
-	}
-
-	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
-	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;
-
 	// ***** Dummy***** //
-	Column.HSplitTop(MarginBetweenSections, nullptr, &Column);
+	Column.HSplitTop(Margin, nullptr, &Column);
 	s_SectionBoxes.push_back(Column);
 	Column.HSplitTop(HeadlineHeight, &Label, &Column);
 	Ui()->DoLabel(&Label, RCLocalize("Dummy"), HeadlineFontSize, TEXTALIGN_MC);
 	Column.HSplitTop(MarginSmall, nullptr, &Column);
-
-	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_TcShowhudDummyPosition, TCLocalize("Show dummy position"), &g_Config.m_TcShowhudDummyPosition, &Column, LineSize);
-	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_TcShowhudDummySpeed, TCLocalize("Show dummy speed"), &g_Config.m_TcShowhudDummySpeed, &Column, LineSize);
-	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_TcShowhudDummyAngle, TCLocalize("Show dummy target angle"), &g_Config.m_TcShowhudDummyAngle, &Column, LineSize);
-	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcShowhudAdvancedDummyActions, TCLocalize("Show advanced dummy actions"), &g_Config.m_RcShowhudAdvancedDummyActions, &Column, LineSize);
-
-	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
-	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;
-
-	// ***** Master servers ***** //
-	Column.HSplitTop(MarginBetweenSections, nullptr, &Column);
-	s_SectionBoxes.push_back(Column);
-	Column.HSplitTop(HeadlineHeight, &Label, &Column);
-	Ui()->DoLabel(&Label, RCLocalize("Master Servers"), HeadlineFontSize, TEXTALIGN_MC);
-	Column.HSplitTop(MarginSmall, nullptr, &Column);
-
-	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcUseRushieMasterServerMirrors, TCLocalize("Use Rushie master server mirror"), &g_Config.m_RcUseRushieMasterServerMirrors, &Column, LineSize);
-	if(g_Config.m_RcUseRushieMasterServerMirrors)
-		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcUseBestClientMasterServerMirrors, TCLocalize("Use BestClient master server mirror"), &g_Config.m_RcUseBestClientMasterServerMirrors, &Column, LineSize);
-	else
-		Column.HSplitTop(LineSize, nullptr, &Column);
-
-	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
-	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;
-
-	// ***** Auto translate ***** //
-	Column.HSplitTop(MarginBetweenSections, nullptr, &Column);
-	s_SectionBoxes.push_back(Column);
-	Column.HSplitTop(HeadlineHeight, &Label, &Column);
-	Ui()->DoLabel(&Label, RCLocalize("Auto translate"), HeadlineFontSize, TEXTALIGN_MC);
-	Column.HSplitTop(MarginSmall, nullptr, &Column);
-
-	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_TcTranslateAuto, TCLocalize("Use auto translate"), &g_Config.m_TcTranslateAuto, &Column, LineSize);
-	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcTranslateServerMessages, TCLocalize("Translate server messages"), &g_Config.m_RcTranslateServerMessages, &Column, LineSize);
 	{
-		static CUi::SDropDownState s_StateTranslateOthers;
-		static CScrollRegion s_ScrollRegionTranslateOthers;
-		s_StateTranslateOthers.m_SelectionPopupContext.m_pScrollRegion = &s_ScrollRegionTranslateOthers;
-		int LangSelectedOld = -1;
-		for(size_t i = 0; i < GameClient()->m_RClient.m_LatestLangsList.size(); ++i)
+		enum
 		{
-			if(!str_utf8_comp_nocase(GameClient()->m_RClient.m_LatestLangsList[i].m_LangCode, g_Config.m_TcTranslateTarget))
-			{
-				LangSelectedOld = i;
-				break;
-			}
-		}
-		CUIRect DropDownRect;
-		Column.HSplitTop(LineSize, &DropDownRect, &Column);
-		DropDownRect.VSplitMid(&Label, &DropDownRect);
-		Ui()->DoLabel(&Label, RCLocalize("Latest languages"), FontSize, TEXTALIGN_ML);
-		const int LangSelectedNew = Ui()->DoDropDown(&DropDownRect, LangSelectedOld,
-			GameClient()->m_RClient.s_LangDropDownNames.data(), GameClient()->m_RClient.s_LangDropDownNames.size(), s_StateTranslateOthers);
-		if(LangSelectedOld != LangSelectedNew)
-		{
-			str_copy(g_Config.m_TcTranslateTarget, GameClient()->m_RClient.m_LatestLangsList[LangSelectedNew].m_LangCode);
-		}
+			DUMMY_TAB_POS = 0,
+			DUMMY_TAB_CLAN,
+			NUMBER_OF_DUMMY_TABS
+		};
 
+		static int s_CurDummyCustomTab = 0;
+		static CButtonContainer s_aPageTabs[NUMBER_OF_DUMMY_TABS] = {};
+		const char *apTabNames[NUMBER_OF_DUMMY_TABS] = {
+			RCLocalize("Position"),
+			RCLocalize("Clan Change")};
+
+		DoTabBar(&Column, apTabNames, NUMBER_OF_DUMMY_TABS, s_aPageTabs, s_CurDummyCustomTab, LineSize);
 		Column.HSplitTop(MarginSmall, nullptr, &Column);
-		CUIRect Box;
-		Column.HSplitTop(LineSize + MarginExtraSmall, &Box, &Column);
-		Box.VSplitLeft(Box.w / 4 * 3, &Label, &Button);
-		Ui()->DoLabel(&Label, RCLocalize("Your language target (in ISO 639-1 code)"), FontSize, TEXTALIGN_ML);
-		static CLineInput s_LineInput(g_Config.m_TcTranslateTarget, sizeof(g_Config.m_TcTranslateTarget));
-		s_LineInput.SetEmptyText(RCLocalize("ru"));
-		if(Ui()->DoEditBox(&s_LineInput, &Button, EditBoxFontSize))
+
+		if(s_CurDummyCustomTab == DUMMY_TAB_POS)
 		{
-			const ChatThings::STranslateLangs pLang = GameClient()->m_RClient.GetLanguageName(g_Config.m_TcTranslateTarget);
-			if(pLang.m_LangCode[0] != '\0')
-			{
-				GameClient()->m_RClient.AddNewLanguage(pLang);
-			}
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_TcShowhudDummyPosition, TCLocalize("Show dummy position"), &g_Config.m_TcShowhudDummyPosition, &Column, LineSize);
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_TcShowhudDummySpeed, TCLocalize("Show dummy speed"), &g_Config.m_TcShowhudDummySpeed, &Column, LineSize);
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_TcShowhudDummyAngle, TCLocalize("Show dummy target angle"), &g_Config.m_TcShowhudDummyAngle, &Column, LineSize);
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcShowhudAdvancedDummyActions, TCLocalize("Show advanced dummy actions"), &g_Config.m_RcShowhudAdvancedDummyActions, &Column, LineSize);
 		}
-		if(LangSelectedOld == -1)
+		if(s_CurDummyCustomTab == DUMMY_TAB_CLAN)
 		{
-			SLabelProperties Props;
-			Props.SetColor(ColorRGBA(1.0f, 0.0f, 0.0f, 1.0f));
-			Column.HSplitTop(LineSize / 1.5f, &Label, &Column);
-			Ui()->DoLabel(&Label, RCLocalize("Unknown language"), FontSize / 1.5f, TEXTALIGN_MR, Props);
+			Column.HSplitTop(MarginSmall, nullptr, &Column);
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcPlayerClanAutoChange, RCLocalize("Auto change clan"), &g_Config.m_RcPlayerClanAutoChange, &Column, LineSize);
+			Column.HSplitTop(MarginSmall, nullptr, &Column);
+			{
+				CUIRect Box;
+				Column.HSplitTop(LineSize + MarginExtraSmall, &Box, &Column);
+				Box.VSplitMid(&Label, &Button);
+				Ui()->DoLabel(&Label, RCLocalize("With Dummy"), FontSize, TEXTALIGN_ML);
+				static CLineInput s_LineInput(g_Config.m_RcPlayerClanWithDummy, sizeof(g_Config.m_RcPlayerClanWithDummy));
+				s_LineInput.SetEmptyText(RCLocalize("#YESDUMMY"));
+				Ui()->DoEditBox(&s_LineInput, &Button, EditBoxFontSize);
+			}
+			Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
+			{
+				CUIRect Box;
+				Column.HSplitTop(LineSize + MarginExtraSmall, &Box, &Column);
+				Box.VSplitMid(&Label, &Button);
+				Ui()->DoLabel(&Label, RCLocalize("Without Dummy"), FontSize, TEXTALIGN_ML);
+				static CLineInput s_LineInput(g_Config.m_RcPlayerClanNoDummy, sizeof(g_Config.m_RcPlayerClanNoDummy));
+				s_LineInput.SetEmptyText(RCLocalize("#NODUMMY"));
+				Ui()->DoEditBox(&s_LineInput, &Button, EditBoxFontSize);
+			}
 		}
 	}
-	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcTranslateSend, TCLocalize("Translate your messages"), &g_Config.m_RcTranslateSend, &Column, LineSize);
-
-	{
-		static CUi::SDropDownState s_StateTranslateYour;
-		static CScrollRegion s_ScrollRegionTranslateYour;
-		s_StateTranslateYour.m_SelectionPopupContext.m_pScrollRegion = &s_ScrollRegionTranslateYour;
-		int LangSelectedOldYour = -1;
-		for(size_t i = 0; i < GameClient()->m_RClient.m_LatestLangsList.size(); ++i)
-		{
-			if(!str_utf8_comp_nocase(GameClient()->m_RClient.m_LatestLangsList[i].m_LangCode, g_Config.m_RcTranslateSendTarget))
-			{
-				LangSelectedOldYour = i;
-				break;
-			}
-		}
-		CUIRect DropDownRect;
-		Column.HSplitTop(LineSize, &DropDownRect, &Column);
-		DropDownRect.VSplitMid(&Label, &DropDownRect);
-		Ui()->DoLabel(&Label, RCLocalize("Latest languages"), FontSize, TEXTALIGN_ML);
-		const int LangSelectedNew = Ui()->DoDropDown(&DropDownRect, LangSelectedOldYour,
-			GameClient()->m_RClient.s_LangDropDownNames.data(), GameClient()->m_RClient.s_LangDropDownNames.size(), s_StateTranslateYour);
-		if(LangSelectedOldYour != LangSelectedNew)
-		{
-			str_copy(g_Config.m_RcTranslateSendTarget, GameClient()->m_RClient.m_LatestLangsList[LangSelectedNew].m_LangCode);
-		}
-
-		Column.HSplitTop(MarginSmall, nullptr, &Column);
-		CUIRect Box;
-		Column.HSplitTop(LineSize + MarginExtraSmall, &Box, &Column);
-		Box.VSplitLeft(Box.w / 4 * 3, &Label, &Button);
-		Ui()->DoLabel(&Label, RCLocalize("Send language target (in ISO 639-1 code)"), FontSize, TEXTALIGN_ML);
-		static CLineInput s_LineInput(g_Config.m_RcTranslateSendTarget, sizeof(g_Config.m_RcTranslateSendTarget));
-		s_LineInput.SetEmptyText(RCLocalize("en"));
-		if(Ui()->DoEditBox(&s_LineInput, &Button, EditBoxFontSize))
-		{
-			const ChatThings::STranslateLangs pLang = GameClient()->m_RClient.GetLanguageName(g_Config.m_RcTranslateSendTarget);
-			if(pLang.m_LangCode[0] != '\0')
-			{
-				GameClient()->m_RClient.AddNewLanguage(pLang);
-			}
-		}
-		if(LangSelectedOldYour == -1)
-		{
-			SLabelProperties Props;
-			Props.SetColor(ColorRGBA(1.0f, 0.0f, 0.0f, 1.0f));
-			Column.HSplitTop(LineSize / 1.5f, &Label, &Column);
-			Ui()->DoLabel(&Label, RCLocalize("Unknown language"), FontSize / 1.5f, TEXTALIGN_MR, Props);
-		}
-	}
-	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcChatShowTranslateFastSettings, TCLocalize("Fast settings in chat"), &g_Config.m_RcChatShowTranslateFastSettings, &Column, LineSize);
 
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
 	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;
@@ -341,14 +215,94 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	Column.HSplitTop(HeadlineHeight, &Label, &Column);
 	Ui()->DoLabel(&Label, RCLocalize("Scoreboard"), HeadlineFontSize, TEXTALIGN_MC);
 	Column.HSplitTop(MarginSmall, nullptr, &Column);
+	{
+		enum
+		{
+			SCOREBOARD_TAB_POPUP = 0,
+			SCOREBOARD_TAB_FRIENDS,
+			NUMBER_OF_SCOREBOARD_TABS
+		};
 
-	static CButtonContainer s_ReaderButtonScoreboardMouse, s_ClearButtonScoreboardmouse;
-	DoLine_KeyReader(Column, s_ReaderButtonScoreboardMouse, s_ClearButtonScoreboardmouse, TCLocalize("Enable scoreboard mouse"), "toggle_scoreboard_cursor");
-	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcShowHeartInScoreboard, RCLocalize("Show friend's heart in scoreboard"), &g_Config.m_RcShowHeartInScoreboard, &Column, LineSize);
-	Column.HSplitTop(LineSize, &Button, &Column);
-	Ui()->DoScrollbarOption(&g_Config.m_RcSizeOfHeart, &g_Config.m_RcSizeOfHeart, &Button, RCLocalize("Heart size"), 0, 200, &CUi::ms_LinearScrollbarScale, 0);
-	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcScoreboardAlwaysShowQuickActions, RCLocalize("Always show quick actions in popup"), &g_Config.m_RcScoreboardAlwaysShowQuickActions, &Column, LineSize);
-	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcScoreboardFreezeInputs, RCLocalize("Freeze inputs when popup opened"), &g_Config.m_RcScoreboardFreezeInputs, &Column, LineSize);
+		static int s_CurScoreboardCustomTab = 0;
+		static CButtonContainer s_aPageTabs[NUMBER_OF_SCOREBOARD_TABS] = {};
+		const char *apTabNames[NUMBER_OF_SCOREBOARD_TABS] = {
+			RCLocalize("Popup"),
+			RCLocalize("Friends")};
+
+		DoTabBar(&Column, apTabNames, NUMBER_OF_SCOREBOARD_TABS, s_aPageTabs, s_CurScoreboardCustomTab, LineSize);
+		Column.HSplitTop(MarginSmall, nullptr, &Column);
+
+		if(s_CurScoreboardCustomTab == SCOREBOARD_TAB_POPUP)
+		{
+			static CButtonContainer s_ReaderButtonScoreboardMouse, s_ClearButtonScoreboardmouse;
+			DoLine_KeyReader(Column, s_ReaderButtonScoreboardMouse, s_ClearButtonScoreboardmouse, TCLocalize("Enable scoreboard mouse"), "toggle_scoreboard_cursor");
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcScoreboardAlwaysShowQuickActions, RCLocalize("Always show quick actions in popup"), &g_Config.m_RcScoreboardAlwaysShowQuickActions, &Column, LineSize);
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcScoreboardFreezeInputs, RCLocalize("Freeze inputs when popup opened"), &g_Config.m_RcScoreboardFreezeInputs, &Column, LineSize);
+		}
+		if(s_CurScoreboardCustomTab == SCOREBOARD_TAB_FRIENDS)
+		{
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcShowHeartInScoreboard, RCLocalize("Show friend's heart in scoreboard"), &g_Config.m_RcShowHeartInScoreboard, &Column, LineSize);
+			Column.HSplitTop(LineSize, &Button, &Column);
+			Ui()->DoScrollbarOption(&g_Config.m_RcSizeOfHeart, &g_Config.m_RcSizeOfHeart, &Button, RCLocalize("Heart size"), 0, 200, &CUi::ms_LinearScrollbarScale, 0);
+		}
+	}
+
+	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
+	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;
+
+	// ***** Players ***** //
+	Column.HSplitTop(MarginBetweenSections, nullptr, &Column);
+	s_SectionBoxes.push_back(Column);
+	Column.HSplitTop(HeadlineHeight, &Label, &Column);
+	Ui()->DoLabel(&Label, RCLocalize("Players"), HeadlineFontSize, TEXTALIGN_MC);
+	Column.HSplitTop(MarginSmall, nullptr, &Column);
+
+	{
+		enum
+		{
+			PLAYERS_TAB_EFFECTS = 0,
+			PLAYERS_TAB_AFK,
+			NUMBER_OF_PLAYERS_TABS
+		};
+
+		static int s_CurPlayersCustomTab = 0;
+		static CButtonContainer s_aPageTabs[NUMBER_OF_PLAYERS_TABS] = {};
+		const char *apTabNames[NUMBER_OF_PLAYERS_TABS] = {
+			RCLocalize("Effects"),
+			RCLocalize("AFK")
+		};
+		DoTabBar(&Column, apTabNames, NUMBER_OF_PLAYERS_TABS, s_aPageTabs, s_CurPlayersCustomTab, LineSize);
+		Column.HSplitTop(MarginSmall, nullptr, &Column);
+
+		if(s_CurPlayersCustomTab == PLAYERS_TAB_EFFECTS)
+		{
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcHideFrozenFlakesEffect, RCLocalize("Hide frozen flakes"), &g_Config.m_RcHideFrozenFlakesEffect, &Column, LineSize);
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcShowSparkleEffect, RCLocalize("Always show sparkles"), &g_Config.m_RcShowSparkleEffect, &Column, LineSize);
+			static std::vector<CButtonContainer> s_vButtonContainersPlayersHitbox = {{}, {}, {}, {}};
+			DoLine_RadioMenu(Column, TCLocalize("Show player hitbox"),
+				   s_vButtonContainersPlayersHitbox,
+				   {Localize("Off"), Localize("Others"), Localize("Everyone"), Localize("Own")},
+				   {0, 1, 2, 3},
+				   g_Config.m_RcShowHitbox);
+		}
+		if(s_CurPlayersCustomTab == PLAYERS_TAB_AFK)
+		{
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcShowAfkEmoteInMenu, RCLocalize("Show AFK emote in menu"), &g_Config.m_RcShowAfkEmoteInMenu, &Column, LineSize);
+			{
+				CUIRect RightSide;
+				Column.VSplitLeft(MarginBetweenViews, nullptr, &RightSide);
+				DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcShowAfkTextureInMenu, TCLocalize("Show texture instead emote in menu"), &g_Config.m_RcShowAfkTextureInMenu, &RightSide, LineSize);
+				Column.HSplitTop(LineSize, nullptr, &Column);
+			}
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcShowAfkEmoteInSpec, RCLocalize("Show AFK emote in spec"), &g_Config.m_RcShowAfkEmoteInSpec, &Column, LineSize);
+			{
+				CUIRect RightSide;
+				Column.VSplitLeft(MarginBetweenViews, nullptr, &RightSide);
+				DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcShowAfkTextureInSpec, TCLocalize("Show texture instead emote in spec"), &g_Config.m_RcShowAfkTextureInSpec, &RightSide, LineSize);
+				Column.HSplitTop(LineSize, nullptr, &Column);
+			}
+		}
+	}
 
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
 	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;
@@ -375,47 +329,18 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
 	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;
 
-	// ***** Chat Features ***** //
+	// ***** Master servers ***** //
 	Column.HSplitTop(MarginBetweenSections, nullptr, &Column);
 	s_SectionBoxes.push_back(Column);
 	Column.HSplitTop(HeadlineHeight, &Label, &Column);
-	Ui()->DoLabel(&Label, RCLocalize("Chat Features"), HeadlineFontSize, TEXTALIGN_MC);
+	Ui()->DoLabel(&Label, RCLocalize("Master Servers"), HeadlineFontSize, TEXTALIGN_MC);
 	Column.HSplitTop(MarginSmall, nullptr, &Column);
 
-	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcCommandsFixLayout, RCLocalize("Fix layout"), &g_Config.m_RcCommandsFixLayout, &Column, LineSize);
-
-	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
-	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;
-
-	// ***** Players ***** //
-	Column.HSplitTop(MarginBetweenSections, nullptr, &Column);
-	s_SectionBoxes.push_back(Column);
-	Column.HSplitTop(HeadlineHeight, &Label, &Column);
-	Ui()->DoLabel(&Label, RCLocalize("Players"), HeadlineFontSize, TEXTALIGN_MC);
-	Column.HSplitTop(MarginSmall, nullptr, &Column);
-
-	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcHideFrozenFlakesEffect, RCLocalize("Hide frozen flakes"), &g_Config.m_RcHideFrozenFlakesEffect, &Column, LineSize);
-	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcShowSparkleEffect, RCLocalize("Always show sparkles"), &g_Config.m_RcShowSparkleEffect, &Column, LineSize);
-	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcShowAfkEmoteInMenu, RCLocalize("Show AFK emote in menu"), &g_Config.m_RcShowAfkEmoteInMenu, &Column, LineSize);
-	{
-		CUIRect RightSide;
-		Column.VSplitLeft(MarginBetweenViews, nullptr, &RightSide);
-		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcShowAfkTextureInMenu, TCLocalize("Show texture instead emote in menu"), &g_Config.m_RcShowAfkTextureInMenu, &RightSide, LineSize);
+	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcUseRushieMasterServerMirrors, TCLocalize("Use Rushie master server mirror"), &g_Config.m_RcUseRushieMasterServerMirrors, &Column, LineSize);
+	if(g_Config.m_RcUseRushieMasterServerMirrors)
+		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcUseBestClientMasterServerMirrors, TCLocalize("Use BestClient master server mirror"), &g_Config.m_RcUseBestClientMasterServerMirrors, &Column, LineSize);
+	else
 		Column.HSplitTop(LineSize, nullptr, &Column);
-	}
-	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcShowAfkEmoteInSpec, RCLocalize("Show AFK emote in spec"), &g_Config.m_RcShowAfkEmoteInSpec, &Column, LineSize);
-	{
-		CUIRect RightSide;
-		Column.VSplitLeft(MarginBetweenViews, nullptr, &RightSide);
-		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcShowAfkTextureInSpec, TCLocalize("Show texture instead emote in spec"), &g_Config.m_RcShowAfkTextureInSpec, &RightSide, LineSize);
-		Column.HSplitTop(LineSize, nullptr, &Column);
-	}
-	static std::vector<CButtonContainer> s_vButtonContainersPlayersHitbox = {{}, {}, {}, {}};
-	DoLine_RadioMenu(Column, TCLocalize("Show player hitbox"),
-		   s_vButtonContainersPlayersHitbox,
-		   {Localize("Off"), Localize("Others"), Localize("Everyone"), Localize("Own")},
-		   {0, 1, 2, 3},
-		   g_Config.m_RcShowHitbox);
 
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
 	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;
@@ -577,8 +502,343 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	LeftView = Column;
 	Column = RightView;
 
-	// ***** Binds ***** //
+	// ***** Chat ***** //
 	Column.HSplitTop(Margin, nullptr, &Column);
+	s_SectionBoxes.push_back(Column);
+	Column.HSplitTop(HeadlineHeight, &Label, &Column);
+	Ui()->DoLabel(&Label, RCLocalize("Chat"), HeadlineFontSize, TEXTALIGN_MC);
+	Column.HSplitTop(MarginSmall, nullptr, &Column);
+
+	{
+		enum
+		{
+			CHAT_TAB_MAIN = 0,
+			CHAT_TAB_FILTER,
+			CHAT_TAB_TRANSLATE,
+			NUMBER_OF_CHAT_TABS
+		};
+
+		static int s_CurChatCustomTab = 0;
+		static CButtonContainer s_aPageTabs[NUMBER_OF_CHAT_TABS] = {};
+		const char *apTabNames[NUMBER_OF_CHAT_TABS] = {
+			RCLocalize("Main"),
+			RCLocalize("Filter"),
+			RCLocalize("Translate")
+		};
+
+		DoTabBar(&Column, apTabNames, NUMBER_OF_CHAT_TABS, s_aPageTabs, s_CurChatCustomTab, LineSize);
+		Column.HSplitTop(MarginSmall, nullptr, &Column);
+
+		if(s_CurChatCustomTab == CHAT_TAB_MAIN)
+		{
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcChatShowMouse, RCLocalize("Show mouse when open chat"), &g_Config.m_RcChatShowMouse, &Column, LineSize);
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcCommandsFixLayout, RCLocalize("Fix layout commands"), &g_Config.m_RcCommandsFixLayout, &Column, LineSize);
+		}
+		if(s_CurChatCustomTab == CHAT_TAB_FILTER)
+		{
+			static std::vector<CButtonContainer> s_vButtonContainersChatFilter = {{}, {}, {}, {}};
+			DoLine_RadioMenu(Column, TCLocalize("Chat Filter Mode"),
+				   s_vButtonContainersChatFilter,
+				   {Localize("Off"), Localize("Partial"), Localize("Full"), Localize("Both")},
+				   {0, 1, 2, 3},
+				   g_Config.m_RcMessageFilterMode);
+			static CButtonContainer s_BlockedMessageColor;
+			DoButton_ColorPickerAutoVMargin(&s_BlockedMessageColor, Localize("Print Blocked Message"), &g_Config.m_RcMessageFilterPrintBlockedMessageColor, color_cast<ColorRGBA>(ColorHSLA(DefaultConfig::RcMessageFilterPrintBlockedMessageColor)), &Column, LineSize, false, &g_Config.m_RcMessageFilterPrintBlockedMessage);
+			if(g_Config.m_RcMessageFilterMode == 1 || g_Config.m_RcMessageFilterMode == 3)
+			{
+				DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcMessageFilterMultiplyChangeWordOnPartialMatch, TCLocalize("Multiply Partial Match"), &g_Config.m_RcMessageFilterMultiplyChangeWordOnPartialMatch, &Column, LineSize);
+				{
+					CUIRect Box;
+					Column.HSplitTop(LineSize + MarginExtraSmall, &Box, &Column);
+					Box.VSplitMid(&Label, &Button);
+					Ui()->DoLabel(&Label, RCLocalize("Partial Word Replacement"), FontSize, TEXTALIGN_ML);
+					static CLineInput s_LineInput(g_Config.m_RcMessageFilterWordOnPartialMatch, sizeof(g_Config.m_RcMessageFilterWordOnPartialMatch));
+					s_LineInput.SetEmptyText(RCLocalize("*"));
+					Ui()->DoEditBox(&s_LineInput, &Button, EditBoxFontSize);
+				}
+			}
+			if(g_Config.m_RcMessageFilterMode == 2 || g_Config.m_RcMessageFilterMode == 3)
+			{
+				DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcMessageFilterMultiplyChangeWordOnFullMatch, TCLocalize("Multiply Full Match"), &g_Config.m_RcMessageFilterMultiplyChangeWordOnFullMatch, &Column, LineSize);
+				{
+					CUIRect Box;
+					Column.HSplitTop(LineSize + MarginExtraSmall, &Box, &Column);
+					Box.VSplitMid(&Label, &Button);
+					Ui()->DoLabel(&Label, RCLocalize("Full Word Replacement"), FontSize, TEXTALIGN_ML);
+					static CLineInput s_LineInput(g_Config.m_RcMessageFilterWordOnFullMatch, sizeof(g_Config.m_RcMessageFilterWordOnFullMatch));
+					s_LineInput.SetEmptyText(RCLocalize("^"));
+					Ui()->DoEditBox(&s_LineInput, &Button, EditBoxFontSize);
+				}
+			}
+		}
+		if(s_CurChatCustomTab == CHAT_TAB_TRANSLATE)
+		{
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_TcTranslateAuto, TCLocalize("Use auto translate"), &g_Config.m_TcTranslateAuto, &Column, LineSize);
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcTranslateServerMessages, TCLocalize("Translate server messages"), &g_Config.m_RcTranslateServerMessages, &Column, LineSize);
+			{
+				static CUi::SDropDownState s_StateTranslateOthers;
+				static CScrollRegion s_ScrollRegionTranslateOthers;
+				s_StateTranslateOthers.m_SelectionPopupContext.m_pScrollRegion = &s_ScrollRegionTranslateOthers;
+				int LangSelectedOld = -1;
+				for(size_t i = 0; i < GameClient()->m_RClient.m_LatestLangsList.size(); ++i)
+				{
+					if(!str_utf8_comp_nocase(GameClient()->m_RClient.m_LatestLangsList[i].m_LangCode, g_Config.m_TcTranslateTarget))
+					{
+						LangSelectedOld = i;
+						break;
+					}
+				}
+				CUIRect DropDownRect;
+				Column.HSplitTop(LineSize, &DropDownRect, &Column);
+				DropDownRect.VSplitMid(&Label, &DropDownRect);
+				Ui()->DoLabel(&Label, RCLocalize("Latest languages"), FontSize, TEXTALIGN_ML);
+				const int LangSelectedNew = Ui()->DoDropDown(&DropDownRect, LangSelectedOld,
+					GameClient()->m_RClient.s_LangDropDownNames.data(), GameClient()->m_RClient.s_LangDropDownNames.size(), s_StateTranslateOthers);
+				if(LangSelectedOld != LangSelectedNew)
+				{
+					str_copy(g_Config.m_TcTranslateTarget, GameClient()->m_RClient.m_LatestLangsList[LangSelectedNew].m_LangCode);
+				}
+
+				Column.HSplitTop(MarginSmall, nullptr, &Column);
+				CUIRect Box;
+				Column.HSplitTop(LineSize + MarginExtraSmall, &Box, &Column);
+				Box.VSplitLeft(Box.w / 4 * 3, &Label, &Button);
+				Ui()->DoLabel(&Label, RCLocalize("Your language target (in ISO 639-1 code)"), FontSize, TEXTALIGN_ML);
+				static CLineInput s_LineInput(g_Config.m_TcTranslateTarget, sizeof(g_Config.m_TcTranslateTarget));
+				s_LineInput.SetEmptyText(RCLocalize("ru"));
+				if(Ui()->DoEditBox(&s_LineInput, &Button, EditBoxFontSize))
+				{
+					const ChatThings::STranslateLangs pLang = GameClient()->m_RClient.GetLanguageName(g_Config.m_TcTranslateTarget);
+					if(pLang.m_LangCode[0] != '\0')
+					{
+						GameClient()->m_RClient.AddNewLanguage(pLang);
+					}
+				}
+				if(LangSelectedOld == -1)
+				{
+					SLabelProperties Props;
+					Props.SetColor(ColorRGBA(1.0f, 0.0f, 0.0f, 1.0f));
+					Column.HSplitTop(LineSize / 1.5f, &Label, &Column);
+					Ui()->DoLabel(&Label, RCLocalize("Unknown language"), FontSize / 1.5f, TEXTALIGN_MR, Props);
+				}
+			}
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcTranslateSend, TCLocalize("Translate your messages"), &g_Config.m_RcTranslateSend, &Column, LineSize);
+
+			{
+				static CUi::SDropDownState s_StateTranslateYour;
+				static CScrollRegion s_ScrollRegionTranslateYour;
+				s_StateTranslateYour.m_SelectionPopupContext.m_pScrollRegion = &s_ScrollRegionTranslateYour;
+				int LangSelectedOldYour = -1;
+				for(size_t i = 0; i < GameClient()->m_RClient.m_LatestLangsList.size(); ++i)
+				{
+					if(!str_utf8_comp_nocase(GameClient()->m_RClient.m_LatestLangsList[i].m_LangCode, g_Config.m_RcTranslateSendTarget))
+					{
+						LangSelectedOldYour = i;
+						break;
+					}
+				}
+				CUIRect DropDownRect;
+				Column.HSplitTop(LineSize, &DropDownRect, &Column);
+				DropDownRect.VSplitMid(&Label, &DropDownRect);
+				Ui()->DoLabel(&Label, RCLocalize("Latest languages"), FontSize, TEXTALIGN_ML);
+				const int LangSelectedNew = Ui()->DoDropDown(&DropDownRect, LangSelectedOldYour,
+					GameClient()->m_RClient.s_LangDropDownNames.data(), GameClient()->m_RClient.s_LangDropDownNames.size(), s_StateTranslateYour);
+				if(LangSelectedOldYour != LangSelectedNew)
+				{
+					str_copy(g_Config.m_RcTranslateSendTarget, GameClient()->m_RClient.m_LatestLangsList[LangSelectedNew].m_LangCode);
+				}
+
+				Column.HSplitTop(MarginSmall, nullptr, &Column);
+				CUIRect Box;
+				Column.HSplitTop(LineSize + MarginExtraSmall, &Box, &Column);
+				Box.VSplitLeft(Box.w / 4 * 3, &Label, &Button);
+				Ui()->DoLabel(&Label, RCLocalize("Send language target (in ISO 639-1 code)"), FontSize, TEXTALIGN_ML);
+				static CLineInput s_LineInput(g_Config.m_RcTranslateSendTarget, sizeof(g_Config.m_RcTranslateSendTarget));
+				s_LineInput.SetEmptyText(RCLocalize("en"));
+				if(Ui()->DoEditBox(&s_LineInput, &Button, EditBoxFontSize))
+				{
+					const ChatThings::STranslateLangs pLang = GameClient()->m_RClient.GetLanguageName(g_Config.m_RcTranslateSendTarget);
+					if(pLang.m_LangCode[0] != '\0')
+					{
+						GameClient()->m_RClient.AddNewLanguage(pLang);
+					}
+				}
+				if(LangSelectedOldYour == -1)
+				{
+					SLabelProperties Props;
+					Props.SetColor(ColorRGBA(1.0f, 0.0f, 0.0f, 1.0f));
+					Column.HSplitTop(LineSize / 1.5f, &Label, &Column);
+					Ui()->DoLabel(&Label, RCLocalize("Unknown language"), FontSize / 1.5f, TEXTALIGN_MR, Props);
+				}
+			}
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcChatShowTranslateFastSettings, TCLocalize("Fast settings in chat"), &g_Config.m_RcChatShowTranslateFastSettings, &Column, LineSize);
+		}
+	}
+	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
+	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;
+
+	// ***** Nameplate ***** //
+	Column.HSplitTop(MarginBetweenSections, nullptr, &Column);
+	s_SectionBoxes.push_back(Column);
+	Column.HSplitTop(HeadlineHeight, &Label, &Column);
+	Ui()->DoLabel(&Label, RCLocalize("Nameplates"), HeadlineFontSize, TEXTALIGN_MC);
+	Column.HSplitTop(MarginSmall, nullptr, &Column);
+
+	{
+		enum
+		{
+			NAMEPLATE_TAB_HOOK = 0,
+			NAMEPLATE_TAB_FIRE,
+			NAMEPLATE_TAB_WEAPONS,
+			NUMBER_OF_NAMEPLATES_TABS
+		};
+
+		static int s_CurNameplatesCustomTab = 0;
+		static CButtonContainer s_aPageTabs[NUMBER_OF_NAMEPLATES_TABS] = {};
+		const char *apTabNames[NUMBER_OF_NAMEPLATES_TABS] = {
+			RCLocalize("Hook"),
+			RCLocalize("Fire"),
+			RCLocalize("Weapons")
+		};
+		DoTabBar(&Column, apTabNames, NUMBER_OF_NAMEPLATES_TABS, s_aPageTabs, s_CurNameplatesCustomTab, LineSize);
+		Column.HSplitTop(MarginSmall, nullptr, &Column);
+
+		if(s_CurNameplatesCustomTab == NAMEPLATE_TAB_HOOK)
+		{
+			static std::vector<CButtonContainer> s_vButtonContainersHookDetection = {{}, {}, {}, {}, {}};
+			DoLine_RadioMenu(Column, TCLocalize("Hook Detection"),
+				   s_vButtonContainersHookDetection,
+				   {Localize("Off"), Localize("Others"), Localize("All"), Localize("Own"), "Dummy"},
+				   {0, 1, 2, 3, 4},
+				   g_Config.m_RcNamePlatesHook);
+			Column.HSplitTop(LineSize, &Button, &Column);
+			Ui()->DoScrollbarOption(&g_Config.m_RcNamePlatesHookSize, &g_Config.m_RcNamePlatesHookSize, &Button, RCLocalize("Hook size"), -50, 100, &CUi::ms_LinearScrollbarScale, 0);
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcNamePlatesHookShiftOnInvis, RCLocalize("Hook shift on invis"), &g_Config.m_RcNamePlatesHookShiftOnInvis, &Column, LineSize);
+		}
+		if(s_CurNameplatesCustomTab == NAMEPLATE_TAB_FIRE)
+		{
+			static std::vector<CButtonContainer> s_vButtonContainersFireDetection = {{}, {}, {}, {}, {}};
+			DoLine_RadioMenu(Column, TCLocalize("Fire Detection"),
+				   s_vButtonContainersFireDetection,
+				   {Localize("Off"), Localize("Others(fake)"), Localize("All(fake)"), Localize("Own"), "Dummy"},
+				   {0, 1, 2, 3, 4},
+				   g_Config.m_RcNamePlatesFire);
+			Column.HSplitTop(LineSize, &Button, &Column);
+			Ui()->DoScrollbarOption(&g_Config.m_RcNamePlatesFireSize, &g_Config.m_RcNamePlatesFireSize, &Button, RCLocalize("Fire size"), -50, 100, &CUi::ms_LinearScrollbarScale, 0);
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcNamePlatesFireShiftOnInvis, RCLocalize("Fire shift on invis"), &g_Config.m_RcNamePlatesFireShiftOnInvis, &Column, LineSize);
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcNamePlatesFirePreInput, RCLocalize("Use preinput for fire"), &g_Config.m_RcNamePlatesFirePreInput, &Column, LineSize);
+		}
+		if(s_CurNameplatesCustomTab == NAMEPLATE_TAB_WEAPONS)
+		{
+			static std::vector<CButtonContainer> s_vButtonContainersWeaponsShow = {{}, {}, {}, {}};
+			DoLine_RadioMenu(Column, TCLocalize("Weapons in nameplates"),
+				   s_vButtonContainersWeaponsShow,
+				   {Localize("Off"), Localize("Others"), Localize("All"), "Dummy"},
+				   {0, 1, 2, 3},
+				   g_Config.m_RcNamePlatesWeapons);
+			Column.HSplitTop(LineSize, &Button, &Column);
+			Ui()->DoScrollbarOption(&g_Config.m_RcNamePlatesWeaponsSize, &g_Config.m_RcNamePlatesWeaponsSize, &Button, RCLocalize("Weapons size"), -50, 100, &CUi::ms_LinearScrollbarScale, 0);
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcNamePlatesWeaponsOwn, RCLocalize("Show own weapons"), &g_Config.m_RcNamePlatesWeaponsOwn, &Column, LineSize);
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcNamePlatesWeaponsShotgun, RCLocalize("Show shotgun"), &g_Config.m_RcNamePlatesWeaponsShotgun, &Column, LineSize);
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcNamePlatesWeaponsGrenade, RCLocalize("Show grenade"), &g_Config.m_RcNamePlatesWeaponsGrenade, &Column, LineSize);
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcNamePlatesWeaponsNinja, RCLocalize("Show ninja"), &g_Config.m_RcNamePlatesWeaponsNinja, &Column, LineSize);
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcNamePlatesWeaponsLaser, RCLocalize("Show laser"), &g_Config.m_RcNamePlatesWeaponsLaser, &Column, LineSize);
+		}
+	}
+
+	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
+	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;
+
+	// ***** Anti AFK ***** //
+	Column.HSplitTop(MarginBetweenSections, nullptr, &Column);
+	s_SectionBoxes.push_back(Column);
+	Column.HSplitTop(HeadlineHeight, &Label, &Column);
+	Ui()->DoLabel(&Label, RCLocalize("Anti AFK"), HeadlineFontSize, TEXTALIGN_MC);
+	Column.HSplitTop(MarginSmall, nullptr, &Column);
+
+	{
+		enum
+		{
+			AFK_TAB_NONACTIVE = 0,
+			AFK_TAB_SPEC,
+			NUMBER_OF_AFK_TABS
+		};
+
+		static int s_CurAfkCustomTab = 0;
+		static CButtonContainer s_aPageTabs[NUMBER_OF_AFK_TABS] = {};
+		const char *apTabNames[NUMBER_OF_AFK_TABS] = {
+			RCLocalize("NonActive"),
+			RCLocalize("Spec")
+		};
+
+		DoTabBar(&Column, apTabNames, NUMBER_OF_AFK_TABS, s_aPageTabs, s_CurAfkCustomTab, LineSize);
+		Column.HSplitTop(MarginSmall, nullptr, &Column);
+
+		if(s_CurAfkCustomTab == AFK_TAB_NONACTIVE)
+		{
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcPlayOnMoveNonInactive, RCLocalize("Play sound when moved and window non active"), &g_Config.m_RcPlayOnMoveNonInactive, &Column, LineSize);
+			if(g_Config.m_RcPlayOnMoveNonInactive)
+			{
+				static std::vector<CButtonContainer> s_vButtonContainersNonActive = {{}, {}, {}};
+				DoLine_RadioMenu(Column, TCLocalize("Choose sound non active"),
+					   s_vButtonContainersNonActive,
+					   {Localize("Wake up"), Localize("Grenade"), Localize("Tag")},
+					   {0, 1, 2},
+					   g_Config.m_RcSoundOnMoveNonInactive);
+			}
+			else
+				Column.HSplitTop(LineSize + 2.0f, nullptr, &Column);
+		}
+		if(s_CurAfkCustomTab == AFK_TAB_SPEC)
+		{
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcNotifyOnMoveInSpec, RCLocalize("Notify when moved in spec"), &g_Config.m_RcNotifyOnMoveInSpec, &Column, LineSize);
+			if(g_Config.m_RcNotifyOnMoveInSpec)
+			{
+				DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcPlayOnMoveInSpec, RCLocalize("Play sound when moved in spec"), &g_Config.m_RcPlayOnMoveInSpec, &Column, LineSize);
+				static std::vector<CButtonContainer> s_vButtonContainersInSpec = {{}, {}, {}};
+				DoLine_RadioMenu(Column, TCLocalize("Choose sound in spec"),
+					   s_vButtonContainersInSpec,
+					   {Localize("Wake up"), Localize("Grenade"), Localize("Tag")},
+					   {0, 1, 2},
+					   g_Config.m_RcSoundOnMoveInSpec);
+				DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcTextOnMoveInSpec, RCLocalize("Show text when moved in spec"), &g_Config.m_RcTextOnMoveInSpec, &Column, LineSize);
+				Column.HSplitTop(LineSize, &Button, &Column);
+				Ui()->DoScrollbarOption(&g_Config.m_RcTextOnMoveInSpecPosX, &g_Config.m_RcTextOnMoveInSpecPosX, &Button, RCLocalize("Text pos x"), 0, 100, &CUi::ms_LinearScrollbarScale, 0);
+				Column.HSplitTop(LineSize, &Button, &Column);
+				Ui()->DoScrollbarOption(&g_Config.m_RcTextOnMoveInSpecPosY, &g_Config.m_RcTextOnMoveInSpecPosY, &Button, RCLocalize("Text pos y"), 0, 100, &CUi::ms_LinearScrollbarScale, 0);
+			}
+			else
+				Column.HSplitTop(LineSize * 5 + 2.0f, nullptr, &Column); // 2.0f for radio menu
+		}
+	}
+
+	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
+	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;
+
+	// ***** Custom Clients ***** //
+	Column.HSplitTop(MarginBetweenSections, nullptr, &Column);
+	s_SectionBoxes.push_back(Column);
+	Column.HSplitTop(HeadlineHeight, &Label, &Column);
+	Ui()->DoLabel(&Label, RCLocalize("Client Indicator"), HeadlineFontSize, TEXTALIGN_MC);
+	Column.HSplitTop(Margin, &Label, &Column);
+	Ui()->DoLabel(&Label, RCLocalize("by +KZ"), Margin, TEXTALIGN_MC);
+	Column.HSplitTop(MarginSmall, nullptr, &Column);
+
+	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcCustomClientsSendClientType, RCLocalize("Send to server that u use RClient"), &g_Config.m_RcCustomClientsSendClientType, &Column, LineSize);
+	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcCustomClientsCollectClientType, RCLocalize("Detect other clients"), &g_Config.m_RcCustomClientsCollectClientType, &Column, LineSize);
+	static std::vector<CButtonContainer> s_vButtonContainersCustomInNameplates = {{}, {}, {}, {}};
+	DoLine_RadioMenu(Column, TCLocalize("Show client type in nameplates"),
+		   s_vButtonContainersCustomInNameplates,
+		   {Localize("Off"), Localize("Others"), Localize("Everyone"), Localize("Only you")},
+		   {0, 1, 2, 3},
+		   g_Config.m_RcCustomClientsInNameplates);
+	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcCustomClientsInScoreboard, RCLocalize("Show client type in scoreboard"), &g_Config.m_RcCustomClientsInScoreboard, &Column, LineSize);
+
+	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
+	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;
+
+	// ***** Binds ***** //
+	Column.HSplitTop(MarginBetweenSections, nullptr, &Column);
 	s_SectionBoxes.push_back(Column);
 	Column.HSplitTop(HeadlineHeight, &Label, &Column);
 	Ui()->DoLabel(&Label, RCLocalize("Binds"), HeadlineFontSize, TEXTALIGN_MC);
@@ -609,51 +869,6 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcToggleSmallSens, TCLocalize("Toggle small sens"), &g_Config.m_RcToggleSmallSens, &RightSide, LineSize);
 		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcSmallSensEcho, TCLocalize("Echo small sens"), &g_Config.m_RcSmallSensEcho, &RightSide, LineSize);
 		Column.HSplitTop(LineSize * 2, nullptr, &Column);
-	}
-
-	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
-	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;
-
-	// ***** Chat Filter ***** //
-	Column.HSplitTop(MarginBetweenSections, nullptr, &Column);
-	s_SectionBoxes.push_back(Column);
-	Column.HSplitTop(HeadlineHeight, &Label, &Column);
-	Ui()->DoLabel(&Label, RCLocalize("Chat Filter"), HeadlineFontSize, TEXTALIGN_MC);
-	Column.HSplitTop(MarginSmall, nullptr, &Column);
-
-	static std::vector<CButtonContainer> s_vButtonContainersChatFilter = {{}, {}, {}, {}};
-	DoLine_RadioMenu(Column, TCLocalize("Chat Filter Mode"),
-		   s_vButtonContainersChatFilter,
-		   {Localize("Off"), Localize("Partial"), Localize("Full"), Localize("Both")},
-		   {0, 1, 2, 3},
-		   g_Config.m_RcMessageFilterMode);
-	static CButtonContainer s_BlockedMessageColor;
-	DoButton_ColorPickerAutoVMargin(&s_BlockedMessageColor, Localize("Print Blocked Message"), &g_Config.m_RcMessageFilterPrintBlockedMessageColor, color_cast<ColorRGBA>(ColorHSLA(DefaultConfig::RcMessageFilterPrintBlockedMessageColor)), &Column, LineSize, false, &g_Config.m_RcMessageFilterPrintBlockedMessage);
-	if(g_Config.m_RcMessageFilterMode == 1 || g_Config.m_RcMessageFilterMode == 3)
-	{
-		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcMessageFilterMultiplyChangeWordOnPartialMatch, TCLocalize("Multiply Partial Match"), &g_Config.m_RcMessageFilterMultiplyChangeWordOnPartialMatch, &Column, LineSize);
-		{
-			CUIRect Box;
-			Column.HSplitTop(LineSize + MarginExtraSmall, &Box, &Column);
-			Box.VSplitMid(&Label, &Button);
-			Ui()->DoLabel(&Label, RCLocalize("Partial Word Replacement"), FontSize, TEXTALIGN_ML);
-			static CLineInput s_LineInput(g_Config.m_RcMessageFilterWordOnPartialMatch, sizeof(g_Config.m_RcMessageFilterWordOnPartialMatch));
-			s_LineInput.SetEmptyText(RCLocalize("*"));
-			Ui()->DoEditBox(&s_LineInput, &Button, EditBoxFontSize);
-		}
-	}
-	if(g_Config.m_RcMessageFilterMode == 2 || g_Config.m_RcMessageFilterMode == 3)
-	{
-		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcMessageFilterMultiplyChangeWordOnFullMatch, TCLocalize("Multiply Full Match"), &g_Config.m_RcMessageFilterMultiplyChangeWordOnFullMatch, &Column, LineSize);
-		{
-			CUIRect Box;
-			Column.HSplitTop(LineSize + MarginExtraSmall, &Box, &Column);
-			Box.VSplitMid(&Label, &Button);
-			Ui()->DoLabel(&Label, RCLocalize("Full Word Replacement"), FontSize, TEXTALIGN_ML);
-			static CLineInput s_LineInput(g_Config.m_RcMessageFilterWordOnFullMatch, sizeof(g_Config.m_RcMessageFilterWordOnFullMatch));
-			s_LineInput.SetEmptyText(RCLocalize("^"));
-			Ui()->DoEditBox(&s_LineInput, &Button, EditBoxFontSize);
-		}
 	}
 
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
@@ -715,124 +930,6 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	Column.HSplitTop(LineSize, &Button, &Column);
 	Ui()->DoScrollbarOption(&g_Config.m_RcSizeOfHeart, &g_Config.m_RcSizeOfHeart, &Button, RCLocalize("Heart size"), 0, 200, &CUi::ms_LinearScrollbarScale, 0);
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcShowhudVotingPercent, RCLocalize("Show percent in hud"), &g_Config.m_RcShowhudVotingPercent, &Column, LineSize);
-
-	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
-	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;
-
-	// ***** Nameplate ***** //
-	Column.HSplitTop(MarginBetweenSections, nullptr, &Column);
-	s_SectionBoxes.push_back(Column);
-	Column.HSplitTop(HeadlineHeight, &Label, &Column);
-	Ui()->DoLabel(&Label, RCLocalize("Nameplates"), HeadlineFontSize, TEXTALIGN_MC);
-	Column.HSplitTop(MarginSmall, nullptr, &Column);
-
-	static std::vector<CButtonContainer> s_vButtonContainersHookDetection = {{}, {}, {}, {}, {}};
-	DoLine_RadioMenu(Column, TCLocalize("Hook Detection"),
-		   s_vButtonContainersHookDetection,
-		   {Localize("Off"), Localize("Others"), Localize("All"), Localize("Own"), "Dummy"},
-		   {0, 1, 2, 3, 4},
-		   g_Config.m_RcNamePlatesHook);
-	Column.HSplitTop(LineSize, &Button, &Column);
-	Ui()->DoScrollbarOption(&g_Config.m_RcNamePlatesHookSize, &g_Config.m_RcNamePlatesHookSize, &Button, RCLocalize("Hook size"), -50, 100, &CUi::ms_LinearScrollbarScale, 0);
-	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcNamePlatesHookShiftOnInvis, RCLocalize("Hook shift on invis"), &g_Config.m_RcNamePlatesHookShiftOnInvis, &Column, LineSize);
-	static std::vector<CButtonContainer> s_vButtonContainersFireDetection = {{}, {}, {}, {}, {}};
-	DoLine_RadioMenu(Column, TCLocalize("Fire Detection"),
-		   s_vButtonContainersFireDetection,
-		   {Localize("Off"), Localize("Others(fake)"), Localize("All(fake)"), Localize("Own"), "Dummy"},
-		   {0, 1, 2, 3, 4},
-		   g_Config.m_RcNamePlatesFire);
-	Column.HSplitTop(LineSize, &Button, &Column);
-	Ui()->DoScrollbarOption(&g_Config.m_RcNamePlatesFireSize, &g_Config.m_RcNamePlatesFireSize, &Button, RCLocalize("Fire size"), -50, 100, &CUi::ms_LinearScrollbarScale, 0);
-	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcNamePlatesFireShiftOnInvis, RCLocalize("Fire shift on invis"), &g_Config.m_RcNamePlatesFireShiftOnInvis, &Column, LineSize);
-	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcNamePlatesFirePreInput, RCLocalize("Use preinput for fire"), &g_Config.m_RcNamePlatesFirePreInput, &Column, LineSize);
-	static std::vector<CButtonContainer> s_vButtonContainersWeaponsShow = {{}, {}, {}, {}};
-	DoLine_RadioMenu(Column, TCLocalize("Weapons in nameplates"),
-		   s_vButtonContainersWeaponsShow,
-		   {Localize("Off"), Localize("Others"), Localize("All"), "Dummy"},
-		   {0, 1, 2, 3},
-		   g_Config.m_RcNamePlatesWeapons);
-	Column.HSplitTop(LineSize, &Button, &Column);
-	Ui()->DoScrollbarOption(&g_Config.m_RcNamePlatesWeaponsSize, &g_Config.m_RcNamePlatesWeaponsSize, &Button, RCLocalize("Weapons size"), -50, 100, &CUi::ms_LinearScrollbarScale, 0);
-	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcNamePlatesWeaponsOwn, RCLocalize("Show own weapons"), &g_Config.m_RcNamePlatesWeaponsOwn, &Column, LineSize);
-	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcNamePlatesWeaponsShotgun, RCLocalize("Show shotgun"), &g_Config.m_RcNamePlatesWeaponsShotgun, &Column, LineSize);
-	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcNamePlatesWeaponsGrenade, RCLocalize("Show grenade"), &g_Config.m_RcNamePlatesWeaponsGrenade, &Column, LineSize);
-	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcNamePlatesWeaponsNinja, RCLocalize("Show ninja"), &g_Config.m_RcNamePlatesWeaponsNinja, &Column, LineSize);
-	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcNamePlatesWeaponsLaser, RCLocalize("Show laser"), &g_Config.m_RcNamePlatesWeaponsLaser, &Column, LineSize);
-
-	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
-	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;
-
-	// ***** Anti AFK ***** //
-	Column.HSplitTop(MarginBetweenSections, nullptr, &Column);
-	s_SectionBoxes.push_back(Column);
-	Column.HSplitTop(HeadlineHeight, &Label, &Column);
-	Ui()->DoLabel(&Label, RCLocalize("Anti AFK"), HeadlineFontSize, TEXTALIGN_MC);
-	Column.HSplitTop(MarginSmall, nullptr, &Column);
-
-	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcPlayOnMoveNonInactive, RCLocalize("Play sound when moved and window non active"), &g_Config.m_RcPlayOnMoveNonInactive, &Column, LineSize);
-	if(g_Config.m_RcPlayOnMoveNonInactive)
-	{
-		static std::vector<CButtonContainer> s_vButtonContainersNonActive = {{}, {}, {}};
-		DoLine_RadioMenu(Column, TCLocalize("Choose sound non active"),
-			   s_vButtonContainersNonActive,
-			   {Localize("Wake up"), Localize("Grenade"), Localize("Tag")},
-			   {0, 1, 2},
-			   g_Config.m_RcSoundOnMoveNonInactive);
-	}
-	else
-		Column.HSplitTop(LineSize + 2.0f, nullptr, &Column);
-	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcNotifyOnMoveInSpec, RCLocalize("Notify when moved in spec"), &g_Config.m_RcNotifyOnMoveInSpec, &Column, LineSize);
-	if(g_Config.m_RcNotifyOnMoveInSpec)
-	{
-		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcPlayOnMoveInSpec, RCLocalize("Play sound when moved in spec"), &g_Config.m_RcPlayOnMoveInSpec, &Column, LineSize);
-		static std::vector<CButtonContainer> s_vButtonContainersInSpec = {{}, {}, {}};
-		DoLine_RadioMenu(Column, TCLocalize("Choose sound in spec"),
-			   s_vButtonContainersInSpec,
-			   {Localize("Wake up"), Localize("Grenade"), Localize("Tag")},
-			   {0, 1, 2},
-			   g_Config.m_RcSoundOnMoveInSpec);
-		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcTextOnMoveInSpec, RCLocalize("Show text when moved in spec"), &g_Config.m_RcTextOnMoveInSpec, &Column, LineSize);
-		Column.HSplitTop(LineSize, &Button, &Column);
-		Ui()->DoScrollbarOption(&g_Config.m_RcTextOnMoveInSpecPosX, &g_Config.m_RcTextOnMoveInSpecPosX, &Button, RCLocalize("Text pos x"), 0, 100, &CUi::ms_LinearScrollbarScale, 0);
-		Column.HSplitTop(LineSize, &Button, &Column);
-		Ui()->DoScrollbarOption(&g_Config.m_RcTextOnMoveInSpecPosY, &g_Config.m_RcTextOnMoveInSpecPosY, &Button, RCLocalize("Text pos y"), 0, 100, &CUi::ms_LinearScrollbarScale, 0);
-	}
-	else
-		Column.HSplitTop(LineSize * 5 + 2.0f, nullptr, &Column); // 2.0f for radio menu
-
-	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
-	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;
-
-	// ***** Custom Clients ***** //
-	Column.HSplitTop(MarginBetweenSections, nullptr, &Column);
-	s_SectionBoxes.push_back(Column);
-	Column.HSplitTop(HeadlineHeight, &Label, &Column);
-	Ui()->DoLabel(&Label, RCLocalize("Client Indicator"), HeadlineFontSize, TEXTALIGN_MC);
-	Column.HSplitTop(Margin, &Label, &Column);
-	Ui()->DoLabel(&Label, RCLocalize("by +KZ"), Margin, TEXTALIGN_MC);
-	Column.HSplitTop(MarginSmall, nullptr, &Column);
-
-	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcCustomClientsSendClientType, RCLocalize("Send to server that u use RClient"), &g_Config.m_RcCustomClientsSendClientType, &Column, LineSize);
-	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcCustomClientsCollectClientType, RCLocalize("Detect other clients"), &g_Config.m_RcCustomClientsCollectClientType, &Column, LineSize);
-	static std::vector<CButtonContainer> s_vButtonContainersCustomInNameplates = {{}, {}, {}, {}};
-	DoLine_RadioMenu(Column, TCLocalize("Show client type in nameplates"),
-		   s_vButtonContainersCustomInNameplates,
-		   {Localize("Off"), Localize("Others"), Localize("Everyone"), Localize("Only you")},
-		   {0, 1, 2, 3},
-		   g_Config.m_RcCustomClientsInNameplates);
-	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcCustomClientsInScoreboard, RCLocalize("Show client type in scoreboard"), &g_Config.m_RcCustomClientsInScoreboard, &Column, LineSize);
-
-	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
-	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;
-
-	// ***** Chat ***** //
-	Column.HSplitTop(MarginBetweenSections, nullptr, &Column);
-	s_SectionBoxes.push_back(Column);
-	Column.HSplitTop(HeadlineHeight, &Label, &Column);
-	Ui()->DoLabel(&Label, RCLocalize("Chat"), HeadlineFontSize, TEXTALIGN_MC);
-	Column.HSplitTop(MarginSmall, nullptr, &Column);
-
-	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcChatShowMouse, RCLocalize("Show mouse when open chat"), &g_Config.m_RcChatShowMouse, &Column, LineSize);
 
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
 	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;

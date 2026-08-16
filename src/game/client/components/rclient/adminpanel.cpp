@@ -565,7 +565,7 @@ void CAdminPanel::RenderPlayerPanelPopUpTimers(CUIRect *pBase)
 			Button.Draw(m_PlayerPopup.m_MinutesTimers == s_aElems[i].Minutes ? SAdminPanelProperties::ActionBanAltButtonColor() : SAdminPanelProperties::GeneralActiveButtonColor(), IGraphics::CORNER_ALL, SAdminPanelProperties::ms_Rounding);
 		else
 			Button.Draw(m_PlayerPopup.m_MinutesTimers == s_aElems[i].Minutes ? SAdminPanelProperties::GeneralActiveButtonColor() : SAdminPanelProperties::GeneralButtonColor(), IGraphics::CORNER_ALL, SAdminPanelProperties::ms_Rounding);
-		Ui()->DoLabel(&Button, RCLocalize(s_aElems[i].pTime), SAdminPanelProperties::ms_FontSize, TEXTALIGN_MC);
+		Ui()->DoLabel(&Button, s_aElems[i].pTime, SAdminPanelProperties::ms_FontSize, TEXTALIGN_MC);
 		if(DoButtonLogic(&Button))
 		{
 			if(m_PlayerPopup.m_MinutesTimers == s_aElems[i].Minutes)
@@ -756,7 +756,7 @@ void CAdminPanel::RenderPlayerPanelPopUpInputs(CUIRect *pBase)
 	Container.VSplitLeft(35, &Label, &m_PopupReasonInputRect);
 	Ui()->DoLabel(&Label, ("Reason:"), SAdminPanelProperties::ms_FontSize, TEXTALIGN_MC);
 	m_PopupReasonInputRect.VSplitLeft(SAdminPanelProperties::ms_ItemSpacing, nullptr, &m_PopupReasonInputRect);
-	m_PlayerPopup.m_LineInput.SetEmptyText(RCLocalize("Insult"));
+	m_PlayerPopup.m_LineInput.SetEmptyText("Insult");
 	DoEditBoxInUiSpace(&m_PlayerPopup.m_LineInput, &m_PopupReasonInputRect, SAdminPanelProperties::ms_FontSize);
 }
 

@@ -827,6 +827,9 @@ public:
 	void ShowQuitPopup();
 	void JoinTutorial();
 
+	//RClient
+	int DoTabBar(CUIRect *pRect, const char *const *apTabNames, int TabCount, CButtonContainer *apPageTabs, int &CurTab, float TabHeight);
+
 private:
 	CCommunityIcons m_CommunityIcons;
 	CMenusIngameTouchControls m_MenusIngameTouchControls;
