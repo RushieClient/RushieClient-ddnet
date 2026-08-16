@@ -853,6 +853,7 @@ private:
 	void RenderSettingsRClientSettings(CUIRect MainView);
 	void RenderSettingsRClientChatBinds(CUIRect MainView);
 	void RenderSettingsRClientInfo(CUIRect MainView);
+	void RenderSettingsRClientSpecWheel(CUIRect MainView);
 
 	// found in menus_tclient.cpp
 	void RenderSettingsTClient(CUIRect MainView);

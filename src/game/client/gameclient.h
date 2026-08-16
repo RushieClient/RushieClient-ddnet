@@ -73,6 +73,7 @@
 #include "components/rclient/notify_on_move.h"
 #include "components/rclient/adminpanel.h"
 #include "components/rclient/above_below_player.h"
+#include "components/rclient/specwheel.h"
 
 //TClient
 #include "components/tclient/bg_draw.h"
@@ -232,6 +233,7 @@ public:
 	CNotifyOnMove m_NotifyOnMove;
 	CAdminPanel m_RcAdminPanel;
 	CAboveBelowPlayer m_RcAboveBelow;
+	CSpecWheel m_RcSpecWheel;
 
 	// TClient Components
 	CSkinProfiles m_SkinProfiles;

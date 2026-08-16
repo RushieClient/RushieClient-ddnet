@@ -2628,6 +2628,8 @@ if(CLIENT)
     components/rclient/rclient.cpp
     components/rclient/rclient.h
     components/rclient/rclient_include.h
+    components/rclient/specwheel.cpp
+    components/rclient/specwheel.h
     components/scoreboard.cpp
     components/scoreboard.h
     components/skins.cpp

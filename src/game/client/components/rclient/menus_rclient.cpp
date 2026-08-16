@@ -21,6 +21,7 @@ enum
 {
 	RCLIENT_TAB_SETTINGS = 0,
 	RCLIENT_TAB_BINDCHAT,
+	RCLIENT_TAB_SPECWHEEL,
 	RCLIENT_TAB_INFO,
 	NUMBER_OF_RCLIENT_TABS
 };
@@ -85,6 +86,7 @@ void CMenus::RenderSettingsRClient(CUIRect MainView)
 	const char *apTabNames[] = {
 		RCLocalize("Settings"),
 		RCLocalize("Chat Binds"),
+		RCLocalize("Spec Wheel"),
 		RCLocalize("Info")};
 
 	for(int Tab = 0; Tab < NUMBER_OF_RCLIENT_TABS; ++Tab)
@@ -105,6 +107,8 @@ void CMenus::RenderSettingsRClient(CUIRect MainView)
 		RenderSettingsRClientSettings(MainView);
 	if(s_CurCustomTab == RCLIENT_TAB_BINDCHAT)
 		RenderSettingsRClientChatBinds(MainView);
+	if(s_CurCustomTab == RCLIENT_TAB_SPECWHEEL)
+		RenderSettingsRClientSpecWheel(MainView);
 	if(s_CurCustomTab == RCLIENT_TAB_INFO)
 		RenderSettingsRClientInfo(MainView);
 }
@@ -1204,4 +1208,176 @@ CUi::EPopupMenuFunctionResult CMenusRClientConfirmAspect::Render(void *pContext,
 	}
 
 	return CUi::POPUP_KEEP_OPEN;
+}
+
+void CMenus::RenderSettingsRClientSpecWheel(CUIRect MainView)
+{
+	CUIRect LeftView, RightView, Label, Button;
+	MainView.VSplitLeft(MainView.w / 2.1f, &LeftView, &RightView);
+
+	const float Radius = minimum(RightView.w, RightView.h) / 2.0f;
+	vec2 Center = RightView.Center();
+	// Draw Circle
+	Graphics()->TextureClear();
+	Graphics()->QuadsBegin();
+	Graphics()->SetColor(0.0f, 0.0f, 0.0f, 0.3f);
+	Graphics()->DrawCircle(Center.x, Center.y, Radius, 64);
+	Graphics()->QuadsEnd();
+
+	static char s_aBindName[SPECWHEEL_MAX_NAME];
+	static char s_aBindCommand[SPECWHEEL_MAX_CMD];
+
+	static int s_SelectedBindIndex = -1;
+	int HoveringIndex = -1;
+
+	float MouseDist = distance(Center, Ui()->MousePos());
+	const int SegmentCount = GameClient()->m_RcSpecWheel.m_vSpecBinds.size();
+	if(MouseDist < Radius && MouseDist > Radius * 0.25f && SegmentCount > 0)
+	{
+		float SegmentAngle = 2.0f * pi / SegmentCount;
+
+		float HoveringAngle = angle(Ui()->MousePos() - Center) + SegmentAngle / 2.0f;
+		if(HoveringAngle < 0.0f)
+			HoveringAngle += 2.0f * pi;
+
+		HoveringIndex = (int)(HoveringAngle / (2.0f * pi) * SegmentCount);
+		HoveringIndex = std::clamp(HoveringIndex, 0, SegmentCount - 1);
+		if(Ui()->MouseButtonClicked(0))
+		{
+			s_SelectedBindIndex = HoveringIndex;
+			str_copy(s_aBindName, GameClient()->m_RcSpecWheel.m_vSpecBinds[HoveringIndex].m_aName);
+			str_copy(s_aBindCommand, GameClient()->m_RcSpecWheel.m_vSpecBinds[HoveringIndex].m_aCommand);
+		}
+		else if(Ui()->MouseButtonClicked(1) && s_SelectedBindIndex >= 0 && HoveringIndex >= 0 && HoveringIndex != s_SelectedBindIndex)
+		{
+			CSpecWheel::CBind BindA = GameClient()->m_RcSpecWheel.m_vSpecBinds[s_SelectedBindIndex];
+			CSpecWheel::CBind BindB = GameClient()->m_RcSpecWheel.m_vSpecBinds[HoveringIndex];
+			str_copy(GameClient()->m_RcSpecWheel.m_vSpecBinds[s_SelectedBindIndex].m_aName, BindB.m_aName);
+			str_copy(GameClient()->m_RcSpecWheel.m_vSpecBinds[s_SelectedBindIndex].m_aCommand, BindB.m_aCommand);
+			str_copy(GameClient()->m_RcSpecWheel.m_vSpecBinds[HoveringIndex].m_aName, BindA.m_aName);
+			str_copy(GameClient()->m_RcSpecWheel.m_vSpecBinds[HoveringIndex].m_aCommand, BindA.m_aCommand);
+		}
+		else if(Ui()->MouseButtonClicked(2))
+		{
+			s_SelectedBindIndex = HoveringIndex;
+		}
+	}
+	else if(MouseDist < Radius && Ui()->MouseButtonClicked(0))
+	{
+		s_SelectedBindIndex = -1;
+		str_copy(s_aBindName, "");
+		str_copy(s_aBindCommand, "");
+	}
+
+	const float Theta = pi * 2.0f / std::max<float>(1.0f, GameClient()->m_RcSpecWheel.m_vSpecBinds.size());
+	for(int i = 0; i < static_cast<int>(GameClient()->m_RcSpecWheel.m_vSpecBinds.size()); i++)
+	{
+		TextRender()->TextColor(ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f));
+
+		float SegmentFontSize = FontSize * 1.1f;
+		if(i == s_SelectedBindIndex)
+		{
+			SegmentFontSize = FontSize * 1.7f;
+			TextRender()->TextColor(ColorRGBA(0.5f, 1.0f, 0.75f, 1.0f));
+		}
+		else if(i == HoveringIndex)
+		{
+			SegmentFontSize = FontSize * 1.35f;
+		}
+
+		const CSpecWheel::CBind Bind = GameClient()->m_RcSpecWheel.m_vSpecBinds[i];
+		const float Angle = Theta * i;
+
+		const vec2 Pos = direction(Angle) * (Radius * 0.75f) + Center;
+		const CUIRect Rect = CUIRect{Pos.x - 50.0f, Pos.y - 50.0f, 100.0f, 100.0f};
+		Ui()->DoLabel(&Rect, Bind.m_aName, SegmentFontSize, TEXTALIGN_MC);
+	}
+
+	TextRender()->TextColor(ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f));
+
+	LeftView.HSplitTop(LineSize, &Button, &LeftView);
+	Button.VSplitLeft(100.0f, &Label, &Button);
+	Ui()->DoLabel(&Label, TCLocalize("Name:"), FontSize, TEXTALIGN_ML);
+	static CLineInput s_NameInput;
+	s_NameInput.SetBuffer(s_aBindName, sizeof(s_aBindName));
+	s_NameInput.SetEmptyText(TCLocalize("Name"));
+	Ui()->DoEditBox(&s_NameInput, &Button, EditBoxFontSize);
+
+	LeftView.HSplitTop(MarginSmall, nullptr, &LeftView);
+	LeftView.HSplitTop(LineSize, &Button, &LeftView);
+	Button.VSplitLeft(100.0f, &Label, &Button);
+	Ui()->DoLabel(&Label, TCLocalize("Command:"), FontSize, TEXTALIGN_ML);
+	static CLineInput s_BindInput;
+	s_BindInput.SetBuffer(s_aBindCommand, sizeof(s_aBindCommand));
+	s_BindInput.SetEmptyText(TCLocalize("Command"));
+	Ui()->DoEditBox(&s_BindInput, &Button, EditBoxFontSize);
+
+	static CButtonContainer s_AddButton, s_RemoveButton, s_OverrideButton;
+
+	LeftView.HSplitTop(MarginSmall, nullptr, &LeftView);
+	LeftView.HSplitTop(LineSize, &Button, &LeftView);
+	if(DoButton_Menu(&s_OverrideButton, TCLocalize("Override Selected"), 0, &Button) && s_SelectedBindIndex >= 0 && s_SelectedBindIndex < static_cast<int>(GameClient()->m_RcSpecWheel.m_vSpecBinds.size()))
+	{
+		CSpecWheel::CBind TempBind;
+		if(str_length(s_aBindName) == 0)
+			str_copy(TempBind.m_aName, "*");
+		else
+			str_copy(TempBind.m_aName, s_aBindName);
+
+		str_copy(GameClient()->m_RcSpecWheel.m_vSpecBinds[s_SelectedBindIndex].m_aName, TempBind.m_aName);
+		str_copy(GameClient()->m_RcSpecWheel.m_vSpecBinds[s_SelectedBindIndex].m_aCommand, s_aBindCommand);
+	}
+	LeftView.HSplitTop(MarginSmall, nullptr, &LeftView);
+	LeftView.HSplitTop(LineSize, &Button, &LeftView);
+	CUIRect ButtonAdd, ButtonRemove;
+	Button.VSplitMid(&ButtonRemove, &ButtonAdd, MarginSmall);
+	if(DoButton_Menu(&s_AddButton, TCLocalize("Add Bind"), 0, &ButtonAdd))
+	{
+		CSpecWheel::CBind TempBind;
+		if(str_length(s_aBindName) == 0)
+			str_copy(TempBind.m_aName, "*");
+		else
+			str_copy(TempBind.m_aName, s_aBindName);
+
+		GameClient()->m_RcSpecWheel.AddBind(TempBind.m_aName, s_aBindCommand);
+		s_SelectedBindIndex = static_cast<int>(GameClient()->m_RcSpecWheel.m_vSpecBinds.size()) - 1;
+	}
+	if(DoButton_Menu(&s_RemoveButton, TCLocalize("Remove Bind"), 0, &ButtonRemove) && s_SelectedBindIndex >= 0)
+	{
+		GameClient()->m_RcSpecWheel.RemoveBind(s_SelectedBindIndex);
+		s_SelectedBindIndex = -1;
+	}
+
+	LeftView.HSplitTop(MarginSmall, nullptr, &LeftView);
+	LeftView.HSplitTop(LineSize, &Label, &LeftView);
+	Ui()->DoLabel(&Label, TCLocalize("The command is ran in console not chat"), FontSize, TEXTALIGN_ML);
+	LeftView.HSplitTop(LineSize * 0.8f, &Label, &LeftView);
+	Ui()->DoLabel(&Label, TCLocalize("Use left mouse to select"), FontSize * 0.8f, TEXTALIGN_ML);
+	LeftView.HSplitTop(LineSize * 0.8f, &Label, &LeftView);
+	Ui()->DoLabel(&Label, TCLocalize("Use right mouse to swap with selected"), FontSize * 0.8f, TEXTALIGN_ML);
+	LeftView.HSplitTop(LineSize * 0.8f, &Label, &LeftView);
+	Ui()->DoLabel(&Label, TCLocalize("Use middle mouse select without copy"), FontSize * 0.8f, TEXTALIGN_ML);
+
+	LeftView.HSplitTop(LineSize, nullptr, &LeftView);
+	LeftView.HSplitTop(LineSize, &Label, &LeftView);
+	Ui()->DoLabel(&Label, TCLocalize("RClient \\/"), FontSize, TEXTALIGN_ML);
+	LeftView.HSplitTop(LineSize * 0.8f, &Label, &LeftView);
+	Ui()->DoLabel(&Label, TCLocalize("Use %plnick% for replacing with nickname"), FontSize * 0.8f, TEXTALIGN_ML);
+	LeftView.HSplitTop(LineSize * 0.8f, &Label, &LeftView);
+	Ui()->DoLabel(&Label, TCLocalize("Use %plid% for replacing with client id"), FontSize * 0.8f, TEXTALIGN_ML);
+	CUIRect RightBox;
+	LeftView.HSplitTop(LineSize * 0.8f, &RightBox, &LeftView);
+	RightBox.VSplitLeft(LineSize, nullptr, &RightBox);
+	SLabelProperties Props;
+	Props.SetColor(ColorRGBA(1.0f, 0.0f, 0.0f, 1.0f));
+	Ui()->DoLabel(&RightBox, TCLocalize("Use bracket yourself \"%plnick%\""), FontSize * 0.8f, TEXTALIGN_ML, Props);
+	LeftView.HSplitTop(LineSize * 0.8f, &Label, &LeftView);
+	Ui()->DoLabel(&Label, TCLocalize("Example: echo \"\\\"%plnick%\\\" %plid%\""), FontSize * 0.8f, TEXTALIGN_ML);
+
+	LeftView.HSplitBottom(LineSize, &LeftView, &Label);
+	static CButtonContainer s_ReaderButtonWheel, s_ClearButtonWheel;
+	DoLine_KeyReader(Label, s_ReaderButtonWheel, s_ClearButtonWheel, TCLocalize("Spec Wheel Key"), "+specwheel");
+
+	LeftView.HSplitBottom(LineSize, &LeftView, &Label);
+	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_TcResetBindWheelMouse, TCLocalize("Reset position of mouse when opening specwheel"), &g_Config.m_TcResetBindWheelMouse, &Label, LineSize);
 }

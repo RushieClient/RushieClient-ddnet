@@ -165,12 +165,13 @@ void CGameClient::OnConsoleInit()
 					      &m_Mod, // TClient
 					      &m_CustomCommunities, // TClient
 					      &m_Hud,
-					      &m_NotifyOnMove,
-					      &m_RcAboveBelow,
+					      &m_NotifyOnMove, // RClient
+					      &m_RcAboveBelow, // RClient
 					      &m_Spectator,
 					      &m_Emoticon,
 					      &m_BindChat, // TClient
 					      &m_BindWheel, // TClient
+					      &m_RcSpecWheel, // RClient
 					      &m_WarList, // TClient
 					      &m_StatusBar, // TClient
 					      &m_InfoMessages,
@@ -182,7 +183,7 @@ void CGameClient::OnConsoleInit()
 					      &m_EdgeHelper, //RClient
 					      &m_Scoreboard,
 					      &m_Statboard,
-					      &m_RcAdminPanel,
+					      &m_RcAdminPanel, // RClient
 					      &m_Motd,
 					      &m_Menus,
 					      &m_Tooltips,
@@ -201,6 +202,7 @@ void CGameClient::OnConsoleInit()
 						  &m_Motd, // for pressing esc to remove it
 						  &m_Spectator,
 						  &m_BindWheel, // TClient
+						  &m_RcSpecWheel, // RClient
 						  &m_Emoticon,
 						  &m_ImportantAlert,
 						  &m_Menus,
