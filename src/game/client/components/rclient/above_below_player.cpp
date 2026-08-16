@@ -55,6 +55,9 @@ void CAboveBelowPlayer::OnRender()
 		if(i == LocalClientId)
 			continue;
 
+		if(!GameClient()->m_Teams.CanCollide(LocalClientId, i))
+			continue;
+
 		const CNetObj_Character *pCurChar = &GameClient()->m_Snap.m_aCharacters[i].m_Cur;
 		vec2 m_PlayerPos = vec2(pCurChar->m_X, pCurChar->m_Y) / 32.0f;
 		if(m_PlayerPos.x == m_LocalPos.x)

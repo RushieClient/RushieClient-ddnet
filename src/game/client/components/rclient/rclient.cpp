@@ -1765,3 +1765,58 @@ void CRClient::ChatCheckingMessages(CNetMsg_Sv_Chat *pMsg)
 	}
 }
 
+bool CRClient::AntiUnSpec()
+{
+	// true - return
+	const int LocalClientId = GameClient()->m_Snap.m_LocalClientId;
+	if(LocalClientId < 0)
+		return false;
+	if(!g_Config.m_RcAntiUnSpec)
+		return false;
+	if(GameClient()->m_aClients[LocalClientId].m_Spec)
+	{
+		bool CanCollidePhysical = false;
+		vec2 LocalPlayerPos = GameClient()->m_aClients[LocalClientId].m_RegularPredicted.m_Pos;
+		if(GameClient()->m_aClients[LocalClientId].m_SpecCharPresent)
+			LocalPlayerPos = GameClient()->m_aClients[LocalClientId].m_SpecChar;
+
+		for(int i = 0; i < MAX_CLIENTS; i++)
+		{
+			if(i == GameClient()->m_aLocalIds[g_Config.m_ClDummy] || i == GameClient()->m_aLocalIds[!g_Config.m_ClDummy])
+				continue;
+
+			if(!GameClient()->m_aClients[i].m_Active ||GameClient()->m_aClients[i].m_Spec)
+				continue;
+
+			bool PlTeamCanCollide = !GameClient()->m_aClients[LocalClientId].m_CollisionDisabled && !GameClient()->m_aClients[i].m_CollisionDisabled
+						&& GameClient()->m_aTuning[g_Config.m_ClDummy].m_PlayerCollision
+						&& GameClient()->m_Teams.CanCollide(LocalClientId, i);
+			if(!PlTeamCanCollide)
+				continue;
+
+			const CNetObj_Character CurPlayer = GameClient()->m_Snap.m_aCharacters[i].m_Cur;
+			const vec2 CurPlayerPos = vec2(CurPlayer.m_X, CurPlayer.m_Y);
+			float Dist = distance(CurPlayerPos, LocalPlayerPos);
+			if(PlTeamCanCollide && Dist < CCharacterCore::PhysicalSize() * 1.25f)
+				CanCollidePhysical = true;
+		}
+
+		if(CanCollidePhysical)
+		{
+			if(ConfirmUnSpec)
+			{
+				ConfirmUnSpec = false;
+				return false;
+			}
+			else
+			{
+				GameClient()->Echo("Are u sure want unspec? Press again to unspec");
+				ConfirmUnSpec = true;
+				return true;
+			}
+		}
+	}
+
+	ConfirmUnSpec = false;
+	return false;
+}

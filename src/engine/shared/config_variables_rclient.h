@@ -147,3 +147,4 @@ MACRO_CONFIG_INT(RcNotifyWhenPosPlayerPosY, rc_notify_when_pos_player_pos_y, 75,
 
 // ChatCheckingMessages
 MACRO_CONFIG_INT(RcAutoLockTeam, rc_auto_lock_team, 0, 0, 2, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Auto lock team when join(1-Empty, 2-Any)")
+MACRO_CONFIG_INT(RcAntiUnSpec, rc_anti_unspec, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Anti unspec when will be collision")

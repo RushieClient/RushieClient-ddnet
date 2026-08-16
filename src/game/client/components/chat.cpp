@@ -1729,9 +1729,13 @@ void CChat::SendChat(int Team, const char *pLine, bool LineTranslated)
 			}
 			else
 				Msg.m_pMessage = pLine;
-	}
+		}
 		else
-		Msg.m_pMessage = pLine;
+			Msg.m_pMessage = pLine;
+
+		if((!str_comp(Msg.m_pMessage, "/spec") || !str_comp(Msg.m_pMessage, "/pause")) && GameClient()->m_RClient.AntiUnSpec())
+			return;
+
 		Client()->SendPackMsgActive(&Msg, MSGFLAG_VITAL);
 	}
 	else

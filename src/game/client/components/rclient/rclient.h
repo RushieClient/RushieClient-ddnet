@@ -196,7 +196,6 @@ public:
 	std::vector<const char *> s_LangDropDownNames;
 	void AddNewLanguage(ChatThings::STranslateLangs Lang);
 	ChatThings::STranslateLangs GetLanguageName(const char *pCode);
-	ChatThings::STranslateLangs GetLatestLanguageNameById(int Id);
 	void ResetLanguages();
 
 	// Animation
@@ -204,6 +203,10 @@ public:
 
 	// Chat Checking
 	void ChatCheckingMessages(CNetMsg_Sv_Chat *pMsg);
+
+	// Anti UnSpec
+	bool AntiUnSpec();
+	bool ConfirmUnSpec = false;
 };
 
 #endif //GAME_CLIENT_COMPONENTS_RCLIENT_RCLIENT_H

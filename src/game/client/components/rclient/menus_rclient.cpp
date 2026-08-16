@@ -961,6 +961,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		   {Localize("Off"), Localize("Empty"), Localize("Any")},
 		   {0, 1, 2},
 		   g_Config.m_RcAutoLockTeam);
+	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcAntiUnSpec, RCLocalize("Anti UnSpec in player"), &g_Config.m_RcAntiUnSpec, &Column, LineSize);
 
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
 	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;
