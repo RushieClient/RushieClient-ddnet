@@ -166,6 +166,7 @@ void CGameClient::OnConsoleInit()
 					      &m_CustomCommunities, // TClient
 					      &m_Hud,
 					      &m_NotifyOnMove,
+					      &m_RcAboveBelow,
 					      &m_Spectator,
 					      &m_Emoticon,
 					      &m_BindChat, // TClient

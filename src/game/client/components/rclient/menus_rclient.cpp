@@ -517,9 +517,15 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		static int s_AspectDisableConsole = 0;
 		if(DoButton_CheckBox(&s_AspectDisableConsole, RCLocalize("Disable for Console"), g_Config.m_RcCustomAspectDisable & RcAspectDisable::CONSOLE, &Button))
 			g_Config.m_RcCustomAspectDisable ^= RcAspectDisable::CONSOLE;
+
+		Column.HSplitTop(LineSize, &Button, &Column);
+		static int s_AspectDisableAboveBelow = 0;
+		if(DoButton_CheckBox(&s_AspectDisableAboveBelow, RCLocalize("Disable for Above/Below Player"), g_Config.m_RcCustomAspectDisable & RcAspectDisable::ABOVEBELOWPL, &Button))
+			g_Config.m_RcCustomAspectDisable ^= RcAspectDisable::ABOVEBELOWPL;
+
 	}
 	else
-		Column.HSplitTop(LineSize * 4, nullptr, &Column);
+		Column.HSplitTop(LineSize * 5, nullptr, &Column);
 
 	Column.HSplitTop(LineSize, &Button, &Column);
 	static int s_AspectDisableHud = 0;
@@ -541,6 +547,27 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	if(DoButton_CheckBox(&s_AspectDisableInfoMessages, RCLocalize("Disable for Info messages"), g_Config.m_RcCustomAspectDisable & RcAspectDisable::INFOMESSAGES, &Button))
 		g_Config.m_RcCustomAspectDisable ^= RcAspectDisable::INFOMESSAGES;
 
+	Column.HSplitTop(LineSize, &Button, &Column);
+	static int s_AspectDisableNotifyInSpec = 0;
+	if(DoButton_CheckBox(&s_AspectDisableNotifyInSpec, RCLocalize("Disable for Notify in spec"), g_Config.m_RcCustomAspectDisable & RcAspectDisable::NOTIFYINSPEC, &Button))
+		g_Config.m_RcCustomAspectDisable ^= RcAspectDisable::NOTIFYINSPEC;
+
+	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
+	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;
+
+	Column.HSplitTop(MarginBetweenSections, nullptr, &Column);
+	s_SectionBoxes.push_back(Column);
+	Column.HSplitTop(HeadlineHeight, &Label, &Column);
+	Ui()->DoLabel(&Label, RCLocalize("Above/Below Player"), HeadlineFontSize, TEXTALIGN_MC);
+	Column.HSplitTop(MarginSmall, nullptr, &Column);
+
+	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcNotifyWhenAbovePosPlayer, RCLocalize("Notify when above player"), &g_Config.m_RcNotifyWhenAbovePosPlayer, &Column, LineSize);
+	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcNotifyWhenSamePosPlayer, RCLocalize("Notify when same pos as player"), &g_Config.m_RcNotifyWhenSamePosPlayer, &Column, LineSize);
+	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcNotifyWhenBelowPosPlayer, RCLocalize("Notify when below player"), &g_Config.m_RcNotifyWhenBelowPosPlayer, &Column, LineSize);
+	Column.HSplitTop(LineSize, &Button, &Column);
+	Ui()->DoScrollbarOption(&g_Config.m_RcNotifyWhenPosPlayerPosX, &g_Config.m_RcNotifyWhenPosPlayerPosX, &Button, RCLocalize("Text pos x"), 0, 100, &CUi::ms_LinearScrollbarScale, 0);
+	Column.HSplitTop(LineSize, &Button, &Column);
+	Ui()->DoScrollbarOption(&g_Config.m_RcNotifyWhenPosPlayerPosY, &g_Config.m_RcNotifyWhenPosPlayerPosY, &Button, RCLocalize("Text pos y"), 0, 100, &CUi::ms_LinearScrollbarScale, 0);
 
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
 	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;

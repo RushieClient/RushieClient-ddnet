@@ -101,7 +101,6 @@ void CEdgeHelper::RenderEdgeHelper()
 	float m_Height = 300.0f;
 	float m_Width = m_Height * (g_Config.m_RcCustomAspectDisable & RcAspectDisable::EDGEINFO ? Graphics()->ScreenAspectReal() : Graphics()->ScreenAspect());
 
-	Ui()->m_RcForceRealAspect = g_Config.m_RcCustomAspectDisable & RcAspectDisable::EDGEINFO;
 	Base.h = m_Height / (g_Config.m_RcEdgeInfoJump && g_Config.m_RcEdgeInfoCords ? 6 : 12);
 	Base.w = m_Width / 5;
 	Base.x = (m_Width - Base.w) * (g_Config.m_RcEdgeInfoPosX / 100.0f);

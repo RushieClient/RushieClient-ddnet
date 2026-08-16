@@ -2,6 +2,7 @@
 
 #include "game/client/gameclient.h"
 #include "engine/shared/config.h"
+#include "rclient_include.h"
 
 CNotifyOnMove::CNotifyOnMove()
 {
@@ -109,7 +110,7 @@ void CNotifyOnMove::OnRender()
 				float Phase = (T < 0.5f) ? (2.0f * T * T) : (1.0f - std::pow(-2.0f * T + 2.0f, 2) / 2.0f);
 
 				int m_Height = 300.0f;
-				int m_Width = m_Height * Graphics()->ScreenAspect();
+				int m_Width = m_Height * (g_Config.m_RcCustomAspectDisable & RcAspectDisable::NOTIFYINSPEC ? Graphics()->ScreenAspectReal() : Graphics()->ScreenAspect());
 				Graphics()->MapScreen(0.0f, 0.0f, (float)m_Width, (float)m_Height);
 				CUIRect NotifyBox;
 				NotifyBox.w = 60.0f;

@@ -2615,6 +2615,8 @@ if(CLIENT)
     components/players.h
     components/race_demo.cpp
     components/race_demo.h
+    components/rclient/above_below_player.cpp
+    components/rclient/above_below_player.h
     components/rclient/adminpanel.cpp
     components/rclient/adminpanel.h
     components/rclient/edgehelper.cpp

@@ -134,3 +134,10 @@ MACRO_CONFIG_INT(RcCustomAspectDisable, rc_custom_aspect_disable, 0, 0, 65536, C
 //Spectator
 MACRO_CONFIG_INT(RcSpectatorMoveSpeed, rc_spectator_move_speed, 100, 10, 200, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Speed of spectator freeview movement")
 MACRO_CONFIG_INT(RcAdminPanelPlaySounds, rc_admin_panel_play_sounds, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Plays sound when do command")
+
+// Above Below player
+MACRO_CONFIG_INT(RcNotifyWhenAbovePosPlayer, rc_notify_when_above_pos_player, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Appear text that u above player")
+MACRO_CONFIG_INT(RcNotifyWhenSamePosPlayer, rc_notify_when_same_pos_player, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Appear text that u same pos player")
+MACRO_CONFIG_INT(RcNotifyWhenBelowPosPlayer, rc_notify_when_below_pos_player, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Appear text that u below player")
+MACRO_CONFIG_INT(RcNotifyWhenPosPlayerPosX, rc_notify_when_pos_player_pos_x, 50, 0, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Appear text when u above/same/below pos player")
+MACRO_CONFIG_INT(RcNotifyWhenPosPlayerPosY, rc_notify_when_pos_player_pos_y, 75, 0, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Appear text when u above/same/below pos player")

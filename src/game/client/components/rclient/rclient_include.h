@@ -15,6 +15,8 @@ namespace RcAspectDisable
 		EDGEINFO = 1 << 7,
 		INFOMESSAGES = 1 << 8,
 		ADMINPANEL = 1 << 9,
+		NOTIFYINSPEC = 1 << 10,
+		ABOVEBELOWPL = 1 << 11,
 	};
 }
 

@@ -72,6 +72,7 @@
 #include "components/rclient/edgehelper.h"
 #include "components/rclient/notify_on_move.h"
 #include "components/rclient/adminpanel.h"
+#include "components/rclient/above_below_player.h"
 
 //TClient
 #include "components/tclient/bg_draw.h"
@@ -230,6 +231,7 @@ public:
 	CEdgeHelper m_EdgeHelper;
 	CNotifyOnMove m_NotifyOnMove;
 	CAdminPanel m_RcAdminPanel;
+	CAboveBelowPlayer m_RcAboveBelow;
 
 	// TClient Components
 	CSkinProfiles m_SkinProfiles;
