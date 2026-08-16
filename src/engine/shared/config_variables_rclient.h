@@ -144,3 +144,6 @@ MACRO_CONFIG_INT(RcNotifyWhenSamePosPlayer, rc_notify_when_same_pos_player, 0, 0
 MACRO_CONFIG_INT(RcNotifyWhenBelowPosPlayer, rc_notify_when_below_pos_player, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Appear text that u below player")
 MACRO_CONFIG_INT(RcNotifyWhenPosPlayerPosX, rc_notify_when_pos_player_pos_x, 50, 0, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Appear text when u above/same/below pos player")
 MACRO_CONFIG_INT(RcNotifyWhenPosPlayerPosY, rc_notify_when_pos_player_pos_y, 75, 0, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Appear text when u above/same/below pos player")
+
+// ChatCheckingMessages
+MACRO_CONFIG_INT(RcAutoLockTeam, rc_auto_lock_team, 0, 0, 2, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Auto lock team when join(1-Empty, 2-Any)")

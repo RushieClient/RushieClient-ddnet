@@ -178,6 +178,14 @@ void CRClient::OnConsoleInit()
 
 void CRClient::OnMessage(int MsgType, void *pRawMsg)
 {
+	if(GameClient()->m_SuppressEvents)
+		return;
+
+	if(MsgType == NETMSGTYPE_SV_CHAT)
+	{
+		CNetMsg_Sv_Chat *pMsg = (CNetMsg_Sv_Chat *)pRawMsg;
+		ChatCheckingMessages(pMsg);
+	}
 }
 
 void CRClient::OnStateChange(int NewState, int OldState)
@@ -1721,5 +1729,39 @@ void CRClient::ConResetLanguages(IConsole::IResult *pResult, void *pUserData)
 {
 	CRClient *pThis = static_cast<CRClient *>(pUserData);
 	pThis->ResetLanguages();
+}
+
+void CRClient::ChatCheckingMessages(CNetMsg_Sv_Chat *pMsg)
+{
+	if(pMsg->m_ClientId == -1)
+	{
+		if(g_Config.m_RcAutoLockTeam)
+		{
+			char aBuf[128];
+			str_format(aBuf, sizeof(aBuf), "\'%s\' joined team ", g_Config.m_ClDummy ? g_Config.m_ClDummyName : g_Config.m_PlayerName);
+			if(str_utf8_find_nocase(pMsg->m_pMessage ,aBuf))
+			{
+				const int Team = GameClient()->m_Teams.Team(GameClient()->m_Snap.m_LocalClientId);
+				if(Team != 0)
+				{
+					if(g_Config.m_RcAutoLockTeam == 1)
+					{
+						int TeamSize = 0;
+						for(int i = 0; i < MAX_CLIENTS; i++)
+						{
+							if(GameClient()->m_aClients[i].m_Active && GameClient()->m_Teams.Team(i) == Team)
+								TeamSize++;
+						}
+						if(TeamSize == 1)
+						{
+							GameClient()->m_Chat.SendChat(0, "/lock 1");
+						}
+					}
+					else
+						GameClient()->m_Chat.SendChat(0, "/lock 1");
+				}
+			}
+		}
+	}
 }
 

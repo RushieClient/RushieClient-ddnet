@@ -201,6 +201,9 @@ public:
 
 	// Animation
 	static float EaseInOutQuad(const float T) { return T == 0.0f ? 0.0f : T == 1.0f ? 1.0f : ((T < 0.5f) ? (2.0f * T * T) : (1.0f - std::pow(-2.0f * T + 2.0f, 2) / 2.0f)); }
+
+	// Chat Checking
+	void ChatCheckingMessages(CNetMsg_Sv_Chat *pMsg);
 };
 
 #endif //GAME_CLIENT_COMPONENTS_RCLIENT_RCLIENT_H

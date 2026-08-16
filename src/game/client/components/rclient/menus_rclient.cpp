@@ -949,6 +949,22 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
 	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;
 
+	Column.HSplitTop(MarginBetweenSections, nullptr, &Column);
+	s_SectionBoxes.push_back(Column);
+	Column.HSplitTop(HeadlineHeight, &Label, &Column);
+	Ui()->DoLabel(&Label, RCLocalize("Helpful Functions"), HeadlineFontSize, TEXTALIGN_MC);
+	Column.HSplitTop(MarginSmall, nullptr, &Column);
+
+	static std::vector<CButtonContainer> s_vButtonContainersAutoLock = {{}, {}, {}};
+	DoLine_RadioMenu(Column, TCLocalize("Auto Lock Team"),
+		   s_vButtonContainersAutoLock,
+		   {Localize("Off"), Localize("Empty"), Localize("Any")},
+		   {0, 1, 2},
+		   g_Config.m_RcAutoLockTeam);
+
+	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
+	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;
+
 	// ***** END OF PAGE 1 SETTINGS ***** //
 	RightView = Column;
 
