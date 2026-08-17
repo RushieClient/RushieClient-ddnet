@@ -145,6 +145,10 @@ MACRO_CONFIG_INT(RcNotifyWhenBelowPosPlayer, rc_notify_when_below_pos_player, 0,
 MACRO_CONFIG_INT(RcNotifyWhenPosPlayerPosX, rc_notify_when_pos_player_pos_x, 50, 0, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Appear text when u above/same/below pos player")
 MACRO_CONFIG_INT(RcNotifyWhenPosPlayerPosY, rc_notify_when_pos_player_pos_y, 75, 0, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Appear text when u above/same/below pos player")
 
-// ChatCheckingMessages
+// Helping features
 MACRO_CONFIG_INT(RcAutoLockTeam, rc_auto_lock_team, 0, 0, 2, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Auto lock team when join(1-Empty, 2-Any)")
 MACRO_CONFIG_INT(RcAntiUnSpec, rc_anti_unspec, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Anti unspec when will be collision")
+
+// Sorting
+MACRO_CONFIG_INT(RcScoreboardSortId, rc_scoreboard_sort_id, 0, 0, 4, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Scoreboard sort id (0-name/team/score 1-id/team/score, 2-id/score, 3-id/team, 4-id)")
+MACRO_CONFIG_INT(RcSpectatorSortId, rc_spectator_sort_id, 0, 0, 2, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Spectator sort id (0-name/team 1-id/team, 2-id)")

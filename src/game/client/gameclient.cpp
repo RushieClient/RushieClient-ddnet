@@ -2268,6 +2268,33 @@ void CGameClient::OnNewSnapshot()
 		}
 	}
 
+	// RClient
+	// sort player infos by score with id sort
+	mem_copy(m_Snap.m_apInfoByScoreWithId, m_Snap.m_apPlayerInfos, sizeof(m_Snap.m_apInfoByScoreWithId));
+	std::stable_sort(m_Snap.m_apInfoByScoreWithId, m_Snap.m_apInfoByScoreWithId + MAX_CLIENTS, SortByTimeScore);
+
+	// sort player infos by DDRace Team (and score id between)
+	Index = 0;
+	for(int Team = TEAM_FLOCK; Team <= TEAM_SUPER; ++Team)
+	{
+		for(int i = 0; i < MAX_CLIENTS && Index < MAX_CLIENTS; ++i)
+		{
+			if(m_Snap.m_apInfoByScoreWithId[i] && m_Teams.Team(m_Snap.m_apInfoByScoreWithId[i]->m_ClientId) == Team)
+				m_Snap.m_apInfoByDDTeamScoreId[Index++] = m_Snap.m_apInfoByScoreWithId[i];
+		}
+	}
+
+	// sort player infos by DDRace Team (and id between)
+	Index = 0;
+	for(int Team = TEAM_FLOCK; Team <= TEAM_SUPER; ++Team)
+	{
+		for(int i = 0; i < MAX_CLIENTS && Index < MAX_CLIENTS; ++i)
+		{
+			if(m_Snap.m_apPlayerInfos[i] && m_Teams.Team(m_Snap.m_apPlayerInfos[i]->m_ClientId) == Team)
+				m_Snap.m_apInfoByDDTeamId[Index++] = m_Snap.m_apPlayerInfos[i];
+		}
+	}
+
 	if(ServerInfo.m_aGameType[0] != '0')
 	{
 		if(str_comp(ServerInfo.m_aGameType, "DM") != 0 && str_comp(ServerInfo.m_aGameType, "TDM") != 0 && str_comp(ServerInfo.m_aGameType, "CTF") != 0)

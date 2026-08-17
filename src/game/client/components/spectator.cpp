@@ -33,7 +33,7 @@ bool CSpectator::CanChangeSpectatorId()
 void CSpectator::SpectateNext(bool Reverse)
 {
 	int CurIndex = -1;
-	const CNetObj_PlayerInfo **paPlayerInfos = GameClient()->m_Snap.m_apInfoByDDTeamName;
+	const CNetObj_PlayerInfo **paPlayerInfos = GameClient()->m_RClient.GetSortedPlayersSpectatorArray(g_Config.m_RcSpectatorSortId);
 
 	// m_SpectatorId may be uninitialized if m_Active is false
 	if(GameClient()->m_Snap.m_SpecInfo.m_Active)
@@ -411,7 +411,7 @@ void CSpectator::OnRender()
 
 	for(int i = 0, Count = 0; i < MAX_CLIENTS; ++i)
 	{
-		if(!GameClient()->m_Snap.m_apInfoByDDTeamName[i] || GameClient()->m_Snap.m_apInfoByDDTeamName[i]->m_Team == TEAM_SPECTATORS)
+		if(!GameClient()->m_RClient.GetSortedPlayersSpectator(g_Config.m_RcSpectatorSortId, i) || GameClient()->m_RClient.GetSortedPlayersSpectator(g_Config.m_RcSpectatorSortId, i)->m_Team == TEAM_SPECTATORS)
 			continue;
 
 		++Count;
@@ -422,13 +422,13 @@ void CSpectator::OnRender()
 			y = StartY;
 		}
 
-		const CNetObj_PlayerInfo *pInfo = GameClient()->m_Snap.m_apInfoByDDTeamName[i];
+		const CNetObj_PlayerInfo *pInfo = GameClient()->m_RClient.GetSortedPlayersSpectator(g_Config.m_RcSpectatorSortId, i);
 		int DDTeam = GameClient()->m_Teams.Team(pInfo->m_ClientId);
 		int NextDDTeam = 0;
 
 		for(int j = i + 1; j < MAX_CLIENTS; j++)
 		{
-			const CNetObj_PlayerInfo *pInfo2 = GameClient()->m_Snap.m_apInfoByDDTeamName[j];
+			const CNetObj_PlayerInfo *pInfo2 = GameClient()->m_RClient.GetSortedPlayersSpectator(g_Config.m_RcSpectatorSortId, j);
 
 			if(!pInfo2 || pInfo2->m_Team == TEAM_SPECTATORS)
 				continue;
@@ -441,7 +441,7 @@ void CSpectator::OnRender()
 		{
 			for(int j = i - 1; j >= 0; j--)
 			{
-				const CNetObj_PlayerInfo *pInfo2 = GameClient()->m_Snap.m_apInfoByDDTeamName[j];
+				const CNetObj_PlayerInfo *pInfo2 = GameClient()->m_RClient.GetSortedPlayersSpectator(g_Config.m_RcSpectatorSortId, j);
 
 				if(!pInfo2 || pInfo2->m_Team == TEAM_SPECTATORS)
 					continue;
@@ -464,7 +464,7 @@ void CSpectator::OnRender()
 
 		OldDDTeam = DDTeam;
 
-		if((Client()->State() == IClient::STATE_DEMOPLAYBACK && GameClient()->m_DemoSpecId == GameClient()->m_Snap.m_apInfoByDDTeamName[i]->m_ClientId) || (Client()->State() != IClient::STATE_DEMOPLAYBACK && GameClient()->m_Snap.m_SpecInfo.m_SpectatorId == GameClient()->m_Snap.m_apInfoByDDTeamName[i]->m_ClientId))
+		if((Client()->State() == IClient::STATE_DEMOPLAYBACK && GameClient()->m_DemoSpecId == GameClient()->m_RClient.GetSortedPlayersSpectator(g_Config.m_RcSpectatorSortId, i)->m_ClientId) || (Client()->State() != IClient::STATE_DEMOPLAYBACK && GameClient()->m_Snap.m_SpecInfo.m_SpectatorId == GameClient()->m_RClient.GetSortedPlayersSpectator(g_Config.m_RcSpectatorSortId, i)->m_ClientId))
 		{
 			Graphics()->DrawRect(Width / 2.0f + x - 10.0f + BoxOffset, Height / 2.0f + y + BoxMove, 270.0f - BoxOffset, LineHeight, ColorRGBA(1.0f, 1.0f, 1.0f, 0.25f), IGraphics::CORNER_ALL, RoundRadius);
 		}
@@ -473,7 +473,7 @@ void CSpectator::OnRender()
 		if(m_SelectorMouse.x >= x - 10.0f && m_SelectorMouse.x < x + 260.0f &&
 			m_SelectorMouse.y >= y - (LineHeight / 6.0f) && m_SelectorMouse.y < y + (LineHeight * 5.0f / 6.0f))
 		{
-			m_SelectedSpectatorId = GameClient()->m_Snap.m_apInfoByDDTeamName[i]->m_ClientId;
+			m_SelectedSpectatorId = GameClient()->m_RClient.GetSortedPlayersSpectator(g_Config.m_RcSpectatorSortId, i)->m_ClientId;
 			PlayerSelected = true;
 			if(MousePressed)
 			{
@@ -508,7 +508,7 @@ void CSpectator::OnRender()
 		}
 		float TeeAlpha;
 		if(Client()->State() == IClient::STATE_DEMOPLAYBACK &&
-			!GameClient()->m_Snap.m_aCharacters[GameClient()->m_Snap.m_apInfoByDDTeamName[i]->m_ClientId].m_Active)
+			!GameClient()->m_Snap.m_aCharacters[GameClient()->m_RClient.GetSortedPlayersSpectator(g_Config.m_RcSpectatorSortId, i)->m_ClientId].m_Active)
 		{
 			TextRender()->TextColor(1.0f, 1.0f, 1.0f, 0.25f);
 			TeeAlpha = 0.5f;
@@ -526,7 +526,7 @@ void CSpectator::OnRender()
 		if(g_Config.m_ClShowIds)
 		{
 			char aClientId[16];
-			GameClient()->FormatClientId(GameClient()->m_Snap.m_apInfoByDDTeamName[i]->m_ClientId, aClientId, EClientIdFormat::INDENT_AUTO);
+			GameClient()->FormatClientId(GameClient()->m_RClient.GetSortedPlayersSpectator(g_Config.m_RcSpectatorSortId, i)->m_ClientId, aClientId, EClientIdFormat::INDENT_AUTO);
 			TextRender()->TextEx(&NameCursor, aClientId);
 		}
 
@@ -536,11 +536,11 @@ void CSpectator::OnRender()
 			TextRender()->TextColor(GameClient()->m_WarList.GetPriorityColor(pInfo->m_ClientId));
 		}
 
-		TextRender()->TextEx(&NameCursor, GameClient()->m_aClients[GameClient()->m_Snap.m_apInfoByDDTeamName[i]->m_ClientId].m_aName);
+		TextRender()->TextEx(&NameCursor, GameClient()->m_aClients[GameClient()->m_RClient.GetSortedPlayersSpectator(g_Config.m_RcSpectatorSortId, i)->m_ClientId].m_aName);
 
 		if(GameClient()->m_MultiViewActivated)
 		{
-			if(GameClient()->m_aMultiViewId[GameClient()->m_Snap.m_apInfoByDDTeamName[i]->m_ClientId])
+			if(GameClient()->m_aMultiViewId[GameClient()->m_RClient.GetSortedPlayersSpectator(g_Config.m_RcSpectatorSortId, i)->m_ClientId])
 			{
 				TextRender()->TextColor(0.1f, 1.0f, 0.1f, PlayerSelected ? 1.0f : 0.5f);
 				TextRender()->Text(Width / 2.0f + x + 50.0f + 180.0f, Height / 2.0f + y + BoxMove + (LineHeight - FontSize) / 2.f, FontSize - 3, "⬤", 220.0f);
@@ -554,10 +554,10 @@ void CSpectator::OnRender()
 
 		// flag
 		if(GameClient()->m_Snap.m_pGameInfoObj && (GameClient()->m_Snap.m_pGameInfoObj->m_GameFlags & GAMEFLAG_FLAGS) &&
-			GameClient()->m_Snap.m_pGameDataObj && (GameClient()->m_Snap.m_pGameDataObj->m_FlagCarrierRed == GameClient()->m_Snap.m_apInfoByDDTeamName[i]->m_ClientId || GameClient()->m_Snap.m_pGameDataObj->m_FlagCarrierBlue == GameClient()->m_Snap.m_apInfoByDDTeamName[i]->m_ClientId))
+			GameClient()->m_Snap.m_pGameDataObj && (GameClient()->m_Snap.m_pGameDataObj->m_FlagCarrierRed == GameClient()->m_RClient.GetSortedPlayersSpectator(g_Config.m_RcSpectatorSortId, i)->m_ClientId || GameClient()->m_Snap.m_pGameDataObj->m_FlagCarrierBlue == GameClient()->m_RClient.GetSortedPlayersSpectator(g_Config.m_RcSpectatorSortId, i)->m_ClientId))
 		{
 			Graphics()->BlendNormal();
-			if(GameClient()->m_Snap.m_pGameDataObj->m_FlagCarrierBlue == GameClient()->m_Snap.m_apInfoByDDTeamName[i]->m_ClientId)
+			if(GameClient()->m_Snap.m_pGameDataObj->m_FlagCarrierBlue == GameClient()->m_RClient.GetSortedPlayersSpectator(g_Config.m_RcSpectatorSortId, i)->m_ClientId)
 				Graphics()->TextureSet(GameClient()->m_GameSkin.m_SpriteFlagBlue);
 			else
 				Graphics()->TextureSet(GameClient()->m_GameSkin.m_SpriteFlagRed);
@@ -571,7 +571,7 @@ void CSpectator::OnRender()
 			Graphics()->QuadsEnd();
 		}
 
-		CTeeRenderInfo TeeInfo = GameClient()->m_aClients[GameClient()->m_Snap.m_apInfoByDDTeamName[i]->m_ClientId].m_RenderInfo;
+		CTeeRenderInfo TeeInfo = GameClient()->m_aClients[GameClient()->m_RClient.GetSortedPlayersSpectator(g_Config.m_RcSpectatorSortId, i)->m_ClientId].m_RenderInfo;
 		TeeInfo.m_Size *= TeeSizeMod;
 
 		const CAnimState *pIdleState = CAnimState::GetIdle();
@@ -581,7 +581,7 @@ void CSpectator::OnRender()
 
 		RenderTools()->RenderTee(pIdleState, &TeeInfo, EMOTE_NORMAL, vec2(1.0f, 0.0f), TeeRenderPos, TeeAlpha);
 
-		if(GameClient()->m_aClients[GameClient()->m_Snap.m_apInfoByDDTeamName[i]->m_ClientId].m_Friend)
+		if(GameClient()->m_aClients[GameClient()->m_RClient.GetSortedPlayersSpectator(g_Config.m_RcSpectatorSortId, i)->m_ClientId].m_Friend)
 		{
 			TextRender()->TextColor(color_cast<ColorRGBA>(ColorHSLA(g_Config.m_ClMessageFriendColor)));
 			TextRender()->Text(Width / 2.0f + x - TeeInfo.m_Size / 2.0f, Height / 2.0f + y + BoxMove + (LineHeight - FontSize) / 2.f, FontSize, "♥", 220.0f);

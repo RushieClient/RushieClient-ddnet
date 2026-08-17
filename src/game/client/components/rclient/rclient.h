@@ -207,6 +207,11 @@ public:
 	// Anti UnSpec
 	bool AntiUnSpec();
 	bool ConfirmUnSpec = false;
+
+	// Sorting players
+	const CNetObj_PlayerInfo *GetSortedPlayersScoreboard(int Config, int ClientId);
+	const CNetObj_PlayerInfo *GetSortedPlayersSpectator(int Config, int ClientId);
+	const CNetObj_PlayerInfo **GetSortedPlayersSpectatorArray(int Config);
 };
 
 #endif //GAME_CLIENT_COMPONENTS_RCLIENT_RCLIENT_H

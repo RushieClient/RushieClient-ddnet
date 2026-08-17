@@ -1820,3 +1820,39 @@ bool CRClient::AntiUnSpec()
 	ConfirmUnSpec = false;
 	return false;
 }
+
+// Sorting
+const CNetObj_PlayerInfo *CRClient::GetSortedPlayersScoreboard(int SwitchNum, int ClientId)
+{
+	switch(SwitchNum)
+	{
+	case 0: return GameClient()->m_Snap.m_apInfoByDDTeamScore[ClientId];
+	case 1: return GameClient()->m_Snap.m_apInfoByDDTeamScoreId[ClientId];
+	case 2: return GameClient()->m_Snap.m_apInfoByScoreWithId[ClientId];
+	case 3: return GameClient()->m_Snap.m_apInfoByDDTeamId[ClientId];
+	case 4: return GameClient()->m_Snap.m_apPlayerInfos[ClientId];
+	default: return GameClient()->m_Snap.m_apInfoByDDTeamScore[ClientId];
+	}
+}
+
+const CNetObj_PlayerInfo *CRClient::GetSortedPlayersSpectator(int SwitchNum, int ClientId)
+{
+	switch(SwitchNum)
+	{
+	case 0: return GameClient()->m_Snap.m_apInfoByDDTeamName[ClientId];
+	case 1: return GameClient()->m_Snap.m_apInfoByDDTeamId[ClientId];
+	case 2: return GameClient()->m_Snap.m_apPlayerInfos[ClientId];
+	default: return GameClient()->m_Snap.m_apInfoByDDTeamName[ClientId];
+	}
+}
+
+const CNetObj_PlayerInfo **CRClient::GetSortedPlayersSpectatorArray(int SwitchNum)
+{
+	switch(SwitchNum)
+	{
+	case 0: return GameClient()->m_Snap.m_apInfoByDDTeamName;
+	case 1: return GameClient()->m_Snap.m_apInfoByDDTeamId;
+	case 2: return GameClient()->m_Snap.m_apPlayerInfos;
+	default: return GameClient()->m_Snap.m_apInfoByDDTeamName;
+	}
+}
