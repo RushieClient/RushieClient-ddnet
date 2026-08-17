@@ -1448,11 +1448,11 @@ void CChat::OnRender()
 	{
 		if(m_MouseUnlocked && g_Config.m_RcChatShowTranslateFastSettings)
 		{
-			const float HistoryBottomY = y - ScaledFontSize;
+			const float HistoryBottomY = y - 10.0f;
 			const float LineWidth = g_Config.m_ClChatWidth;
-			const float MarginSmall = 4.0f;
+			const float MarginSmall = 3.0f;
 			CUIRect TranslateYour, TranslateOthers;
-			CUIRect Settings = {LineWidth, HistoryBottomY - 10.0f, 75.0f, 10.0f}; // W - Settings 10, Others - 30, 30
+			CUIRect Settings = {LineWidth + MarginSmall, HistoryBottomY, 76.0f, 10.0f}; // W - Settings 10, Others - 30, 30
 			Settings.VSplitLeft(30.0f, &TranslateYour, &Settings);
 			Settings.VSplitLeft(MarginSmall, nullptr, &Settings);
 			Settings.VSplitLeft(30.0f, &TranslateOthers, &Settings);
@@ -1494,7 +1494,7 @@ void CChat::OnRender()
 				const float Scale = 2.0f;
 				const float LineSize = 16.0f;
 				const float WindowSize = LineSize * 5.0f + 4.0f * 2.0f;
-				Settings = {LineWidth * Scale, (HistoryBottomY - 10.0f - MarginSmall) * Scale - WindowSize, 75.0f * Scale, WindowSize};
+				Settings = {(LineWidth + MarginSmall) * Scale, (HistoryBottomY - MarginSmall) * Scale - WindowSize, 76.0f * Scale, WindowSize};
 				Settings.Draw(ColorRGBA(0.3f, 0.3f, 0.3f, 0.5f), IGraphics::CORNER_ALL, 6.0f);
 				Settings.Margin(4.0f, &Settings);
 
