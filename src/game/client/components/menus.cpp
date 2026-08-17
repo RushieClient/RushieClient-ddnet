@@ -2817,19 +2817,56 @@ void CMenus::JoinTutorial()
 }
 
 //RClient
-int CMenus::DoTabBar(CUIRect *pRect, const char *const *apTabNames, int TabCount, CButtonContainer *apPageTabs, int &CurTab, float TabHeight)
+int CMenus::DoMenuSettingsBar(CUIRect *pRect, const char *const *apTabNames, int TabCount, CButtonContainer *apPageTabs, int &CurTab, float TabHeight)
 {
 	CUIRect TabBar, Button;
 	pRect->HSplitTop(TabHeight, &TabBar, pRect);
 	const float TabWidth = TabBar.w / TabCount;
+	const ColorRGBA DefaultColor = ColorRGBA(1.0f, 1.0f, 1.0f, 0.5f);
+	const ColorRGBA ActiveColor = ColorRGBA(0.6f, 0.6f, 0.6f, 0.5f);
+	const ColorRGBA HoverColor = ColorRGBA(1.0f, 1.0f, 1.0f, 0.5f * Ui()->ButtonColorMulHot());
 	for(int Tab = 0; Tab < TabCount; ++Tab)
 	{
 		TabBar.VSplitLeft(TabWidth, &Button, &TabBar);
 		const int Corners = Tab == 0 ? IGraphics::CORNER_L :
 				   Tab == TabCount - 1 ? IGraphics::CORNER_R : IGraphics::CORNER_NONE;
 		if(DoButton_MenuTab(&apPageTabs[Tab], apTabNames[Tab], CurTab == Tab,
-				    &Button, Corners, nullptr, nullptr, nullptr, nullptr, 4.0f))
+			&Button, Corners, nullptr, &DefaultColor, &ActiveColor, &HoverColor, 4.0f))
 			CurTab = Tab;
 	}
 	return CurTab;
+}
+
+bool CMenus::DoLine_RadioMenu_WLabelSize(CUIRect &View, const char *pLabel, float LabelSize, std::vector<CButtonContainer> &vButtonContainers, const std::vector<const char *> &vLabels, const std::vector<int> &vValues, int &Value)
+{
+	dbg_assert(vButtonContainers.size() == vValues.size(), "vButtonContainers and vValues must have the same size");
+	dbg_assert(vButtonContainers.size() == vLabels.size(), "vButtonContainers and vLabels must have the same size");
+	const int N = vButtonContainers.size();
+	const float Spacing = 2.0f;
+	const float ButtonHeight = 20.0f;
+	CUIRect Label, Buttons;
+	View.HSplitTop(Spacing, nullptr, &View);
+	View.HSplitTop(ButtonHeight, &Buttons, &View);
+	Buttons.VSplitLeft(LabelSize, &Label, &Buttons);
+	Buttons.VSplitLeft(10.0f, nullptr, &Buttons);
+	Buttons.HMargin(2.0f, &Buttons);
+	Ui()->DoLabel(&Label, pLabel, 13.0f, TEXTALIGN_ML);
+	const float W = Buttons.w / N;
+	bool Pressed = false;
+	for(int i = 0; i < N; ++i)
+	{
+		CUIRect Button;
+		Buttons.VSplitLeft(W, &Button, &Buttons);
+		int Corner = IGraphics::CORNER_NONE;
+		if(i == 0)
+			Corner = IGraphics::CORNER_L;
+		if(i == N - 1)
+			Corner = IGraphics::CORNER_R;
+		if(DoButton_Menu(&vButtonContainers[i], vLabels[i], vValues[i] == Value, &Button, BUTTONFLAG_LEFT, nullptr, Corner))
+		{
+			Pressed = true;
+			Value = vValues[i];
+		}
+	}
+	return Pressed;
 }

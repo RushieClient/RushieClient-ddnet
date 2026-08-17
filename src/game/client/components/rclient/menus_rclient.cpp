@@ -173,7 +173,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 			RCLocalize("Position"),
 			RCLocalize("Clan Change")};
 
-		DoTabBar(&Column, apTabNames, NUMBER_OF_DUMMY_TABS, s_aPageTabs, s_CurDummyCustomTab, LineSize);
+		DoMenuSettingsBar(&Column, apTabNames, NUMBER_OF_DUMMY_TABS, s_aPageTabs, s_CurDummyCustomTab, LineSize);
 		Column.HSplitTop(MarginSmall, nullptr, &Column);
 
 		if(s_CurDummyCustomTab == DUMMY_TAB_POS)
@@ -233,7 +233,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 			RCLocalize("Popup"),
 			RCLocalize("Friends")};
 
-		DoTabBar(&Column, apTabNames, NUMBER_OF_SCOREBOARD_TABS, s_aPageTabs, s_CurScoreboardCustomTab, LineSize);
+		DoMenuSettingsBar(&Column, apTabNames, NUMBER_OF_SCOREBOARD_TABS, s_aPageTabs, s_CurScoreboardCustomTab, LineSize);
 		Column.HSplitTop(MarginSmall, nullptr, &Column);
 
 		if(s_CurScoreboardCustomTab == SCOREBOARD_TAB_POPUP)
@@ -277,7 +277,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 			RCLocalize("AFK"),
 			RCLocalize("Hitbox")
 		};
-		DoTabBar(&Column, apTabNames, NUMBER_OF_PLAYERS_TABS, s_aPageTabs, s_CurPlayersCustomTab, LineSize);
+		DoMenuSettingsBar(&Column, apTabNames, NUMBER_OF_PLAYERS_TABS, s_aPageTabs, s_CurPlayersCustomTab, LineSize);
 		Column.HSplitTop(MarginSmall, nullptr, &Column);
 
 		if(s_CurPlayersCustomTab == PLAYERS_TAB_EFFECTS)
@@ -541,7 +541,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 			RCLocalize("Translate")
 		};
 
-		DoTabBar(&Column, apTabNames, NUMBER_OF_CHAT_TABS, s_aPageTabs, s_CurChatCustomTab, LineSize);
+		DoMenuSettingsBar(&Column, apTabNames, NUMBER_OF_CHAT_TABS, s_aPageTabs, s_CurChatCustomTab, LineSize);
 		Column.HSplitTop(MarginSmall, nullptr, &Column);
 
 		if(s_CurChatCustomTab == CHAT_TAB_MAIN)
@@ -715,7 +715,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 			RCLocalize("Fire"),
 			RCLocalize("Weapons")
 		};
-		DoTabBar(&Column, apTabNames, NUMBER_OF_NAMEPLATES_TABS, s_aPageTabs, s_CurNameplatesCustomTab, LineSize);
+		DoMenuSettingsBar(&Column, apTabNames, NUMBER_OF_NAMEPLATES_TABS, s_aPageTabs, s_CurNameplatesCustomTab, LineSize);
 		Column.HSplitTop(MarginSmall, nullptr, &Column);
 
 		if(s_CurNameplatesCustomTab == NAMEPLATE_TAB_HOOK)
@@ -786,7 +786,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 			RCLocalize("Spec")
 		};
 
-		DoTabBar(&Column, apTabNames, NUMBER_OF_AFK_TABS, s_aPageTabs, s_CurAfkCustomTab, LineSize);
+		DoMenuSettingsBar(&Column, apTabNames, NUMBER_OF_AFK_TABS, s_aPageTabs, s_CurAfkCustomTab, LineSize);
 		Column.HSplitTop(MarginSmall, nullptr, &Column);
 
 		if(s_CurAfkCustomTab == AFK_TAB_NONACTIVE)
@@ -955,13 +955,51 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	Ui()->DoLabel(&Label, RCLocalize("Helpful Functions"), HeadlineFontSize, TEXTALIGN_MC);
 	Column.HSplitTop(MarginSmall, nullptr, &Column);
 
-	static std::vector<CButtonContainer> s_vButtonContainersAutoLock = {{}, {}, {}};
-	DoLine_RadioMenu(Column, TCLocalize("Auto Lock Team"),
-		   s_vButtonContainersAutoLock,
-		   {Localize("Off"), Localize("Empty"), Localize("Any")},
-		   {0, 1, 2},
-		   g_Config.m_RcAutoLockTeam);
-	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcAntiUnSpec, RCLocalize("Anti UnSpec in player"), &g_Config.m_RcAntiUnSpec, &Column, LineSize);
+	{
+		enum
+		{
+			HELP_TAB_MAIN = 0,
+			HELP_TAB_SORT,
+			NUMBER_OF_HELP_TABS
+		};
+
+		static int s_CurHelpCustomTab = 0;
+		static CButtonContainer s_aPageTabs[NUMBER_OF_HELP_TABS] = {};
+		const char *apTabNames[NUMBER_OF_HELP_TABS] = {
+			RCLocalize("Main"),
+			RCLocalize("Sort")
+		};
+		DoMenuSettingsBar(&Column, apTabNames, NUMBER_OF_HELP_TABS, s_aPageTabs, s_CurHelpCustomTab, LineSize);
+		Column.HSplitTop(MarginSmall, nullptr, &Column);
+
+		if(s_CurHelpCustomTab == HELP_TAB_MAIN)
+		{
+			static std::vector<CButtonContainer> s_vButtonContainersAutoLock = {{}, {}, {}};
+			DoLine_RadioMenu(Column, TCLocalize("Auto Lock Team"),
+				   s_vButtonContainersAutoLock,
+				   {Localize("Off"), Localize("Empty"), Localize("Any")},
+				   {0, 1, 2},
+				   g_Config.m_RcAutoLockTeam);
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcAntiUnSpec, RCLocalize("Anti UnSpec in player"), &g_Config.m_RcAntiUnSpec, &Column, LineSize);
+		}
+
+		if(s_CurHelpCustomTab == HELP_TAB_SORT)
+		{
+			static std::vector<CButtonContainer> s_vButtonContainersSortScoreboard = {{}, {}, {}, {}, {}};
+			DoLine_RadioMenu_WLabelSize(Column, TCLocalize("Sort Scoreboard"), Column.w / 4,
+				   s_vButtonContainersSortScoreboard,
+				   {"name-team-score", "id-team-score", "id-score", "id-team", "id"},
+				   {0, 1, 2, 3, 4},
+				   g_Config.m_RcScoreboardSortId);
+
+			static std::vector<CButtonContainer> s_vButtonContainersSortSpectator = {{}, {}, {}};
+			DoLine_RadioMenu_WLabelSize(Column, TCLocalize("Sort Spectator"), Column.w / 4,
+				   s_vButtonContainersSortSpectator,
+				   {"name-team", "id-team", "id"},
+				   {0, 1, 2},
+				   g_Config.m_RcSpectatorSortId);
+		}
+	}
 
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
 	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;

@@ -828,7 +828,8 @@ public:
 	void JoinTutorial();
 
 	//RClient
-	int DoTabBar(CUIRect *pRect, const char *const *apTabNames, int TabCount, CButtonContainer *apPageTabs, int &CurTab, float TabHeight);
+	int DoMenuSettingsBar(CUIRect *pRect, const char *const *apTabNames, int TabCount, CButtonContainer *apPageTabs, int &CurTab, float TabHeight);
+	bool DoLine_RadioMenu_WLabelSize(CUIRect &View, const char *pLabel, float LabelSize, std::vector<CButtonContainer> &vButtonContainers, const std::vector<const char *> &vLabels, const std::vector<int> &vValues, int &Value);
 
 private:
 	CCommunityIcons m_CommunityIcons;
