@@ -47,10 +47,12 @@ public:
 		"v", "Velocity", "", "Displays X and Y velocity");
 	CStatusItem m_Zoom = CStatusItem([this] { ZoomRender(); }, [this] { return ZoomWidth(); },
 		"z", "Zoom", "", "Displays current zoom value");
+	CStatusItem m_CheckPoint = CStatusItem([this] { CheckPointRender(); }, [this] { return CheckPointWidth(); },
+		"j", "Checkpoint", "CP", "Displays current checkpoint");
 	CStatusItem m_Space = CStatusItem([this] { SpaceRender(); }, [this] { return SpaceWidth(); },
 		" _", "Space", " ", "Gap between statusbar items", false);
 
-	std::vector<CStatusItem> m_StatusItemTypes = {m_Angle, m_Ping, m_Prediction, m_Position, m_LocalTime, m_RaceTime, m_FPS, m_Velocity, m_Zoom, m_Space};
+	std::vector<CStatusItem> m_StatusItemTypes = {m_Angle, m_Ping, m_Prediction, m_Position, m_LocalTime, m_RaceTime, m_FPS, m_Velocity, m_Zoom, m_CheckPoint, m_Space};
 	std::vector<CStatusItem *> m_StatusBarItems = {&m_LocalTime, &m_FPS, &m_Space, &m_Angle, &m_Space, &m_Ping};
 
 	void UpdateStatusBarSize();
@@ -99,6 +101,10 @@ private:
 
 	float SpaceWidth();
 	void SpaceRender();
+
+	//RClient
+	float CheckPointWidth();
+	void CheckPointRender();
 
 	void LabelRender(const char *pLabel);
 	float LabelWidth(const char *pLabel);

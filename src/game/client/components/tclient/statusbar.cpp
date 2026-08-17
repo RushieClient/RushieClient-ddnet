@@ -227,6 +227,14 @@ void CStatusBar::ZoomRender()
 	TextRender()->Text(m_CursorX, m_CursorY, m_FontSize, aBuf);
 }
 
+float CStatusBar::CheckPointWidth() { return TextRender()->TextWidth(m_FontSize, "00"); }
+void CStatusBar::CheckPointRender()
+{
+	char aBuf[32];
+	str_format(aBuf, sizeof(aBuf), "%02i", GameClient()->m_RClient.GetCheckpointId());
+	TextRender()->Text(m_CursorX, m_CursorY, m_FontSize, aBuf);
+}
+
 float CStatusBar::SpaceWidth() { return 0.0f; }
 void CStatusBar::SpaceRender() {}
 
