@@ -97,6 +97,16 @@ class CRClient : public CComponent
 	//Find checkpoint/finish
 	static void ConGotoTeleCursor(IConsole::IResult *pResult, void *pUserData);
 	static void ConGotoFinishCursor(IConsole::IResult *pResult, void *pUserData);
+
+	// Spectator moves
+	static void ConSpecGoUp(IConsole::IResult *pResult, void *pUserData);
+	static void ConSpecGoDown(IConsole::IResult *pResult, void *pUserData);
+	static void ConSpecGoRight(IConsole::IResult *pResult, void *pUserData);
+	static void ConSpecGoLeft(IConsole::IResult *pResult, void *pUserData);
+	bool m_SpecMoveUp = false;
+	bool m_SpecMoveDown = false;
+	bool m_SpecMoveRight = false;
+	bool m_SpecMoveLeft = false;
 public:
 	CRClient();
 	int Sizeof() const override { return sizeof(*this); }

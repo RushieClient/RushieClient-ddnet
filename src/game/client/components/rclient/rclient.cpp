@@ -142,6 +142,20 @@ void CRClient::OnRender()
 			}
 		}
 	}
+
+	if(GameClient()->m_Snap.m_SpecInfo.m_Active && GameClient()->m_Snap.m_SpecInfo.m_SpectatorId == SPEC_FREEVIEW && !GameClient()->m_RcAdminPanel.IsActive() && g_Config.m_RcSpectatorMoveEnable)
+	{
+		float Speed = 75.0f * 32.0f * (GameClient()->m_Camera.m_Zoom * 6 / g_Config.m_ClDefaultZoom) * (g_Config.m_RcSpectatorMoveSpeed / 100.0f); // Adjusted for frame-time independence
+		float FrameTime = Client()->RenderFrameTime();
+		if(m_SpecMoveUp)
+			GameClient()->m_Controls.m_aMousePos[g_Config.m_ClDummy].y -= Speed * FrameTime;
+		if(m_SpecMoveDown)
+			GameClient()->m_Controls.m_aMousePos[g_Config.m_ClDummy].y += Speed * FrameTime;
+		if(m_SpecMoveLeft)
+			GameClient()->m_Controls.m_aMousePos[g_Config.m_ClDummy].x -= Speed * FrameTime;
+		if(m_SpecMoveRight)
+			GameClient()->m_Controls.m_aMousePos[g_Config.m_ClDummy].x += Speed * FrameTime;
+	}
 }
 
 void CRClient::OnConsoleInit()
@@ -171,6 +185,10 @@ void CRClient::OnConsoleInit()
 	Console()->Register("rc_translate_reset_languages", "", CFGFLAG_CLIENT, ConResetLanguages, this, "Reset languages");
 	Console()->Register("rc_goto_tele_cursor", "", CFGFLAG_CLIENT, ConGotoTeleCursor, this, "Goto tele cursor");
 	Console()->Register("rc_goto_finish_cursor", "", CFGFLAG_CLIENT, ConGotoFinishCursor, this, "Goto Finish cursor");
+	Console()->Register("+rc_spec_go_left", "", CFGFLAG_CLIENT, ConSpecGoLeft, this, "Go left in spec freeview");
+	Console()->Register("+rc_spec_go_right", "", CFGFLAG_CLIENT, ConSpecGoRight, this, "Go right in spec freeview");
+	Console()->Register("+rc_spec_go_up", "", CFGFLAG_CLIENT, ConSpecGoUp, this, "Go up in spec freeview");
+	Console()->Register("+rc_spec_go_down", "", CFGFLAG_CLIENT, ConSpecGoDown, this, "Go down in spec freeview");
 	Console()->Chain("rc_message_filter_mode", ConchainResetCensorListCache, this);
 	Console()->Chain("rc_message_filter_multiply_change_word_on_full_match", ConchainResetCensorListCache, this);
 	Console()->Chain("rc_message_filter_word_on_full_match", ConchainResetCensorListCache, this);
@@ -2075,4 +2093,29 @@ void CRClient::ConGotoFinishCursor(IConsole::IResult *pResult, void *pUserData)
 
 	const vec2 TargetPos = vec2(Targets[BestIndex].x * 32.0f + 16.0f, Targets[BestIndex].y * 32.0f + 16.0f);
 	pSelf->GameClient()->m_Controls.m_aMousePos[g_Config.m_ClDummy] = TargetPos;
+}
+
+// Spectator move
+void CRClient::ConSpecGoUp(IConsole::IResult *pResult, void *pUserData)
+{
+	CRClient *pSelf = static_cast<CRClient *>(pUserData);
+	pSelf->m_SpecMoveUp = pResult->GetInteger(0) != 0;
+}
+
+void CRClient::ConSpecGoDown(IConsole::IResult *pResult, void *pUserData)
+{
+	CRClient *pSelf = static_cast<CRClient *>(pUserData);
+	pSelf->m_SpecMoveDown = pResult->GetInteger(0) != 0;
+}
+
+void CRClient::ConSpecGoRight(IConsole::IResult *pResult, void *pUserData)
+{
+	CRClient *pSelf = static_cast<CRClient *>(pUserData);
+	pSelf->m_SpecMoveRight = pResult->GetInteger(0) != 0;
+}
+
+void CRClient::ConSpecGoLeft(IConsole::IResult *pResult, void *pUserData)
+{
+	CRClient *pSelf = static_cast<CRClient *>(pUserData);
+	pSelf->m_SpecMoveLeft = pResult->GetInteger(0) != 0;
 }

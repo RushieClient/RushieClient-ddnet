@@ -135,6 +135,7 @@ MACRO_CONFIG_INT(RcCustomAspectY, rc_custom_aspect_y, 1080, 1, 10000, CFGFLAG_CL
 MACRO_CONFIG_INT(RcCustomAspectDisable, rc_custom_aspect_disable, 0, 0, 65536, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Enable custom aspect ratio for all ui")
 
 //Spectator
+MACRO_CONFIG_INT(RcSpectatorMoveEnable, rc_spectator_move_enabled, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "enable spectator freeview movement")
 MACRO_CONFIG_INT(RcSpectatorMoveSpeed, rc_spectator_move_speed, 100, 10, 200, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Speed of spectator freeview movement")
 MACRO_CONFIG_INT(RcAdminPanelPlaySounds, rc_admin_panel_play_sounds, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Plays sound when do command")
 

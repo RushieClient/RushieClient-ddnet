@@ -512,6 +512,29 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
 	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;
 
+	// ***** Spectator ***** //
+	Column.HSplitTop(MarginBetweenSections, nullptr, &Column);
+	s_SectionBoxes.push_back(Column);
+	Column.HSplitTop(HeadlineHeight, &Label, &Column);
+	Ui()->DoLabel(&Label, RCLocalize("Spectator"), HeadlineFontSize, TEXTALIGN_MC);
+	Column.HSplitTop(MarginSmall, nullptr, &Column);
+
+	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcSpectatorMoveEnable, RCLocalize("Enable spectator movement"), &g_Config.m_RcSpectatorMoveEnable, &Column, LineSize);
+	Column.HSplitTop(LineSize, &Button, &Column);
+	Ui()->DoScrollbarOption(&g_Config.m_RcSpectatorMoveSpeed, &g_Config.m_RcSpectatorMoveSpeed, &Button, RCLocalize("Spectator Speed"), 1, 200, &CUi::ms_LinearScrollbarScale, 0);
+	static CButtonContainer s_ReaderButtonSpecGoLeft, s_ClearButtonSpecGoLeft,
+				s_ReaderButtonSpecGoRight, s_ClearButtonSpecGoRight,
+				s_ReaderButtonSpecGoUp, s_ClearButtonSpecGoUp,
+				s_ReaderButtonSpecGoDown, s_ClearButtonSpecGoDown;
+	DoLine_KeyReader(Column, s_ReaderButtonSpecGoLeft, s_ClearButtonSpecGoLeft, TCLocalize("Spec go Left"), "+rc_spec_go_left");
+	DoLine_KeyReader(Column, s_ReaderButtonSpecGoRight, s_ClearButtonSpecGoRight, TCLocalize("Spec go Right"), "+rc_spec_go_right");
+	DoLine_KeyReader(Column, s_ReaderButtonSpecGoUp, s_ClearButtonSpecGoUp, TCLocalize("Spec go Up"), "+rc_spec_go_up");
+	DoLine_KeyReader(Column, s_ReaderButtonSpecGoDown, s_ClearButtonSpecGoDown, TCLocalize("Spec go Down"), "+rc_spec_go_down");
+
+
+	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
+	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;
+
 
 	// ***** RightView ***** //
 	LeftView = Column;
