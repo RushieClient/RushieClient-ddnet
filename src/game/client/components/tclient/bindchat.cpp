@@ -76,6 +76,10 @@ decltype(CBindChat::BIND_DEFAULTS_RCLIENT) CBindChat::BIND_DEFAULTS_RCLIENT = {
 		{TCLocalizable("Remove Tracker:"), {"!trackerrem", "rc_tracker_remove"}},
 		{TCLocalizable("Reset Tracker:"), {"!trackerreset", "rc_tracker_reset"}},
 	}},
+	{TCLocalizable("Map Search"), {
+		{TCLocalizable("Find Teleport:"), {"!findtele", "rc_goto_tele_cursor"}},
+		{TCLocalizable("Find Finish:"), {"!findfinish", "rc_goto_finish_cursor"}},
+	}},
 	};
 
 CBindChat::CBindChat()

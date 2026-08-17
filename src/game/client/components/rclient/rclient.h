@@ -93,6 +93,10 @@ class CRClient : public CComponent
 	//Translate
 	static void ConAddLanguage(IConsole::IResult *pResult, void *pUserData);
 	static void ConResetLanguages(IConsole::IResult *pResult, void *pUserData);
+
+	//Find checkpoint/finish
+	static void ConGotoTeleCursor(IConsole::IResult *pResult, void *pUserData);
+	static void ConGotoFinishCursor(IConsole::IResult *pResult, void *pUserData);
 public:
 	CRClient();
 	int Sizeof() const override { return sizeof(*this); }

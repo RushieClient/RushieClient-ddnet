@@ -861,7 +861,9 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 
 	static CButtonContainer s_ReaderButtonDeepfly, s_ClearButtonDeepfly,
 				s_ReaderButton45degrees, s_ClearButton45degrees,
-				s_ReaderButtonSmallsens, s_ClearButtonSmallsens;
+				s_ReaderButtonSmallsens, s_ClearButtonSmallsens,
+				s_ReaderButtonFindTeleport, s_ClearButtonFindTeleport,
+				s_ReaderButtonFindFinish, s_ClearButtonFindFinish;
 	DoLine_KeyReader(Column, s_ReaderButtonDeepfly, s_ClearButtonDeepfly, TCLocalize("Toggle deepfly"), "rc_toggle_deepfly");
 	{
 		CUIRect RightSide;
@@ -885,6 +887,8 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcSmallSensEcho, TCLocalize("Echo small sens"), &g_Config.m_RcSmallSensEcho, &RightSide, LineSize);
 		Column.HSplitTop(LineSize * 2, nullptr, &Column);
 	}
+	DoLine_KeyReader(Column, s_ReaderButtonFindTeleport, s_ClearButtonFindTeleport, TCLocalize("Find Teleport"), "rc_goto_tele_cursor");
+	DoLine_KeyReader(Column, s_ReaderButtonFindFinish, s_ClearButtonFindFinish, TCLocalize("Find Finish"), "rc_goto_finish_cursor");
 
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
 	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;
