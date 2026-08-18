@@ -70,12 +70,12 @@ static const char *GetUpdaterUrl(char *pBuf, int BufSize, const char *pFile)
 {
 	if(!str_comp(pFile, "update.json"))
 	{
-		str_copy(pBuf, "https://updates.rushie-client.ru/api/get/updates", BufSize);
+		str_copy(pBuf, "https://updates.rushie.qzz.io/api/get/updates", BufSize);
 		return pBuf;
 	}
 	char aBuf[1024];
 	UrlEncodePath(pFile, aBuf, sizeof(aBuf));
-	str_format(pBuf, BufSize, "https://updates.rushie-client.ru/latest/" PLAT_URL_OS "/%s", aBuf);
+	str_format(pBuf, BufSize, "https://updates.rushie.qzz.io/latest/" PLAT_URL_OS "/%s", aBuf);
 	return pBuf;
 }
 
