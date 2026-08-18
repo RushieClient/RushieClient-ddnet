@@ -715,6 +715,28 @@ void CPlayers::RenderPlayer(
 			State.Add(Player.m_VelX < 0 ? &g_pData->m_aAnimations[ANIM_RUN_LEFT] : &g_pData->m_aAnimations[ANIM_RUN_RIGHT], RunTime, 1.0f);
 		else
 			State.Add(&g_pData->m_aAnimations[ANIM_WALK], WalkTime, 1.0f);
+
+		bool ShowStep;
+		switch(g_Config.m_RcShowStepEffects)
+		{
+		case 0:
+			ShowStep = false;
+			break;
+		case 1:
+			ShowStep = ClientId != GameClient()->m_Snap.m_LocalClientId;
+			break;
+		case 2:
+			ShowStep = true;
+			break;
+		case 3:
+			ShowStep = ClientId == GameClient()->m_Snap.m_LocalClientId;
+			break;
+		default:
+			ShowStep = false;
+			break;
+		}
+		if(ShowStep && !InAir && length(Vel) > 2.0f)
+			GameClient()->m_Effects.SmokePlayerTrail(Position, Vel, Player.m_Direction, Alpha);
 	}
 
 	const float HammerAnimationTimeScale = 5.0f;

@@ -284,6 +284,12 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		{
 			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcHideFrozenFlakesEffect, RCLocalize("Hide frozen flakes"), &g_Config.m_RcHideFrozenFlakesEffect, &Column, LineSize);
 			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcShowSparkleEffect, RCLocalize("Always show sparkles"), &g_Config.m_RcShowSparkleEffect, &Column, LineSize);
+			static std::vector<CButtonContainer> s_vButtonContainersStepEffects = {{}, {}, {}, {}};
+			DoLine_RadioMenu(Column, TCLocalize("Show step effects"),
+				   s_vButtonContainersStepEffects,
+				   {Localize("Off"), Localize("Others"), Localize("Everyone"), Localize("Own")},
+				   {0, 1, 2, 3},
+				   g_Config.m_RcShowStepEffects);
 		}
 		if(s_CurPlayersCustomTab == PLAYERS_TAB_AFK)
 		{

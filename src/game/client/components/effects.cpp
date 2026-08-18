@@ -19,6 +19,7 @@
 CEffects::CEffects()
 {
 	m_Add5hz = false;
+	m_Add10hz = false;
 	m_Add50hz = false;
 	m_Add100hz = false;
 }
@@ -170,6 +171,27 @@ void CEffects::SkidTrail(vec2 Pos, vec2 Vel, int Direction, float Alpha, float V
 			m_SkidSoundTimer = Now;
 			GameClient()->m_Sounds.PlayAt(CSounds::CHN_WORLD, SOUND_PLAYER_SKID, Volume, Pos);
 		}
+	}
+}
+
+//RClient
+void CEffects::SmokePlayerTrail(vec2 Pos, vec2 Vel, int Direction, float Alpha)
+{
+	if(m_Add50hz && rand() % 5 == 0)
+	{
+		CParticle p;
+		p.SetDefault();
+		p.m_Spr = SPRITE_PART_SMOKE;
+		p.m_Pos = Pos + vec2(-Direction * 6.0f, 12.0f);
+		p.m_Vel = vec2(-Direction * length(Vel), -50.0f) + random_direction() * 25.0f;
+		p.m_LifeSpan = random_float(0.3f, 0.5f);
+		p.m_StartSize = random_float(12.0f, 18.0f);
+		p.m_EndSize = 0.0f;
+		p.m_Friction = 0.7f;
+		p.m_Gravity = random_float(-125.0f);
+		p.m_Color = ColorRGBA(0.75f, 0.75f, 0.75f, Alpha);
+		p.m_StartAlpha = Alpha;
+		GameClient()->m_Particles.Add(CParticles::GROUP_GENERAL, &p);
 	}
 }
 
@@ -422,6 +444,7 @@ void CEffects::OnRender()
 			LastUpdate = Now;
 	};
 	UpdateClock(m_Add5hz, m_LastUpdate5hz, 5);
+	UpdateClock(m_Add10hz, m_LastUpdate10hz, 10);
 	UpdateClock(m_Add50hz, m_LastUpdate50hz, 50);
 	UpdateClock(m_Add100hz, m_LastUpdate100hz, 100);
 

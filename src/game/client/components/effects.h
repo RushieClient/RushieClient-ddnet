@@ -13,6 +13,9 @@ private:
 	bool m_Add5hz;
 	int64_t m_LastUpdate5hz = 0;
 
+	bool m_Add10hz;
+	int64_t m_LastUpdate10hz = 0;
+
 	bool m_Add50hz;
 	int64_t m_LastUpdate50hz = 0;
 
@@ -40,6 +43,8 @@ public:
 	void FreezingFlakes(vec2 Pos, vec2 Size, float Alpha);
 	void SparkleTrail(vec2 Pos, float Alpha);
 	void Confetti(vec2 Pos, float Alpha);
+	//RClient
+	void SmokePlayerTrail(vec2 Pos, vec2 Vel, int Direction, float Alpha);
 
 	void Update();
 };
