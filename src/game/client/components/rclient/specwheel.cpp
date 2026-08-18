@@ -336,12 +336,18 @@ void CSpecWheel::ExecuteBind(int Bind)
 	std::string Command{m_vSpecBinds[Bind].m_aCommand};
 	std::string old_str{"%plnick%"};
 	size_t startnick {Command.find(old_str)};
-	if(startnick != std::string::npos)
+	while (startnick != std::string::npos)
+	{
 		Command.replace(startnick, old_str.length(), GameClient()->m_aClients[GameClient()->m_Snap.m_SpecInfo.m_SpectatorId].m_aName);
+		startnick = Command.find(old_str, startnick + str_length(GameClient()->m_aClients[GameClient()->m_Snap.m_SpecInfo.m_SpectatorId].m_aName));
+	}
 	old_str = {"%plid%"};
 	size_t startid {Command.find(old_str)};
-	if(startid != std::string::npos)
+	while (startid != std::string::npos)
+	{
 		Command.replace(startid, old_str.length(), std::to_string(GameClient()->m_Snap.m_SpecInfo.m_SpectatorId));
+		startid = Command.find(old_str, startid + std::to_string(GameClient()->m_Snap.m_SpecInfo.m_SpectatorId).length());
+	}
 	Console()->ExecuteLine(Command.c_str(), IConsole::CLIENT_ID_UNSPECIFIED);
 }
 void CSpecWheel::ExecuteHoveredBind()
