@@ -1035,6 +1035,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 				   {0, 1, 2},
 				   g_Config.m_RcAutoLockTeam);
 			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcAntiUnSpec, RCLocalize("Anti UnSpec in player"), &g_Config.m_RcAntiUnSpec, &Column, LineSize);
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcShowRechargeBars, RCLocalize("Show Recharge bars (by +KZ)"), &g_Config.m_RcShowRechargeBars, &Column, LineSize);
 		}
 
 		if(s_CurHelpCustomTab == HELP_TAB_SORT)

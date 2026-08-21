@@ -2629,6 +2629,8 @@ if(CLIENT)
     components/rclient/rclient.cpp
     components/rclient/rclient.h
     components/rclient/rclient_include.h
+    components/rclient/rechargebars.cpp
+    components/rclient/rechargebars.h
     components/rclient/specwheel.cpp
     components/rclient/specwheel.h
     components/rclient/swaptimer.cpp

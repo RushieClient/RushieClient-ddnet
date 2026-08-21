@@ -163,3 +163,6 @@ MACRO_CONFIG_INT(RcSpectatorSortId, rc_spectator_sort_id, 0, 0, 2, CFGFLAG_CLIEN
 MACRO_CONFIG_INT(RcEnableSwapTimer, rc_enable_swap_timer, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Enable swap timer")
 MACRO_CONFIG_INT(RcEnableSwapTimerOnLeftSide, rc_enable_swap_timer_on_left_side, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Swap timer on left side")
 MACRO_CONFIG_INT(RcEnableSwapTimerPosY, rc_enable_swap_timer_pos_y, 50, 0, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Swap timer y")
+
+// Recharge Bars
+MACRO_CONFIG_INT(RcShowRechargeBars, rc_show_recharge_bars, 0, 0, 1, CFGFLAG_SAVE | CFGFLAG_CLIENT, "Show weapon cooldown bars")
