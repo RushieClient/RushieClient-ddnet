@@ -74,6 +74,7 @@
 #include "components/rclient/adminpanel.h"
 #include "components/rclient/above_below_player.h"
 #include "components/rclient/specwheel.h"
+#include "components/rclient/swaptimer.h"
 
 //TClient
 #include "components/tclient/bg_draw.h"
@@ -234,6 +235,7 @@ public:
 	CAdminPanel m_RcAdminPanel;
 	CAboveBelowPlayer m_RcAboveBelow;
 	CSpecWheel m_RcSpecWheel;
+	CSwapTimer m_RcSwapTimer;
 
 	// TClient Components
 	CSkinProfiles m_SkinProfiles;

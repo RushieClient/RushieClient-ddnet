@@ -154,3 +154,8 @@ MACRO_CONFIG_INT(RcAntiUnSpec, rc_anti_unspec, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG
 // Sorting
 MACRO_CONFIG_INT(RcScoreboardSortId, rc_scoreboard_sort_id, 0, 0, 4, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Scoreboard sort id (0-name/team/score 1-id/team/score, 2-id/score, 3-id/team, 4-id)")
 MACRO_CONFIG_INT(RcSpectatorSortId, rc_spectator_sort_id, 0, 0, 2, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Spectator sort id (0-name/team 1-id/team, 2-id)")
+
+//Swap Timer
+MACRO_CONFIG_INT(RcEnableSwapTimer, rc_enable_swap_timer, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Enable swap timer")
+MACRO_CONFIG_INT(RcEnableSwapTimerOnLeftSide, rc_enable_swap_timer_on_left_side, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Swap timer on left side")
+MACRO_CONFIG_INT(RcEnableSwapTimerPosY, rc_enable_swap_timer_pos_y, 50, 0, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Swap timer y")

@@ -167,6 +167,7 @@ void CGameClient::OnConsoleInit()
 					      &m_Hud,
 					      &m_NotifyOnMove, // RClient
 					      &m_RcAboveBelow, // RClient
+					      &m_RcSwapTimer, // RClient
 					      &m_Spectator,
 					      &m_Emoticon,
 					      &m_BindChat, // TClient
@@ -1117,6 +1118,13 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker, int Conn, bool Dumm
 		CNetMsg_Sv_ChangeInfoCooldown *pMsg = (CNetMsg_Sv_ChangeInfoCooldown *)pRawMsg;
 		m_aNextChangeInfo[Conn] = pMsg->m_WaitUntil;
 		return;
+	}
+
+	if(MsgId == NETMSGTYPE_SV_CHAT && g_Config.m_RcEnableSwapTimer)
+	{
+		CNetMsg_Sv_Chat *pMsg = (CNetMsg_Sv_Chat *)pRawMsg;
+		if(pMsg->m_ClientId == -1)
+			m_RcSwapTimer.GameClientMessage(MsgId, pRawMsg, Dummy);
 	}
 
 	if(Dummy)
