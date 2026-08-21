@@ -1,8 +1,11 @@
 #include "rclient.h"
 
+#include "base/log.h"
+#include "base/process.h"
 #include "base/str.h"
 #include "engine/shared/config.h"
 #include "game/client/gameclient.h"
+#include "game/localization.h"
 #include "game/version.h"
 
 #include <engine/shared/json.h>
@@ -189,6 +192,7 @@ void CRClient::OnConsoleInit()
 	Console()->Register("+rc_spec_go_right", "", CFGFLAG_CLIENT, ConSpecGoRight, this, "Go right in spec freeview");
 	Console()->Register("+rc_spec_go_up", "", CFGFLAG_CLIENT, ConSpecGoUp, this, "Go up in spec freeview");
 	Console()->Register("+rc_spec_go_down", "", CFGFLAG_CLIENT, ConSpecGoDown, this, "Go down in spec freeview");
+	Console()->Register("rc_launch_second_client", "", CFGFLAG_CLIENT, ConLaunchSecondClient, this, "Launch second client");
 	Console()->Chain("rc_message_filter_mode", ConchainResetCensorListCache, this);
 	Console()->Chain("rc_message_filter_multiply_change_word_on_full_match", ConchainResetCensorListCache, this);
 	Console()->Chain("rc_message_filter_word_on_full_match", ConchainResetCensorListCache, this);
@@ -2118,4 +2122,23 @@ void CRClient::ConSpecGoLeft(IConsole::IResult *pResult, void *pUserData)
 {
 	CRClient *pSelf = static_cast<CRClient *>(pUserData);
 	pSelf->m_SpecMoveLeft = pResult->GetInteger(0) != 0;
+}
+
+void CRClient::ConLaunchSecondClient(IConsole::IResult *pResult, void *pUserData)
+{
+	CRClient *pSelf = (CRClient *)pUserData;
+#if !defined(CONF_PLATFORM_ANDROID)
+	char aClientBinaryPath[IO_MAX_PATH_LENGTH];
+	pSelf->Storage()->GetBinaryPathAbsolute(PLAT_CLIENT_EXEC, aClientBinaryPath, sizeof(aClientBinaryPath));
+	const PROCESS Process = process_execute(aClientBinaryPath, EShellExecuteWindowState::FOREGROUND);
+	if(Process == INVALID_PROCESS)
+	{
+		log_error("rclient", "failed to launch second client from '%s'", aClientBinaryPath);
+		pSelf->GameClient()->Echo(Localize("Failed to launch second client. See local console for details."));
+		return;
+	}
+#else
+	log_warn("rclient", "launch_client is not supported on Android");
+	pSelf->GameClient()->Echo(Localize("Launching a second client is not supported on Android."));
+#endif
 }

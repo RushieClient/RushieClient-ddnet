@@ -107,6 +107,9 @@ class CRClient : public CComponent
 	bool m_SpecMoveDown = false;
 	bool m_SpecMoveRight = false;
 	bool m_SpecMoveLeft = false;
+
+	// 2nd client
+	static void ConLaunchSecondClient(IConsole::IResult *pResult, void *pUserData);
 public:
 	CRClient();
 	int Sizeof() const override { return sizeof(*this); }

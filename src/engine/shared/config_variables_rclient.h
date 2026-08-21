@@ -169,3 +169,6 @@ MACRO_CONFIG_INT(RcShowRechargeBars, rc_show_recharge_bars, 0, 0, 1, CFGFLAG_SAV
 
 // Clear configs
 MACRO_CONFIG_INT(RcClearConfigsInUnknownFile, rc_clear_configs_in_unknown_file, 0, 0, 1, CFGFLAG_SAVE | CFGFLAG_CLIENT, "Move all unknown configs in unknown files")
+
+// 2nd Client
+MACRO_CONFIG_INT(RcShowOpenSecondClientButton, rc_show_open_second_client_button, 1, 0, 1, CFGFLAG_SAVE | CFGFLAG_CLIENT, "Show open second client button")
