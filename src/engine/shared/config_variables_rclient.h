@@ -88,6 +88,7 @@ MACRO_CONFIG_INT(RcNamePlatesWeaponsLaser, rc_nameplates_weapons_laser, 1, 0, 1,
 MACRO_CONFIG_INT(RcCommandsFixLayout, rc_commands_fix_layout, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "checkpoint and hud will be oneline")
 
 // Players
+MACRO_CONFIG_INT(RcRemoveHammerHitEffect, rc_remove_hammer_hit_effect, 0, 0, 2, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show step effects (1 = Visual, 2 = Full")
 MACRO_CONFIG_INT(RcShowStepEffects, rc_show_step_effects, 0, 0, 3, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show step effects (1 = other players', 2 = everyone, 3 = only your own")
 MACRO_CONFIG_INT(RcHideFrozenFlakesEffect, rc_hide_frozen_flakes_effect, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Hide frozen flakes effect")
 MACRO_CONFIG_INT(RcShowSparkleEffect, rc_show_sparkle_effect, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Always show sparkle effect")

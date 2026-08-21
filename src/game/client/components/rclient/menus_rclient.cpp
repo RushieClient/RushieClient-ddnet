@@ -290,6 +290,12 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 				   {Localize("Off"), Localize("Others"), Localize("Everyone"), Localize("Own")},
 				   {0, 1, 2, 3},
 				   g_Config.m_RcShowStepEffects);
+			static std::vector<CButtonContainer> s_vButtonContainersHammerHitEffect = {{}, {}, {}};
+			DoLine_RadioMenu(Column, TCLocalize("Remove hammer hit effect"),
+				   s_vButtonContainersHammerHitEffect,
+				   {Localize("Default"), Localize("Visual"), Localize("Full")},
+				   {0, 1, 2},
+				   g_Config.m_RcRemoveHammerHitEffect);
 		}
 		if(s_CurPlayersCustomTab == PLAYERS_TAB_AFK)
 		{
