@@ -577,6 +577,8 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		{
 			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcChatShowMouse, RCLocalize("Show mouse when open chat"), &g_Config.m_RcChatShowMouse, &Column, LineSize);
 			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcCommandsFixLayout, RCLocalize("Fix layout commands"), &g_Config.m_RcCommandsFixLayout, &Column, LineSize);
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcChatScroll, RCLocalize("Enable chat scroll"), &g_Config.m_RcChatScroll, &Column, LineSize);
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcChatShowScrollbar, RCLocalize("Show scroll bar"), &g_Config.m_RcChatShowScrollbar, &Column, LineSize);
 		}
 		if(s_CurChatCustomTab == CHAT_TAB_FILTER)
 		{

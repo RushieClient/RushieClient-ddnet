@@ -31,6 +31,12 @@
 
 char CChat::ms_aDisplayText[MAX_LINE_LENGTH] = "";
 
+namespace ScrollBar
+{
+	static constexpr float SCROLLBAR_WIDTH = 10.0f;
+	static constexpr float SCROLLBAR_MARGIN = 3.0f;
+}
+
 CChat::CLine::CLine()
 {
 	m_TextContainerIndex.Reset();
@@ -124,6 +130,7 @@ void CChat::ClearLines()
 		Line.Reset(*this);
 	m_PrevScoreBoardShowed = false;
 	m_PrevShowChat = false;
+	m_HistoryScrollOffset = 0;
 }
 
 void CChat::OnWindowResize()
@@ -527,6 +534,16 @@ bool CChat::OnInput(const IInput::CEvent &Event)
 		}
 	}
 
+	if(g_Config.m_RcChatScroll)
+	{
+		const int TotalLines = GetInitializedLineCount();
+		const int RenderLines = TotalLines - m_VisibleLineCount;
+		if(Event.m_Flags & IInput::FLAG_PRESS && Event.m_Key == KEY_MOUSE_WHEEL_UP && TotalLines > m_VisibleLineCount)
+			m_HistoryScrollOffset = minimum(m_HistoryScrollOffset + 1, RenderLines);
+		else if(Event.m_Flags & IInput::FLAG_PRESS && Event.m_Key == KEY_MOUSE_WHEEL_DOWN && m_HistoryScrollOffset > 0)
+			--m_HistoryScrollOffset;
+	}
+
 	return true;
 }
 
@@ -589,6 +606,7 @@ void CChat::DisableMode()
 		LockMouse();
 		m_SettingsOpened = false;
 	}
+	m_HistoryScrollOffset = 0;
 }
 
 void CChat::OnMessage(int MsgType, void *pRawMsg)
@@ -1008,7 +1026,7 @@ void CChat::OnPrepareLines(float y)
 	float TextBegin = Begin + RealMsgPaddingX / 2.0f;
 	int OffsetType = IsScoreBoardOpen ? 1 : 0;
 
-	for(int i = 0; i < MAX_LINES; i++)
+	for(int i = m_HistoryScrollOffset; i < MAX_LINES; i++)
 	{
 		CLine &Line = m_aLines[((m_CurrentLine - i) + MAX_LINES) % MAX_LINES];
 		if(!Line.m_Initialized)
@@ -1414,6 +1432,8 @@ void CChat::OnRender()
 #endif
 		return;
 
+	m_HistoryScrollOffset = g_Config.m_RcChatScroll ? m_HistoryScrollOffset : 0;
+
 	y -= ScaledFontSize;
 
 	OnPrepareLines(y);
@@ -1552,7 +1572,8 @@ void CChat::OnRender()
 		}
 	}
 
-	for(int i = 0; i < MAX_LINES; i++)
+	m_VisibleLineCount = 0;
+	for(int i = m_HistoryScrollOffset; i < MAX_LINES; i++)
 	{
 		CLine &Line = m_aLines[((m_CurrentLine - i) + MAX_LINES) % MAX_LINES];
 		if(!Line.m_Initialized)
@@ -1570,6 +1591,8 @@ void CChat::OnRender()
 		// cut off if msgs waste too much space
 		if(y < HeightLimit)
 			break;
+
+		++m_VisibleLineCount;
 
 		float Blend = Now > Line.m_Time + 14 * time_freq() && !m_PrevShowChat ? 1.0f - (Now - Line.m_Time - 14 * time_freq()) / (2.0f * time_freq()) : 1.0f;
 
@@ -1652,6 +1675,35 @@ void CChat::OnRender()
 		!GameClient()->m_Menus.IsActive() && !GameClient()->m_Scoreboard.IsActive() && m_MouseUnlocked)
 	{
 		Ui()->MapScreen();
+
+		if(g_Config.m_RcChatShowScrollbar && g_Config.m_RcChatScroll)
+		{
+			float TotalLines = GetInitializedLineCount();
+			if(TotalLines > m_VisibleLineCount)
+			{
+				float RenderLines = TotalLines - m_VisibleLineCount;
+				const float SettingsSize = 16.0f * 5.0f + 4.0f * 2.0f;
+				float ScrollY = 600.0f - 40.0f * FontSize() / 3.0f;
+				const float RailTop = HeightLimit * 2.0f;
+				const int LineWidth = g_Config.m_ClChatWidth;
+				const float MarginSmall = 6.0f;
+				const CUIRect Rail = {(LineWidth * 2.0f + MarginSmall), RailTop, ScrollBar::SCROLLBAR_WIDTH, ScrollY - 10.0f - MarginSmall - (m_SettingsOpened ? SettingsSize + MarginSmall : 0) - RailTop};
+				const float MaxY = std::max(0.0f, Rail.h - 30.0f);
+				const float Value = 1.0f - m_HistoryScrollOffset / RenderLines;
+				const CUIRect Handle = {Rail.x, Rail.y + Value * MaxY, Rail.w, 30.0f};
+				ScrollbarActive = (Input()->NativeMousePressed(1) && Ui()->MouseX() >= Rail.x && Ui()->MouseX() <= Rail.x + Rail.w) || (ScrollbarActive && Input()->NativeMousePressed(1));
+
+				if(ScrollbarActive)
+				{
+					const float ClickedValue = std::clamp((Ui()->MouseY() - Rail.y - Handle.h / 2) / MaxY, 0.0f, 1.0f);
+					m_HistoryScrollOffset = std::round((1.0f - ClickedValue) * RenderLines);
+				}
+
+				Rail.Draw(ColorRGBA(1.0f, 1.0f, 1.0f, 0.25f), IGraphics::CORNER_ALL, Rail.w / 2.0f);
+				Handle.Draw(Handle.Inside(Ui()->MousePos()) || ScrollbarActive ? ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f) : ColorRGBA(0.8f, 0.8f, 0.8f, 1.0f), IGraphics::CORNER_ALL, Handle.w / 2.0f);
+			}
+		}
+
 		Ui()->RenderPopupMenus();
 		Ui()->FinishCheck();
 		Graphics()->MapScreen(0.0f, 0.0f, Width, Height);
@@ -1844,8 +1896,11 @@ CUi::EPopupMenuFunctionResult CChat::CChatPopupContext::Render(void *pContext, C
 	CGameClient::CClientData &Client = pChat->GameClient()->m_aClients[pPopupContext->m_ClientId];
 
 	bool IsServer = false;
+	bool IsClient = false;
 	if(pPopupContext->m_ClientId < 0)
 		IsServer = true;
+		if(pPopupContext->m_ClientId == -2)
+			IsClient = true;
 
 	CUIRect Label, Container;
 	const float ItemSpacing = 2.0f;
@@ -1854,7 +1909,7 @@ CUi::EPopupMenuFunctionResult CChat::CChatPopupContext::Render(void *pContext, C
 	View.Margin(4.0f, &View);
 
 	char NicknameId[80];
-	str_format(NicknameId, sizeof(NicknameId), "%i: %s", pPopupContext->m_ClientId, IsServer ? "Server" : pPopupContext->m_aName);
+	str_format(NicknameId, sizeof(NicknameId), "%i: %s", pPopupContext->m_ClientId, IsServer ? IsClient ? "Client" : "Server" : pPopupContext->m_aName);
 	View.HSplitTop(FontSize, &Label, &View);
 	pUi->DoLabel(&Label, NicknameId, FontSize, TEXTALIGN_TL);
 

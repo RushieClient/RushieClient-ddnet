@@ -38,7 +38,7 @@ class CChat : public CComponent
 
 	enum
 	{
-		MAX_LINES = 64,
+		MAX_LINES = 128,
 		MAX_LINE_LENGTH = 256
 	};
 
@@ -181,6 +181,20 @@ class CChat : public CComponent
 	void SetUiMousePos(vec2 Pos);
 	void LockMouse();
 	bool m_SettingsOpened = false;
+	int m_HistoryScrollOffset = 0;
+	bool ScrollbarActive;
+	int m_VisibleLineCount = 0;
+	int GetInitializedLineCount() const
+	{
+		int Count = 0;
+		for(int i = 0; i < MAX_LINES; i++)
+		{
+			if(!m_aLines[((m_CurrentLine - i) + MAX_LINES) % MAX_LINES].m_Initialized)
+				break;
+			++Count;
+		}
+		return Count;
+	}
 
 	class CChatPopupContext : public SPopupMenuId
 	{
