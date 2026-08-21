@@ -136,7 +136,7 @@ void CSwapTimer::GameClientMessage(int MsgType, void *pRawMsg, bool Dummy)
 				int ClientIdName = FindClientId(aName);
 				if((ClientIdName == GameClient()->m_aLocalIds[0] || ClientIdName == GameClient()->m_aLocalIds[1]) && Dummy)
 					return;
-				AddNewSwapEntry(ClientIdName, GameClient()->m_aLocalIds[g_Config.m_ClDummy ^ Dummy]);
+				AddNewSwapEntry(ClientIdName, GameClient()->m_aLocalIds[g_Config.m_ClDummy ^ (int)Dummy]);
 			}
 
 			if(str_utf8_find_nocase(pMsg->m_pMessage, "You have requested to swap with "))
@@ -155,7 +155,7 @@ void CSwapTimer::GameClientMessage(int MsgType, void *pRawMsg, bool Dummy)
 				if((ClientIdName == GameClient()->m_aLocalIds[0] || ClientIdName == GameClient()->m_aLocalIds[1]) && Dummy)
 					return;
 
-				AddNewSwapEntry(GameClient()->m_aLocalIds[g_Config.m_ClDummy ^ Dummy], ClientIdName);
+				AddNewSwapEntry(GameClient()->m_aLocalIds[g_Config.m_ClDummy ^ (int)Dummy], ClientIdName);
 			}
 
 			if(str_utf8_find_nocase(pMsg->m_pMessage, " has canceled swap with you."))
@@ -168,7 +168,7 @@ void CSwapTimer::GameClientMessage(int MsgType, void *pRawMsg, bool Dummy)
 				char aName[16];
 				str_truncate(aName, sizeof(aName), pMsg->m_pMessage, pStart - pMsg->m_pMessage);
 
-				RemoveSwapEntryId(FindClientId(aName), GameClient()->m_aLocalIds[g_Config.m_ClDummy ^ Dummy]);
+				RemoveSwapEntryId(FindClientId(aName), GameClient()->m_aLocalIds[g_Config.m_ClDummy ^ (int)Dummy]);
 			}
 
 			if(str_utf8_find_nocase(pMsg->m_pMessage, "You have canceled swap with "))
@@ -182,7 +182,7 @@ void CSwapTimer::GameClientMessage(int MsgType, void *pRawMsg, bool Dummy)
 				int pStartLen = strlen("You have canceled swap with ");
 				str_truncate(aName, sizeof(aName), pStart + pStartLen, strlen(pMsg->m_pMessage) - pStartLen - 1);
 
-				RemoveSwapEntryId(GameClient()->m_aLocalIds[g_Config.m_ClDummy ^ Dummy], FindClientId(aName));
+				RemoveSwapEntryId(GameClient()->m_aLocalIds[g_Config.m_ClDummy ^ (int)Dummy], FindClientId(aName));
 			}
 			// *** : [D] Voix has swapped with Voix.
 			if(str_utf8_find_nocase(pMsg->m_pMessage, " has swapped with "))
