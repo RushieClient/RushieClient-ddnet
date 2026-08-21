@@ -428,7 +428,7 @@ bool CConfigManager::Save()
 
 	if(!m_aFailed[ConfigDomain::DDNET] && m_aConfigFile[ConfigDomain::DDNET])
 		for(const char *pCommand : m_vpUnknownCommands)
-			WriteLine(pCommand);
+			WriteLine(pCommand, g_Config.m_RcClearConfigsInUnknownFile ? ConfigDomain::RCLIENTUNKNOWN : ConfigDomain::DDNET);
 
 	for(ConfigDomain ConfigDomain = ConfigDomain::START; ConfigDomain < ConfigDomain::NUM; ++ConfigDomain)
 	{

@@ -166,3 +166,6 @@ MACRO_CONFIG_INT(RcEnableSwapTimerPosY, rc_enable_swap_timer_pos_y, 50, 0, 100, 
 
 // Recharge Bars
 MACRO_CONFIG_INT(RcShowRechargeBars, rc_show_recharge_bars, 0, 0, 1, CFGFLAG_SAVE | CFGFLAG_CLIENT, "Show weapon cooldown bars")
+
+// Clear configs
+MACRO_CONFIG_INT(RcClearConfigsInUnknownFile, rc_clear_configs_in_unknown_file, 0, 0, 1, CFGFLAG_SAVE | CFGFLAG_CLIENT, "Move all unknown configs in unknown files")

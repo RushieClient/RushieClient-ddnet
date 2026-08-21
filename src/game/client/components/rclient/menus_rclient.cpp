@@ -1036,6 +1036,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 				   g_Config.m_RcAutoLockTeam);
 			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcAntiUnSpec, RCLocalize("Anti UnSpec in player"), &g_Config.m_RcAntiUnSpec, &Column, LineSize);
 			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcShowRechargeBars, RCLocalize("Show Recharge bars (by +KZ)"), &g_Config.m_RcShowRechargeBars, &Column, LineSize);
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcClearConfigsInUnknownFile, RCLocalize("Clear ddnet config from unknown configs on exit"), &g_Config.m_RcClearConfigsInUnknownFile, &Column, LineSize);
 		}
 
 		if(s_CurHelpCustomTab == HELP_TAB_SORT)
