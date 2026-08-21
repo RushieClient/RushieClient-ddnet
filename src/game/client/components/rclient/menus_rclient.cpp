@@ -877,6 +877,10 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		   {0, 1, 2, 3},
 		   g_Config.m_RcCustomClientsInNameplates);
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcCustomClientsInScoreboard, RCLocalize("Show client type in scoreboard"), &g_Config.m_RcCustomClientsInScoreboard, &Column, LineSize);
+	Column.HSplitTop(LineSize, &Button, &Column);
+	Ui()->DoScrollbarOption(&g_Config.m_RcCustomClientsInNameplatesSize, &g_Config.m_RcCustomClientsInNameplatesSize, &Button, RCLocalize("Icons size in nameplates"), -50, 100, &CUi::ms_LinearScrollbarScale, 0);
+	Column.HSplitTop(LineSize, &Button, &Column);
+	Ui()->DoScrollbarOption(&g_Config.m_RcCustomClientsInScoreboardSize, &g_Config.m_RcCustomClientsInScoreboardSize, &Button, RCLocalize("Icons size in scoreboard"), 0, 100, &CUi::ms_LinearScrollbarScale, 0);
 
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
 	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;

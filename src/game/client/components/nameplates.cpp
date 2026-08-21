@@ -767,8 +767,7 @@ protected:
 				m_Texture = g_pData->m_aImages[IMAGE_RCKAZIOICON].m_Id;
 				break;
 			case CUSTOM_CLIENT_ID_RUSHIECLIENT:
-				m_Texture = g_pData->m_aImages[IMAGE_RCRUSHIEWHITEICON].m_Id;
-				m_Color = ColorRGBA(0.0f, 165.0f / 255.0f, 250.0f / 255.0f, Data.m_Color.a);
+				m_Texture = g_pData->m_aImages[IMAGE_RCRUSHIEICON].m_Id;
 				break;
 			case CUSTOM_CLIENT_ID_CHILLERBOTUX:
 				m_Texture = g_pData->m_aImages[IMAGE_RCCHILLERICON].m_Id;
@@ -1260,7 +1259,7 @@ void CNamePlates::RenderNamePlateGame(vec2 Position, const CNetObj_PlayerInfo *p
 	}
 
 	// RClient
-	Data.m_FontSizeCustomClient = 18.0f + 20.0f * g_Config.m_RcNamePlatesHookSize / 100.0f;
+	Data.m_FontSizeCustomClient = 18.0f + 20.0f * g_Config.m_RcCustomClientsInNameplatesSize / 100.0f;
 	int ShowCustomClient = g_Config.m_RcCustomClientsInNameplates && g_Config.m_RcCustomClientsCollectClientType ? g_Config.m_RcCustomClientsInNameplates : 0;
 	switch(ShowCustomClient)
 	{
@@ -1335,6 +1334,7 @@ void CNamePlates::RenderNamePlatePreview(vec2 Position, int Dummy)
 	const float FontSizeHookDetection = 18.0f + 20.0f * g_Config.m_RcNamePlatesHookSize / 100.0f;
 	const float FontSizeFireDetection = 18.0f + 20.0f * g_Config.m_RcNamePlatesFireSize / 100.0f;
 	const float RcFontSizeWeapons = 18.0f + 20.0f * g_Config.m_RcNamePlatesWeaponsSize / 100.0f;
+	const float FontSizeCustomClient = 18.0f + 20.0f * g_Config.m_RcCustomClientsInNameplatesSize / 100.0f;
 
 	CNamePlateData Data;
 
@@ -1388,7 +1388,7 @@ void CNamePlates::RenderNamePlatePreview(vec2 Position, int Dummy)
 	Data.m_FontSizeFireDetection = FontSizeFireDetection;
 	Data.m_RcFontSizeWeapons = RcFontSizeWeapons;
 	Data.m_RcShowWeapons = g_Config.m_RcNamePlatesWeapons != 0;
-	Data.m_FontSizeCustomClient = FontSizeHookDetection;
+	Data.m_FontSizeCustomClient = FontSizeCustomClient;
 	Data.m_ShowCustomClient = (g_Config.m_RcCustomClientsInNameplates && g_Config.m_RcCustomClientsCollectClientType) ? CUSTOM_CLIENT_ID_RUSHIECLIENT : 0;
 
 	// TClient

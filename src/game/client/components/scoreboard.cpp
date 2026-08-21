@@ -781,7 +781,7 @@ void CScoreboard::RenderScoreboard(CUIRect Scoreboard, int Team, int CountStart,
 						default:
 							break;
 						}
-						const float IconSize = FontSize;
+						const float IconSize = FontSize * g_Config.m_RcCustomClientsInScoreboardSize / 50.0f;
 						const float OriginalY = Cursor.m_Y;
 						Cursor.m_Y = Row.y + (Row.h - IconSize) / 2.0f;
 						Graphics()->BlendNormal();
