@@ -1246,7 +1246,41 @@ void CMenus::RenderSettingsRClientInfo(CUIRect MainView)
 		Ui()->DoLabel(&Label, "Voix", LineSize, TEXTALIGN_ML);
 		if(Ui()->DoButton_FontIcon(&s_LinkButton1, FontIcon::ARROW_UP_RIGHT_FROM_SQUARE, 0, &Button, IGraphics::CORNER_ALL))
 			Client()->ViewLink("https://github.com/1Voix1");
-		RenderDevSkin(TeeRect.Center(), 50.0f, "Bomb 2", "bomb", false, 0, 0, 0, false, true, ColorRGBA(0.92f, 0.29f, 0.48f, 1.0f), ColorRGBA(0.55f, 0.64f, 0.76f, 1.0f));
+		RenderDevSkin(TeeRect.Center(), 50.0f, "Bomb 2", "bomb", false, 0, 0, 0, false, true);
+	}
+
+	RightView.HSplitTop(HeadlineHeight, &Label, &RightView);
+	Ui()->DoLabel(&Label, RCLocalize("Big Thanks To"), HeadlineFontSize, TEXTALIGN_ML);
+	RightView.HSplitTop(MarginSmall, nullptr, &RightView);
+	RightView.HSplitTop(MarginSmall, nullptr, &RightView);
+
+	static CButtonContainer s_CarreyLinkButton1, s_CarreyLinkButton2;
+	{
+		CUIRect ButtonsBox;
+		RightView.HSplitTop(CardSize, &DevCardRect, &RightView);
+		DevCardRect.VSplitLeft(CardSize, &TeeRect, &Label);
+		Label.VSplitLeft(TextRender()->TextWidth(LineSize, "Carrey"), &Label, &ButtonsBox);
+		Ui()->DoLabel(&Label, "Carrey", LineSize, TEXTALIGN_ML);
+		ButtonsBox.VSplitLeft(MarginSmall, nullptr, &ButtonsBox);
+		ButtonsBox.h = LineSize;
+		ButtonsBox.w = LineSize * 2 + MarginSmall;
+		ButtonsBox.y = Label.y + (Label.h / 2.0f - Button.h / 2.0f);
+		ButtonsBox.VSplitLeft(LineSize, &Button, &ButtonsBox);
+		if(Ui()->DoButton_FontIcon(&s_CarreyLinkButton1, FontIcon::RC_TWITCH, 0, &Button, IGraphics::CORNER_ALL))
+			Client()->ViewLink("https://www.twitch.tv/icarreyj");
+		ButtonsBox.VSplitLeft(MarginSmall, nullptr, &ButtonsBox);
+		if(Ui()->DoButton_FontIcon(&s_CarreyLinkButton2, FontIcon::RC_DISCORD, 0, &ButtonsBox, IGraphics::CORNER_ALL))
+			Client()->ViewLink("https://discord.gg/BKUzXdDhy6");
+		RenderDevSkin(TeeRect.Center(), 50.0f, "Apish Coke Carrey", "Apish Coke Carrey", false, 0, 0, 0, false, true);
+	}
+
+	{
+		CUIRect ButtonsBox;
+		RightView.HSplitTop(CardSize, &DevCardRect, &RightView);
+		DevCardRect.VSplitLeft(CardSize, &TeeRect, &Label);
+		Label.VSplitLeft(TextRender()->TextWidth(LineSize, "Wee"), &Label, &ButtonsBox);
+		Ui()->DoLabel(&Label, "Wee", LineSize, TEXTALIGN_ML);
+		RenderDevSkin(TeeRect.Center(), 50.0f, "twinbop", "twinbop", true, 2490112, 1769216, 0, false, true);
 	}
 
 	RightView.HSplitTop(MarginSmall, nullptr, &RightView);

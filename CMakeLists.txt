@@ -1509,6 +1509,7 @@ set(EXPECTED_DATA
   emoticons.png
   extras.png
   fonts/DejaVuSans.ttf
+  fonts/Font_Awesome_6_Brands-Regular-400.otf
   fonts/Font_Awesome_6_Free-Solid-900.otf
   fonts/GlowSansJ-Compressed-Book.otf
   fonts/NotoEmoji-Regular.ttf

@@ -2,6 +2,7 @@
     "font files": [
         "DejaVuSans.ttf",
         "Font_Awesome_6_Free-Solid-900.otf",
+        "Font_Awesome_6_Brands-Regular-400.otf",
         "GlowSansJ-Compressed-Book.otf",
         "SourceHanSans.ttc",
         "NotoEmoji-Regular.ttf"
@@ -14,6 +15,7 @@
         "traditional_chinese": "Source Han Sans TC"
     },
     "fallbacks": [
+        "Font Awesome 6 Brands Regular",
         "Source Han Sans",
         "Noto Emoji"
     ],
