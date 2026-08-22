@@ -20,4 +20,9 @@ namespace RcAspectDisable
 	};
 }
 
+enum
+{
+	CUSTOM_CLIENT_ID_BESTCLIENT = 33554431,
+};
+
 #endif //RCLIENT_RCLIENT_INCLUDE_H

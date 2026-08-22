@@ -1650,6 +1650,7 @@ set(EXPECTED_DATA
   race_flag.png
   rclient/audio/nonactive_wakeup.wv
   rclient/icons/ascendclient_size.png
+  rclient/icons/bc_icon.png
   rclient/icons/chillerbotux_size.png
   rclient/icons/duckicon_size.png
   rclient/icons/kazioicon_size.png

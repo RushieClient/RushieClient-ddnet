@@ -7,6 +7,7 @@
 #include "game/client/gameclient.h"
 #include "game/localization.h"
 #include "game/version.h"
+#include "rclient_include.h"
 
 #include <engine/shared/json.h>
 
@@ -159,6 +160,28 @@ void CRClient::OnRender()
 		if(m_SpecMoveRight)
 			GameClient()->m_Controls.m_aMousePos[g_Config.m_ClDummy].x += Speed * FrameTime;
 	}
+
+	if(g_Config.m_RcCustomClientsCollectClientTypeBestClient)
+	{
+		if(Client()->State() == IClient::STATE_ONLINE)
+		{
+			const uint64_t CurrentTime = time_get();
+			if(CurrentTime > m_LastBCFetchTime)
+			{
+				m_LastBCFetchTime = CurrentTime + 30 * time_freq();
+				FetchRclientBCFetchList();
+			}
+		}
+	}
+	else
+	{
+		m_vBcUsers.clear();
+	}
+	if(m_pRClientBCFetchListTask && m_pRClientBCFetchListTask->State() == EHttpState::DONE)
+	{
+		FinishRclientBCFetchList();
+		ResetRclientBCFetchList();
+	}
 }
 
 void CRClient::OnConsoleInit()
@@ -215,7 +238,15 @@ void CRClient::OnMessage(int MsgType, void *pRawMsg)
 void CRClient::OnStateChange(int NewState, int OldState)
 {
 	if(NewState == IClient::STATE_OFFLINE)
+	{
 		ResetBinds();
+		m_vBcUsers.clear();
+	}
+	if(NewState == IClient::STATE_ONLINE)
+	{
+		FetchRclientBCFetchList();
+		m_LastBCFetchTime = time_get() + 30 * time_freq();
+	}
 }
 
 void CRClient::OnShutdown()
@@ -226,6 +257,12 @@ void CRClient::OnShutdown()
 void CRClient::OnNewSnapshot()
 {
 	SetForcedAspectRatio();
+	if(g_Config.m_RcCustomClientsCollectClientTypeBestClient)
+	{
+		for(int ClientId : m_vBcUsers)
+			if(GameClient()->m_aClients[ClientId].m_CustomClient == 0)
+				GameClient()->m_aClients[ClientId].m_CustomClient = CUSTOM_CLIENT_ID_BESTCLIENT;
+	}
 }
 
 void CRClient::ConfigSaveCallback(IConfigManager *pConfigManager, void *pUserData)
@@ -2141,4 +2178,77 @@ void CRClient::ConLaunchSecondClient(IConsole::IResult *pResult, void *pUserData
 	log_warn("rclient", "launch_client is not supported on Android");
 	pSelf->GameClient()->Echo(Localize("Launching a second client is not supported on Android."));
 #endif
+}
+
+void CRClient::FetchRclientBCFetchList()
+{
+	if(m_pRClientBCFetchListTask && !m_pRClientBCFetchListTask->Done())
+		return;
+	const char *BCIp = "https://150.241.70.188:8779/users.json";
+	m_pRClientBCFetchListTask = HttpGet(BCIp);
+	m_pRClientBCFetchListTask->Timeout(CTimeout{10000, 0, 500, 10});
+	m_pRClientBCFetchListTask->IpResolve(IPRESOLVE::V4);
+	m_pRClientBCFetchListTask->InsecureSsl(true);
+	m_pRClientBCFetchListTask->LogProgress(HTTPLOG::FAILURE);
+	Http()->Run(m_pRClientBCFetchListTask);
+}
+
+void CRClient::FinishRclientBCFetchList()
+{
+	json_value *pJson = m_pRClientBCFetchListTask->ResultJson();
+	if(!pJson)
+	{
+		return;
+	}
+	m_vBcUsers.clear();
+	char aBuf[NETADDR_MAXSTRSIZE];
+	net_addr_str(&Client()->ServerAddress(), aBuf, sizeof(aBuf), true);
+	if(pJson->type == json_array)
+	{
+		int ServerId = -1;
+		for(int i = 0; i < json_array_length(pJson); i++)
+		{
+			const json_value *CheckServ = json_array_get(pJson, i);
+			if(CheckServ->type == json_object)
+			{
+				const json_value *CheckServerIp = json_object_get(CheckServ, "server_address");
+				if(CheckServerIp->type == json_string && !str_comp(CheckServerIp->u.string.ptr, aBuf))
+				{
+					ServerId = i;
+					break;
+				}
+			}
+		}
+
+		if(ServerId != -1)
+		{
+			const json_value *BcServ = json_array_get(pJson, ServerId);
+			const json_value *BcUsers = json_object_get(BcServ, "players");
+			if(BcUsers->type == json_array)
+			{
+				for(int i = 0; i < json_array_length(BcUsers); i++)
+				{
+					const json_value *CurrentUser = json_array_get(BcUsers, i);
+					const json_value *ClientIdVal = json_object_get(CurrentUser, "client_id");
+					if(ClientIdVal && ClientIdVal->type == json_integer)
+					{
+						int ClientId = ClientIdVal->u.integer;
+						if(ClientId >= 0 && ClientId < MAX_CLIENTS)
+							m_vBcUsers.push_back(ClientId);
+					}
+				}
+			}
+		}
+	}
+
+	json_value_free(pJson);
+}
+
+void CRClient::ResetRclientBCFetchList()
+{
+	if(m_pRClientBCFetchListTask)
+	{
+		m_pRClientBCFetchListTask->Abort();
+		m_pRClientBCFetchListTask = NULL;
+	}
 }

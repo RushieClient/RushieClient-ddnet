@@ -121,6 +121,7 @@ MACRO_CONFIG_INT(RcCustomClientsInNameplates, rc_custom_clients_in_nameplates, 1
 MACRO_CONFIG_INT(RcCustomClientsInScoreboard, rc_custom_clients_in_scoreboard, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show custom client icons on scoreboard")
 MACRO_CONFIG_INT(RcCustomClientsInNameplatesSize, rc_custom_clients_in_nameplates_size, -5, -50, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Size of client icons")
 MACRO_CONFIG_INT(RcCustomClientsInScoreboardSize, rc_custom_clients_in_scoreboard_size, 50, 0, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Size of client icons")
+MACRO_CONFIG_INT(RcCustomClientsCollectClientTypeBestClient, rc_custom_clients_collect_client_type_best_client, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Fetch bestclient users")
 
 // Streamer Mode
 MACRO_CONFIG_INT(RcRconSteamerMode, rc_rcon_streamer_mode, 0, 0, 2, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Hide ddnet from stream when rcon opened")

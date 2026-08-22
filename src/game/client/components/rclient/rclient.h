@@ -5,6 +5,7 @@
 #include <engine/shared/console.h>
 #include <game/client/component.h>
 #include <game/client/components/chat.h>
+#include <array>
 
 namespace ChatThings
 {
@@ -110,6 +111,14 @@ class CRClient : public CComponent
 
 	// 2nd client
 	static void ConLaunchSecondClient(IConsole::IResult *pResult, void *pUserData);
+
+	// Fetch bestclient users
+	uint64_t m_LastBCFetchTime;
+	std::vector<int> m_vBcUsers;
+	std::shared_ptr<CHttpRequest> m_pRClientBCFetchListTask = nullptr;
+	void FetchRclientBCFetchList();
+	void FinishRclientBCFetchList();
+	void ResetRclientBCFetchList();
 public:
 	CRClient();
 	int Sizeof() const override { return sizeof(*this); }

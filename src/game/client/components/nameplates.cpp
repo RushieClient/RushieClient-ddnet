@@ -19,6 +19,7 @@
 
 //RClient
 #include "rclient/external/ddnet-custom-clients/custom_clients_ids.h"
+#include "rclient/rclient_include.h"
 
 enum class EHookStrongWeakState
 {
@@ -777,6 +778,9 @@ protected:
 				break;
 			case CUSTOM_CLIENT_ID_ASCENDCLIENT:
 				m_Texture = g_pData->m_aImages[IMAGE_RCASCENDICON].m_Id;
+				break;
+			case CUSTOM_CLIENT_ID_BESTCLIENT:
+				m_Texture = g_pData->m_aImages[IMAGE_RCBCICON].m_Id;
 				break;
 			default:
 				break;

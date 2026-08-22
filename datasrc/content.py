@@ -270,6 +270,7 @@ image_rc_ascend_icon = Image("rcascendicon", "rclient/icons/ascendclient_size.pn
 image_rc_rushie_icon = Image("rcrushieicon", "rclient/rclient_icon.png")
 image_rc_rushie_white_icon = Image("rcrushiewhiteicon", "rclient/rclient_icon_white.png")
 image_rc_weapons = Image("rcweapons", "rclient/rcweapons.png")
+image_rc_bc_icon = Image("rcbcicon", "rclient/icons/bc_icon.png")
 
 container.images.Add(image_null)
 container.images.Add(image_game)
@@ -297,6 +298,7 @@ container.images.Add(image_rc_ascend_icon)
 container.images.Add(image_rc_rushie_icon)
 container.images.Add(image_rc_rushie_white_icon)
 container.images.Add(image_rc_weapons)
+container.images.Add(image_rc_bc_icon)
 
 container.pickups.Add(Pickup("health"))
 container.pickups.Add(Pickup("armor"))

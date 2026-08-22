@@ -778,6 +778,9 @@ void CScoreboard::RenderScoreboard(CUIRect Scoreboard, int Team, int CountStart,
 						case CUSTOM_CLIENT_ID_ASCENDCLIENT:
 							m_Texture = IMAGE_RCASCENDICON;
 							break;
+						case CUSTOM_CLIENT_ID_BESTCLIENT:
+							m_Texture = IMAGE_RCBCICON;
+							break;
 						default:
 							break;
 						}

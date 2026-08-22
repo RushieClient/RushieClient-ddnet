@@ -121,6 +121,7 @@ class CHttpRequest : public IHttpRequest
 	std::atomic<int> m_Progress{0};
 	HTTPLOG m_LogProgress = HTTPLOG::ALL;
 	IPRESOLVE m_IpResolve = IPRESOLVE::WHATEVER;
+	bool m_InsecureSsl = false;
 
 	bool m_FailOnErrorStatus = true;
 
@@ -168,6 +169,7 @@ public:
 	void MaxResponseSize(int64_t MaxResponseSize) { m_MaxResponseSize = MaxResponseSize; }
 	void LogProgress(HTTPLOG LogProgress) { m_LogProgress = LogProgress; }
 	void IpResolve(IPRESOLVE IpResolve) { m_IpResolve = IpResolve; }
+	void InsecureSsl(bool Insecure) { m_InsecureSsl = Insecure; }
 	void FailOnErrorStatus(bool FailOnErrorStatus) { m_FailOnErrorStatus = FailOnErrorStatus; }
 	// Download to memory only. Get the result via `Result*`.
 	void WriteToMemory()

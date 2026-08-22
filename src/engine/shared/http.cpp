@@ -216,6 +216,11 @@ bool CHttpRequest::ConfigureHandle(void *pHandle)
 #pragma GCC diagnostic pop
 #endif
 	curl_easy_setopt(pH, CURLOPT_IPRESOLVE, m_IpResolve == IPRESOLVE::V4 ? CURL_IPRESOLVE_V4 : (m_IpResolve == IPRESOLVE::V6 ? CURL_IPRESOLVE_V6 : CURL_IPRESOLVE_WHATEVER));
+	if(m_InsecureSsl)
+	{
+		curl_easy_setopt(pH, CURLOPT_SSL_VERIFYPEER, 0L);
+		curl_easy_setopt(pH, CURLOPT_SSL_VERIFYHOST, 0L);
+	}
 	if(g_Config.m_Bindaddr[0] != '\0')
 	{
 		curl_easy_setopt(pH, CURLOPT_INTERFACE, g_Config.m_Bindaddr);
