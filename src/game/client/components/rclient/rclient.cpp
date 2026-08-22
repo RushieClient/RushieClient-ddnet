@@ -2295,3 +2295,12 @@ int CRClient::GetSavesAmount(const char *MapName)
 	}
 	return SavesCount;
 }
+
+// Gun Volume
+float CRClient::GetMultiplySoundVolume(int SoundId)
+{
+	if(SoundId != SOUND_GUN_FIRE)
+		return 1.0f;
+
+	return g_Config.m_RcSndGunFireVolume / 100.0f;
+}

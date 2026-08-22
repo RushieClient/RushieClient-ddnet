@@ -1051,6 +1051,8 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 				   {Localize("Off"), Localize("File"), Localize("/load")},
 				   {0, 1, 2},
 				   g_Config.m_RcShowSavesCount);
+			Column.HSplitTop(LineSize, &Button, &Column);
+			Ui()->DoScrollbarOption(&g_Config.m_RcSndGunFireVolume, &g_Config.m_RcSndGunFireVolume, &Button, RCLocalize("Gun fire volume"), 0, 100, &CUi::ms_LinearScrollbarScale, 0);
 		}
 
 		if(s_CurHelpCustomTab == HELP_TAB_SORT)

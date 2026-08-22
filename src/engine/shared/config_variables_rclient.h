@@ -177,3 +177,6 @@ MACRO_CONFIG_INT(RcShowOpenSecondClientButton, rc_show_open_second_client_button
 
 // Last saves
 MACRO_CONFIG_INT(RcShowSavesCount, rc_show_saves_count, 0, 0, 2, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Shows save count on map join (1-from file, 2-from /load)")
+
+// Gunfire Volume
+MACRO_CONFIG_INT(RcSndGunFireVolume, rc_snd_gun_fire_volume, 100, 0, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Change gun fire volume")

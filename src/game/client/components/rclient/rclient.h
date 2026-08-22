@@ -244,6 +244,9 @@ public:
 
 	// Saves Reader
 	int GetSavesAmount(const char *MapName);
+
+	// Gun Volume
+	float GetMultiplySoundVolume(int SoundId);
 };
 
 #endif //GAME_CLIENT_COMPONENTS_RCLIENT_RCLIENT_H
