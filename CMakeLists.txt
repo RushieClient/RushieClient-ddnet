@@ -2624,6 +2624,8 @@ if(CLIENT)
     components/rclient/edgehelper.cpp
     components/rclient/edgehelper.h
     components/rclient/external/ddnet-custom-clients/custom_clients_ids.h
+    components/rclient/last_saves.cpp
+    components/rclient/last_saves.h
     components/rclient/menus_rclient.cpp
     components/rclient/notify_on_move.cpp
     components/rclient/notify_on_move.h

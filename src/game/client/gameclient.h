@@ -76,6 +76,7 @@
 #include "components/rclient/specwheel.h"
 #include "components/rclient/swaptimer.h"
 #include "components/rclient/rechargebars.h"
+#include "components/rclient/last_saves.h"
 
 //TClient
 #include "components/tclient/bg_draw.h"
@@ -238,6 +239,7 @@ public:
 	CSpecWheel m_RcSpecWheel;
 	CSwapTimer m_RcSwapTimer;
 	CRechargeBars m_RcRechargeBars;
+	CLastSaves m_RcLastSaves;
 
 	// TClient Components
 	CSkinProfiles m_SkinProfiles;

@@ -119,6 +119,9 @@ class CRClient : public CComponent
 	void FetchRclientBCFetchList();
 	void FinishRclientBCFetchList();
 	void ResetRclientBCFetchList();
+
+	// Test function
+	static void ConRClientTestFunction(IConsole::IResult *pResult, void *pUserData);
 public:
 	CRClient();
 	int Sizeof() const override { return sizeof(*this); }
@@ -238,6 +241,9 @@ public:
 	const CNetObj_PlayerInfo *GetSortedPlayersScoreboard(int Config, int ClientId);
 	const CNetObj_PlayerInfo *GetSortedPlayersSpectator(int Config, int ClientId);
 	const CNetObj_PlayerInfo **GetSortedPlayersSpectatorArray(int Config);
+
+	// Saves Reader
+	int GetSavesAmount(const char *MapName);
 };
 
 #endif //GAME_CLIENT_COMPONENTS_RCLIENT_RCLIENT_H

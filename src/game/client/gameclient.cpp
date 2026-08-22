@@ -139,7 +139,6 @@ void CGameClient::OnConsoleInit()
 					      &m_Background, // render instead of m_MapLayersBackground when g_Config.m_ClOverlayEntities == 100
 					      &m_MapLayersBackground, // first to render
 					      &m_BgDraw, // TClient
-					      &m_ChatBubbles, // RClient
 					      &m_Particles.m_RenderTrail,
 					      &m_Particles.m_RenderTrailExtra,
 					      &m_Items,
@@ -169,6 +168,8 @@ void CGameClient::OnConsoleInit()
 					      &m_NotifyOnMove, // RClient
 					      &m_RcAboveBelow, // RClient
 					      &m_RcSwapTimer, // RClient
+					      &m_RcLastSaves, // RClient
+					      &m_ChatBubbles, // RClient
 					      &m_Spectator,
 					      &m_Emoticon,
 					      &m_BindChat, // TClient

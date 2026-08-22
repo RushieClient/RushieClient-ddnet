@@ -4,6 +4,7 @@
 #include "base/process.h"
 #include "base/str.h"
 #include "engine/shared/config.h"
+#include "engine/shared/linereader.h"
 #include "game/client/gameclient.h"
 #include "game/localization.h"
 #include "game/version.h"
@@ -216,6 +217,7 @@ void CRClient::OnConsoleInit()
 	Console()->Register("+rc_spec_go_up", "", CFGFLAG_CLIENT, ConSpecGoUp, this, "Go up in spec freeview");
 	Console()->Register("+rc_spec_go_down", "", CFGFLAG_CLIENT, ConSpecGoDown, this, "Go down in spec freeview");
 	Console()->Register("rc_launch_second_client", "", CFGFLAG_CLIENT, ConLaunchSecondClient, this, "Launch second client");
+	Console()->Register("rc_test_function", "s[map]", CFGFLAG_CLIENT, ConRClientTestFunction, this, "Just for test, lazy to remove");
 	Console()->Chain("rc_message_filter_mode", ConchainResetCensorListCache, this);
 	Console()->Chain("rc_message_filter_multiply_change_word_on_full_match", ConchainResetCensorListCache, this);
 	Console()->Chain("rc_message_filter_word_on_full_match", ConchainResetCensorListCache, this);
@@ -2251,4 +2253,45 @@ void CRClient::ResetRclientBCFetchList()
 		m_pRClientBCFetchListTask->Abort();
 		m_pRClientBCFetchListTask = NULL;
 	}
+}
+
+// Test function
+void CRClient::ConRClientTestFunction(IConsole::IResult *pResult, void *pUserData)
+{
+	CRClient *pThis = static_cast<CRClient *>(pUserData);
+	pThis->GetSavesAmount(pResult->GetString(0));
+}
+
+// Saves reader
+int CRClient::GetSavesAmount(const char *MapName)
+{
+	CLineReader LineReader;
+	if(!LineReader.OpenFile(Storage()->OpenFile(SAVES_FILE, IOFLAG_READ, IStorage::TYPE_SAVE)))
+	{
+		log_error("RClient-saves", "Didnt find file %s", SAVES_FILE);
+		return 0;
+	}
+	int SavesCount = 0;
+	while(const char *pLine = LineReader.Get())
+	{
+		int PredOffset = 0;
+		int Offset = 0;
+		const char *pEnd;
+		while((pEnd = str_find(pLine + Offset, ",")) != nullptr)
+		{
+			PredOffset = Offset;
+			Offset = pEnd - pLine + 1;
+		}
+
+		if(!PredOffset)
+			continue;
+
+		const char *pStart =  str_find(pLine + PredOffset - 1, ",");
+
+		char aMapNameSave[128];
+		str_truncate(aMapNameSave, sizeof(aMapNameSave), pStart + 1, Offset - PredOffset - 1);
+		if(!str_utf8_comp_nocase(MapName, aMapNameSave))
+			SavesCount++;
+	}
+	return SavesCount;
 }

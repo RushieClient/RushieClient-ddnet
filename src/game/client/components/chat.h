@@ -221,6 +221,7 @@ class CChat : public CComponent
 	friend class CTranslate;
 	friend class CTClient;
 	friend class CChatBubbles;
+	friend class CLastSaves;
 
 public:
 	CChat();

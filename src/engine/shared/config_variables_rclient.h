@@ -174,3 +174,6 @@ MACRO_CONFIG_INT(RcClearConfigsInUnknownFile, rc_clear_configs_in_unknown_file, 
 
 // 2nd Client
 MACRO_CONFIG_INT(RcShowOpenSecondClientButton, rc_show_open_second_client_button, 1, 0, 1, CFGFLAG_SAVE | CFGFLAG_CLIENT, "Show open second client button")
+
+// Last saves
+MACRO_CONFIG_INT(RcShowSavesCount, rc_show_saves_count, 0, 0, 2, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Shows save count on map join (1-from file, 2-from /load)")

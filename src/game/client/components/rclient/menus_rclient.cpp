@@ -1045,6 +1045,12 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcShowRechargeBars, RCLocalize("Show Recharge bars (by +KZ/Kaizo Client)"), &g_Config.m_RcShowRechargeBars, &Column, LineSize);
 			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcClearConfigsInUnknownFile, RCLocalize("Clear ddnet config from unknown configs on exit"), &g_Config.m_RcClearConfigsInUnknownFile, &Column, LineSize);
 			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcShowOpenSecondClientButton, RCLocalize("Show open second client button"), &g_Config.m_RcShowOpenSecondClientButton, &Column, LineSize);
+			static std::vector<CButtonContainer> s_vButtonContainersSaveCount = {{}, {}, {}};
+			DoLine_RadioMenu(Column, TCLocalize("Show Save Count"),
+				   s_vButtonContainersSaveCount,
+				   {Localize("Off"), Localize("File"), Localize("/load")},
+				   {0, 1, 2},
+				   g_Config.m_RcShowSavesCount);
 		}
 
 		if(s_CurHelpCustomTab == HELP_TAB_SORT)
