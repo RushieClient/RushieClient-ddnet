@@ -15,9 +15,9 @@
         "traditional_chinese": "Source Han Sans TC"
     },
     "fallbacks": [
-        "Font Awesome 6 Brands Regular",
         "Source Han Sans",
-        "Noto Emoji"
+        "Noto Emoji",
+        "Font Awesome 6 Brands Regular"
     ],
     "icon": "Font Awesome 6 Free"
 }

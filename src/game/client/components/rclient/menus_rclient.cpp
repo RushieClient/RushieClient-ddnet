@@ -873,7 +873,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	Column.HSplitTop(HeadlineHeight, &Label, &Column);
 	Ui()->DoLabel(&Label, RCLocalize("Client Indicator"), HeadlineFontSize, TEXTALIGN_MC);
 	Column.HSplitTop(Margin, &Label, &Column);
-	Ui()->DoLabel(&Label, RCLocalize("by +KZ"), Margin, TEXTALIGN_MC);
+	Ui()->DoLabel(&Label, RCLocalize("by +KZ/Kaizo Client"), Margin, TEXTALIGN_MC);
 	Column.HSplitTop(MarginSmall, nullptr, &Column);
 
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcCustomClientsSendClientType, RCLocalize("Send to server that u use RClient"), &g_Config.m_RcCustomClientsSendClientType, &Column, LineSize);
@@ -1042,7 +1042,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 				   {0, 1, 2},
 				   g_Config.m_RcAutoLockTeam);
 			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcAntiUnSpec, RCLocalize("Anti UnSpec in player"), &g_Config.m_RcAntiUnSpec, &Column, LineSize);
-			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcShowRechargeBars, RCLocalize("Show Recharge bars (by +KZ)"), &g_Config.m_RcShowRechargeBars, &Column, LineSize);
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcShowRechargeBars, RCLocalize("Show Recharge bars (by +KZ/Kaizo Client)"), &g_Config.m_RcShowRechargeBars, &Column, LineSize);
 			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcClearConfigsInUnknownFile, RCLocalize("Clear ddnet config from unknown configs on exit"), &g_Config.m_RcClearConfigsInUnknownFile, &Column, LineSize);
 			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcShowOpenSecondClientButton, RCLocalize("Show open second client button"), &g_Config.m_RcShowOpenSecondClientButton, &Column, LineSize);
 		}
@@ -1307,7 +1307,7 @@ void CMenus::RenderSettingsRClientInfo(CUIRect MainView)
 	const char *apTabNames[] = {
 		RCLocalize("Settings"),
 		RCLocalize("Chat Binds"),
-		RCLocalize("Info")};
+		RCLocalize("Spec Wheel")};
 	static int s_aShowTabs[NUMBER_OF_RCLIENT_TABS] = {};
 	for(int i = 0; i < NUMBER_OF_RCLIENT_TABS - 1; ++i)
 	{

@@ -595,9 +595,6 @@ void CMenus::RenderMenubar(CUIRect Box, IClient::EClientState ClientState)
 
 		if(Box.w >= 10.0f + 33.0f && g_Config.m_RcShowOpenSecondClientButton)
 		{
-			TextRender()->SetFontPreset(EFontPreset::ICON_FONT);
-			TextRender()->SetRenderFlags(ETextRenderFlags::TEXT_RENDER_FLAG_ONLY_ADVANCE_WIDTH | ETextRenderFlags::TEXT_RENDER_FLAG_NO_X_BEARING | ETextRenderFlags::TEXT_RENDER_FLAG_NO_Y_BEARING | ETextRenderFlags::TEXT_RENDER_FLAG_NO_PIXEL_ALIGNMENT | ETextRenderFlags::TEXT_RENDER_FLAG_NO_OVERSIZE);
-
 			Box.VSplitRight(10.0f, &Box, nullptr);
 			Box.VSplitRight(33.0f, &Box, &Button);
 			static CButtonContainer s_SecondClientButton;
@@ -606,9 +603,6 @@ void CMenus::RenderMenubar(CUIRect Box, IClient::EClientState ClientState)
 				Console()->ExecuteLine("rc_launch_second_client", IConsole::CLIENT_ID_UNSPECIFIED);
 			}
 			GameClient()->m_Tooltips.DoToolTip(&s_SecondClientButton, &Button, Localize("Second Client"));
-
-			TextRender()->SetRenderFlags(0);
-			TextRender()->SetFontPreset(EFontPreset::DEFAULT_FONT);
 		}
 
 		Box.VSplitRight(10.0f, &Box, nullptr);
