@@ -15,6 +15,8 @@ void CNotifyOnMove::OnReset()
 	m_SoundPlayedSpec = false;
 	m_SpecNotifyMoved = false;
 	m_SpecNotifyAnim = 0.0f;
+	m_SpecHasLastPos = false;
+	m_SpecLastTargetId = -1000;
 }
 
 void CNotifyOnMove::OnInit()
@@ -62,9 +64,24 @@ void CNotifyOnMove::OnRender()
 		if(GameClient()->m_Snap.m_SpecInfo.m_Active)
 		{
 			const int ClientId = GameClient()->m_Snap.m_LocalClientId;
-			const bool LocalCharacterMoved =
-			GameClient()->m_Snap.m_aCharacters[ClientId].m_Cur.m_X != GameClient()->m_Snap.m_aCharacters[ClientId].m_Prev.m_X ||
-				GameClient()->m_Snap.m_aCharacters[ClientId].m_Cur.m_Y != GameClient()->m_Snap.m_aCharacters[ClientId].m_Prev.m_Y;
+			const int SpecTargetId = GameClient()->m_Snap.m_SpecInfo.m_SpectatorId;
+			const bool TargetChanged = SpecTargetId != m_SpecLastTargetId;
+			m_SpecLastTargetId = SpecTargetId;
+
+			bool LocalCharacterMoved = false;
+			if(ClientId >= 0 && GameClient()->m_Snap.m_aCharacters[ClientId].m_Active)
+			{
+				const vec2 Pos(GameClient()->m_Snap.m_aCharacters[ClientId].m_Cur.m_X,
+					GameClient()->m_Snap.m_aCharacters[ClientId].m_Cur.m_Y);
+				if(m_SpecHasLastPos && !TargetChanged)
+					LocalCharacterMoved = Pos != m_SpecLastPos;
+				m_SpecLastPos = Pos;
+				m_SpecHasLastPos = true;
+			}
+			else
+			{
+				m_SpecHasLastPos = false;
+			}
 
 			if(LocalCharacterMoved)
 			{
@@ -93,6 +110,7 @@ void CNotifyOnMove::OnRender()
 		{
 			m_SpecNotifyMoved = false;
 			m_SoundPlayedSpec = false;
+			m_SpecHasLastPos = false;
 		}
 
 		if((m_SpecNotifyMoved || m_SpecNotifyAnim > 0.0f) && g_Config.m_RcTextOnMoveInSpec)

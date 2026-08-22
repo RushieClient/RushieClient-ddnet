@@ -152,6 +152,7 @@ void CGameClient::OnConsoleInit()
 					      &m_MapLayersForeground,
 					      &m_MovingTilesForeground, // TClient
 					      &m_Outlines,  // TClient
+					      &m_ChatBubbles, // RClient
 					      &m_Mumble, // TClient
 					      &m_Pet, // TClient
 					      &m_Particles.m_RenderExplosions,
@@ -169,7 +170,6 @@ void CGameClient::OnConsoleInit()
 					      &m_RcAboveBelow, // RClient
 					      &m_RcSwapTimer, // RClient
 					      &m_RcLastSaves, // RClient
-					      &m_ChatBubbles, // RClient
 					      &m_Spectator,
 					      &m_Emoticon,
 					      &m_BindChat, // TClient
