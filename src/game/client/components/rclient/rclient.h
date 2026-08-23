@@ -69,12 +69,7 @@ class CRClient : public CComponent
 	static void ConRemoveCensorWord(IConsole::IResult *pResult, void *pUserData);
 	static void ConPrintCensorList(IConsole::IResult *pResult, void *pUserData);
 	std::vector<std::string> CensorWordsList;
-	struct SCensorListCache
-	{
-		std::string m_BlockedMessage;
-		std::string m_FinalMessage;
-	};
-	std::vector<SCensorListCache> m_CensorMessageListCache;
+	std::unordered_map<std::string, std::string> m_FilteredMessagesCache;
 	static void ConchainResetCensorListCache(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
 
 	// FindHours
@@ -153,7 +148,6 @@ public:
 
 	// Message Filter
 	const char *FilterMessage(const char *Message, bool IsChat = false, int ClientId = -1);
-	std::string m_FilteredMessage;
 
 	// Translate
 	class CLineTranslate
@@ -205,13 +199,7 @@ public:
 
 	// Chat Commands
 	const char *FixLayoutLine(const char *Line);
-	char m_LineLayoutFix[256];
-	struct SFixLayoutListCache
-	{
-		std::string m_FirstMessage;
-		std::string m_FixedMessage;
-	};
-	std::vector<SFixLayoutListCache> m_FixLayoutListCache;
+	std::unordered_map<std::string, std::string> m_FixLayoutListCache;
 
 	// Reset RClient ChatBinds
 	void ResetRClientChatBinds();

@@ -1056,7 +1056,7 @@ void CRClient::ToggleDeepFly(bool Enable, const char *CurBind, bool NeedEcho)
 void CRClient::ConchainResetCensorListCache(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData)
 {
 	pfnCallback(pResult, pCallbackUserData);
-	((CRClient *)pUserData)->m_CensorMessageListCache.clear();
+	((CRClient *)pUserData)->m_FilteredMessagesCache.clear();
 }
 
 void CRClient::ConAddCensorWord(IConsole::IResult *pResult, void *pUserData)
@@ -1065,6 +1065,7 @@ void CRClient::ConAddCensorWord(IConsole::IResult *pResult, void *pUserData)
 	char aBuf[256];
 	str_utf8_tolower(pResult->GetString(0), aBuf, sizeof(aBuf));
 	pSelf->CensorWordsList.push_back(aBuf);
+	pSelf->m_FilteredMessagesCache.clear();
 }
 
 void CRClient::ConRemoveCensorWord(IConsole::IResult *pResult, void *pUserData)
@@ -1077,9 +1078,12 @@ void CRClient::ConRemoveCensorWord(IConsole::IResult *pResult, void *pUserData)
 		{
 			FastPrint(pSelf->GameClient(), "Censor", "Removed word: %s", pSelf->CensorWordsList[i].c_str());
 			pSelf->CensorWordsList.erase(pSelf->CensorWordsList.begin() + i);
+			pSelf->m_FilteredMessagesCache.clear();
 			return;
 		}
 	}
+	FastPrint(pSelf->GameClient(), "Censor", "Didn't find word");
+	pSelf->m_FilteredMessagesCache.clear();
 }
 
 void CRClient::ConPrintCensorList(IConsole::IResult *pResult, void *pUserData)
@@ -1103,14 +1107,8 @@ const char *CRClient::FilterMessage(const char *Message, bool IsChat, int Client
 		return Message;
 	}
 
-	for(size_t i = 0; i < m_CensorMessageListCache.size(); i++)
-	{
-		if(!str_utf8_comp_nocase(Message, m_CensorMessageListCache[i].m_BlockedMessage.c_str()))
-		{
-			m_FilteredMessage = m_CensorMessageListCache[i].m_FinalMessage;
-			return m_FilteredMessage.c_str();
-		}
-	}
+	if(auto It = m_FilteredMessagesCache.find(Message); It != m_FilteredMessagesCache.end())
+		return It->second.c_str();
 
 	bool CensorFoundInMessage = false;
 	std::string text {Message};
@@ -1166,14 +1164,10 @@ const char *CRClient::FilterMessage(const char *Message, bool IsChat, int Client
 			BlockedMessage += Message;
 			GameClient()->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "CensorList", BlockedMessage.c_str(), g_Config.m_RcMessageFilterPrintBlockedMessageColor);
 		}
-		if(CensorFoundInMessage)
-		{
-			m_CensorMessageListCache.push_back({Message, text});
-			if(m_CensorMessageListCache.size() > 25)
-				m_CensorMessageListCache.erase(m_CensorMessageListCache.cbegin());
-		}
-		m_FilteredMessage = text;
-		return m_FilteredMessage.c_str();
+		if(m_FilteredMessagesCache.size() > 512)
+			m_FilteredMessagesCache.clear();
+		auto [It, _] = m_FilteredMessagesCache.try_emplace(Message, std::move(text));
+		return It->second.c_str();
 	}
 	if(g_Config.m_RcMessageFilterMode == 2)
 	{
@@ -1234,14 +1228,10 @@ const char *CRClient::FilterMessage(const char *Message, bool IsChat, int Client
 			BlockedMessage += Message;
 			GameClient()->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "CensorList", BlockedMessage.c_str(), g_Config.m_RcMessageFilterPrintBlockedMessageColor);
 		}
-		if(CensorFoundInMessage)
-		{
-			m_CensorMessageListCache.push_back({Message, text});
-			if(m_CensorMessageListCache.size() > 25)
-				m_CensorMessageListCache.erase(m_CensorMessageListCache.cbegin());
-		}
-		m_FilteredMessage = text;
-		return m_FilteredMessage.c_str();
+		if(m_FilteredMessagesCache.size() > 512)
+			m_FilteredMessagesCache.clear();
+		auto [It, _] = m_FilteredMessagesCache.try_emplace(Message, std::move(text));
+		return It->second.c_str();
 	}
 	if(g_Config.m_RcMessageFilterMode == 3)
 	{
@@ -1333,14 +1323,10 @@ const char *CRClient::FilterMessage(const char *Message, bool IsChat, int Client
 			BlockedMessage += Message;
 			GameClient()->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "CensorList", BlockedMessage.c_str(), g_Config.m_RcMessageFilterPrintBlockedMessageColor);
 		}
-		if(CensorFoundInMessage)
-		{
-			m_CensorMessageListCache.push_back({Message, text});
-			if(m_CensorMessageListCache.size() > 25)
-				m_CensorMessageListCache.erase(m_CensorMessageListCache.cbegin());
-		}
-		m_FilteredMessage = text;
-		return m_FilteredMessage.c_str();
+		if(m_FilteredMessagesCache.size() > 512)
+			m_FilteredMessagesCache.clear();
+		auto [It, _] = m_FilteredMessagesCache.try_emplace(Message, std::move(text));
+		return It->second.c_str();
 	}
 	return Message;
 }
@@ -1646,17 +1632,10 @@ const char *CRClient::FixLayoutLine(const char *Line)
 	if(Line[0] != '/' && Line[0] != '.')
 		return Line;
 
-	for(size_t i = 0; i < m_FixLayoutListCache.size(); i++)
-	{
-		if(!str_utf8_comp_nocase(Line, m_FixLayoutListCache[i].m_FirstMessage.c_str()))
-		{
-			str_copy(m_LineLayoutFix, m_FixLayoutListCache[i].m_FixedMessage.c_str());
-			return m_LineLayoutFix;
-		}
-	}
+	if(auto It = m_FixLayoutListCache.find(Line); It != m_FixLayoutListCache.end())
+		return It->second.c_str();
 
 	std::string OutString;
-	bool Changed = false;
 	const char *pIn = Line;
 
 	while(*pIn != '\0' && *pIn != ' ')
@@ -1680,19 +1659,14 @@ const char *CRClient::FixLayoutLine(const char *Line)
 		{
 			OutString += pKey->m_LetterEnglish;
 			pIn += str_length(pKey->m_pWrongLetter);
-			Changed = true;
 		}
 	}
 
 	OutString += pIn;
-	str_copy(m_LineLayoutFix, OutString.c_str(), sizeof(m_LineLayoutFix));
-	if(Changed)
-	{
-		m_FixLayoutListCache.push_back({Line, m_LineLayoutFix});
-		if(m_FixLayoutListCache.size() > 15)
-			m_FixLayoutListCache.erase(m_FixLayoutListCache.cbegin());
-	}
-	return m_LineLayoutFix;
+	if(m_FixLayoutListCache.size() > 256)
+		m_FixLayoutListCache.clear();
+	auto [It, _] = m_FixLayoutListCache.try_emplace(Line, std::move(OutString));
+	return It->second.c_str();
 }
 
 void CRClient::ResetRClientChatBinds()
