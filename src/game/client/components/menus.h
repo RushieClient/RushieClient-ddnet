@@ -465,6 +465,10 @@ protected:
 	};
 	std::vector<CFriendItem> m_avFriends[NUM_FRIEND_TYPES];
 	const CFriendItem *m_pRemoveFriend = nullptr;
+	std::vector<std::vector<CFriendItem>> m_avWars;
+	char m_aRemoveWarName[MAX_NAME_LENGTH] = "";
+	char m_aRemoveWarClan[MAX_CLAN_LENGTH] = "";
+	char m_aRemoveWarType[MAX_WARLIST_TYPE_LENGTH] = "";
 
 	// found in menus.cpp
 	void Render();
@@ -560,6 +564,7 @@ protected:
 	void RenderServerbrowserFriends(CUIRect View);
 	void FriendlistOnUpdate();
 	void PopupConfirmRemoveFriend();
+	void PopupConfirmRemoveWarlist();
 	void RenderServerbrowserTabBar(CUIRect TabBar);
 	void RenderServerbrowserToolBox(CUIRect ToolBox);
 	void RenderServerbrowser(CUIRect MainView);

@@ -1518,6 +1518,41 @@ void CMenus::RenderServerbrowserFriends(CUIRect View)
 	for(auto &vFriends : m_avFriends)
 		std::sort(vFriends.begin(), vFriends.end());
 
+	// RClient warlist
+	const auto &vWarTypes = GameClient()->m_WarList.m_WarTypes;
+	for(auto &vWars : m_avWars)
+		vWars.clear();
+	m_avWars.resize(vWarTypes.size());
+
+	if(g_Config.m_TcWarList)
+	{
+		for(int ServerIndex = 0; ServerIndex < ServerBrowser()->NumServers(); ++ServerIndex)
+		{
+			const CServerInfo *pEntry = ServerBrowser()->Get(ServerIndex);
+			if(!pEntry->m_NumClients) continue;
+
+			for(int ClientIndex = 0; ClientIndex < pEntry->m_NumClients; ++ClientIndex)
+			{
+				const CServerInfo::CClient &CurrentClient = pEntry->m_aClients[ClientIndex];
+				for(const CWarEntry &War : GameClient()->m_WarList.m_vWarEntries)
+				{
+					const bool NameHit = War.m_aName[0] != '\0' && str_comp(War.m_aName, CurrentClient.m_aName) == 0;
+					const bool ClanHit = War.m_aClan[0] != '\0' && str_comp(War.m_aClan, CurrentClient.m_aClan) == 0;
+					if(!NameHit && !ClanHit)
+						continue;
+
+					const auto TypeIt = std::find_if(vWarTypes.begin(), vWarTypes.end(),
+						[&](const CWarType *pType) { return pType == War.m_pWarType; });
+					if(TypeIt != vWarTypes.end())
+						m_avWars[TypeIt - vWarTypes.begin()].emplace_back(CurrentClient, pEntry);
+					break;
+				}
+			}
+		}
+		for(auto &vWars : m_avWars)
+			std::sort(vWars.begin(), vWars.end());
+	}
+
 	// friends list
 	static CScrollRegion s_ScrollRegion;
 	vec2 ScrollOffset(0.0f, 0.0f);
@@ -1732,7 +1767,190 @@ void CMenus::RenderServerbrowserFriends(CUIRect View)
 			s_ScrollRegion.AddRect(Space);
 		}
 	}
-	s_ScrollRegion.End();
+
+	if(g_Config.m_TcWarList)
+	{
+		CUIRect Header, GroupIcon, GroupLabel;
+		List.HSplitTop(ms_ListheaderHeight, &Header, &List);
+		Ui()->DoLabel(&Header, "\\/ War List \\/", FontSize, TEXTALIGN_MC);
+		static std::vector<int> s_vWarExtended;
+		s_vWarExtended.resize(vWarTypes.size(), 1);
+		for(size_t WarTypeIndex = 0; WarTypeIndex < vWarTypes.size(); ++WarTypeIndex)
+		{
+			auto &vItems = m_avWars[WarTypeIndex];
+			const CWarType *pType = vWarTypes[WarTypeIndex];
+			// header
+			List.HSplitTop(ms_ListheaderHeight, &Header, &List);
+			s_ScrollRegion.AddRect(Header);
+			Header.Draw(ColorRGBA(1.0f, 1.0f, 1.0f, Ui()->HotItem() == &s_vWarExtended[WarTypeIndex] ? 0.4f : 0.25f), IGraphics::CORNER_ALL, 5.0f);
+			Header.VSplitLeft(Header.h, &GroupIcon, &GroupLabel);
+			GroupIcon.Margin(2.0f, &GroupIcon);
+			TextRender()->SetFontPreset(EFontPreset::ICON_FONT);
+			TextRender()->TextColor(Ui()->HotItem() == &s_vWarExtended[WarTypeIndex] ? TextRender()->DefaultTextColor() : ColorRGBA(0.6f, 0.6f, 0.6f, 1.0f));
+			Ui()->DoLabel(&GroupIcon, s_vWarExtended[WarTypeIndex] ? FontIcon::SQUARE_MINUS : FontIcon::SQUARE_PLUS, GroupIcon.h * CUi::ms_FontmodHeight, TEXTALIGN_MC);
+			TextRender()->TextColor(TextRender()->DefaultTextColor());
+			TextRender()->SetFontPreset(EFontPreset::DEFAULT_FONT);
+			str_format(aBuf, sizeof(aBuf), "%s (%d)", pType->m_aWarName, (int)vItems.size());
+			Ui()->DoLabel(&GroupLabel, aBuf, FontSize, TEXTALIGN_ML);
+
+			if(Ui()->DoButtonLogic(&s_vWarExtended[WarTypeIndex], 0, &Header, BUTTONFLAG_LEFT))
+			{
+				s_vWarExtended[WarTypeIndex] = !s_vWarExtended[WarTypeIndex];
+			}
+
+			// entries
+			if(s_vWarExtended[WarTypeIndex])
+			{
+				for(size_t WarIndex = 0; WarIndex < vItems.size(); ++WarIndex)
+				{
+					// space
+					{
+						CUIRect Space;
+						List.HSplitTop(SpacingH, &Space, &List);
+						s_ScrollRegion.AddRect(Space);
+					}
+
+					CUIRect Rect;
+					const auto &WarPlayer = vItems[WarIndex];
+					List.HSplitTop(11.0f + 10.0f + 2 * 2.0f + 1.0f + (WarPlayer.ServerInfo() == nullptr ? 0.0f : 10.0f), &Rect, &List);
+					s_ScrollRegion.AddRect(Rect);
+					if(s_ScrollRegion.RectClipped(Rect))
+						continue;
+
+					const bool Inside = Ui()->HotItem() == WarPlayer.ListItemId() || Ui()->HotItem() == WarPlayer.RemoveButtonId() || Ui()->HotItem() == WarPlayer.CommunityTooltipId() || Ui()->HotItem() == WarPlayer.SkinTooltipId();
+					int ButtonResult = Ui()->DoButtonLogic(WarPlayer.ListItemId(), 0, &Rect, BUTTONFLAG_LEFT);
+
+					if(WarPlayer.ServerInfo())
+					{
+						GameClient()->m_Tooltips.DoToolTip(WarPlayer.ListItemId(), &Rect, Localize("Click to select server. Double click to join your friend."));
+					}
+
+					// Compare unsorted server id of the friend with the unsorted id of the currently selected server
+					bool InSelectedServer = m_SelectedIndex >= 0 && WarPlayer.ServerInfo() && WarPlayer.ServerInfo()->m_ServerIndex == ServerBrowser()->SortedGet(m_SelectedIndex)->m_ServerIndex;
+
+					const ColorRGBA Color = pType->m_Color.WithAlpha(0.3f + (Inside ? 0.15f : 0.0f) + (InSelectedServer ? 0.12f : 0.0f));
+					Rect.Draw(Color, IGraphics::CORNER_ALL, 5.0f);
+					Rect.Margin(2.0f, &Rect);
+
+					CUIRect RemoveButton, NameLabel, ClanLabel, InfoLabel;
+					Rect.HSplitTop(16.0f, &RemoveButton, nullptr);
+					RemoveButton.VSplitRight(13.0f, nullptr, &RemoveButton);
+					RemoveButton.HMargin((RemoveButton.h - RemoveButton.w) / 2.0f, &RemoveButton);
+					Rect.VSplitLeft(2.0f, nullptr, &Rect);
+
+					if(WarPlayer.ServerInfo())
+						Rect.HSplitBottom(10.0f, &Rect, &InfoLabel);
+					Rect.HSplitTop(11.0f + 10.0f, &Rect, nullptr);
+
+					// tee
+					CUIRect Skin;
+					Rect.VSplitLeft(Rect.h, &Skin, &Rect);
+					Rect.VSplitLeft(2.0f, nullptr, &Rect);
+					if(WarPlayer.Skin()[0] != '\0')
+					{
+						const CTeeRenderInfo TeeInfo = GetTeeRenderInfo(vec2(Skin.w, Skin.h), WarPlayer.Skin(), WarPlayer.CustomSkinColors(), WarPlayer.CustomSkinColorBody(), WarPlayer.CustomSkinColorFeet());
+						const CAnimState *pIdleState = CAnimState::GetIdle();
+						vec2 OffsetToMid;
+						CRenderTools::GetRenderTeeOffsetToRenderedTee(pIdleState, &TeeInfo, OffsetToMid);
+						const vec2 TeeRenderPos = vec2(Skin.x + Skin.w / 2.0f, Skin.y + Skin.h * 0.55f + OffsetToMid.y);
+						RenderTools()->RenderTee(pIdleState, &TeeInfo, WarPlayer.IsAfk() ? EMOTE_BLINK : EMOTE_NORMAL, vec2(1.0f, 0.0f), TeeRenderPos);
+						Ui()->DoButtonLogic(WarPlayer.SkinTooltipId(), 0, &Skin, BUTTONFLAG_NONE);
+						GameClient()->m_Tooltips.DoToolTip(WarPlayer.SkinTooltipId(), &Skin, WarPlayer.Skin());
+					}
+					else if(WarPlayer.Skin7(protocol7::SKINPART_BODY)[0] != '\0')
+					{
+						CTeeRenderInfo TeeInfo;
+						TeeInfo.m_Size = minimum(Skin.w, Skin.h);
+						for(int Part = 0; Part < protocol7::NUM_SKINPARTS; Part++)
+						{
+							GameClient()->m_Skins7.FindSkinPart(Part, WarPlayer.Skin7(Part), true)->ApplyTo(TeeInfo.m_aSixup[g_Config.m_ClDummy]);
+							GameClient()->m_Skins7.ApplyColorTo(TeeInfo.m_aSixup[g_Config.m_ClDummy], WarPlayer.UseCustomSkinColor7(Part), WarPlayer.CustomSkinColor7(Part), Part);
+						}
+						const CAnimState *pIdleState = CAnimState::GetIdle();
+						vec2 OffsetToMid;
+						CRenderTools::GetRenderTeeOffsetToRenderedTee(pIdleState, &TeeInfo, OffsetToMid);
+						const vec2 TeeRenderPos = vec2(Skin.x + Skin.w / 2.0f, Skin.y + Skin.h * 0.55f + OffsetToMid.y);
+						RenderTools()->RenderTee(pIdleState, &TeeInfo, WarPlayer.IsAfk() ? EMOTE_BLINK : EMOTE_NORMAL, vec2(1.0f, 0.0f), TeeRenderPos);
+					}
+					Rect.HSplitTop(11.0f, &NameLabel, &ClanLabel);
+
+					// name
+					Ui()->DoLabel(&NameLabel, WarPlayer.Name(), FontSize - 1.0f, TEXTALIGN_ML);
+
+					// clan
+					Ui()->DoLabel(&ClanLabel, WarPlayer.Clan(), FontSize - 2.0f, TEXTALIGN_ML);
+
+					// server info
+					if(WarPlayer.ServerInfo())
+					{
+						// community icon
+						const CCommunity *pCommunity = ServerBrowser()->Community(WarPlayer.ServerInfo()->m_aCommunityId);
+						if(pCommunity != nullptr)
+						{
+							const CCommunityIcon *pIcon = m_CommunityIcons.Find(pCommunity->Id());
+							if(pIcon != nullptr)
+							{
+								CUIRect CommunityIcon;
+								InfoLabel.VSplitLeft(21.0f, &CommunityIcon, &InfoLabel);
+								InfoLabel.VSplitLeft(2.0f, nullptr, &InfoLabel);
+								m_CommunityIcons.Render(pIcon, CommunityIcon, true);
+								Ui()->DoButtonLogic(WarPlayer.CommunityTooltipId(), 0, &CommunityIcon, BUTTONFLAG_NONE);
+								GameClient()->m_Tooltips.DoToolTip(WarPlayer.CommunityTooltipId(), &CommunityIcon, pCommunity->Name());
+							}
+						}
+
+						// server info text
+						char aLatency[16];
+						FormatServerbrowserPing(aLatency, WarPlayer.ServerInfo());
+						if(aLatency[0] != '\0')
+							str_format(aBuf, sizeof(aBuf), "%s | %s | %s", WarPlayer.ServerInfo()->m_aMap, WarPlayer.ServerInfo()->m_aGameType, aLatency);
+						else
+							str_format(aBuf, sizeof(aBuf), "%s | %s", WarPlayer.ServerInfo()->m_aMap, WarPlayer.ServerInfo()->m_aGameType);
+						Ui()->DoLabel(&InfoLabel, aBuf, FontSize - 2.0f, TEXTALIGN_ML);
+					}
+
+					// remove button
+					if(Inside)
+					{
+						TextRender()->TextColor(Ui()->HotItem() == WarPlayer.RemoveButtonId() ? TextRender()->DefaultTextColor() : ColorRGBA(0.4f, 0.4f, 0.4f, 1.0f));
+						TextRender()->SetFontPreset(EFontPreset::ICON_FONT);
+						TextRender()->SetRenderFlags(ETextRenderFlags::TEXT_RENDER_FLAG_ONLY_ADVANCE_WIDTH | ETextRenderFlags::TEXT_RENDER_FLAG_NO_X_BEARING | ETextRenderFlags::TEXT_RENDER_FLAG_NO_Y_BEARING | ETextRenderFlags::TEXT_RENDER_FLAG_NO_OVERSIZE);
+						Ui()->DoLabel(&RemoveButton, FontIcon::TRASH, RemoveButton.h * CUi::ms_FontmodHeight, TEXTALIGN_MC);
+						TextRender()->SetRenderFlags(0);
+						TextRender()->SetFontPreset(EFontPreset::DEFAULT_FONT);
+						TextRender()->TextColor(TextRender()->DefaultTextColor());
+						if(Ui()->DoButtonLogic(WarPlayer.RemoveButtonId(), 0, &RemoveButton, BUTTONFLAG_LEFT))
+						{
+							str_copy(m_aRemoveWarName, WarPlayer.Name());
+							str_copy(m_aRemoveWarClan, WarPlayer.Clan());
+							str_copy(m_aRemoveWarType, pType->m_aWarName);
+							ButtonResult = 0;
+						}
+						GameClient()->m_Tooltips.DoToolTip(WarPlayer.RemoveButtonId(), &RemoveButton, "Click to remove this clan from your warlist.");
+					}
+
+					// handle click and double click on item
+					if(ButtonResult && WarPlayer.ServerInfo())
+					{
+						str_copy(g_Config.m_UiServerAddress, WarPlayer.ServerInfo()->m_aAddress);
+						m_ServerBrowserShouldRevealSelection = true;
+						if(ButtonResult == 1 && Ui()->DoDoubleClickLogic(WarPlayer.ListItemId()))
+						{
+							Connect(g_Config.m_UiServerAddress);
+						}
+					}
+				}
+			}
+
+			// space
+			{
+				CUIRect Space;
+				List.HSplitTop(SpacingH, &Space, &List);
+				s_ScrollRegion.AddRect(Space);
+			}
+		}
+	}
+		s_ScrollRegion.End();
 
 	if(m_pRemoveFriend != nullptr)
 	{
@@ -1741,6 +1959,13 @@ void CMenus::RenderServerbrowserFriends(CUIRect View)
 			m_pRemoveFriend->FriendState() == IFriends::FRIEND_PLAYER ? Localize("Are you sure that you want to remove the player '%s' from your friends list?") : Localize("Are you sure that you want to remove the clan '%s' from your friends list?"),
 			m_pRemoveFriend->FriendState() == IFriends::FRIEND_PLAYER ? m_pRemoveFriend->Name() : m_pRemoveFriend->Clan());
 		PopupConfirm(Localize("Remove friend"), aMessage, Localize("Yes"), Localize("No"), &CMenus::PopupConfirmRemoveFriend);
+	}
+
+	if(m_aRemoveWarName[0] != '\0')
+	{
+		char aMessage[256];
+		str_format(aMessage, sizeof(aMessage), "Are you sure that you want to remove the player '%s' from your warlist?", m_aRemoveWarName);
+		PopupConfirm(Localize("Remove War"), aMessage, Localize("Yes"), Localize("No"), &CMenus::PopupConfirmRemoveWarlist);
 	}
 
 	// add friend
@@ -1789,6 +2014,15 @@ void CMenus::PopupConfirmRemoveFriend()
 	FriendlistOnUpdate();
 	Client()->ServerBrowserUpdate();
 	m_pRemoveFriend = nullptr;
+}
+
+void CMenus::PopupConfirmRemoveWarlist()
+{
+	GameClient()->m_WarList.RemoveWarEntry(m_aRemoveWarName, m_aRemoveWarClan, m_aRemoveWarType);
+	Client()->ServerBrowserUpdate();
+	m_aRemoveWarName[0] = '\0';
+	m_aRemoveWarClan[0] = '\0';
+	m_aRemoveWarType[0] = '\0';
 }
 
 enum
