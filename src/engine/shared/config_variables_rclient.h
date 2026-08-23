@@ -180,3 +180,6 @@ MACRO_CONFIG_INT(RcShowSavesCount, rc_show_saves_count, 0, 0, 2, CFGFLAG_CLIENT 
 
 // Gunfire Volume
 MACRO_CONFIG_INT(RcSndGunFireVolume, rc_snd_gun_fire_volume, 100, 0, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Change gun fire volume")
+
+// Configs
+MACRO_CONFIG_INT(RcUiShowRClient, rc_ui_show_rclient, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show RClient domain in Configs tab")

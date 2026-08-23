@@ -2610,9 +2610,14 @@ void CMenus::RenderSettingsTClientConfigs(CUIRect MainView)
 		const float RightInset = 24.0f;
 		RightRow.VSplitLeft(RightInset, nullptr, &RightRow);
 		CUIRect TopCol1, TopCol2;
-		RightRow.VSplitMid(&TopCol1, &TopCol2, 0.0f);
+		const float BoxSize = (RightRow.w - MarginExtraSmall * 2.0f) / 3.0f;
+		RightRow.VSplitLeft(BoxSize, &TopCol1, &TopCol2);
 		if(DoButton_CheckBox(&g_Config.m_TcUiShowTClient, Localize("TClient"), g_Config.m_TcUiShowTClient, &TopCol1))
 			g_Config.m_TcUiShowTClient ^= 1;
+		TopCol2.VSplitLeft(MarginExtraSmall, nullptr, &TopCol2);
+		TopCol2.VSplitLeft(BoxSize, &TopCol1, &TopCol2);
+		if(DoButton_CheckBox(&g_Config.m_RcUiShowRClient, Localize("RClient"), g_Config.m_RcUiShowRClient, &TopCol1))
+			g_Config.m_RcUiShowRClient ^= 1;
 		if(DoButton_CheckBox(&g_Config.m_TcUiCompactList, Localize("Compact List"), g_Config.m_TcUiCompactList, &TopCol2))
 			g_Config.m_TcUiCompactList ^= 1;
 	}
@@ -2634,9 +2639,12 @@ void CMenus::RenderSettingsTClientConfigs(CUIRect MainView)
 		CUIRect RightCol1, RightCol2;
 		const float RightInset2 = 24.0f;
 		RightHalf.VSplitLeft(RightInset2, nullptr, &RightHalf);
-		RightHalf.VSplitMid(&RightCol1, &RightCol2, 0.0f);
+		const float BoxSize = (RightHalf.w - MarginExtraSmall * 2.0f) / 3.0f;
+		RightHalf.VSplitLeft(BoxSize, &RightCol1, &RightCol2);
 		if(DoButton_CheckBox(&g_Config.m_TcUiShowDDNet, Localize("DDNet"), g_Config.m_TcUiShowDDNet, &RightCol1))
 			g_Config.m_TcUiShowDDNet ^= 1;
+		RightCol2.VSplitLeft(MarginExtraSmall, nullptr, &RightCol2);
+		RightCol2.VSplitLeft(BoxSize, nullptr, &RightCol2);
 		if(DoButton_CheckBox(&g_Config.m_TcUiOnlyModified, Localize("Only modified"), g_Config.m_TcUiOnlyModified, &RightCol2))
 			g_Config.m_TcUiOnlyModified ^= 1;
 	}
@@ -2661,6 +2669,8 @@ void CMenus::RenderSettingsTClientConfigs(CUIRect MainView)
 			return g_Config.m_TcUiShowDDNet != 0;
 		if(Domain == ConfigDomain::TCLIENT)
 			return g_Config.m_TcUiShowTClient != 0;
+		if(Domain == ConfigDomain::RCLIENT)
+			return g_Config.m_RcUiShowRClient != 0;
 		// only show DDNet and TClient domains
 		return false;
 	};
@@ -2733,6 +2743,7 @@ void CMenus::RenderSettingsTClientConfigs(CUIRect MainView)
 		{
 		case ConfigDomain::DDNET: return "DDNet";
 		case ConfigDomain::TCLIENT: return "TClient";
+		case ConfigDomain::RCLIENT: return "RClient";
 		default: return "Other";
 		}
 	};
