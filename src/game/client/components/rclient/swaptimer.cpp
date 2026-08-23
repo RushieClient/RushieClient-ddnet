@@ -247,15 +247,20 @@ void CSwapTimer::OnRender()
 		if(i != 0)
 			Base.HSplitBottom(Margin, &Base, nullptr);
 		Base.HSplitBottom(LineSize, &Base, &Line);
-		const float Seconds = (Client()->GameTick(0) - m_vSwapList[i].m_SwapTick) / Client()->GameTickSpeed();
-		const float SwapTime = g_Config.m_SvSaveSwapGamesDelay - Seconds;
-		const float ExpTime = g_Config.m_SvSwapTimeout - Seconds + g_Config.m_SvSaveSwapGamesDelay;
-		char aBuf[128];
+		const int Seconds = (Client()->GameTick(0) - m_vSwapList[i].m_SwapTick) / Client()->GameTickSpeed();
+		const int SwapTime = g_Config.m_SvSaveSwapGamesDelay - Seconds;
+		const int ExpTime = g_Config.m_SvSwapTimeout - Seconds;
+		if(ExpTime < 0.0f)
+		{
+			RemoveSwapEntryId(m_vSwapList[i].m_FromClientId, m_vSwapList[i].m_ToClientId);
+			continue;
+		}
 
+		char aBuf[128];
 		if(SwapTime > 0.0f)
-			str_format(aBuf, sizeof(aBuf), "%s → %s. In %.1f", GameClient()->m_aClients[m_vSwapList[i].m_FromClientId].m_aName, GameClient()->m_aClients[m_vSwapList[i].m_ToClientId].m_aName, SwapTime);
+			str_format(aBuf, sizeof(aBuf), "%s → %s. In %d", GameClient()->m_aClients[m_vSwapList[i].m_FromClientId].m_aName, GameClient()->m_aClients[m_vSwapList[i].m_ToClientId].m_aName, SwapTime);
 		else
-			str_format(aBuf, sizeof(aBuf), "%s → %s. Exp %.1f",GameClient()->m_aClients[m_vSwapList[i].m_FromClientId].m_aName, GameClient()->m_aClients[m_vSwapList[i].m_ToClientId].m_aName, ExpTime);
+			str_format(aBuf, sizeof(aBuf), "%s → %s. Exp %d",GameClient()->m_aClients[m_vSwapList[i].m_FromClientId].m_aName, GameClient()->m_aClients[m_vSwapList[i].m_ToClientId].m_aName, ExpTime);
 
 
 		Ui()->DoLabel(&Line, aBuf, FontSize, g_Config.m_RcEnableSwapTimerOnLeftSide ? TEXTALIGN_ML : TEXTALIGN_MR);

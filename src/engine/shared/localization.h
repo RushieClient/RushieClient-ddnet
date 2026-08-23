@@ -17,4 +17,9 @@ static constexpr const char *TCLocalizable(const char *pStr, const char *pContex
 	return pStr;
 }
 
+static constexpr const char *RCLocalizable(const char *pStr, const char *pContext = "")
+{
+	return pStr;
+}
+
 #endif

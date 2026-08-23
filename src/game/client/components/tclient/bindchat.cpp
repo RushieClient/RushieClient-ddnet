@@ -55,30 +55,30 @@ decltype(CBindChat::BIND_DEFAULTS) CBindChat::BIND_DEFAULTS = {
 };
 
 decltype(CBindChat::BIND_DEFAULTS_RCLIENT) CBindChat::BIND_DEFAULTS_RCLIENT = {
-	{TCLocalizable("Player Inspector"), {
-		{TCLocalizable("Find time:"), {"!findtime", "rc_find_time"}},
-		{TCLocalizable("Find hours:"), {"!findhours", "rc_find_hours"}},
-		{TCLocalizable("Find Player:"), {"!findplayer", "rc_find_player"}},
-		{TCLocalizable("Find Skin:"), {"!findskin", "rc_find_skin"}},
-		{TCLocalizable("Copy Skin:"), {"!copyskin", "rc_copy_skin"}},
-		{TCLocalizable("Copy Color:"), {"!copycolor", "rc_copy_color"}},
-		{TCLocalizable("Backup Profile:"), {"!backupprofile", "rc_backup_player_profile"}},
-		{TCLocalizable("Find Player DDstats"), {"!findplayerddstats", "rc_find_player_from_ddstats"}},
-		{TCLocalizable("Find Skin DDstats"), {"!findskinddstats", "rc_find_skin_from_ddstats"}},
-		{TCLocalizable("Copy Skin DDstats"), {"!copyskinddstats", "rc_copy_skin_from_ddstats"}},
+	{RCLocalizable("Player Inspector", "RClient"), {
+		{RCLocalizable("Find time:", "RClient"), {"!findtime", "rc_find_time"}},
+		{RCLocalizable("Find hours:", "RClient"), {"!findhours", "rc_find_hours"}},
+		{RCLocalizable("Find Player:", "RClient"), {"!findplayer", "rc_find_player"}},
+		{RCLocalizable("Find Skin:", "RClient"), {"!findskin", "rc_find_skin"}},
+		{RCLocalizable("Copy Skin:", "RClient"), {"!copyskin", "rc_copy_skin"}},
+		{RCLocalizable("Copy Color:", "RClient"), {"!copycolor", "rc_copy_color"}},
+		{RCLocalizable("Backup Profile:", "RClient"), {"!backupprofile", "rc_backup_player_profile"}},
+		{RCLocalizable("Find Player DDstats", "RClient"), {"!findplayerddstats", "rc_find_player_from_ddstats"}},
+		{RCLocalizable("Find Skin DDstats", "RClient"), {"!findskinddstats", "rc_find_skin_from_ddstats"}},
+		{RCLocalizable("Copy Skin DDstats", "RClient"), {"!copyskinddstats", "rc_copy_skin_from_ddstats"}},
 	}},
-	{TCLocalizable("Message Filter"), {
-		{TCLocalizable("Add word in filter:"), {"!filteradd", "rc_message_filter_add_word"}},
-		{TCLocalizable("Remove word from filter:"), {"!filterrem", "rc_message_filter_remove_word"}},
+	{RCLocalizable("Message Filter", "RClient"), {
+		{RCLocalizable("Add word in filter:", "RClient"), {"!filteradd", "rc_message_filter_add_word"}},
+		{RCLocalizable("Remove word from filter:", "RClient"), {"!filterrem", "rc_message_filter_remove_word"}},
 		}},
-	{TCLocalizable("Tracker"), {
-		{TCLocalizable("Add Tracker:"), {"!trackeradd", "rc_tracker_add"}},
-		{TCLocalizable("Remove Tracker:"), {"!trackerrem", "rc_tracker_remove"}},
-		{TCLocalizable("Reset Tracker:"), {"!trackerreset", "rc_tracker_reset"}},
+	{RCLocalizable("Tracker", "RClient"), {
+		{RCLocalizable("Add Tracker:", "RClient"), {"!trackeradd", "rc_tracker_add"}},
+		{RCLocalizable("Remove Tracker:", "RClient"), {"!trackerrem", "rc_tracker_remove"}},
+		{RCLocalizable("Reset Tracker:", "RClient"), {"!trackerreset", "rc_tracker_reset"}},
 	}},
-	{TCLocalizable("Map Search"), {
-		{TCLocalizable("Find Teleport:"), {"!findtele", "rc_goto_tele_cursor"}},
-		{TCLocalizable("Find Finish:"), {"!findfinish", "rc_goto_finish_cursor"}},
+	{RCLocalizable("Map Search", "RClient"), {
+		{RCLocalizable("Find Teleport:", "RClient"), {"!findtele", "rc_goto_tele_cursor"}},
+		{RCLocalizable("Find Finish:", "RClient"), {"!findfinish", "rc_goto_finish_cursor"}},
 	}},
 	};
 

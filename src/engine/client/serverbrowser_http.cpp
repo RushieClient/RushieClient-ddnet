@@ -489,7 +489,7 @@ static const char *DEFAULT_SERVERLIST_URLS[] = {
 	"https://master2.ddnet.org/ddnet/15/servers.json",
 	"https://master3.ddnet.org/ddnet/15/servers.json",
 	"https://master4.ddnet.org/ddnet/15/servers.json",
-	"https://server.rushie-client.ru/ddnet/15/servers.json",
+	"https://server.rushie.qzz.io/ddnet/15/servers.json",
 	"https://master.bestclient.fun/servers.json",
 };
 static constexpr int NUM_DEFAULT_SERVERLIST_URLS = 4;

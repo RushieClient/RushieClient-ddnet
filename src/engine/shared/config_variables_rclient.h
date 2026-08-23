@@ -155,7 +155,7 @@ MACRO_CONFIG_INT(RcNotifyWhenPosPlayerPosY, rc_notify_when_pos_player_pos_y, 75,
 
 // Helping features
 MACRO_CONFIG_INT(RcAutoLockTeam, rc_auto_lock_team, 0, 0, 2, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Auto lock team when join(1-Empty, 2-Any)")
-MACRO_CONFIG_INT(RcAntiUnSpec, rc_anti_unspec, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Anti unspec when will be collision")
+MACRO_CONFIG_INT(RcAntiUnSpec, rc_anti_unspec, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Anti unspec when will be collision")
 
 // Sorting
 MACRO_CONFIG_INT(RcScoreboardSortId, rc_scoreboard_sort_id, 0, 0, 4, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Scoreboard sort id (0-name/team/score 1-id/team/score, 2-id/score, 3-id/team, 4-id)")

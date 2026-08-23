@@ -758,6 +758,7 @@ void CScoreboard::RenderScoreboard(CUIRect Scoreboard, int Team, int CountStart,
 				if(g_Config.m_RcCustomClientsInScoreboard && g_Config.m_RcCustomClientsCollectClientType)
 				{
 					int Type = ClientData.m_CustomClient;
+					const float IconSize = FontSize * g_Config.m_RcCustomClientsInScoreboardSize / 50.0f;
 					if(Type != 0)
 					{
 						int m_Texture = 0;
@@ -784,7 +785,6 @@ void CScoreboard::RenderScoreboard(CUIRect Scoreboard, int Team, int CountStart,
 						default:
 							break;
 						}
-						const float IconSize = FontSize * g_Config.m_RcCustomClientsInScoreboardSize / 50.0f;
 						const float OriginalY = Cursor.m_Y;
 						Cursor.m_Y = Row.y + (Row.h - IconSize) / 2.0f;
 						Graphics()->BlendNormal();
@@ -796,23 +796,34 @@ void CScoreboard::RenderScoreboard(CUIRect Scoreboard, int Team, int CountStart,
 						Cursor.m_X += IconSize;
 						Cursor.m_Y = OriginalY;
 					}
+					else
+					{
+						Cursor.m_X += IconSize;
+					}
 				}
 
 				// RClient Heart
-				if(pInfo->m_ClientId >= 0 && (GameClient()->m_aClients[pInfo->m_ClientId].m_Friend) && g_Config.m_RcShowHeartInScoreboard)
+				if(g_Config.m_RcShowHeartInScoreboard)
 				{
 					const float HeartFontSize = FontSize / 100.0f * g_Config.m_RcSizeOfHeart;
-					const float OriginalY = Cursor.m_Y;
-					Cursor.m_Y = Row.y + (Row.h - HeartFontSize) / 2.0f;
-					Cursor.m_FontSize = HeartFontSize;
-					TextRender()->TextColor(ColorRGBA(1.0f, 0.0f, 0.0f, 1.0f));
-					TextRender()->SetFontPreset(EFontPreset::ICON_FONT);
-					TextRender()->TextEx(&Cursor, FontIcon::HEART);
-					TextRender()->SetFontPreset(EFontPreset::DEFAULT_FONT);
-					TextRender()->TextColor(TextRender()->DefaultTextColor());
-					TextRender()->TextEx(&Cursor, " ");
-					Cursor.m_Y = OriginalY;
-					Cursor.m_FontSize = FontSize;
+					if(GameClient()->m_aClients[pInfo->m_ClientId].m_Friend)
+					{
+						const float OriginalY = Cursor.m_Y;
+						Cursor.m_Y = Row.y + (Row.h - HeartFontSize) / 2.0f;
+						Cursor.m_FontSize = HeartFontSize;
+						TextRender()->TextColor(ColorRGBA(1.0f, 0.0f, 0.0f, 1.0f));
+						TextRender()->SetFontPreset(EFontPreset::ICON_FONT);
+						TextRender()->TextEx(&Cursor, FontIcon::HEART);
+						TextRender()->SetFontPreset(EFontPreset::DEFAULT_FONT);
+						TextRender()->TextColor(TextRender()->DefaultTextColor());
+						TextRender()->TextEx(&Cursor, " ");
+						Cursor.m_Y = OriginalY;
+						Cursor.m_FontSize = FontSize;
+					}
+					else
+					{
+						Cursor.m_X += HeartFontSize;
+					}
 				}
 
 				if(ClientData.m_AuthLevel)

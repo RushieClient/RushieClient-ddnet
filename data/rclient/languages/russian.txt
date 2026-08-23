@@ -1,1218 +1,1055 @@
-Settings
-== Настройки
-
-Bindwheel in spec
-== Колесо биндов в спеке
-
-Info
-== Информация
-
-Name:
-== Название
-
-Name
-== Название
-
-Command:
-== Команда
-
-Command
-== Команда
-
-Override Selected
-== Перезаписать выбранное
-
-Add Bind
-== Добавить бинд
-
-Remove Bind
-== Удалить бинд
-
-Use left mouse to select
-== Используйте левую кнопку мыши для выбора
-
-Use right mouse to swap with selected
-== Используйте правую кнопку мыши для обмена с выбранным
-
-Use middle mouse select without copy
-== Используйте среднюю кнопку мыши для выбора без копирования
-
-Rclient bindwheel settings
-== Настройки колеса биндов Rclient
-
-playernickname to enter nickname
-== playernickname чтобы ввести никнейм
-
-Do "playernickname" yourself in u need
-== Введите "playernickname" вручную, если нужно
-
-playerid to enter id
-== playerid чтобы ввести id
-
-Bind Wheel In Spec Key
-== Кнопка Колеса Биндов
-
-Reset position of mouse when opening bindwheel
-== Сброс позиции мыши при открытии колеса биндов
-
-Rushie Client Links
-== Ссылки Rushie Client
-
-Discord
-== Дискорд
-
-Website
-== Веб-сайт
-
-Config Files
-== Файлы конфигурации
-
-RClient Settings
-== Настройки RClient
-
-RClient Developer
-== Разработчик RClient
-
-Hide Settings Tabs
-== Скрыть вкладки настроек
-
-Bindwheel
-== Колесо биндов
-
-Unlock mouse in scoreboard
-== Разблокировать мышь в табло
-
-Tracker for spectating player
-== Трекер для наблюдаемого игрока
-
-Dummy pseudo
-== Дамми псевдо
-
-Deepfly
-== Дипфлай
-
-45° bind
-== 45° бинд
-
-Small sens bind
-== Бинд маленькой сенсы
-
-Left jump
-== Прыжок влево
-
-Right jump
-== Прыжок вправо
-
-Deepfly toggle
-== Вкл/выкл Дипфлай
-
-Player Inspector
-== Инспектор игроков
-
-[Chatbinds]
-Find skin
-== Найти скин
-
-[Chatbinds]
-Copy skin
-== Скопировать скин
-
-[Chatbinds]
-Find player
-== Найти игрока
-
-[Chatbinds]
-Copy color
-== Скопировать цвет игрока
-
-[Chatbinds]
-Find skin from ddstats
-== Найти скин из базы DDStats
-
-[Chatbinds]
-Copy skin from ddstats
-== Скопировать скин из базы DDStats
-
-[Chatbinds]
-Find player from ddstats
-== Найти игрока из базы DDStats
-
-[Chatbinds]
-Backup profile after copy
-== Бекап профиля после копирования
-
-Reset Find/Copy Skin Chatbinds
-== Сбросить чатбинды для всех настроек "авто смены"
-
-Auto change clan when dummy connect
-== Авто смена клана когда дамми подключен
-
-Clan with dummy:
-== Клан с дамми:
-
-Clan without dummy:
-== Клан без дамми:
-
-Chat Functions
-== Чат функции
-
-[Chatbinds]
-Find hours
-== Найти кол-во часов
-
-Add a word to the censor list
-== Добавить слово в цензурный список
-
-Find time on other map
-== Найти время на другой карте
-
-Search map info
-== Поиск информации о карте
-
-Reset Chat Chatbinds
-== Сбросить чатбинды "функций чата"
-
-Show blocked word in console
-== Показывать скрытые слова в консоль
-
-Blocked words console color
-== Цвет скрытых слов
-
-Enable word block list
-== Включить цензор лист
-
-Animate chat
-== Анимировать чат
-
-Anim chat ms
-== Время анимации в мс
-
-Movement
-== Передвижения
-
-Scoreboard(Pulse)
-== Табло(Pulse)
-
-Reset mouse in scoreboard on untab
-== Сбрасывать мышь после выхода из табло
-
-Toggle mouse unlock in scoreboard
-== Переключать разблокирование мыши
-
-Player Indicator
-== Индикатор игроков
-
-Player indicator transparent toggle
-== Прозрачность индикатора вкл/выкл
-
-Indicator transparent start
-== Начало прозрачности индикатора
-
-Indicator transparent end
-== Конец прозрачности индикатора
-
-Indicator transparent minimum
-== Минимум прозрачности индикатора
-
-Changed Tater
-== Измененный TClient
-
-Pos x of Frozen hud
-== Позиция X дисплея замороженных тии
-
-Hide your chat bubble(without rcon)
-== Убрать свою чат эмоцию(Без ркона)
-
-Tracker Player
-== Трекер игрока
-
-Tracker player
-== Добавить игрока в трекер
-
-Tracker player reset
-== Сброса трекера игроков
-
-Tracker player remove
-== Убрать игрока из трекера
-
-Reset Tracker Chatbinds
-== Сбросить Чатбинды "Трекера"
-
-Show last known pos instead no info
-== Показывать последнию позицию вместо "no info"
-
-Change target pos x color when x target = x player
-== Менять цвет X позиции у цели трекера если на одной оси
-
-Change player pos x color when x target = x player
-== Менять цвет X позиции у игрока если на одной оси с целью трекера
-
-Add Hud Functions
-== Добавленные худ функции
-
-Friend heart size
-== Размер сердца друзей
-
-Friend heart position
-== Позиция сердца друзей
-
-Show milliseconds in timer
-== Показывать миллисекунды в таймере
-
-Show sleep emote in menu (ONLY CLIENT OTHER DON'T SEE THAT)
-== Показывать эмоцию сна в меню (Другие не видят это)
-
-Show afk texture instead emote
-== Показывать текстуру АФК вместо эмоции
-
-Show sleep emote in spec (ONLY CLIENT OTHER DON'T SEE THAT)
-== Показывать эмоцию сна в спеке (Другие не видят это)
-
-Show spec texture instead emote
-== Показывать текстуру наблюдателя вместо эмоции
-
-Controls
-== Управление
-
-Toggle 45 degrees
-== Вкл/Выкл 45 градусов
-
-Toggle small sens
-== Вкл/Выкл маленькой сенсы
-
-Laser Settings(Pulse)
-== Настройки Лазера(Pulse)
-
-Enhanced Laser Effects
-== Улучшенные Эффекты Лазера
-
-Laser Glow Intensity
-== Интенсивность Лазерного Свечения
-
-Laser Preview
-== Превью Лазера
-
-Spectator
-== Наблюдатель
-
-Chat Bubbles(E-Client)
-== Чат-Баблы(E-Client)
-
-Show Chatbubbles above players
-== Показывать чат-баблы над игроками
-
-Chat Bubble Size
-== Размер чат-бабла
-
-Show the Bubbles for
-== Показывать баблы в течение
-
-fade in for
-== появление за
-
-fade out for
-== исчезновение за
-
-Discord RPC(E-Client)
-== Дискорд RPC (E-Client)
-
-Use Discord Rich Presence
-== Использовать Дискорд RPC
-
-Show What Map you're on
-== Показывать, на какой карте вы находитесь
-
-Online Message:
-== Сообщение онлайн:
-
-Offline Message:
-== Сообщение оффлайн:
-
-Multiple replacement char on blocked word len
-== Умножить замененный текст на длину заблокированного слова
-
-Replacement char
-== Текст для замены
-
-p=ping i=ignore m=ID n=name c=clan d=direction f=friend h=hook r=reason s=skin H=HookName F=FireName l=newline
-== p=пинг i=игнор m=ID n=имя c=клан d=направления f=друг h=хук r=причина s=скин H=хукнейм F=хаммернейм l=новая_строка
-
-[Nameplate_Editor]
-Nick
-== Ник
-
-[Nameplate_Editor]
-Ignore
-== Игнор
-
-[Nameplate_Editor]
-Skin
-== Скин
-
-[Nameplate_Editor]
-Dir
-== Напр
-
-[Nameplate_Editor]
-Friend
-== Друзья
-
-Nameplate Scheme
-== Схема Неймплейтов
-
-Current scheme:
-== Текущая схема:
-
-Preview:
-== Превью:
-
-Nameplate editor
-== Редактор Неймплейтов
-
-Show dummy
-== Показать дамми
-
-Reset to default
-== Сбросить к дефолтным
-
-Clear all
-== Очистить все
-
-[Nameplate_Editor]
-HookName
-== ХукНеймплейт
-
-[Nameplate_Editor]
-FireName
-== ХаммерНеймплейт
-
-Show you' fire presses
-== Показывать твой зажатый удар
-
-[Show players' key presses]
+[RClient]
 Dummy
 == Дамми
 
-[Show players' key presses]
-Both
-== У обоих
+[RClient]
+Position
+== Позиция
 
-[Show players' key presses RC]
+[RClient]
+Clan Change
+== Смена Клана
+
+[RClient]
+Settings
+== Настройки
+
+[RClient]
+Chat Binds
+== Чат бинды
+
+[RClient]
+Spec Wheel
+== Спек Колесо
+
+[RClient]
+Info
+== Инфо
+
+[RClient]
+Show dummy position
+== Показывать позицию дамми
+
+[RClient]
+Show dummy speed
+== Показывать скорость дамми
+
+[RClient]
+Show dummy target angle
+== Показывать угол дамми
+
+[RClient]
+Show advanced dummy actions
+== Улучшенные действия дамми
+
+[RClient]
+Auto change clan
+== Авто смена клана
+
+[RClient]
+With Dummy
+== С Дамми
+
+[RClient]
+Without Dummy
+== Без Дамми
+
+[RClient]
+Scoreboard
+== Табло
+
+[RClient]
+Popup
+==
+
+[RClient]
+Friends
+== Друзья
+
+[RClient]
+Enable scoreboard mouse
+== Включить мышь в табло
+
+[RClient]
+Always show quick actions in popup
+== Всегда показывать быстрые действия в табе
+
+[RClient]
+Freeze inputs when popup opened
+== Заморозить инпуты когда Popup открыт
+
+[RClient]
+Show friend's heart in scoreboard
+== Показывать друзей в табе
+
+[RClient]
+Heart size
+== Размер сердца
+
+[RClient]
+Players
+== Игроки
+
+[RClient]
+Effects
+== Эффекты
+
+[RClient]
+AFK
+== АФК
+
+[RClient]
+Hitbox
+== Хитбоксы
+
+[RClient]
+Hide frozen flakes
+== Убрать снежки у замороженных
+
+[RClient]
+Always show sparkles
+== Всегда показывать искры
+
+[RClient]
+Show step effects
+== Вкл эффект ходьбы
+
+[RClient]
+Off
+== Выкл
+
+[RClient]
+Others
+== Другие
+
+[RClient]
+Everyone
+== Все
+
+[RClient]
 Own
-== Свой
+== Свои
 
-Size of fire press icons
-== Размер иконки нажатия хаммера
+[RClient]
+Remove hammer hit effect
+== Убрать эффект хаммера
 
-Show players' hook presses
-== Показывать зажатый хук игроков
+[RClient]
+Default
+== Дефолт
 
-Size of hook press icons
-== Размер иконки нажатия хука
+[RClient]
+Visual
+== Визуал
 
-Hook will change pos when some nearby
-== Хук будет менять позицию когда другая иконка рядом
+[RClient]
+Full
+== Весь
 
-Fire will change pos when some nearby
-== Хаммер будет менять позицию когда другая иконка рядом
+[RClient]
+Show AFK emote in menu
+== Показывать АФК эмоцию в меню
 
-if you move away from the tee, the indicator will become more transparent
-== Если ты отойдешь от тии индикатор станет более прозрачным
+[RClient]
+Show texture instead emote in menu
+== Показать текстуру вместо эмоции в меню
 
-if no will be 'badbad->*' if yes 'badbad->******'
-== если нет, то будет "badbad->*", если да, то "badbad->******"
+[RClient]
+Show AFK emote in spec
+== Показывать эмоцию в спеке
 
-Replacing blocked word with replacement char(badbad->******)
-== Замена заблокированного слова заменяющим символом(badbad->******)
+[RClient]
+Show texture instead emote in spec
+== Показывать текстуру вместо эмоции в спеке
 
-In console will be like 'tee said badbad'
-== В консоли будет что-то вроде 'tee said badbad'
+[RClient]
+Show player hitbox
+== Показывать хитбокс игрока
+
+[RClient]
+Size of hitbox
+== Размер хитбокса
+
+[RClient]
+Quality of hitbox
+== Качество хитбокса
+
+[RClient]
+Hitbox color
+== Цвет хитбокса
+
+[RClient]
+Chat Bubbles
+== Чат баблы
+
+[RClient]
+by qxdFox/Entity Client
+== 
+
+[RClient]
+Enable Chat Bubbles
+== Вкл чат баблы
+
+[RClient]
+Chat bubble size
+== Размер чат баблов
+
+[RClient]
+Show time
+== Время показа
+
+[RClient]
+Fade out time
+== Время угасания
+
+[RClient]
+Fade in time
+== Время появления
+
+[RClient]
+Master Servers
+== Мастер Серверов
+
+[RClient]
+Use Rushie master server mirror
+== Использовать Rushie зеркало мастеров
+
+[RClient]
+Use BestClient master server mirror
+== Использовать BestClient зеркало мастеров
+
+[RClient]
+Integrations
+== Интеграции
+
+[RClient]
+Discord RPC
+== 
+
+[RClient]
+Steam
+== 
+
+[RClient]
+Aspect Ratio
+== Аспект Ратио
+
+[RClient]
+Enable custom aspect ratio
+== Включить кастом аспект ратио
+
+[RClient]
+Width
+== Длина
+
+[RClient]
+Height
+== Высота
+
+[RClient]
+Apply
+== Применить
+
+[RClient]
+Disable for almost all UI
+== Выкл почти для всего UI
+
+[RClient]
+Disable for Wheels
+== Выкл для Колес
+
+[RClient]
+Disable for Menus
+== Выкл для Меню
+
+[RClient]
+Disable for Scoreboard
+== Выкл для Табло
+
+[RClient]
+Disable for Console
+== Выкл для Консоли
+
+[RClient]
+Disable for Above/Below Player
+== Выкл для Над/Под игроком
+
+[RClient]
+Disable for Hud
+== Выкл для Худа
+
+[RClient]
+Disable for Chat
+== Выкл для Чата
+
+[RClient]
+Disable for Edge info
+== Выкл для Эдж инфо
+
+[RClient]
+Disable for Info messages
+== Выкл для Инфо сообщений
+
+[RClient]
+Disable for Notify in spec
+== Выкл для Уведомлений в спеке
+
+[RClient]
+Above/Below Player
+== Над/Под игрокм
+
+[RClient]
+Notify when above player
+== Уведомлять когда над игроком
+
+[RClient]
+Notify when same pos as player
+== Уведомлять когда на одной позиции с игроком
+
+[RClient]
+Notify when below player
+== Уведомлять когда под игроком
+
+[RClient]
+Text pos x
+== Позиция X текста
+
+[RClient]
+Text pos y
+== Позиция Y текста
+
+[RClient]
+Spectator
+== Спектатор
+
+[RClient]
+Enable spectator movement
+== Вкл движения спектатора
+
+[RClient]
+Spectator Speed
+== Скорость спектатора
+
+[RClient]
+Spec go Left
+== Двигаться влево в спеке
+
+[RClient]
+Spec go Right
+== Двигаться вправо в спеке
+
+[RClient]
+Spec go Up
+== Двигаться вверх в спеке
+
+[RClient]
+Spec go Down
+== Двигаться вниз в спеке
+
+[RClient]
+Chat
+== Чат
+
+[RClient]
+Main
+== Мейн
+
+[RClient]
+Filter
+== Фильтр
+
+[RClient]
+Translate
+== Перевод
+
+[RClient]
+Show mouse when open chat
+== Показывать мышь когда открыт чат
+
+[RClient]
+Fix language commands
+== Исправлять язык команд
+
+[RClient]
+Enable chat scroll
+== Вкл скролл чата
+
+[RClient]
+Show scroll bar
+== Вкл скролл бар
+
+[RClient]
+Chat Filter Mode
+== Мод чат фильтра
+
+[RClient]
+Partial
+== Частично
+
+[RClient]
+Both
+== Оба
+
+[RClient]
+Print Blocked Message
+== Показывать заблокированное сообщение
+
+[RClient]
+Multiply Partial Match
+== Умножать частичное совпадение
+
+[RClient]
+Partial Word Replacement
+== Частичный заменитель слова
+
+[RClient]
+*
+== 
+
+[RClient]
+Multiply Full Match
+== Умножать полное совпадение
+
+[RClient]
+Full Word Replacement
+== Полный заменитель слова
+
+[RClient]
+^
+== 
+
+[RClient]
+Use auto translate
+== Использовать авто перевод
+
+[RClient]
+Translate server messages
+== Переводить серверные сообщения
+
+[RClient]
+Latest languages
+== Последние языки
+
+[RClient]
+Your language target (in ISO 639-1 code)
+== Твой язык (ISO 639-1)
+
+[RClient]
+ru
+== 
+
+[RClient]
+Unknown language
+== Неизвестный язык
+
+[RClient]
+Translate your messages
+== Переводить твои сообщения
+
+[RClient]
+Send language target (in ISO 639-1 code)
+== Язык для перевода твоих сообщений (ISO 639-1)
+
+[RClient]
+en
+== 
+
+[RClient]
+Fast settings in chat
+== Быстрые настройки в чате
 
 [RClient]
 Nameplates
 == Неймплейты
 
-Show Chatbubbles above you
-== Показывать чат-баблы над вами
-
-Show Chatbubbles in demo
-== Показывать чат-баблы в демо
-
-Show RClient User indicator
-== Показывать пользователей RClient
-
-Size of Rclient indicator icons
-== Размер индикатора RClient
-
-Indicator will change pos when some nearby
-== Индикатор будет менять позицию когда другая иконка рядом
-
-Show indicator above you
-== Показывать индикатор над тобой
-
-RClient User Indicator
-== Индикатор пользователя RClient
+[RClient]
+Hook
+== Хук
 
 [RClient]
-Dummy
-== Дамми
+Fire
+== Удар
 
-Show Advanced Dummy Actions
-== Показывать улучшенные действия дамми
+[RClient]
+Weapons
+== Оружия
 
-Show Dummy position
-== Показывать позицию дамми
+[RClient]
+Hook Detection
+== Обнаружение хука
 
-Change dummy pos x color when x dummy = x player
-== Менять цвет X позиции у дамми если на одной оси с игроком
-
-Change player pos x color when x dummy = x player
-== Менять цвет X позиции у игрока если на одной оси с дамми
-
-Edge Info
-== Эдж инфо
-
-Show edge info about freeze
-== Показывать эдж инфо о фризе
-
-Show edge info about jumps
-== Показывать эдж инфо о прыжках
-
-Color when over freeze
-== Цвет когда над фризом
-
-Color when over kill
-== Цвет когда над киллом
-
-Color when falling safely
-== Цвет когда падать безопасно
-
-Show edge info
-== Показать эдж инфо
-
-Edge info pos x
-== Поз. x эдж инфо
-
-Edge info pos y
-== Поз. y эдж инфо
-
-Only empty servers
-== Только пустые сервера
-
-Change whole word (else use regex)
-== Менять все слово (иначе regex)
-
-[Rclientfilter]
-Replace word with:
-== Заменять слово с:
-
-[Rclientfilter]
-Full
-== Полностью
-
-[Rclientfilter]
-Both
-== Оба
-
-Move up
-== Шаг вверх
-
-Move down
-== Шаг вниз
-
-Enable spectator camera move
-== Включить движение камеры в спеке
-
-Speed of camera
-== Скорость камеры
-
-[ScoreboardSorting]
-Sort by id:
-== Сортировать по айди:
-
-[ScoreboardSorting]
-Default
-== Обычно
-
-[ScoreboardSorting]
-Teams
-== Команды
-
-[ScoreboardSorting]
+[RClient]
 All
-== Всё
+== Все
+
+[RClient]
+Hook size
+== Размер хука
+
+[RClient]
+Hook shift on invis
+== Смещать хук при отсутствии
+
+[RClient]
+Fire Detection
+== Обнаружение удара
+
+[RClient]
+Others(fake)
+== Остальные(фейк)
+
+[RClient]
+All(fake)
+== Все(фейк)
+
+[RClient]
+Fire size
+== Размер удара
+
+[RClient]
+Fire shift on invis
+== Смещать удар при отсутствии
+
+[RClient]
+Use preinput for fire
+== Использовать преинпут для удара
+
+[RClient]
+Weapons in nameplates
+== Оружия в неймплейтах
+
+[RClient]
+Weapons size
+== Размер оружий
+
+[RClient]
+Show own weapons
+== Показывать свои оружия
+
+[RClient]
+Show shotgun
+== Показывать дробовик
+
+[RClient]
+Show grenade
+== Показывать гранатомет
 
-Show friend icon in scoreboard
-== Показвать иконку друга в скорбоард
+[RClient]
+Show ninja
+== Показывать ниндзя
 
-Always show quick actions
-== Всегда показывать быстрые действия
+[RClient]
+Show laser
+== Показывать лазер
 
-Show sparkle trail
-== Показвать трейл из частиц
+[RClient]
+Anti AFK
+== Анти АФК
 
-Show frozen flakes in freeze
-== Показвать снежки в фризе
+[RClient]
+NonActive
+== Свернут
 
-Partial Replacement char
-== Частичная замена
+[RClient]
+Spec
+== Спек
 
-Voice mix
-== Микшер войса
+[RClient]
+Play sound when moved and window non active
+== Играть звук когда двигаешься и окно свернуто
 
-Volume
-== Громкость
+[RClient]
+Choose sound non active
+== Выбор звука при свернутом окне
 
-No active players
-== Нет активных игроков
+[RClient]
+Wake up
+== 
 
-Block list
-== Список блокировки
+[RClient]
+Grenade
+== Граната
 
-Chat
-== Чат
+[RClient]
+Tag
+== Тег
 
-Scoreboard
-== Табло
+[RClient]
+Notify when moved in spec
+== Оповещать когда двигаешься в спеке
 
-No colored frozen tee skins for yourself
-== Нет цветных замороженных скинов для себя
+[RClient]
+Play sound when moved in spec
+== Играть звук когда двигаешься в спеке
 
-Effects
-== Эффекты
+[RClient]
+Choose sound in spec
+== Выбор звука в спеке
 
-Hud
-== Худ
+[RClient]
+Show text when moved in spec
+== Показывать текст когда двигаешься в спеке
 
-Move left
-== Шаг влево
+[RClient]
+Client Indicator
+== Клиент Индикатор
 
-Move right
-== Шаг вправо
+[RClient]
+by +KZ/Kaizo Client
+== 
 
-Find teleport
-== Найти телепорт
+[RClient]
+Send to server that u use RClient
+== Отправлять на сервер что ты используешь RClient
 
-Voice
-== Войс
+[RClient]
+Detect other clients
+== Обнаруживать другие клиенты
 
-Enable voice chat
-== Включить голосовой чат
+[RClient]
+Show client type in nameplates
+== Показывать клиент в неймплейтах
 
-Ignore distance
-== Игнорировать дистанцию
+[RClient]
+Only you
+== Только свое
 
-Stereo output (pan left/right)
-== Стерео вывод (панорама влево/вправо)
+[RClient]
+Show client type in scoreboard
+== Показывать клиент в табло
 
-Voice filter (HPF+compressor+soft limiter)
-== Фильтр голоса (HPF+компрессор+мягкий лимитер)
+[RClient]
+Icons size in nameplates
+== Размер иконки в неймплейтах
 
-Filter presets
-== Пресеты фильтра
+[RClient]
+Icons size in scoreboard
+== Размер иконки в табло
 
-Soft
-== Мягкий
+[RClient]
+Detect BestClient users
+== Обрнаруживать юзеров BestClient
 
-Balanced
-== Сбалансированный
-
-Strong
-== Сильный
-
-Show advanced filter settings
-== Показать расширенные настройки фильтра
-
-Comp threshold (%)
-== Порог компрессора (%)
-
-Comp ratio (x0.1)
-== Коэффициент компрессии (x0.1)
-
-Comp attack (ms)
-== Атака компрессора (мс)
-
-Comp release (ms)
-== Релиз компрессора (мс)
-
-Comp makeup (%)
-== Усиление после компрессии (%)
-
-Limiter (%)
-== Лимитер (%)
-
-Show voice indicator
-== Показывать индикатор голоса
-
-Voice radius (tiles)
-== Радиус голоса (тайлы)
-
-Voice volume
-== Громкость голоса
-
-Name volume
-== Громкость по имени
-
-Nickname
-== Никнейм
-
-Name volume (%)
-== Громкость по имени (%)
-
-Set volume
-== Установить громкость
-
-Remove volume
-== Убрать громкость
-
-Example: Name=80,Other=120
-== Пример: Name=80,Other=120
-
-Name volume list empty
-== Список громкости по именам пуст
-
-Input device
-== Устройство ввода
-
-Output device
-== Устройство вывода
-
-Use ri_voice_list_devices in console
-== Используйте ri_voice_list_devices в консоли
-
-Voice button
-== Кнопка вкл голоса
-
-[VoiceChat]
-Block people with:
-== Блокировать людей с:
-
-[VoiceChat]
-None
-== Нет
-
-[VoiceChat]
-Whitelist
-== Белый список
-
-[VoiceChat]
-Blacklist
-== Черный список
-
-Reset Voice Chatbinds
-== Сбросить чатбинды голоса
-
-Admin Panel
-== Админ-панель
-
-Adminpanel
-== Админ панель
-
-Plays sound at exec command
-== Звук при выполнении команды
-
-The command is ran in console not chat
-== Команда выполняется в консоли, а не в чате
-
-Show when microphone active
-== Показывать когда включен микро
-
-Find checkpoint
-== Найти чекпоинт
-
-Play sound on move when window inactive
-== Проигрывать звук при движение когда свернут
-
-Choose sound:
-== Выбрать звук:
-
-[HammerHit]
-Show Hammer Hit:
-== Показывать удар хаммером
-
-[HammerHit]
-No effect
-== Без эффекта
-
-[HammerHit]
-No Sound
-== Без звука
-
-[HammerHit]
-Normal
-== Обычно
-
-Show frozen HUD only for warlist teammates
-== Показывать худ замороженных только для тимлиста
-
-Group mode
-== Режим группы
-
-Group token
-== Токен группы
-
-FastInput version:
-== Версия ФастИнпута:
-
-Hear group members everywhere
-== Слышать участников группы везде
-
-Microphone volume
-== Громкость микрофона
-
-Off voice when window nonactive
-== Выключать войс когда окно не активно
-
-Audio backend
-== Бекенд звука
-
-If change backend u need restart game
-== Если меняешь бекенд тебе надо перезапустить игру
-
-PTT release delay (ms)
-== PTT задержка после отпускания (мс)
-
-[VoiceChat]
-Hear people that:
-== Слышать людей которые:
-
-[VoiceChat]
-You see
-== Ты видишь
-
-[VoiceChat]
-In team
-== В команде
-
-Hear from camera center while spectating
-== Слышать от центра камеры при наблюдении
-
-Hear observers (inactive players, not /spec)
-== Слышать наблюдателей (не играющих, не спек)
-
-Show overlay
-== Показывать оверлей
-
-VAD allow list
-== Разрешенные для VAD
-
-Hear players using voice activation
-== Слышать игроков использующие VAD
-
-Show voice ping
-== Показывать пинг войса
-
-Voice activation (VAD)
-== Активация голосом (VAD)
-
-Add in whitelist
-== Добавить в вайтлист
-
-Add in blacklist
-== Добавить в блеклист
-
-VAD allow add
-== Разрешить VAD
-
-VAD allow remove
-== Запретить VAD
-
-Show indicator in scoreboard
-== Показывать индикатор в табло
-
-Size of indicator in scoreboard
-== Размер индикатора в табло
-
-Find finish
-== Найти финиш
-
-Player menu
-== Меню игрока
-
-Devices
-== Девайсы
-
-Listening & Groups
-== Прослушивание и группы
-
-Mix & Processing
-== Микс и обработка
-
-[VoiceChat]
-Test mode
-== Тест мод
-
-[VoiceChat]
-Off
-== Выключено
-
-[VoiceChat]
-Local
-== Локально
-
-[VoiceChat]
-Server
-== Сервер
-
-Overlay
-== Оверлей
-
-Noise suppressor (RNNoise)
-== Шумодав (RNNoise)
-
-Noise suppressor
-== Шумодав
-
-Mute microphone
-== Мут микрофона
-
-Mic Mute toggle
-== вкл/выкл мут микрофона
-
-[VoiceChat]
-All
-== Всех
-
-Show new RClient's menu
-== Вкл новое меню
-
-custom RClient's menu background
-== Вкл новый бекграунд
-
-show RClient's menu topbar
-== Вкл верхнюю панель
-
-show RClient's menu bottombar
-== Вкл нижнюю панель
-
-Menu
-== Меню
-
-Color of settings menu
-== Цвет настроек в меню
-
-[Voice activation]
-Voice activation:
-== Активация войса:
-
-[Voice activation]
-Push to talk
-== По нажатию
-
-[Voice activation]
-Voice
-== По голосу
-
-VAD threshold (%)
-== Порог активации (%)
-
-VAD release delay (ms)
-== Задержка VAD (мс)
-
-Checkpoint:
-== Чекпоинт
-
-Dummy Change Clan
-== Дамми Смена Клана
-
-Add player to the filter white list
-== Добавить игрока в вайтлист фильтра
-
-Chat Animate
-== Анимация Чата
-
-Chat Filter
-== Фильтр Чата
-
-Chat Utils
-== Чат Утилиты
-
-Show cursor when chat is open
-== Показывать курсор когда чат открыт
-
-Show chat scrollbar
-== Показывать скроллбар чата
-
-Scoreboard Sort
-== Сортировка табло
-
-Scoreboard Heart
-== Сердце в табло
-
-Scoreboard Actions
-== Действия в табло
-
-Freeze inputs when unlock mouse
-== Замораживать действия когда включено
-
-Nameplates Scheme
-== Схема Неймплейтов
-
-Nameplates Show Fire
-== Удар В Неймплейтах
-
-Nameplates Show Hook
-== Хук В Неймплейтах
-
-Dummy Tracker
-== Дамми Трекер
-
-Advanced Dummy Hud
-== Улучшенный Дамми Худ
-
-Trails
-== Трейлы
-
-AFK Emote/Texture In Menu
-== АФК Эмоция/Текстура В Меню
-
-AFK Emote/Texture In Spec
-== АФК Эмоция/Текстура В Спеке
-
-Disable Frozen Flakes
-== Выключить Снежки
-
-Show when muted
-== Показывать когда замучен
-
-Hide Hammer Hit
-== Скрыть Удар Хаммером
-
-Sound On Move
-== Звук При Движении
-
-Freeze inputs when new menu opened
-== Замораживать инпуты когда открыто новое меню
-
-Skip open new RClient's menu
-== Пропустить открытие нового меню
-
-Open new menu
-== Открыть новое меню
-
-Music Player
-== Музыкальный Плеер
-
-Show music island
-== Показывать музыкальный плеер
-
-Show cover image
-== Показывать изображение
-
-Show visualizer
-== Показывать визуализатор
-
-Show full timer
-== Показывать весь таймер
-
-Minimum width
-== Минимальная ширина
-
-Maximum width
-== Максимальная ширина
-
-Dynamic width expansion
-== Динамическое расширение
-
-Show visualizer sections
-== Показывать секции визуализатора
-
-Game timer:
-== Таймер:
-
-[Music]
-Full
-== Весь
-
-[Music]
-Scroll
-== Скролл
-
-Show visualizer sections
-== Показывать секции визуализатора
-
-Music island color
-== Цвет музыкального островка
-
-Section gaps color
-== Цвет секций
-
-Tracker
-== Трекер
-
-Millisecond In Game Timer
-== Миллисекунды В Таймере
-
-Heart Size In Nameplate
-== Размер Сердца В Неймплейтах
-
+[RClient]
 Binds
 == Бинды
 
-Better Lasers (Pulse)
-== Улучшенные лазеры (Pulse)
+[RClient]
+Toggle deepfly
+== Вкл/Выкл Дипфлай
 
-Spectator Move
-== Движение В Спеке
+[RClient]
+Deepfly on rmb
+== Дипфлай на пкм
 
-Spectator Sort
-== Сортировка В Спеке
+[RClient]
+Toggle 45 degrees
+== Вкл/Выкл 45 градусов
 
-Player Menu
-== Меню Игрока
+[RClient]
+Echo 45 degrees
+== Echo 45 градусов
 
-Chat Bubbles (Entity)
-== Чат Баблы (Entity)
+[RClient]
+Toggle small sens
+== Вкл/Выкл Маленькой сенсы
 
-Show RClient User indicator in nameplates
-== Показывать индикатор клиента в неймплейтах
+[RClient]
+Echo small sens
+== Echo Маленькой сенсы
 
-Ignore indicator errors
-== Игнор ошибок индикатора
+[RClient]
+Find Teleport
+== Найти Телепорт
 
-Output
-== Вывод
+[RClient]
+Find Finish
+== Найти Финиш
 
-Advanced devices
-== Расширенные девайсы
+[RClient]
+Streamer mode
+== Стример мод
 
-Testing
-== Тесты
+[RClient]
+Only windows
+== Только виндовс
 
-Microphone level
-== Громкость микрофона
+[RClient]
+Hide window from capture when RCON opened
+== Убирать захват окна когда открыт ркон
 
-Listening
-== Прослушивание
+[RClient]
+Monitor(win7-11)
+== 
 
-VAD listening
-== Прослушивание VAD
+[RClient]
+Exclude(win10-11)
+== 
 
-Always hear these VAD players
-== Всегда слышать этих игроков с VAD
+[RClient]
+Edge info
+== Эдж инфо
 
-Groups
-== Группы
+[RClient]
+Toggle Edge info
+== Вкл/Выкл эдж инфо
 
-Processing
-== Обработка
+[RClient]
+Show coordinates info
+== Показывать инфо координат
 
-Stereo width (%)
-== Ширина стерео (%)
+[RClient]
+Show jump info
+== Показывать инфо прыжков
 
-Overlay & Indicator
-== Оверлей и Индикатор
+[RClient]
+Edge info X pos
+== Эдж инфо X позиция
 
-Show muted players
-== Показывать игроков в муте
+[RClient]
+Edge info Y pos
+== Эдж инфо Y позиция
 
-Show muted in nameplates
-== Показывать мут в неймплейтах
+[RClient]
+Above Freeze color
+== Цвет над фризом
 
-Show muted in overlay
-== Показывать мут в оверлее
+[RClient]
+Above Kill color
+== Цвет над килом
 
-Open changed voice mix
-== Открыть измененный войс микс
+[RClient]
+Above Save color
+== Цвет над безопасностью
 
-Chatbinds
-== Чатбинды
+[RClient]
+Hud
+== Худ
 
-Percent In Vote Bar
-== Проценты В Голосовании
+[RClient]
+Show checkpoint
+== Показывать Чекпоинт
 
-Show procent in vote bar
+[RClient]
+Smaller hud (angle,checkpoint)
+== Маленький худ (угол, чекпоинт)
+
+[RClient]
+Show percent in vote
 == Показывать проценты в голосовании
 
-Show/Find Checkpoint
-== Показывать/Найти Чекпоинт
+[RClient]
+Swap Timer
+== Свап Таймер
 
-Show current checkpoint in hud
-== Показывать текущий чек в худе
+[RClient]
+Enable swap timer
+== Вкл свап таймера
 
-Compact Angle/Checkpoint
-== Компактный угол/чек
+[RClient]
+Swap timer on left side
+== Свап таймер слева
 
-Show angle and checkpoint oneline
-== Показывать угол и чек в одну линию
+[RClient]
+Swap timer pos y
+== Позиция Y свап таймера
 
-Player Join Sound
-== Звук При Входе Игрока
+[RClient]
+Helpful Functions
+== Помогающие функции
 
-Play sound when player join
-== Играть звук при входе игрока
+[RClient]
+Sort
+== Сортировка
 
-Player names
-== Ники игроков
+[RClient]
+Auto Lock Team
+== Автолок тимы
 
-Saved settings
-== Сохраненные настройки
+[RClient]
+Empty
+== Пустая
 
-Current settings
-== Текущее настройки
+[RClient]
+Any
+== Любая
 
-Selected profile
-== Выбранный профиль
+[RClient]
+Anti UnSpec in player
+== Анти АнСпек в игроке
 
-No profile selected
-== Не выбран профиль
+[RClient]
+Show Recharge bars (by +KZ/Kaizo Client)
+== Показывать кд удара (by +KZ/Kaizo Client)
 
-Config: Modified/Total
-== Конфиг: Измененных/Всего
+[RClient]
+Clear ddnet config from unknown configs on exit
+== Чистить конфиг дднета от неизвестных настроек при выходе
 
-Include DDNet settings
-== Вкл настройки DDNet
+[RClient]
+Show open second client button
+== Вкл кнопку открытия второго клиента
 
-Include key binds
-== Вкл бинды
+[RClient]
+Show Save Count
+== Показать счетчик сейвов
 
-Include TClient settings
-== Вкл настройки TClient
+[RClient]
+File
+== Файл
 
-Include TClient bindwheel
-== Вкл колесо биндов TClient
+[RClient]
+/load
+== /load
 
-Include RClient settings
-== Вкл настройки RClient
+[RClient]
+Gun fire volume
+== Громкость пистолета
 
-Selected
-== Выбран
+[RClient]
+Sort Scoreboard
+== Сортировка табло
 
-Include RClient bindwheel
-== Вкл колесо биндов RClient
+[RClient]
+name-team-score
+==
 
-Include warlist
-== Вкл варлист
+[RClient]
+id-team-score
+==
 
-Include chat binds
-== Вкл чат бинды
+[RClient]
+id-score
+==
 
-Include skin profiles
-== вкл профили скинов
+[RClient]
+id-team
+==
 
-Save New
-== Сохранить новый
+[RClient]
+id
+== 
 
-Apply Selected
-== Применить выбраный
+[RClient]
+Sort Spectator
+== Сортировка Спека
 
-Delete Selected
-== Удалить выбранный
+[RClient]
+name-team
+== 
 
-Create or update
-== Создать или обновить
+[RClient]
+Reset RClient chatbinds
+== Сброс RClient чатбиндов
 
-On server
-== На сервере
+[RClient]
+RClient Links
+== Ссылки RClient
 
-Changed
-== Измененные
+[RClient]
+Discord
+== Дискорд
 
-Show locally muted players
-== Показывать игроков в муте у себя
+[RClient]
+Website
+== Вебсайт
 
-Show locally muted in nameplates
-== Показывать мут у себя в неймплейтах
+[RClient]
+Github
+== Гитхаб
 
-Show locally muted in overlay
-== Показывать мут у себя в оверлее
+[RClient]
+Config Files
+== Файлы конфигов
+
+[RClient]
+RClient Settings
+== Настройки RClient
+
+[RClient]
+RClient Developers
+== Разработчики RClient
+
+[RClient]
+Big Thanks To
+== Большое Спасибо
+
+[test]
+Hide Settings Tabs
+== Спрятать вкладки настроек
+
+[RClient]
+Integration
+== Интеграция
+
+[RClient]
+Enable Discord Integration
+== Вкл Интеграцию дискорда
+
+[RClient]
+Keep this settings?
+== Оставить такие настройки?
+
+[RClient]
+Confirm
+== Подтвердить
+
+[RClient]
+Deny
+== Отклонить
+
+[RClient]
+Name:
+== Ник:
+
+[RClient]
+Name
+== Ник
+
+[RClient]
+Command:
+== Команда:
+
+[RClient]
+Command
+== Команда
+
+[RClient]
+Override Selected
+== Перезаписать выбранное
+
+[RClient]
+Add Bind
+== Добавить бинд
+
+[RClient]
+Remove Bind
+== Убрать бинд
+
+[RClient]
+The command is ran in console not chat
+== Команда запускается в консоли, не в чате
+
+[RClient]
+Use left mouse to select
+== Используй ЛКМ для выбора
+
+[RClient]
+Use right mouse to swap with selected
+== Используй ПКМ для свапа с выбранным
+
+[RClient]
+Use middle mouse select without copy
+== Используй Колесико для выбора без копирования
+
+[RClient]
+RClient \\/
+== 
+
+[RClient]
+Use %plnick% for replacing with nickname
+== Используй %plnick% для замены с ником
+
+[RClient]
+Use %plid% for replacing with client id
+== Используй %plid% для замены с клиент айди
+
+[RClient]
+Use bracket yourself "%plnick%"
+== Используй кавычки сам "%plnick%"
+
+[RClient]
+Example: echo "\\"%plnick%\\" %plid%"
+== Пример: echo "\\"%plnick%\\" %plid%"
+
+[RClient]
+Spec Wheel Key
+== Кнопка Спек Колеса
+
+[RClient]
+Reset position of mouse when opening specwheel
+== Сброс позиции мышки при открытии спек колеса
+
+[RClient]
+Player Inspector
+== Инспектор игроков
+
+[RClient]
+Find time:
+== Найти тайм:
+
+[RClient]
+Find hours:
+== Найти часы:
+
+[RClient]
+Find Player:
+== Найти игрока:
+
+[RClient]
+Find Skin:
+== Найти скин:
+
+[RClient]
+Copy Skin:
+== Копировать скин:
+
+[RClient]
+Copy Color:
+== Копировать цвет:
+
+[RClient]
+Backup Profile:
+== Бекап профиля:
+
+[RClient]
+Find Player DDstats
+== Найти игрока DDstats
+
+[RClient]
+Find Skin DDstats
+== Найти скин DDstats
+
+[RClient]
+Copy Skin DDstats
+== Копировать скин DDstats
+
+[RClient]
+Message Filter
+== Фильтр сообщений
+
+[RClient]
+Add word in filter:
+== Добавить слово в фильтр:
+
+[RClient]
+Remove word from filter:
+== Убрать слово из фильтра:
+
+[RClient]
+Tracker
+== Трекер
+
+[RClient]
+Add Tracker:
+== Добавить в трекер:
+
+[RClient]
+Remove Tracker:
+== Убрать из трекера:
+
+[RClient]
+Reset Tracker:
+== Сброс Трекера:
+
+[RClient]
+Map Search
+== Поиск по карте
+
+[RClient]
+Find Teleport:
+== Поиск Телепорта:
+
+[RClient]
+Find Finish:
+== Поиск финиша:

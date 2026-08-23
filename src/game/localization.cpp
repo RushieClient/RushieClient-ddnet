@@ -254,13 +254,14 @@ bool CLocalizationDatabase::Load(const char *pFilename, IStorage *pStorage, ICon
 		AddString(aOrigin, pReplacement, aContext);
 	}
 	std::sort(m_vStrings.begin(), m_vStrings.end());
+	m_vStrings.erase(std::unique(m_vStrings.begin(), m_vStrings.end()), m_vStrings.end());
 	return true;
 }
 
 void CLocalizationDatabase::AddString(const char *pOrgStr, const char *pNewStr, const char *pContext)
 {
-	if(!FindString(str_quickhash(pOrgStr), str_quickhash(pContext)))
-		m_vStrings.emplace_back(str_quickhash(pOrgStr), str_quickhash(pContext), m_StringsHeap.StoreString(*pNewStr ? pNewStr : pOrgStr));
+	m_vStrings.emplace_back(str_quickhash(pOrgStr), str_quickhash(pContext),
+	m_StringsHeap.StoreString(*pNewStr ? pNewStr : pOrgStr));
 }
 
 const char *CLocalizationDatabase::FindString(unsigned Hash, unsigned ContextHash) const
@@ -270,7 +271,7 @@ const char *CLocalizationDatabase::FindString(unsigned Hash, unsigned ContextHas
 	String.m_ContextHash = ContextHash;
 	String.m_pReplacement = nullptr;
 	auto Range1 = std::equal_range(m_vStrings.begin(), m_vStrings.end(), String);
-	if(std::distance(Range1.first, Range1.second) == 1)
+	if(Range1.first != Range1.second)
 		return Range1.first->m_pReplacement;
 
 	const unsigned DefaultHash = str_quickhash("");
@@ -279,7 +280,7 @@ const char *CLocalizationDatabase::FindString(unsigned Hash, unsigned ContextHas
 		// Do another lookup with the default context hash
 		String.m_ContextHash = DefaultHash;
 		auto Range2 = std::equal_range(m_vStrings.begin(), m_vStrings.end(), String);
-		if(std::distance(Range2.first, Range2.second) == 1)
+		if(Range2.first != Range2.second)
 			return Range2.first->m_pReplacement;
 	}
 

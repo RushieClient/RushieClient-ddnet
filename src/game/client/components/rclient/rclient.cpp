@@ -12,7 +12,7 @@
 
 #include <engine/shared/json.h>
 
-static constexpr const char *RCLIENT_INFO_URL = "https://server.rushie-client.ru/version";
+static constexpr const char *RCLIENT_INFO_URL = "https://server.rushie.qzz.io/version";
 
 namespace ChatThings
 {
