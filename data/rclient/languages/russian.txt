@@ -59,10 +59,6 @@ Scoreboard
 == Табло
 
 [RClient]
-Popup
-==
-
-[RClient]
 Friends
 == Друзья
 
@@ -183,10 +179,6 @@ Chat Bubbles
 == Чат баблы
 
 [RClient]
-by qxdFox/Entity Client
-== 
-
-[RClient]
 Enable Chat Bubbles
 == Вкл чат баблы
 
@@ -221,14 +213,6 @@ Use BestClient master server mirror
 [RClient]
 Integrations
 == Интеграции
-
-[RClient]
-Discord RPC
-== 
-
-[RClient]
-Steam
-== 
 
 [RClient]
 Aspect Ratio
@@ -403,20 +387,12 @@ Partial Word Replacement
 == Частичный заменитель слова
 
 [RClient]
-*
-== 
-
-[RClient]
 Multiply Full Match
 == Умножать полное совпадение
 
 [RClient]
 Full Word Replacement
 == Полный заменитель слова
-
-[RClient]
-^
-== 
 
 [RClient]
 Use auto translate
@@ -435,10 +411,6 @@ Your language target (in ISO 639-1 code)
 == Твой язык (ISO 639-1)
 
 [RClient]
-ru
-== 
-
-[RClient]
 Unknown language
 == Неизвестный язык
 
@@ -449,10 +421,6 @@ Translate your messages
 [RClient]
 Send language target (in ISO 639-1 code)
 == Язык для перевода твоих сообщений (ISO 639-1)
-
-[RClient]
-en
-== 
 
 [RClient]
 Fast settings in chat
@@ -493,14 +461,6 @@ Hook shift on invis
 [RClient]
 Fire Detection
 == Обнаружение удара
-
-[RClient]
-Others(fake)
-== Остальные(фейк)
-
-[RClient]
-All(fake)
-== Все(фейк)
 
 [RClient]
 Fire size
@@ -563,10 +523,6 @@ Choose sound non active
 == Выбор звука при свернутом окне
 
 [RClient]
-Wake up
-== 
-
-[RClient]
 Grenade
 == Граната
 
@@ -593,10 +549,6 @@ Show text when moved in spec
 [RClient]
 Client Indicator
 == Клиент Индикатор
-
-[RClient]
-by +KZ/Kaizo Client
-== 
 
 [RClient]
 Send to server that u use RClient
@@ -677,14 +629,6 @@ Only windows
 [RClient]
 Hide window from capture when RCON opened
 == Убирать захват окна когда открыт ркон
-
-[RClient]
-Monitor(win7-11)
-== 
-
-[RClient]
-Exclude(win10-11)
-== 
 
 [RClient]
 Edge info
@@ -811,32 +755,8 @@ Sort Scoreboard
 == Сортировка табло
 
 [RClient]
-name-team-score
-==
-
-[RClient]
-id-team-score
-==
-
-[RClient]
-id-score
-==
-
-[RClient]
-id-team
-==
-
-[RClient]
-id
-== 
-
-[RClient]
 Sort Spectator
 == Сортировка Спека
-
-[RClient]
-name-team
-== 
 
 [RClient]
 Reset RClient chatbinds
@@ -941,10 +861,6 @@ Use right mouse to swap with selected
 [RClient]
 Use middle mouse select without copy
 == Используй Колесико для выбора без копирования
-
-[RClient]
-RClient \\/
-== 
 
 [RClient]
 Use %plnick% for replacing with nickname
@@ -1053,3 +969,90 @@ Find Teleport:
 [RClient]
 Find Finish:
 == Поиск финиша:
+
+[RClient]
+Popup
+== 
+
+[RClient]
+by qxdFox/Entity Client
+== 
+
+[RClient]
+Discord RPC
+== 
+
+[RClient]
+Steam
+== 
+
+[RClient]
+*
+== 
+
+[RClient]
+^
+== 
+
+[RClient]
+ru
+== 
+
+[RClient]
+en
+== 
+
+[RClient]
+Others(*)
+== Другие(*)
+
+[RClient]
+All(*)
+== Все(*)
+
+* - Can be fake info in some cases. Better when preinput enabled
+== * - Может быть фейк инфа в некоторых случаях. Лучше когда preinput включен
+
+[RClient]
+Wake up
+== 
+
+[RClient]
+by +KZ/Kaizo Client
+== 
+
+[RClient]
+Monitor(win7-11)
+== 
+
+[RClient]
+Exclude(win10-11)
+== 
+
+[RClient]
+name-team-score
+== 
+
+[RClient]
+id-team-score
+== 
+
+[RClient]
+id-score
+== 
+
+[RClient]
+id-team
+== 
+
+[RClient]
+id
+== 
+
+[RClient]
+name-team
+== 
+
+[RClient]
+RClient \\/
+== 

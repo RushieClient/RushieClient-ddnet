@@ -1,21 +1,16 @@
 #include "engine/font_icons.h"
-#include "game/client/animstate.h"
 #include "game/client/components/menus.h"
 #include "game/client/gameclient.h"
 #include "game/client/ui_listbox.h"
 #include "game/localization.h"
+#include "rclient_include.h"
 
-#include <base/log.h>
 #include <base/math.h>
 #include <base/system.h>
 #include <base/types.h>
 
 #include <algorithm>
-#include <string>
-#include <unordered_map>
 #include <vector>
-
-#include "rclient_include.h"
 
 enum
 {
@@ -176,6 +171,8 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		DoMenuSettingsBar(&Column, apTabNames, NUMBER_OF_DUMMY_TABS, s_aPageTabs, s_CurDummyCustomTab, LineSize);
 		Column.HSplitTop(MarginSmall, nullptr, &Column);
 
+		const float m_BiggestTab = LineSize * 4.0f;
+		const float m_CurrentY = Column.y;
 		if(s_CurDummyCustomTab == DUMMY_TAB_POS)
 		{
 			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_TcShowhudDummyPosition, RCLocalize("Show dummy position", "RClient"), &g_Config.m_TcShowhudDummyPosition, &Column, LineSize);
@@ -208,6 +205,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 				Ui()->DoEditBox(&s_LineInput, &Button, EditBoxFontSize);
 			}
 		}
+		Column.HSplitTop(m_BiggestTab - Column.y + m_CurrentY, nullptr, &Column);
 	}
 
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
@@ -236,6 +234,8 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		DoMenuSettingsBar(&Column, apTabNames, NUMBER_OF_SCOREBOARD_TABS, s_aPageTabs, s_CurScoreboardCustomTab, LineSize);
 		Column.HSplitTop(MarginSmall, nullptr, &Column);
 
+		const float m_BiggestTab = LineSize * 3.0f;
+		const float m_CurrentY = Column.y;
 		if(s_CurScoreboardCustomTab == SCOREBOARD_TAB_POPUP)
 		{
 			static CButtonContainer s_ReaderButtonScoreboardMouse, s_ClearButtonScoreboardmouse;
@@ -249,6 +249,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 			Column.HSplitTop(LineSize, &Button, &Column);
 			Ui()->DoScrollbarOption(&g_Config.m_RcSizeOfHeart, &g_Config.m_RcSizeOfHeart, &Button, RCLocalize("Heart size", "RClient"), 0, 200, &CUi::ms_LinearScrollbarScale, 0);
 		}
+		Column.HSplitTop(m_BiggestTab - Column.y + m_CurrentY, nullptr, &Column);
 	}
 
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
@@ -280,6 +281,8 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		DoMenuSettingsBar(&Column, apTabNames, NUMBER_OF_PLAYERS_TABS, s_aPageTabs, s_CurPlayersCustomTab, LineSize);
 		Column.HSplitTop(MarginSmall, nullptr, &Column);
 
+		const float m_BiggestTab = LineSize * 4.0f + 2.0f * 2.0f;
+		const float m_CurrentY = Column.y;
 		if(s_CurPlayersCustomTab == PLAYERS_TAB_EFFECTS)
 		{
 			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcHideFrozenFlakesEffect, RCLocalize("Hide frozen flakes", "RClient"), &g_Config.m_RcHideFrozenFlakesEffect, &Column, LineSize);
@@ -329,6 +332,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 			static CButtonContainer s_HitboxColor;
 			DoButton_ColorPickerAutoVMargin(&s_HitboxColor, RCLocalize("Hitbox color", "RClient"), &g_Config.m_RcShowHitboxColor, color_cast<ColorRGBA>(ColorHSLA(DefaultConfig::RcShowHitboxColor)), &Column, LineSize, true);
 		}
+		Column.HSplitTop(m_BiggestTab - Column.y + m_CurrentY, nullptr, &Column);
 	}
 
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
@@ -579,6 +583,8 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		DoMenuSettingsBar(&Column, apTabNames, NUMBER_OF_CHAT_TABS, s_aPageTabs, s_CurChatCustomTab, LineSize);
 		Column.HSplitTop(MarginSmall, nullptr, &Column);
 
+		const float m_BiggestTab = LineSize * 4.0f + LineSize * 2.0f + (LineSize + MarginExtraSmall + MarginSmall) * 2.0f;
+		const float m_CurrentY = Column.y;
 		if(s_CurChatCustomTab == CHAT_TAB_MAIN)
 		{
 			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcChatShowMouse, RCLocalize("Show mouse when open chat", "RClient"), &g_Config.m_RcChatShowMouse, &Column, LineSize);
@@ -725,6 +731,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 			}
 			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcChatShowTranslateFastSettings, RCLocalize("Fast settings in chat", "RClient"), &g_Config.m_RcChatShowTranslateFastSettings, &Column, LineSize);
 		}
+		Column.HSplitTop(m_BiggestTab - Column.y + m_CurrentY, nullptr, &Column);
 	}
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
 	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;
@@ -755,6 +762,8 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		DoMenuSettingsBar(&Column, apTabNames, NUMBER_OF_NAMEPLATES_TABS, s_aPageTabs, s_CurNameplatesCustomTab, LineSize);
 		Column.HSplitTop(MarginSmall, nullptr, &Column);
 
+		const float m_BiggestTab = LineSize * 5.0f + LineSize + (LineSize + 2.0f);
+		const float m_CurrentY = Column.y;
 		if(s_CurNameplatesCustomTab == NAMEPLATE_TAB_HOOK)
 		{
 			static std::vector<CButtonContainer> s_vButtonContainersHookDetection = {{}, {}, {}, {}, {}};
@@ -798,6 +807,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcNamePlatesWeaponsNinja, RCLocalize("Show ninja", "RClient"), &g_Config.m_RcNamePlatesWeaponsNinja, &Column, LineSize);
 			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcNamePlatesWeaponsLaser, RCLocalize("Show laser", "RClient"), &g_Config.m_RcNamePlatesWeaponsLaser, &Column, LineSize);
 		}
+		Column.HSplitTop(m_BiggestTab - Column.y + m_CurrentY, nullptr, &Column);
 	}
 
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
@@ -827,6 +837,9 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 
 		DoMenuSettingsBar(&Column, apTabNames, NUMBER_OF_AFK_TABS, s_aPageTabs, s_CurAfkCustomTab, LineSize);
 		Column.HSplitTop(MarginSmall, nullptr, &Column);
+
+		const float m_BiggestTab = LineSize * 2.0f + LineSize * 2.0f + (LineSize + 2.0f);
+		const float m_CurrentY = Column.y;
 
 		if(s_CurAfkCustomTab == AFK_TAB_NONACTIVE)
 		{
@@ -864,6 +877,8 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 			else
 				Column.HSplitTop(LineSize * 5 + 2.0f, nullptr, &Column); // 2.0f for radio menu
 		}
+
+		Column.HSplitTop(m_BiggestTab - Column.y + m_CurrentY, nullptr, &Column);
 	}
 
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
@@ -1035,6 +1050,9 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		DoMenuSettingsBar(&Column, apTabNames, NUMBER_OF_HELP_TABS, s_aPageTabs, s_CurHelpCustomTab, LineSize);
 		Column.HSplitTop(MarginSmall, nullptr, &Column);
 
+		const float m_BiggestTab = LineSize * 4.0f + LineSize + (LineSize + 2.0f) * 2.0f;
+		const float m_CurrentY = Column.y;
+
 		if(s_CurHelpCustomTab == HELP_TAB_MAIN)
 		{
 			static std::vector<CButtonContainer> s_vButtonContainersAutoLock = {{}, {}, {}};
@@ -1073,6 +1091,8 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 				   {0, 1, 2},
 				   g_Config.m_RcSpectatorSortId);
 		}
+
+		Column.HSplitTop(m_BiggestTab - Column.y + m_CurrentY, nullptr, &Column);
 	}
 
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
