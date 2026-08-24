@@ -556,7 +556,6 @@ void CChat::EnableMode(int Team)
 	{
 		GameClient()->m_Spectator.OnRelease();
 		GameClient()->m_Emoticon.OnRelease();
-		GameClient()->m_Scoreboard.OnRelease();
 
 		if(!IsActive() && m_MouseUnlocked)
 		{
