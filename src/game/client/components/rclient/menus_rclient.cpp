@@ -922,6 +922,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	Column.HSplitTop(MarginSmall, nullptr, &Column);
 
 	static CButtonContainer s_ReaderButtonDeepfly, s_ClearButtonDeepfly,
+				s_ReaderButtonPseudofly, s_ClearButtonPseudofly,
 				s_ReaderButton45degrees, s_ClearButton45degrees,
 				s_ReaderButtonSmallsens, s_ClearButtonSmallsens,
 				s_ReaderButtonFindTeleport, s_ClearButtonFindTeleport,
@@ -933,6 +934,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcDeepFlyOnRMB, RCLocalize("Deepfly on rmb", "RClient"), &g_Config.m_RcDeepFlyOnRMB, &RightSide, LineSize);
 		Column.HSplitTop(LineSize, nullptr, &Column);
 	}
+	DoLine_KeyReader(Column, s_ReaderButtonPseudofly, s_ClearButtonPseudofly, RCLocalize("Pseudo fly", "RClient"), "+toggle cl_dummy_hammer 1 0");
 	DoLine_KeyReader(Column, s_ReaderButton45degrees, s_ClearButton45degrees, RCLocalize("Toggle 45 degrees", "RClient"), "+rc_45_degrees");
 	{
 		CUIRect RightSide;
