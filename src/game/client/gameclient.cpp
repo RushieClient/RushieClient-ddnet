@@ -206,6 +206,7 @@ void CGameClient::OnConsoleInit()
 						  &m_Spectator,
 						  &m_BindWheel, // TClient
 						  &m_RcSpecWheel, // RClient
+						  &m_NotifyOnMove, // RClient
 						  &m_Emoticon,
 						  &m_ImportantAlert,
 						  &m_Menus,

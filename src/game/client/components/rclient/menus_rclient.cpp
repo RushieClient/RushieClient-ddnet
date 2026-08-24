@@ -844,7 +844,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		DoMenuSettingsBar(&Column, apTabNames, NUMBER_OF_AFK_TABS, s_aPageTabs, s_CurAfkCustomTab, LineSize);
 		Column.HSplitTop(MarginSmall, nullptr, &Column);
 
-		const float m_BiggestTab = LineSize * 2.0f + LineSize * 2.0f + (LineSize + 2.0f);
+		const float m_BiggestTab = LineSize * 4.0f + LineSize * 2.0f + (LineSize + 2.0f);
 		const float m_CurrentY = Column.y;
 
 		if(s_CurAfkCustomTab == AFK_TAB_NONACTIVE)
@@ -859,8 +859,6 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 					   {0, 1, 2},
 					   g_Config.m_RcSoundOnMoveNonInactive);
 			}
-			else
-				Column.HSplitTop(LineSize + 2.0f, nullptr, &Column);
 		}
 		if(s_CurAfkCustomTab == AFK_TAB_SPEC)
 		{
@@ -879,9 +877,8 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 				Ui()->DoScrollbarOption(&g_Config.m_RcTextOnMoveInSpecPosX, &g_Config.m_RcTextOnMoveInSpecPosX, &Button, RCLocalize("Text pos x", "RClient"), 0, 100, &CUi::ms_LinearScrollbarScale, 0);
 				Column.HSplitTop(LineSize, &Button, &Column);
 				Ui()->DoScrollbarOption(&g_Config.m_RcTextOnMoveInSpecPosY, &g_Config.m_RcTextOnMoveInSpecPosY, &Button, RCLocalize("Text pos y", "RClient"), 0, 100, &CUi::ms_LinearScrollbarScale, 0);
+				DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcTextOnMoveInSpecRemoveOnInput, RCLocalize("Remove text on any input", "RClient"), &g_Config.m_RcTextOnMoveInSpecRemoveOnInput, &Column, LineSize);
 			}
-			else
-				Column.HSplitTop(LineSize * 5 + 2.0f, nullptr, &Column); // 2.0f for radio menu
 		}
 
 		Column.HSplitTop(m_BiggestTab - Column.y + m_CurrentY, nullptr, &Column);

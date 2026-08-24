@@ -24,6 +24,22 @@ void CNotifyOnMove::OnInit()
 	m_pGraphics = Kernel()->RequestInterface<IEngineGraphics>();
 }
 
+bool CNotifyOnMove::OnInput(const IInput::CEvent &Event)
+{
+	if(!m_SpecNotifyMoved)
+		return false;
+
+	if(!g_Config.m_RcTextOnMoveInSpecRemoveOnInput)
+		return false;
+
+	if(Event.m_Flags & IInput::FLAG_PRESS)
+	{
+		m_SpecNotifyMovedRemove = true;
+	}
+
+	return false;
+}
+
 void CNotifyOnMove::OnRender()
 {
 	if(g_Config.m_RcPlayOnMoveNonInactive)
@@ -111,12 +127,13 @@ void CNotifyOnMove::OnRender()
 			m_SpecNotifyMoved = false;
 			m_SoundPlayedSpec = false;
 			m_SpecHasLastPos = false;
+			m_SpecNotifyMovedRemove = false;
 		}
 
 		if((m_SpecNotifyMoved || m_SpecNotifyAnim > 0.0f) && g_Config.m_RcTextOnMoveInSpec)
 		{
 			const float AnimSpeed = 0.1f;
-			if(m_SpecNotifyMoved)
+			if(m_SpecNotifyMoved && !m_SpecNotifyMovedRemove)
 				m_SpecNotifyAnim += Client()->RenderFrameTime() / AnimSpeed;
 			else
 				m_SpecNotifyAnim -= Client()->RenderFrameTime() / AnimSpeed * 2.0f;
