@@ -1850,7 +1850,7 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket, int Conn, bool Dummy)
 			m_DummyConnecting = false;
 			g_Config.m_ClDummy = 1;
 			Rcon("crashmeplx");
-			if(m_aRconAuthed[0] && !m_aRconAuthed[1])
+			if(m_aRconAuthed[0] && !m_aRconAuthed[1] && g_Config.m_RcRconAuthOnDummyConnect)
 				RconAuth(m_aRconUsername, m_aRconPassword);
 		}
 		else if(Msg == NETMSG_PING)
@@ -2006,7 +2006,7 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket, int Conn, bool Dummy)
 			{
 				m_aRconAuthed[Conn] = ResultInt;
 
-				if(m_aRconAuthed[Conn])
+				if(m_aRconAuthed[Conn] && g_Config.m_RcRconAuthOnDummyConnect)
 					RconAuth(m_aRconUsername, m_aRconPassword, g_Config.m_ClDummy ^ 1);
 			}
 			if(Conn == CONN_MAIN)

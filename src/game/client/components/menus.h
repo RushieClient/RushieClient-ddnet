@@ -858,6 +858,7 @@ private:
 	// menus_rclient.cpp
 	void RenderSettingsRClient(CUIRect MainView);
 	void RenderSettingsRClientSettings(CUIRect MainView);
+	void RenderSettingsRClientRcon(CUIRect MainView);
 	void RenderSettingsRClientChatBinds(CUIRect MainView);
 	void RenderSettingsRClientInfo(CUIRect MainView);
 	void RenderSettingsRClientSpecWheel(CUIRect MainView);

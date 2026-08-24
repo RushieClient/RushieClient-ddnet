@@ -152,6 +152,7 @@ MACRO_CONFIG_INT(RcCustomAspectDisable, rc_custom_aspect_disable, 0, 0, 65536, C
 MACRO_CONFIG_INT(RcSpectatorMoveEnable, rc_spectator_move_enabled, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "enable spectator freeview movement")
 MACRO_CONFIG_INT(RcSpectatorMoveSpeed, rc_spectator_move_speed, 100, 10, 200, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Speed of spectator freeview movement")
 MACRO_CONFIG_INT(RcAdminPanelPlaySounds, rc_admin_panel_play_sounds, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Plays sound when do command")
+MACRO_CONFIG_INT(RcRconAuthOnDummyConnect, rc_rcon_auth_on_dummy_connect, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Auth rcon dummy when connect")
 
 // Above Below player
 MACRO_CONFIG_INT(RcNotifyWhenAbovePosPlayer, rc_notify_when_above_pos_player, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Appear text that u above player")

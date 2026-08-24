@@ -15,6 +15,7 @@
 enum
 {
 	RCLIENT_TAB_SETTINGS = 0,
+	RCLIENT_TAB_RCON,
 	RCLIENT_TAB_BINDCHAT,
 	RCLIENT_TAB_SPECWHEEL,
 	RCLIENT_TAB_INFO,
@@ -76,10 +77,11 @@ void CMenus::RenderSettingsRClient(CUIRect MainView)
 	}
 
 	MainView.HSplitTop(LineSize, &TabBar, &MainView);
-	const float TabWidth = TabBar.w / TabCount;
+	const float TabWidth = TabBar.w / (TabCount - !Client()->RconAuthed());
 	static CButtonContainer s_aPageTabs[NUMBER_OF_RCLIENT_TABS] = {};
 	const char *apTabNames[] = {
 		RCLocalize("Settings", "RClient"),
+		RCLocalize("Rcon", "RClient"),
 		RCLocalize("Chat Binds", "RClient"),
 		RCLocalize("Spec Wheel", "RClient"),
 		RCLocalize("Info", "RClient")};
@@ -87,6 +89,9 @@ void CMenus::RenderSettingsRClient(CUIRect MainView)
 	for(int Tab = 0; Tab < NUMBER_OF_RCLIENT_TABS; ++Tab)
 	{
 		if(IsFlagSet(g_Config.m_RcRClientSettingsTabs, Tab))
+			continue;
+
+		if(Tab == RCLIENT_TAB_RCON && !Client()->RconAuthed())
 			continue;
 
 		TabBar.VSplitLeft(TabWidth, &Button, &TabBar);
@@ -100,6 +105,8 @@ void CMenus::RenderSettingsRClient(CUIRect MainView)
 
 	if(s_CurCustomTab == RCLIENT_TAB_SETTINGS)
 		RenderSettingsRClientSettings(MainView);
+	if(s_CurCustomTab == RCLIENT_TAB_RCON)
+		RenderSettingsRClientRcon(MainView);
 	if(s_CurCustomTab == RCLIENT_TAB_BINDCHAT)
 		RenderSettingsRClientChatBinds(MainView);
 	if(s_CurCustomTab == RCLIENT_TAB_SPECWHEEL)
@@ -1098,6 +1105,92 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		}
 
 		Column.HSplitTop(m_BiggestTab - Column.y + m_CurrentY, nullptr, &Column);
+	}
+
+	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
+	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;
+
+	// ***** END OF PAGE 1 SETTINGS ***** //
+	RightView = Column;
+
+	// Scroll
+	CUIRect ScrollRegion;
+	ScrollRegion.x = MainView.x;
+	ScrollRegion.y = maximum(LeftView.y, RightView.y) + MarginSmall * 2.0f;
+	ScrollRegion.w = MainView.w;
+	ScrollRegion.h = 0.0f;
+	s_ScrollRegion.AddRect(ScrollRegion);
+	s_ScrollRegion.End();
+}
+
+void CMenus::RenderSettingsRClientRcon(CUIRect MainView)
+{
+	CUIRect Column, LeftView, RightView, Button, Label;
+
+	static CScrollRegion s_ScrollRegion;
+	vec2 ScrollOffset(0.0f, 0.0f);
+	CScrollRegionParams ScrollParams;
+	ScrollParams.m_ScrollUnit = 60.0f;
+	ScrollParams.m_Flags = CScrollRegionParams::FLAG_CONTENT_STATIC_WIDTH;
+	ScrollParams.m_ScrollbarMargin = 5.0f;
+	s_ScrollRegion.Begin(&MainView, &ScrollOffset, &ScrollParams);
+
+	static std::vector<CUIRect> s_SectionBoxes;
+	static vec2 s_PrevScrollOffset(0.0f, 0.0f);
+
+	MainView.y += ScrollOffset.y;
+
+	MainView.VSplitRight(5.0f, &MainView, nullptr); // Padding for scrollbar
+	MainView.VSplitLeft(5.0f, nullptr, &MainView); // Padding for scrollbar
+
+	MainView.VSplitMid(&LeftView, &RightView, MarginBetweenViews);
+	LeftView.VSplitLeft(MarginSmall, nullptr, &LeftView);
+	RightView.VSplitRight(MarginSmall, &RightView, nullptr);
+
+	for(CUIRect &Section : s_SectionBoxes)
+	{
+		float Padding = MarginBetweenViews * 0.6666f;
+		Section.w += Padding;
+		Section.h += Padding;
+		Section.x -= Padding * 0.5f;
+		Section.y -= Padding * 0.5f;
+		Section.y -= s_PrevScrollOffset.y - ScrollOffset.y;
+		Section.Draw(ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f), IGraphics::CORNER_ALL, 10.0f);
+	}
+	s_PrevScrollOffset = ScrollOffset;
+	s_SectionBoxes.clear();
+
+	// ***** LeftView ***** //
+	Column = LeftView;
+
+	// ***** Base ***** //
+	Column.HSplitTop(Margin, nullptr, &Column);
+	s_SectionBoxes.push_back(Column);
+	Column.HSplitTop(HeadlineHeight, &Label, &Column);
+	Ui()->DoLabel(&Label, RCLocalize("Main", "RClient"), HeadlineFontSize, TEXTALIGN_MC);
+
+	Column.HSplitTop(MarginSmall, nullptr, &Column);
+	{
+		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcRconAuthOnDummyConnect, RCLocalize("Auto login rcon on dummy", "RClient"), &g_Config.m_RcRconAuthOnDummyConnect, &Column, LineSize);
+	}
+
+	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
+	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;
+
+	// ***** RightView ***** //
+	LeftView = Column;
+	Column = RightView;
+
+	// ***** Admin panel ***** //
+	Column.HSplitTop(Margin, nullptr, &Column);
+	s_SectionBoxes.push_back(Column);
+	Column.HSplitTop(HeadlineHeight, &Label, &Column);
+	Ui()->DoLabel(&Label, RCLocalize("Admin Panel", "RClient"), HeadlineFontSize, TEXTALIGN_MC);
+	Column.HSplitTop(MarginSmall, nullptr, &Column);
+	{
+		static CButtonContainer s_ReaderButtonAdminPanel, s_ClearButtonAdminPanel;
+		DoLine_KeyReader(Column, s_ReaderButtonAdminPanel, s_ClearButtonAdminPanel, RCLocalize("Open Admin Panel", "RClient"), "rc_toggle_adminpanel");
+		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcAdminPanelPlaySounds, RCLocalize("Play sound on action", "RClient"), &g_Config.m_RcAdminPanelPlaySounds, &Column, LineSize);
 	}
 
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
