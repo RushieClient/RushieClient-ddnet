@@ -333,13 +333,17 @@ void CSpecWheel::ExecuteBind(int Bind)
 {
 	if(GameClient()->m_Snap.m_SpecInfo.m_SpectatorId < 0)
 		return;
+	char aEscapedName[MAX_NAME_LENGTH * 2] = "";
+	char *pDst = aEscapedName;
+	str_escape(&pDst, GameClient()->m_aClients[GameClient()->m_Snap.m_SpecInfo.m_SpectatorId].m_aName, aEscapedName + sizeof(aEscapedName));
+
 	std::string Command{m_vSpecBinds[Bind].m_aCommand};
 	std::string old_str{"%plnick%"};
 	size_t startnick {Command.find(old_str)};
 	while (startnick != std::string::npos)
 	{
-		Command.replace(startnick, old_str.length(), GameClient()->m_aClients[GameClient()->m_Snap.m_SpecInfo.m_SpectatorId].m_aName);
-		startnick = Command.find(old_str, startnick + str_length(GameClient()->m_aClients[GameClient()->m_Snap.m_SpecInfo.m_SpectatorId].m_aName));
+		Command.replace(startnick, old_str.length(), aEscapedName);
+		startnick = Command.find(old_str, startnick + str_length(aEscapedName));
 	}
 	old_str = {"%plid%"};
 	size_t startid {Command.find(old_str)};
