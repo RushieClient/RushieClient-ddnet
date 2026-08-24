@@ -1252,11 +1252,14 @@ CUi::EPopupMenuFunctionResult CScoreboard::CScoreboardPopupContext::Render(void 
 		Container.VSplitLeft(ActionSpacing, nullptr, &Container);
 		Container.VSplitLeft(ActionSize, &Action, &Container);
 
-		if(pUi->DoButton_FontIcon(&pPopupContext->m_MuteAction, FontIcon::BAN, Client.m_ChatIgnore, &Action, BUTTONFLAG_LEFT, ActionCorners))
+		if(pUi->DoButton_FontIcon(&pPopupContext->m_MuteAction, FontIcon::BAN, Client.m_Foe, &Action, BUTTONFLAG_LEFT, ActionCorners))
 		{
-			Client.m_ChatIgnore ^= 1;
+			if(Client.m_Foe)
+				pScoreboard->GameClient()->Client()->Foes()->RemoveFriend(Client.m_aName, Client.m_aClan);
+			else
+				pScoreboard->GameClient()->Client()->Foes()->AddFriend(Client.m_aName, Client.m_aClan);
 		}
-		pScoreboard->GameClient()->m_Tooltips.DoToolTip(&pPopupContext->m_MuteAction, &Action, Client.m_ChatIgnore ? Localize("Unmute") : Localize("Mute"));
+		pScoreboard->GameClient()->m_Tooltips.DoToolTip(&pPopupContext->m_MuteAction, &Action, Client.m_Foe ? Localize("Unmute") : Localize("Mute"));
 
 		Container.VSplitLeft(ActionSpacing, nullptr, &Container);
 		Container.VSplitLeft(ActionSize, &Action, &Container);
