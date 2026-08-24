@@ -2278,3 +2278,30 @@ float CRClient::GetMultiplySoundVolume(int SoundId)
 
 	return g_Config.m_RcSndGunFireVolume / 100.0f;
 }
+
+// Alpha in spec
+bool CRClient::IsOtherTeamAlpha(int ClientId) const
+{
+	if(!g_Config.m_RcSaveAlphaInOtherTeamInSpec)
+		return GameClient()->IsOtherTeam(ClientId);
+
+	bool Local = GameClient()->m_Snap.m_LocalClientId == ClientId;
+
+	if(GameClient()->m_Snap.m_LocalClientId < 0)
+		return false;
+	else if(ClientId < 0)
+		return false;
+	else if(GameClient()->m_Snap.m_SpecInfo.m_Active && GameClient()->m_Snap.m_SpecInfo.m_SpectatorId != SPEC_FREEVIEW)
+	{
+		if(GameClient()->m_Teams.Team(ClientId) == TEAM_SUPER || GameClient()->m_Teams.Team(GameClient()->m_Snap.m_SpecInfo.m_SpectatorId) == TEAM_SUPER)
+			return false;
+		return GameClient()->m_Teams.Team(ClientId) != GameClient()->m_Teams.Team(GameClient()->m_Snap.m_SpecInfo.m_SpectatorId);
+	}
+	else if((GameClient()->m_aClients[GameClient()->m_Snap.m_LocalClientId].m_Solo || GameClient()->m_aClients[ClientId].m_Solo) && !Local)
+		return true;
+
+	if(GameClient()->m_Teams.Team(ClientId) == TEAM_SUPER || GameClient()->m_Teams.Team(GameClient()->m_Snap.m_LocalClientId) == TEAM_SUPER)
+		return false;
+
+	return GameClient()->m_Teams.Team(ClientId) != GameClient()->m_Teams.Team(GameClient()->m_Snap.m_LocalClientId);
+}

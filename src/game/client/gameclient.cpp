@@ -2495,7 +2495,7 @@ void CGameClient::OnNewSnapshot()
 					vec2(m_Snap.m_aCharacters[i].m_Cur.m_X, m_Snap.m_aCharacters[i].m_Cur.m_Y),
 					Client()->IntraGameTick(g_Config.m_ClDummy));
 				float Alpha = 1.0f;
-				if(IsOtherTeam(i))
+				if(m_RClient.IsOtherTeamAlpha(i))
 					Alpha = g_Config.m_ClShowOthersAlpha / 100.0f;
 				const float Volume = 1.0f; // TODO snd_game_volume_others
 				m_Effects.AirJump(Pos, Alpha, Volume);

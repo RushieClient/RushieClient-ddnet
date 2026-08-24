@@ -38,7 +38,7 @@ void CRechargeBars::RenderRechargeBar(const int ClientId)
 	Position.x -= RechargeBarHalfWidth;
 	Position.y += 48;
 
-	float Alpha = GameClient()->IsOtherTeam(ClientId) ? g_Config.m_ClShowOthersAlpha / 100.0f : 1.0f;
+	float Alpha = GameClient()->m_RClient.IsOtherTeamAlpha(ClientId) ? g_Config.m_ClShowOthersAlpha / 100.0f : 1.0f;
 	if(pCharacterPred->m_IsInFreeze)
 		Alpha *= 0;
 

@@ -1085,6 +1085,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 				   g_Config.m_RcShowSavesCount);
 			Column.HSplitTop(LineSize, &Button, &Column);
 			Ui()->DoScrollbarOption(&g_Config.m_RcSndGunFireVolume, &g_Config.m_RcSndGunFireVolume, &Button, RCLocalize("Gun fire volume", "RClient"), 0, 100, &CUi::ms_LinearScrollbarScale, 0);
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcSaveAlphaInOtherTeamInSpec, RCLocalize("Fix cl_show_others_alpha in spec", "RClient"), &g_Config.m_RcSaveAlphaInOtherTeamInSpec, &Column, LineSize);
 		}
 
 		if(s_CurHelpCustomTab == HELP_TAB_SORT)

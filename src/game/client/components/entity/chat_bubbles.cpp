@@ -209,7 +209,7 @@ void CChatBubbles::RenderChatBubbles(int ClientId)
 	for(CBubble &Bubble : m_avChatBubbles[ClientId])
 	{
 		float Alpha = 1.0f;
-		if(GameClient()->IsOtherTeam(ClientId))
+		if(GameClient()->m_RClient.IsOtherTeamAlpha(ClientId))
 			Alpha = g_Config.m_ClShowOthersAlpha / 100.0f;
 
 		Alpha *= GetAlpha(Bubble.m_Time);

@@ -1043,7 +1043,7 @@ void CNamePlates::RenderNamePlateGame(vec2 Position, const CNetObj_PlayerInfo *p
 	CNamePlateData Data;
 
 	const auto &ClientData = GameClient()->m_aClients[pPlayerInfo->m_ClientId];
-	const bool OtherTeam = GameClient()->IsOtherTeam(pPlayerInfo->m_ClientId);
+	const bool OtherTeam = GameClient()->m_RClient.IsOtherTeamAlpha(pPlayerInfo->m_ClientId);
 
 	Data.m_InGame = true;
 

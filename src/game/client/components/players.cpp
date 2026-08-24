@@ -403,7 +403,7 @@ void CPlayers::RenderHookCollLine(
 	// Render hook coll line
 	const int HookCollSize = Local ? g_Config.m_ClHookCollSize : g_Config.m_ClHookCollSizeOther;
 
-	float Alpha = GameClient()->IsOtherTeam(ClientId) ? g_Config.m_ClShowOthersAlpha / 100.0f : 1.0f;
+	float Alpha = GameClient()->m_RClient.IsOtherTeamAlpha(ClientId) ? g_Config.m_ClShowOthersAlpha / 100.0f : 1.0f;
 	Alpha *= (float)g_Config.m_ClHookCollAlpha / 100;
 	if(Alpha <= 0.0f)
 		return;
@@ -485,7 +485,7 @@ void CPlayers::RenderHook(
 	if(ClientId >= 0)
 		Intra = GameClient()->m_aClients[ClientId].m_IsPredicted ? Client()->PredIntraGameTick(g_Config.m_ClDummy) : Client()->IntraGameTick(g_Config.m_ClDummy);
 
-	bool OtherTeam = GameClient()->IsOtherTeam(ClientId);
+	bool OtherTeam = GameClient()->m_RClient.IsOtherTeamAlpha(ClientId);
 	float Alpha = (OtherTeam || ClientId < 0) ? g_Config.m_ClShowOthersAlpha / 100.0f : 1.0f;
 	if(ClientId == -2) // ghost
 		Alpha = g_Config.m_ClRaceGhostAlpha / 100.0f;
@@ -573,7 +573,7 @@ void CPlayers::RenderPlayer(
 	CTeeRenderInfo RenderInfo = *pRenderInfo;
 
 	bool Local = GameClient()->m_Snap.m_LocalClientId == ClientId;
-	bool OtherTeam = GameClient()->IsOtherTeam(ClientId);
+	bool OtherTeam = GameClient()->m_RClient.IsOtherTeamAlpha(ClientId);
 	// float Alpha = (OtherTeam || ClientId < 0) ? g_Config.m_ClShowOthersAlpha / 100.0f : 1.0f;
 	bool Spec = GameClient()->m_Snap.m_SpecInfo.m_Active;
 
@@ -1174,7 +1174,7 @@ void CPlayers::RenderPlayerGhost(
 	CTeeRenderInfo RenderInfo = *pRenderInfo;
 
 	bool Local = GameClient()->m_Snap.m_LocalClientId == ClientId;
-	bool OtherTeam = GameClient()->IsOtherTeam(ClientId);
+	bool OtherTeam = GameClient()->m_RClient.IsOtherTeamAlpha(ClientId);
 	float Alpha = 1.0f;
 
 	RenderTools()->m_LocalTeeRender = Local; // TClient
@@ -1699,7 +1699,7 @@ void CPlayers::OnRender()
 		}
 
 		const int ClientId = Client.ClientId();
-		float Alpha = (GameClient()->IsOtherTeam(ClientId) || ClientId < 0) ? g_Config.m_ClShowOthersAlpha / 100.f : 1.f;
+		float Alpha = (GameClient()->m_RClient.IsOtherTeamAlpha(ClientId) || ClientId < 0) ? g_Config.m_ClShowOthersAlpha / 100.f : 1.f;
 		if(ClientId == -2) // ghost
 		{
 			Alpha = g_Config.m_ClRaceGhostAlpha / 100.f;

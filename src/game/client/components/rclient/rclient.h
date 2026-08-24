@@ -235,6 +235,9 @@ public:
 
 	// Gun Volume
 	float GetMultiplySoundVolume(int SoundId);
+
+	// Alpha in spec
+	bool IsOtherTeamAlpha(int ClientId) const;
 };
 
 #endif //GAME_CLIENT_COMPONENTS_RCLIENT_RCLIENT_H

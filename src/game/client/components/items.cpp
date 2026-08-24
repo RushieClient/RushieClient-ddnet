@@ -52,7 +52,7 @@ void CItems::RenderProjectile(const CProjectileData *pCurrent, int ItemId)
 	if(GameClient()->m_Snap.m_pGameInfoObj && !(GameClient()->m_Snap.m_pGameInfoObj->m_GameStateFlags & GAMESTATEFLAG_PAUSED))
 		s_LastGameTickTime = Client()->GameTickTime(g_Config.m_ClDummy);
 
-	bool IsOtherTeam = (pCurrent->m_ExtraInfo && pCurrent->m_Owner >= 0 && GameClient()->IsOtherTeam(pCurrent->m_Owner));
+	bool IsOtherTeam = (pCurrent->m_ExtraInfo && pCurrent->m_Owner >= 0 && GameClient()->m_RClient.IsOtherTeamAlpha(pCurrent->m_Owner));
 
 	int PredictionTick = Client()->GetPredictionTick();
 
@@ -314,7 +314,7 @@ void CItems::RenderLaser(const CLaserData *pCurrent, bool IsPredicted)
 		ColorIn = g_Config.m_ClLaserRifleInnerColor;
 	}
 
-	bool IsOtherTeam = (pCurrent->m_ExtraInfo && pCurrent->m_Owner >= 0 && GameClient()->IsOtherTeam(pCurrent->m_Owner));
+	bool IsOtherTeam = (pCurrent->m_ExtraInfo && pCurrent->m_Owner >= 0 && GameClient()->m_RClient.IsOtherTeamAlpha(pCurrent->m_Owner));
 
 	float Alpha = IsOtherTeam ? g_Config.m_ClShowOthersAlpha / 100.0f : 1.f;
 
@@ -736,7 +736,7 @@ void CItems::ReconstructSmokeTrail(const CProjectileData *pCurrent, int DestroyT
 	float Gt = (Client()->PrevGameTick(g_Config.m_ClDummy) - pCurrent->m_StartTick) / (float)Client()->GameTickSpeed() + Client()->GameTickTime(g_Config.m_ClDummy);
 
 	float Alpha = 1.f;
-	if(pCurrent->m_ExtraInfo && pCurrent->m_Owner >= 0 && GameClient()->IsOtherTeam(pCurrent->m_Owner))
+	if(pCurrent->m_ExtraInfo && pCurrent->m_Owner >= 0 && GameClient()->m_RClient.IsOtherTeamAlpha(pCurrent->m_Owner))
 	{
 		Alpha = g_Config.m_ClShowOthersAlpha / 100.0f;
 	}
