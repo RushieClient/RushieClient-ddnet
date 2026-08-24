@@ -971,12 +971,31 @@ Find Finish:
 == Поиск финиша:
 
 [RClient]
+Others(*)
+== Другие(*)
+
+[RClient]
+All(*)
+== Все(*)
+
+* - Can be fake info in some cases. Better when preinput enabled
+== * - Может быть фейк инфа в некоторых случаях. Лучше когда preinput включен
+
+[RClient]
 Popup
 == 
 
 [RClient]
 by qxdFox/Entity Client
 == 
+
+[RClient]
+Show Chat Bubbles Yourself Input
+== Показывать Чат бабл Ввода текста
+
+[RClient]
+Show Chat Bubbles Above Yourself
+== Показывать Чат бабл Над собой
 
 [RClient]
 Discord RPC
@@ -995,6 +1014,22 @@ Steam
 == 
 
 [RClient]
+Filter Chat
+== Фильтр Чата
+
+[RClient]
+Filter Nameplates
+== Фильтр Неймплейтов
+
+[RClient]
+Filter Scoreboard
+== Фильтр Табло
+
+[RClient]
+Filter Info messages
+== Фильтр Инфо(килфид)
+
+[RClient]
 ru
 == 
 
@@ -1003,18 +1038,11 @@ en
 == 
 
 [RClient]
-Others(*)
-== Другие(*)
-
-[RClient]
-All(*)
-== Все(*)
-
-* - Can be fake info in some cases. Better when preinput enabled
-== * - Может быть фейк инфа в некоторых случаях. Лучше когда preinput включен
-
-[RClient]
 Wake up
+== 
+
+[RClient]
+Remove text on any input
 == 
 
 [RClient]
