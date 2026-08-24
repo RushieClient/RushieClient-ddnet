@@ -618,9 +618,6 @@ void CChat::OnMessage(int MsgType, void *pRawMsg)
 	{
 		CNetMsg_Sv_Chat *pMsg = (CNetMsg_Sv_Chat *)pRawMsg;
 
-		if(g_Config.m_RcMessageFilterMode != 0)
-			pMsg->m_pMessage = GameClient()->m_RClient.FilterMessage(pMsg->m_pMessage, true, pMsg->m_ClientId);
-
 		/*
 		if(g_Config.m_ClCensorChat)
 		{
@@ -738,6 +735,12 @@ void CChat::AddLine(int ClientId, int Team, const char *pLine)
 	// TClient
 	if(ClientId == CLIENT_MSG && !g_Config.m_TcShowChatClient)
 		return;
+
+	char aFilteredText[MAX_LINE_LENGTH];
+	str_copy(aFilteredText, pLine);
+	if(ClientId >= 0 && g_Config.m_RcMessageFilterMode != 0 && g_Config.m_RcMessageFilterChat)
+		str_copy(aFilteredText, GameClient()->m_RClient.FilterMessage(pLine, ClientId >= 0, ClientId));
+	pLine = aFilteredText;
 
 	// trim right and set maximum length to 256 utf8-characters
 	int Length = 0;
@@ -932,6 +935,12 @@ void CChat::AddLine(int ClientId, int Team, const char *pLine)
 			CurrentLine.m_Friend = LineAuthor.m_Friend;
 			CurrentLine.m_pManagedTeeRenderInfo = GameClient()->CreateManagedTeeRenderInfo(LineAuthor);
 		}
+	}
+
+	if(ClientId >= 0 && g_Config.m_RcMessageFilterMode != 0 && g_Config.m_RcMessageFilterChat)
+	{
+		const char *NicknameFilter = GameClient()->m_RClient.FilterMessage(CurrentLine.m_aName);
+		str_copy(CurrentLine.m_aName, NicknameFilter);
 	}
 
 	FChatMsgCheckAndPrint(CurrentLine);

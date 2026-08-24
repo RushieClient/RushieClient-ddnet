@@ -583,7 +583,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		DoMenuSettingsBar(&Column, apTabNames, NUMBER_OF_CHAT_TABS, s_aPageTabs, s_CurChatCustomTab, LineSize);
 		Column.HSplitTop(MarginSmall, nullptr, &Column);
 
-		const float m_BiggestTab = LineSize * 4.0f + LineSize * 2.0f + (LineSize + MarginExtraSmall + MarginSmall) * 2.0f;
+		const float m_BiggestTab = LineSize * 7.0f + (LineSize + 2.0f) + (LineSize + MarginExtraSmall) * 2.0f;
 		const float m_CurrentY = Column.y;
 		if(s_CurChatCustomTab == CHAT_TAB_MAIN)
 		{
@@ -628,6 +628,10 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 					Ui()->DoEditBox(&s_LineInput, &Button, EditBoxFontSize);
 				}
 			}
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcMessageFilterChat, RCLocalize("Filter Chat", "RClient"), &g_Config.m_RcMessageFilterChat, &Column, LineSize);
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcMessageFilterNameplates, RCLocalize("Filter Nameplates", "RClient"), &g_Config.m_RcMessageFilterNameplates, &Column, LineSize);
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcMessageFilterScoreboard, RCLocalize("Filter Scoreboard", "RClient"), &g_Config.m_RcMessageFilterScoreboard, &Column, LineSize);
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcMessageFilterInfoMessages, RCLocalize("Filter Info messages", "RClient"), &g_Config.m_RcMessageFilterInfoMessages, &Column, LineSize);
 		}
 		if(s_CurChatCustomTab == CHAT_TAB_TRANSLATE)
 		{

@@ -373,7 +373,15 @@ void CScoreboard::RenderSpectators(CUIRect Spectators)
 			TextRender()->TextColor(color_cast<ColorRGBA>(ColorHSLA(g_Config.m_ClAuthedPlayerColor)));
 		}
 
-		TextRender()->TextEx(&Cursor, GameClient()->m_aClients[pInfo->m_ClientId].m_aName);
+		if(g_Config.m_RcMessageFilterMode != 0 && g_Config.m_RcMessageFilterScoreboard)
+		{
+			const char *FilteredNickname = GameClient()->m_RClient.FilterMessage(GameClient()->m_aClients[pInfo->m_ClientId].m_aName);
+			TextRender()->TextEx(&Cursor, FilteredNickname);
+		}
+		else
+		{
+			TextRender()->TextEx(&Cursor, GameClient()->m_aClients[pInfo->m_ClientId].m_aName);
+		}
 		TextRender()->TextColor(TextRender()->DefaultTextColor());
 
 		CommaNeeded = true;
@@ -848,7 +856,15 @@ void CScoreboard::RenderScoreboard(CUIRect Scoreboard, int Team, int CountStart,
 				if(pInfo->m_ClientId >= 0 && g_Config.m_TcWarList && g_Config.m_TcWarListScoreboard && GameClient()->m_WarList.GetAnyWar(pInfo->m_ClientId))
 					TextRender()->TextColor(GameClient()->m_WarList.GetNameplateColor(pInfo->m_ClientId));
 
-				TextRender()->TextEx(&Cursor, ClientData.m_aName);
+				if(g_Config.m_RcMessageFilterMode != 0 && g_Config.m_RcMessageFilterScoreboard)
+				{
+					const char *FilteredNickname = GameClient()->m_RClient.FilterMessage(ClientData.m_aName);
+					TextRender()->TextEx(&Cursor, FilteredNickname);
+				}
+				else
+				{
+					TextRender()->TextEx(&Cursor, ClientData.m_aName);
+				}
 
 				// ready / watching
 				if(Client()->IsSixup() && Client()->m_TranslationContext.m_aClients[pInfo->m_ClientId].m_PlayerFlags7 & protocol7::PLAYERFLAG_READY)
