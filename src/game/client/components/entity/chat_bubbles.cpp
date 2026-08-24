@@ -148,6 +148,9 @@ void CChatBubbles::RemoveBubble(int ClientId, const CBubble &Bubble)
 
 void CChatBubbles::RenderCurInput(float y)
 {
+	if(!g_Config.m_RcChatBubblesSelfInput)
+		return;
+
 	const int FontSize = g_Config.m_RcChatBubbleSize;
 	const char *pText = Chat()->m_Input.GetString();
 	int LocalId = GameClient()->m_Snap.m_LocalClientId;
@@ -197,7 +200,11 @@ void CChatBubbles::RenderChatBubbles(int ClientId)
 	float BaseY = Position.y - GetOffset(ClientId) - NameplateOffset;
 
 	if(ClientId == GameClient()->m_Snap.m_LocalClientId)
+	{
 		RenderCurInput(BaseY);
+		if(!g_Config.m_RcChatBubblesSelfBubble)
+			return;
+	}
 
 	for(CBubble &Bubble : m_avChatBubbles[ClientId])
 	{

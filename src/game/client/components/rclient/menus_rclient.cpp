@@ -348,6 +348,8 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	Column.HSplitTop(MarginSmall, nullptr, &Column);
 
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcChatBubbles, RCLocalize("Enable Chat Bubbles", "RClient"), &g_Config.m_RcChatBubbles, &Column, LineSize);
+	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcChatBubblesSelfInput, RCLocalize("Show Chat Bubbles Yourself Input", "RClient"), &g_Config.m_RcChatBubblesSelfInput, &Column, LineSize);
+	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcChatBubblesSelfBubble, RCLocalize("Show Chat Bubbles Above Yourself", "RClient"), &g_Config.m_RcChatBubblesSelfBubble, &Column, LineSize);
 	Column.HSplitTop(LineSize, &Button, &Column);
 	Ui()->DoScrollbarOption(&g_Config.m_RcChatBubbleSize, &g_Config.m_RcChatBubbleSize, &Button, RCLocalize("Chat bubble size", "RClient"), 15, 30, &CUi::ms_LinearScrollbarScale, 0);
 	Column.HSplitTop(LineSize, &Button, &Column);
