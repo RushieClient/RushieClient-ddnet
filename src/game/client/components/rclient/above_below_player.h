@@ -4,6 +4,7 @@
 
 class CAboveBelowPlayer : public CComponent
 {
+	const float m_HideAnim = -0.25f;
 	float m_AboveAnim = 0.0f;
 	float m_SameAnim = 0.0f;
 	float m_BelowAnim = 0.0f;

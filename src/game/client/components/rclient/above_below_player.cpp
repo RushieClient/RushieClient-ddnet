@@ -11,9 +11,9 @@ CAboveBelowPlayer::CAboveBelowPlayer()
 
 void CAboveBelowPlayer::OnReset()
 {
-	m_AboveAnim = 0.0f;
-	m_SameAnim = 0.0f;
-	m_BelowAnim = 0.0f;
+	m_AboveAnim = m_HideAnim;
+	m_SameAnim = m_HideAnim;
+	m_BelowAnim = m_HideAnim;
 	m_PlayerAbove = false;
 	m_PlayerSame = false;
 	m_PlayerBelow = false;
@@ -71,7 +71,7 @@ void CAboveBelowPlayer::OnRender()
 		}
 	}
 
-	m_LinesNum = (m_PlayerAbove ? 1 : m_AboveAnim > 0.0f ? 1 : 0) + (m_PlayerSame ? 1 : m_SameAnim > 0.0f ? 1 : 0) + (m_PlayerBelow ? 1 : m_BelowAnim > 0.0f ? 1 : 0);
+	m_LinesNum = (m_PlayerAbove ? 1 : m_AboveAnim > m_HideAnim ? 1 : 0) + (m_PlayerSame ? 1 : m_SameAnim > m_HideAnim ? 1 : 0) + (m_PlayerBelow ? 1 : m_BelowAnim > m_HideAnim ? 1 : 0);
 
 	if(!m_LinesNum)
 		return;
@@ -91,7 +91,7 @@ void CAboveBelowPlayer::OnRender()
 	Line.y = (pScreen->h - Line.h) * g_Config.m_RcNotifyWhenPosPlayerPosY / 100.0f;
 	Ui()->m_RcForceRealAspect = false;
 
-	if(m_PlayerAbove || m_AboveAnim > 0.0f)
+	if(m_PlayerAbove || m_AboveAnim > m_HideAnim)
 	{
 		Line.HSplitTop(LineSize, &CurLine, &Line);
 		const float AnimSpeed = 0.2f;
@@ -99,14 +99,17 @@ void CAboveBelowPlayer::OnRender()
 			m_AboveAnim += Client()->RenderFrameTime() / AnimSpeed;
 		else
 			m_AboveAnim -= Client()->RenderFrameTime() / AnimSpeed * 2.0f;
-		m_AboveAnim = std::clamp(m_AboveAnim, 0.0f, 1.0f);
-		CurLine.Draw(ColorRGBA(0.25f, 0.70f, 0.40f, 0.5f * CRClient::EaseInOutQuad(m_AboveAnim)), IGraphics::CORNER_ALL, CurLine.h / 3.0f);
-		SLabelProperties Props;
-		Props.SetColor(ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f * CRClient::EaseInOutQuad(m_AboveAnim)));
-		Ui()->DoLabel(&CurLine, "/\\ You Above /\\", FontSize, TEXTALIGN_MC, Props);
-		Line.HSplitTop(Margin, nullptr, &Line);
+		m_AboveAnim = std::clamp(m_AboveAnim, m_HideAnim, 1.0f);
+		if(m_AboveAnim > 0.0f)
+		{
+			CurLine.Draw(ColorRGBA(0.25f, 0.70f, 0.40f, 0.5f * CRClient::EaseInOutQuad(m_AboveAnim)), IGraphics::CORNER_ALL, CurLine.h / 3.0f);
+			SLabelProperties Props;
+			Props.SetColor(ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f * CRClient::EaseInOutQuad(m_AboveAnim)));
+			Ui()->DoLabel(&CurLine, "/\\ You Above /\\", FontSize, TEXTALIGN_MC, Props);
+			Line.HSplitTop(Margin, nullptr, &Line);
+		}
 	}
-	if(m_PlayerSame || m_SameAnim > 0.0f)
+	if(m_PlayerSame || m_SameAnim > m_HideAnim)
 	{
 		Line.HSplitTop(LineSize, &CurLine, &Line);
 		const float AnimSpeed = 0.2f;
@@ -114,14 +117,17 @@ void CAboveBelowPlayer::OnRender()
 			m_SameAnim += Client()->RenderFrameTime() / AnimSpeed;
 		else
 			m_SameAnim -= Client()->RenderFrameTime() / AnimSpeed * 2.0f;
-		m_SameAnim = std::clamp(m_SameAnim, 0.0f, 1.0f);
-		CurLine.Draw(ColorRGBA(0.90f, 0.65f, 0.20f, 0.5f * CRClient::EaseInOutQuad(m_SameAnim)), IGraphics::CORNER_ALL, CurLine.h / 3.0f);
-		SLabelProperties Props;
-		Props.SetColor(ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f * CRClient::EaseInOutQuad(m_SameAnim)));
-		Ui()->DoLabel(&CurLine, "= Same =", FontSize, TEXTALIGN_MC, Props);
-		Line.HSplitTop(Margin, nullptr, &Line);
+		m_SameAnim = std::clamp(m_SameAnim, m_HideAnim, 1.0f);
+		if(m_SameAnim > 0.0f)
+		{
+			CurLine.Draw(ColorRGBA(0.90f, 0.65f, 0.20f, 0.5f * CRClient::EaseInOutQuad(m_SameAnim)), IGraphics::CORNER_ALL, CurLine.h / 3.0f);
+			SLabelProperties Props;
+			Props.SetColor(ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f * CRClient::EaseInOutQuad(m_SameAnim)));
+			Ui()->DoLabel(&CurLine, "= Same =", FontSize, TEXTALIGN_MC, Props);
+			Line.HSplitTop(Margin, nullptr, &Line);
+		}
 	}
-	if(m_PlayerBelow || m_BelowAnim > 0.0f)
+	if(m_PlayerBelow || m_BelowAnim > m_HideAnim)
 	{
 		Line.HSplitTop(LineSize, &CurLine, &Line);
 		const float AnimSpeed = 0.2f;
@@ -129,10 +135,13 @@ void CAboveBelowPlayer::OnRender()
 			m_BelowAnim += Client()->RenderFrameTime() / AnimSpeed;
 		else
 			m_BelowAnim -= Client()->RenderFrameTime() / AnimSpeed * 2.0f;
-		m_BelowAnim = std::clamp(m_BelowAnim, 0.0f, 1.0f);
-		CurLine.Draw(ColorRGBA(0.85f, 0.30f, 0.30f, 0.5f * CRClient::EaseInOutQuad(m_BelowAnim)), IGraphics::CORNER_ALL, CurLine.h / 3.0f);
-		SLabelProperties Props;
-		Props.SetColor(ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f * CRClient::EaseInOutQuad(m_BelowAnim)));
-		Ui()->DoLabel(&CurLine, "\\/ You Below \\/", FontSize, TEXTALIGN_MC, Props);
+		m_BelowAnim = std::clamp(m_BelowAnim, m_HideAnim, 1.0f);
+		if(m_BelowAnim > 0.0f)
+		{
+			CurLine.Draw(ColorRGBA(0.85f, 0.30f, 0.30f, 0.5f * CRClient::EaseInOutQuad(m_BelowAnim)), IGraphics::CORNER_ALL, CurLine.h / 3.0f);
+			SLabelProperties Props;
+			Props.SetColor(ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f * CRClient::EaseInOutQuad(m_BelowAnim)));
+			Ui()->DoLabel(&CurLine, "\\/ You Below \\/", FontSize, TEXTALIGN_MC, Props);
+		}
 	}
 }
