@@ -649,6 +649,87 @@ public:
 	}
 };
 
+class CTranslateBackendDDG : public ITranslateBackendHttp
+{
+private:
+	bool ParseResponseJson(const json_value *pObj, CTranslateResponse &Out)
+	{
+		if(!pObj)
+		{
+			str_copy(Out.m_Text, "Response is not JSON");
+			return false;
+		}
+
+		if(pObj->type != json_object)
+		{
+			str_copy(Out.m_Text, "Response is not array");
+			return false;
+		}
+
+		const json_value *pTranslatedText = json_object_get(pObj, "translated");
+		if(pTranslatedText == &json_value_none)
+		{
+			str_copy(Out.m_Text, "No destination-text");
+			return false;
+		}
+		if(pTranslatedText->type != json_string)
+		{
+			str_copy(Out.m_Text, "destination-text is not string");
+			return false;
+		}
+
+		const json_value *pDetectedLanguage = json_object_get(pObj, "detected_language");
+		if(pDetectedLanguage == &json_value_none)
+		{
+			str_copy(Out.m_Text, "No source-language");
+			return false;
+		}
+		if(pDetectedLanguage->type != json_string)
+		{
+			str_copy(Out.m_Text, "source-language is not string");
+			return false;
+		}
+
+		UrlDecode(pTranslatedText->u.string.ptr, Out.m_Text, sizeof(Out.m_Text));
+		str_utf8_fix_truncation(Out.m_Text);
+		str_copy(Out.m_Language, pDetectedLanguage->u.string.ptr);
+
+		return true;
+	}
+
+protected:
+	bool ParseResponse(CTranslateResponse &Out) override
+	{
+		json_value *pObj = m_pHttpRequest->ResultJson();
+		bool Res = ParseResponseJson(pObj, Out);
+		json_value_free(pObj);
+		return Res;
+	}
+
+public:
+	const char *EncodeTarget(const char *pTarget) const override
+	{
+		if(!pTarget || pTarget[0] == '\0')
+			return DefaultConfig::TcTranslateTarget;
+		return pTarget;
+	}
+	const char *Name() const override
+	{
+		return "DuckDuckGo";
+	}
+	CTranslateBackendDDG(IHttp &Http, const char *pText, const char *pVqd, bool SendTranslate = false)
+	{
+		char aBuf[512];
+		str_format(aBuf, sizeof(aBuf), "%s/translation.js?vqd=%s&query=translate&to=%s",
+			g_Config.m_TcTranslateEndpoint[0] != '\0' ? g_Config.m_TcTranslateEndpoint : "https://duckduckgo.com",
+			pVqd,
+			CTranslateBackendDDG::EncodeTarget(SendTranslate ? g_Config.m_RcTranslateSendTarget : g_Config.m_TcTranslateTarget));
+		m_pHttpRequest->HeaderString("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:132.0) Gecko/20100101 Firefox/132.0");
+		CreateHttpRequest(Http, aBuf);
+		m_pHttpRequest->PostTextPlain(pText);
+	}
+};
+
 void CTranslate::ConTranslate(IConsole::IResult *pResult, void *pUserData)
 {
 	const char *pName;
@@ -767,6 +848,8 @@ void CTranslate::Translate(CChat::CLine &Line, bool ShowProgress)
 		Job.m_pBackend = std::make_unique<CTranslateBackendFedilab>(*Http(), pTextToTranslate);
 	else if(str_comp_nocase(g_Config.m_TcTranslateBackend, "bing") == 0)
 		Job.m_pBackend = std::make_unique<CTranslateBackendBing>(*Http(), pTextToTranslate);
+	else if(str_comp_nocase(g_Config.m_TcTranslateBackend, "duckduckgo") == 0)
+		Job.m_pBackend = std::make_unique<CTranslateBackendDDG>(*Http(), pTextToTranslate, GameClient()->m_RClient.GetDDGVqd());
 	else
 	{
 		GameClient()->m_Chat.Echo("Invalid translate backend");
@@ -916,6 +999,8 @@ void CTranslate::TranslateSend(const char *Line, int WorkId, int m_JobIntVariabl
 		Job.m_pBackend = std::make_unique<CTranslateBackendFedilab>(*Http(), Job.m_pLineTranslate->m_aText, true);
 	else if(str_comp_nocase(g_Config.m_TcTranslateBackend, "bing") == 0)
 		Job.m_pBackend = std::make_unique<CTranslateBackendBing>(*Http(), Job.m_pLineTranslate->m_aText, true);
+	else if(str_comp_nocase(g_Config.m_TcTranslateBackend, "duckduckgo") == 0)
+		Job.m_pBackend = std::make_unique<CTranslateBackendDDG>(*Http(), Job.m_pLineTranslate->m_aText, GameClient()->m_RClient.GetDDGVqd(), true);
 	else
 	{
 		GameClient()->m_Chat.Echo("Invalid translate backend");

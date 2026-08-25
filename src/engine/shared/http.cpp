@@ -246,9 +246,14 @@ bool CHttpRequest::ConfigureHandle(void *pHandle)
 		break;
 	case REQUEST::POST:
 	case REQUEST::POST_JSON:
+	case REQUEST::POST_PLAINTEXT:
 		if(m_Type == REQUEST::POST_JSON)
 		{
 			Header("Content-Type: application/json");
+		}
+		else if(m_Type == REQUEST::POST_PLAINTEXT)
+		{
+			Header("Content-Type: text/plain");
 		}
 		else
 		{

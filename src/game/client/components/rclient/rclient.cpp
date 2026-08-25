@@ -95,6 +95,8 @@ void CRClient::OnInit()
 	SetForcedAspectRatio();
 	if(m_LatestLangsList.empty())
 		ResetLanguages();
+	if(!str_comp(g_Config.m_TcTranslateBackend, "duckduckgo"))
+		FetchDuckDuckGoVqd();
 }
 
 void CRClient::OnRender()
@@ -183,6 +185,21 @@ void CRClient::OnRender()
 		FinishRclientBCFetchList();
 		ResetRclientBCFetchList();
 	}
+
+	if(m_pRClientVqdTask && m_pRClientVqdTask->State() == EHttpState::DONE)
+	{
+		FinishDuckDuckGoVqd();
+		ResetDuckDuckGoVqdTask();
+	}
+	if(!str_comp(g_Config.m_TcTranslateBackend, "duckduckgo"))
+	{
+		const uint64_t CurrentTime = time_get();
+		if(CurrentTime > m_LastDDGFetchTime)
+		{
+			m_LastDDGFetchTime = CurrentTime + 600 * time_freq();
+			FetchDuckDuckGoVqd();
+		}
+	}
 }
 
 void CRClient::OnConsoleInit()
@@ -223,6 +240,7 @@ void CRClient::OnConsoleInit()
 	Console()->Chain("rc_message_filter_word_on_full_match", ConchainResetCensorListCache, this);
 	Console()->Chain("rc_message_filter_multiply_change_word_on_partial_match", ConchainResetCensorListCache, this);
 	Console()->Chain("rc_message_filter_word_on_partial_match", ConchainResetCensorListCache, this);
+	Console()->Chain("tc_translate_backend", ConchainCheckBackend, this);
 }
 
 void CRClient::OnMessage(int MsgType, void *pRawMsg)
@@ -2236,7 +2254,7 @@ void CRClient::ResetRclientBCFetchList()
 void CRClient::ConRClientTestFunction(IConsole::IResult *pResult, void *pUserData)
 {
 	CRClient *pThis = static_cast<CRClient *>(pUserData);
-	pThis->GetSavesAmount(pResult->GetString(0));
+	pThis->FetchDuckDuckGoVqd();
 }
 
 // Saves reader
@@ -2340,4 +2358,63 @@ void CRClient::RemoveHighlightPlayer(const char *PlayerName)
 void CRClient::ResetHighlightPlayer()
 {
 	m_HighLightPlayersList.clear();
+}
+
+// DuckDuckGo vqd parse
+void CRClient::ConchainCheckBackend(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData)
+{
+	pfnCallback(pResult, pCallbackUserData);
+	if(!str_comp(g_Config.m_TcTranslateBackend, "duckduckgo"))
+		((CRClient *)pUserData)->FetchDuckDuckGoVqd();
+}
+
+void CRClient::FetchDuckDuckGoVqd()
+{
+	if(m_pRClientVqdTask && !m_pRClientVqdTask->Done())
+		return;
+	m_pRClientVqdTask = HttpGet("https://duckduckgo.com/?q=translate");
+	m_pRClientVqdTask->Timeout(CTimeout{10000, 0, 500, 10});
+	m_pRClientVqdTask->LogProgress(HTTPLOG::FAILURE);
+	m_pRClientVqdTask->HeaderString("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:132.0) Gecko/20100101 Firefox/132.0");
+	Http()->Run(m_pRClientVqdTask);
+}
+
+void CRClient::FinishDuckDuckGoVqd()
+{
+	unsigned char *pResult;
+	size_t ResultLength;
+	m_pRClientVqdTask->Result(&pResult, &ResultLength);
+	std::string Html((const char *)pResult, ResultLength);
+	const char *pVqd = str_find(Html.c_str(), "vqd=\"");
+	if(pVqd)
+	{
+		pVqd += 5;
+		const char *pVqdEnd = str_find(pVqd, "\"");
+		if(pVqdEnd)
+		{
+			str_truncate(m_aDuckDuckGoVqd, sizeof(m_aDuckDuckGoVqd), pVqd, pVqdEnd - pVqd);
+			m_FetchedDuckDuckGoVqd = true;
+		}
+	}
+}
+
+void CRClient::ResetDuckDuckGoVqdTask()
+{
+	if(m_pRClientVqdTask)
+	{
+		m_pRClientVqdTask->Abort();
+		m_pRClientVqdTask = NULL;
+	}
+}
+
+const char *CRClient::GetDDGVqd()
+{
+	if(m_FetchedDuckDuckGoVqd)
+	{
+		return m_aDuckDuckGoVqd;
+	}
+	else
+	{
+		return "4-67416225507472698366506662181163081335";
+	}
 }

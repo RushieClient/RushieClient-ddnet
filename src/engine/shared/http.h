@@ -64,6 +64,7 @@ class CHttpRequest : public IHttpRequest
 		HEAD,
 		POST,
 		POST_JSON,
+		POST_PLAINTEXT,
 	};
 
 	static constexpr const char *GetRequestType(REQUEST Type)
@@ -76,6 +77,7 @@ class CHttpRequest : public IHttpRequest
 			return "HEAD";
 		case REQUEST::POST:
 		case REQUEST::POST_JSON:
+		case REQUEST::POST_PLAINTEXT:
 			return "POST";
 		}
 
@@ -199,6 +201,13 @@ public:
 		m_BodyLength = str_length(pJson);
 		m_pBody = (unsigned char *)malloc(m_BodyLength);
 		mem_copy(m_pBody, pJson, m_BodyLength);
+	}
+	void PostTextPlain(const char *pText)
+	{
+		m_Type = REQUEST::POST_PLAINTEXT;
+		m_BodyLength = str_length(pText);
+		m_pBody = (unsigned char *)malloc(m_BodyLength);
+		mem_copy(m_pBody, pText, m_BodyLength);
 	}
 	void Header(const char *pNameColonValue);
 	void HeaderString(const char *pName, const char *pValue)

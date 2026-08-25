@@ -108,7 +108,7 @@ class CRClient : public CComponent
 	static void ConLaunchSecondClient(IConsole::IResult *pResult, void *pUserData);
 
 	// Fetch bestclient users
-	uint64_t m_LastBCFetchTime;
+	uint64_t m_LastBCFetchTime = 0;
 	std::vector<int> m_vBcUsers;
 	std::shared_ptr<CHttpRequest> m_pRClientBCFetchListTask = nullptr;
 	void FetchRclientBCFetchList();
@@ -117,6 +117,14 @@ class CRClient : public CComponent
 
 	// Test function
 	static void ConRClientTestFunction(IConsole::IResult *pResult, void *pUserData);
+
+	// DuckDuckGo vqd parse
+	std::shared_ptr<CHttpRequest> m_pRClientVqdTask = nullptr;
+	void FetchDuckDuckGoVqd();
+	void FinishDuckDuckGoVqd();
+	void ResetDuckDuckGoVqdTask();
+	static void ConchainCheckBackend(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
+	uint64_t m_LastDDGFetchTime  = 0;
 public:
 	CRClient();
 	int Sizeof() const override { return sizeof(*this); }
@@ -245,6 +253,11 @@ public:
 	void RemoveHighlightPlayer(const char *PlayerName);
 	void ResetHighlightPlayer();
 	std::vector<std::string> m_HighLightPlayersList;
+
+	// DuckDuckGo vqd parse
+	char m_aDuckDuckGoVqd[64] = "";
+	bool m_FetchedDuckDuckGoVqd = false;
+	const char *GetDDGVqd();
 };
 
 #endif //GAME_CLIENT_COMPONENTS_RCLIENT_RCLIENT_H

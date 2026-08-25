@@ -982,36 +982,12 @@ All(*)
 == * - Может быть фейк инфа в некоторых случаях. Лучше когда preinput включен
 
 [RClient]
-Popup
-== 
-
-[RClient]
-by qxdFox/Entity Client
-== 
-
-[RClient]
 Show Chat Bubbles Yourself Input
 == Показывать Чат бабл Ввода текста
 
 [RClient]
 Show Chat Bubbles Above Yourself
 == Показывать Чат бабл Над собой
-
-[RClient]
-Discord RPC
-== 
-
-[RClient]
-Steam
-== 
-
-[RClient]
-*
-== 
-
-[RClient]
-^
-== 
 
 [RClient]
 Filter Chat
@@ -1030,12 +1006,52 @@ Filter Info messages
 == Фильтр Инфо(килфид)
 
 [RClient]
+Rcon
+== 
+
+[RClient]
+Popup
+== 
+
+[RClient]
+by qxdFox/Entity Client
+== 
+
+[RClient]
+Discord RPC
+== 
+
+[RClient]
+Steam
+== 
+
+[RClient]
+Enable highlight players in chat
+== Вкл подсветку игроков в чате
+
+[RClient]
+*
+== 
+
+[RClient]
+^
+== 
+
+[RClient]
 ru
 == 
 
 [RClient]
 en
 == 
+
+[RClient]
+Choose backend
+== Выбрать бекенд
+
+[RClient]
+Google backends
+== Гугл бекенд
 
 [RClient]
 Wake up
@@ -1050,12 +1066,20 @@ by +KZ/Kaizo Client
 == 
 
 [RClient]
+Pseudo fly
+== Псевдо флай
+
+[RClient]
 Monitor(win7-11)
 == 
 
 [RClient]
 Exclude(win10-11)
 == 
+
+[RClient]
+Fix cl_show_others_alpha in spec
+== Фикс cl_show_others_alpha в спеке
 
 [RClient]
 name-team-score
@@ -1080,6 +1104,22 @@ id
 [RClient]
 name-team
 == 
+
+[RClient]
+Auto login rcon on dummy
+== Авто логин ркона на дамми
+
+[RClient]
+Admin Panel
+== Админ Панель
+
+[RClient]
+Open Admin Panel
+== Открыть Админ Панель
+
+[RClient]
+Play sound on action
+== Проигрывать звук при действии
 
 [RClient]
 RClient \\/

@@ -751,7 +751,8 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 				static CScrollRegion s_ScrollRegionTranslateBackend;
 				s_StateTranslateBackend.m_SelectionPopupContext.m_pScrollRegion = &s_ScrollRegionTranslateBackend;
 
-				static const char *s_apBackendNames[] = {"ftapi", "libretranslate", "googlegtx", "fedilab", "bing"};
+				static const char *s_apBackendNames[] = {"ftapi", "libretranslate", "googlegtx", "fedilab", "bing", "duckduckgo"};
+				static const char *s_apBackendNamesVisual[] = {"ftapi (not work)", "libretranslate (need key)", "googlegtx (maybe work)", "fedilab (not work)", "bing (work on upd)", "duckduckgo (work on upd)"};
 				int BackendSelectedOld = -1;
 				for(size_t i = 0; i < std::size(s_apBackendNames); ++i)
 				{
@@ -1113,7 +1114,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		DoMenuSettingsBar(&Column, apTabNames, NUMBER_OF_HELP_TABS, s_aPageTabs, s_CurHelpCustomTab, LineSize);
 		Column.HSplitTop(MarginSmall, nullptr, &Column);
 
-		const float m_BiggestTab = LineSize * 4.0f + LineSize + (LineSize + 2.0f) * 2.0f;
+		const float m_BiggestTab = LineSize * 5.0f + LineSize + (LineSize + 2.0f) * 2.0f;
 		const float m_CurrentY = Column.y;
 
 		if(s_CurHelpCustomTab == HELP_TAB_MAIN)
