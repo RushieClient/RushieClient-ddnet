@@ -34,7 +34,6 @@ char CChat::ms_aDisplayText[MAX_LINE_LENGTH] = "";
 namespace ScrollBar
 {
 	static constexpr float SCROLLBAR_WIDTH = 10.0f;
-	static constexpr float SCROLLBAR_MARGIN = 3.0f;
 }
 
 CChat::CLine::CLine()
