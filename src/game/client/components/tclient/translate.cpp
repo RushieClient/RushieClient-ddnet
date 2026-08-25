@@ -918,7 +918,7 @@ void CTranslate::OnRender()
 			{
 				if(str_comp_nocase(Job.m_pLineTranslate->m_aText, Job.m_pTranslateResponse->m_Text) == 0) // Check for no translation difference
 					str_copy(Job.m_pTranslateResponse->m_Text, Job.m_pLineTranslate->m_aText, sizeof(Job.m_pTranslateResponse->m_Text));
-				else if(Job.m_TextPrefix[0] != '\0')
+				if(Job.m_TextPrefix[0] != '\0')
 				{
 					char aBuf[sizeof(Job.m_pTranslateResponse->m_Text)];
 					str_format(aBuf, sizeof(aBuf), "%s%s", Job.m_TextPrefix, Job.m_pTranslateResponse->m_Text);
