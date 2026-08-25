@@ -280,7 +280,7 @@ Disable for Notify in spec
 
 [RClient]
 Above/Below Player
-== Над/Под игрокм
+== Над/Под игроком
 
 [RClient]
 Notify when above player

@@ -2384,6 +2384,8 @@ void CRClient::FinishDuckDuckGoVqd()
 	unsigned char *pResult;
 	size_t ResultLength;
 	m_pRClientVqdTask->Result(&pResult, &ResultLength);
+	if(!pResult || !ResultLength)
+		return;
 	std::string Html((const char *)pResult, ResultLength);
 	const char *pVqd = str_find(Html.c_str(), "vqd=\"");
 	if(pVqd)
