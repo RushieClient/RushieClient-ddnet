@@ -580,7 +580,7 @@ Icons size in scoreboard
 
 [RClient]
 Detect BestClient users
-== Обрнаруживать юзеров BestClient
+== Обнаруживать юзеров BestClient
 
 [RClient]
 Binds

@@ -254,7 +254,8 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		{
 			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcShowHeartInScoreboard, RCLocalize("Show friend's heart in scoreboard", "RClient"), &g_Config.m_RcShowHeartInScoreboard, &Column, LineSize);
 			Column.HSplitTop(LineSize, &Button, &Column);
-			Ui()->DoScrollbarOption(&g_Config.m_RcSizeOfHeart, &g_Config.m_RcSizeOfHeart, &Button, RCLocalize("Heart size", "RClient"), 0, 200, &CUi::ms_LinearScrollbarScale, 0);
+			static int s_HeartSizeScoreboardId = 0;
+			Ui()->DoScrollbarOption(&s_HeartSizeScoreboardId, &g_Config.m_RcSizeOfHeart, &Button, RCLocalize("Heart size", "RClient"), 0, 200, &CUi::ms_LinearScrollbarScale, 0);
 		}
 		Column.HSplitTop(m_BiggestTab - Column.y + m_CurrentY, nullptr, &Column);
 	}
@@ -1070,7 +1071,8 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcShowhudPlayerCheckpoint, RCLocalize("Show checkpoint", "RClient"), &g_Config.m_RcShowhudPlayerCheckpoint, &Column, LineSize);
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcShowhudSmallerHud, RCLocalize("Smaller hud (angle,checkpoint)", "RClient"), &g_Config.m_RcShowhudSmallerHud, &Column, LineSize);
 	Column.HSplitTop(LineSize, &Button, &Column);
-	Ui()->DoScrollbarOption(&g_Config.m_RcSizeOfHeart, &g_Config.m_RcSizeOfHeart, &Button, RCLocalize("Heart size", "RClient"), 0, 200, &CUi::ms_LinearScrollbarScale, 0);
+	static int s_HeartSizeHudId = 0;
+	Ui()->DoScrollbarOption(&s_HeartSizeHudId, &g_Config.m_RcSizeOfHeart, &Button, RCLocalize("Heart size", "RClient"), 0, 200, &CUi::ms_LinearScrollbarScale, 0);
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcShowhudVotingPercent, RCLocalize("Show percent in vote", "RClient"), &g_Config.m_RcShowhudVotingPercent, &Column, LineSize);
 
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
@@ -1487,11 +1489,14 @@ void CMenus::RenderSettingsRClientInfo(CUIRect MainView)
 
 	const char *apTabNames[] = {
 		RCLocalize("Settings", "RClient"),
+		RCLocalize("Rcon", "RClient"),
 		RCLocalize("Chat Binds", "RClient"),
 		RCLocalize("Spec Wheel", "RClient")};
 	static int s_aShowTabs[NUMBER_OF_RCLIENT_TABS] = {};
 	for(int i = 0; i < NUMBER_OF_RCLIENT_TABS - 1; ++i)
 	{
+		if(i == RCLIENT_TAB_RCON && !Client()->RconAuthed())
+			continue;
 		DoButton_CheckBoxAutoVMarginAndSet(&s_aShowTabs[i], apTabNames[i], &s_aShowTabs[i], i % 2 == 0 ? &LeftSettings : &RightSettings, LineSize);
 		SetFlag(g_Config.m_RcRClientSettingsTabs, i, s_aShowTabs[i]);
 	}
