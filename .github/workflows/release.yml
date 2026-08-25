@@ -23,7 +23,7 @@ jobs:
 
     env:
       BUILD_PREFIX: ddnet
-      CLIENT_NAME: TClient
+      CLIENT_NAME: RClient
       TARGET_REPOSITORY: ${{ github.repository }} 
 
     steps:
