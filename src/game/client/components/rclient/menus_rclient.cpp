@@ -287,7 +287,14 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 			RCLocalize("Hitbox", "RClient")
 		};
 		DoMenuSettingsBar(&Column, apTabNames, NUMBER_OF_PLAYERS_TABS, s_aPageTabs, s_CurPlayersCustomTab, LineSize);
-		Column.HSplitTop(MarginSmall, nullptr, &Column);
+		Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
+		Column.HSplitTop(Margin, &Label, &Column);
+		if(s_CurPlayersCustomTab == PLAYERS_TAB_HITBOX)
+		{
+			Label.VSplitRight(Column.w / NUMBER_OF_PLAYERS_TABS * 2, nullptr, &Label);
+			Label.VSplitRight(Column.w / NUMBER_OF_PLAYERS_TABS, &Label, nullptr);
+			Ui()->DoLabel(&Label, RCLocalize("idea from BestClient", "RClient"), Margin, TEXTALIGN_MC);
+		}
 
 		const float m_BiggestTab = LineSize * 4.0f + 2.0f * 2.0f;
 		const float m_CurrentY = Column.y;
@@ -353,7 +360,6 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	Ui()->DoLabel(&Label, RCLocalize("Chat Bubbles", "RClient"), HeadlineFontSize, TEXTALIGN_MC);
 	Column.HSplitTop(Margin, &Label, &Column);
 	Ui()->DoLabel(&Label, RCLocalize("by qxdFox/Entity Client", "RClient"), Margin, TEXTALIGN_MC);
-	Column.HSplitTop(MarginSmall, nullptr, &Column);
 
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcChatBubbles, RCLocalize("Enable Chat Bubbles", "RClient"), &g_Config.m_RcChatBubbles, &Column, LineSize);
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcChatBubblesSelfInput, RCLocalize("Show Chat Bubbles Yourself Input", "RClient"), &g_Config.m_RcChatBubblesSelfInput, &Column, LineSize);
@@ -525,7 +531,8 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	s_SectionBoxes.push_back(Column);
 	Column.HSplitTop(HeadlineHeight, &Label, &Column);
 	Ui()->DoLabel(&Label, RCLocalize("Above/Below Player", "RClient"), HeadlineFontSize, TEXTALIGN_MC);
-	Column.HSplitTop(MarginSmall, nullptr, &Column);
+	Column.HSplitTop(Margin, &Label, &Column);
+	Ui()->DoLabel(&Label, RCLocalize("idea from BestClient", "RClient"), Margin, TEXTALIGN_MC);
 
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcNotifyWhenAbovePosPlayer, RCLocalize("Notify when above player", "RClient"), &g_Config.m_RcNotifyWhenAbovePosPlayer, &Column, LineSize);
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcNotifyWhenSamePosPlayer, RCLocalize("Notify when same pos as player", "RClient"), &g_Config.m_RcNotifyWhenSamePosPlayer, &Column, LineSize);
@@ -902,7 +909,13 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		};
 
 		DoMenuSettingsBar(&Column, apTabNames, NUMBER_OF_AFK_TABS, s_aPageTabs, s_CurAfkCustomTab, LineSize);
-		Column.HSplitTop(MarginSmall, nullptr, &Column);
+		Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
+		Column.HSplitTop(Margin, &Label, &Column);
+		if(s_CurAfkCustomTab == AFK_TAB_SPEC)
+		{
+			Label.VSplitRight(Label.w / NUMBER_OF_AFK_TABS, nullptr, &Label);
+			Ui()->DoLabel(&Label, RCLocalize("idea from BestClient", "RClient"), Margin, TEXTALIGN_MC);
+		}
 
 		const float m_BiggestTab = LineSize * 4.0f + LineSize * 2.0f + (LineSize + 2.0f);
 		const float m_CurrentY = Column.y;
@@ -954,7 +967,6 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	Ui()->DoLabel(&Label, RCLocalize("Client Indicator", "RClient"), HeadlineFontSize, TEXTALIGN_MC);
 	Column.HSplitTop(Margin, &Label, &Column);
 	Ui()->DoLabel(&Label, RCLocalize("by +KZ/Kaizo Client", "RClient"), Margin, TEXTALIGN_MC);
-	Column.HSplitTop(MarginSmall, nullptr, &Column);
 
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcCustomClientsSendClientType, RCLocalize("Send to server that u use RClient", "RClient"), &g_Config.m_RcCustomClientsSendClientType, &Column, LineSize);
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcCustomClientsCollectClientType, RCLocalize("Detect other clients", "RClient"), &g_Config.m_RcCustomClientsCollectClientType, &Column, LineSize);
