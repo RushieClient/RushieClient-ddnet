@@ -1006,6 +1006,42 @@ Filter Info messages
 == Фильтр Инфо(килфид)
 
 [RClient]
+Enable highlight players in chat
+== Вкл подсветку игроков в чате
+
+[RClient]
+Choose backend
+== Выбрать бекенд
+
+[RClient]
+Google backends
+== Гугл бекенд
+
+[RClient]
+Pseudo fly
+== Псевдо флай
+
+[RClient]
+Fix cl_show_others_alpha in spec
+== Фикс cl_show_others_alpha в спеке
+
+[RClient]
+Auto login rcon on dummy
+== Авто логин ркона на дамми
+
+[RClient]
+Admin Panel
+== Админ Панель
+
+[RClient]
+Open Admin Panel
+== Открыть Админ Панель
+
+[RClient]
+Play sound on action
+== Проигрывать звук при действии
+
+[RClient]
 Rcon
 == 
 
@@ -1026,10 +1062,6 @@ Steam
 == 
 
 [RClient]
-Enable highlight players in chat
-== Вкл подсветку игроков в чате
-
-[RClient]
 *
 == 
 
@@ -1046,28 +1078,16 @@ en
 == 
 
 [RClient]
-Choose backend
-== Выбрать бекенд
-
-[RClient]
-Google backends
-== Гугл бекенд
-
-[RClient]
 Wake up
 == 
 
 [RClient]
 Remove text on any input
-== 
+== Убирать текст при любом вводе
 
 [RClient]
 by +KZ/Kaizo Client
 == 
-
-[RClient]
-Pseudo fly
-== Псевдо флай
 
 [RClient]
 Monitor(win7-11)
@@ -1076,10 +1096,6 @@ Monitor(win7-11)
 [RClient]
 Exclude(win10-11)
 == 
-
-[RClient]
-Fix cl_show_others_alpha in spec
-== Фикс cl_show_others_alpha в спеке
 
 [RClient]
 name-team-score
@@ -1104,22 +1120,6 @@ id
 [RClient]
 name-team
 == 
-
-[RClient]
-Auto login rcon on dummy
-== Авто логин ркона на дамми
-
-[RClient]
-Admin Panel
-== Админ Панель
-
-[RClient]
-Open Admin Panel
-== Открыть Админ Панель
-
-[RClient]
-Play sound on action
-== Проигрывать звук при действии
 
 [RClient]
 RClient \\/
