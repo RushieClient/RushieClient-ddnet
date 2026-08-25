@@ -170,6 +170,14 @@ jobs:
         ${{ matrix.workaround-issue10203-run-after-configure }}
         ${{ matrix.cmake-path }}cmake --build . --config Release --target everything
 
+    - name: Print DDNet.exe SHA256
+      if: contains(matrix.os, 'windows')
+      shell: pwsh
+      run: |
+        $hash = (Get-FileHash .\release\DDNet.exe -Algorithm SHA256).Hash
+        Write-Output "DDNet.exe SHA256: $hash"
+        "DDNet.exe SHA256: ``$hash``" >> $env:GITHUB_STEP_SUMMARY
+
     - name: Test release
       run: |
         cd release

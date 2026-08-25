@@ -101,6 +101,14 @@ jobs:
         ${{ matrix.cmake-path }}cmake -E env ${{ matrix.cmake-init-env }} $ENVFLAGS ${{ matrix.cmake-path }}cmake ${{ matrix.cmake-args }} $POST_FLAGS -DCMAKE_BUILD_TYPE=Release -DDOWNLOAD_GTEST=ON -DCMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE=. ..
         ${{ matrix.cmake-path }}cmake --build . --config Release --target everything ${{ matrix.build-args }}
 
+    - name: Print DDNet.exe SHA256
+      if: contains(matrix.os, 'windows')
+      shell: pwsh
+      run: |
+        $hash = (Get-FileHash .\release\DDNet.exe -Algorithm SHA256).Hash
+        Write-Output "DDNet.exe SHA256: $hash"
+        "DDNet.exe SHA256: ``$hash``" >> $env:GITHUB_STEP_SUMMARY
+
     - name: Package
       run: |
         cd release
