@@ -1013,6 +1013,8 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	}
 	DoLine_KeyReader(Column, s_ReaderButtonFindTeleport, s_ClearButtonFindTeleport, RCLocalize("Find Teleport", "RClient"), "rc_goto_tele_cursor");
 	DoLine_KeyReader(Column, s_ReaderButtonFindFinish, s_ClearButtonFindFinish, RCLocalize("Find Finish", "RClient"), "rc_goto_finish_cursor");
+	static int s_WeaponSlotsBindsId = 0;
+	DoButton_CheckBoxAutoVMarginAndSet(&s_WeaponSlotsBindsId, RCLocalize("Weapon slots", "RClient"), &g_Config.m_RcWeaponSlots, &Column, LineSize);
 
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
 	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;
@@ -1116,7 +1118,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		DoMenuSettingsBar(&Column, apTabNames, NUMBER_OF_HELP_TABS, s_aPageTabs, s_CurHelpCustomTab, LineSize);
 		Column.HSplitTop(MarginSmall, nullptr, &Column);
 
-		const float m_BiggestTab = LineSize * 5.0f + LineSize + (LineSize + 2.0f) * 2.0f;
+		const float m_BiggestTab = LineSize * 6.0f + LineSize + (LineSize + 2.0f) * 2.0f;
 		const float m_CurrentY = Column.y;
 
 		if(s_CurHelpCustomTab == HELP_TAB_MAIN)
@@ -1140,6 +1142,8 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 			Column.HSplitTop(LineSize, &Button, &Column);
 			Ui()->DoScrollbarOption(&g_Config.m_RcSndGunFireVolume, &g_Config.m_RcSndGunFireVolume, &Button, RCLocalize("Gun fire volume", "RClient"), 0, 100, &CUi::ms_LinearScrollbarScale, 0);
 			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcSaveAlphaInOtherTeamInSpec, RCLocalize("Fix cl_show_others_alpha in spec", "RClient"), &g_Config.m_RcSaveAlphaInOtherTeamInSpec, &Column, LineSize);
+			static int s_WeaponSlotsHelpId = 0;
+			DoButton_CheckBoxAutoVMarginAndSet(&s_WeaponSlotsHelpId, RCLocalize("Weapon slots", "RClient"), &g_Config.m_RcWeaponSlots, &Column, LineSize);
 		}
 
 		if(s_CurHelpCustomTab == HELP_TAB_SORT)

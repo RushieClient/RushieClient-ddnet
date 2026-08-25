@@ -2423,3 +2423,19 @@ const char *CRClient::GetDDGVqd()
 		return "4-67416225507472698366506662181163081335";
 	}
 }
+
+int CRClient::GetWeaponSlot(int Value)
+{
+	int Count = 1;
+	int LastOwned = WEAPON_HAMMER + 1;
+	for(int Wanted = WEAPON_HAMMER + 1; Wanted <= WEAPON_LASER + 1; Wanted++)
+	{
+		if(!GameClient()->m_PredictedChar.m_aWeapons[Wanted - 1].m_Got)
+			continue;
+		LastOwned = Wanted;
+		if(Count == Value)
+			return Wanted;
+		Count++;
+	}
+	return LastOwned;
+}

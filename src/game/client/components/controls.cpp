@@ -99,7 +99,10 @@ void CControls::ConKeyInputSet(IConsole::IResult *pResult, void *pUserData)
 	CInputSet *pSet = (CInputSet *)pUserData;
 	if(pResult->GetInteger(0))
 	{
-		*pSet->m_apVariables[g_Config.m_ClDummy] = pSet->m_Value;
+		int Value = pSet->m_Value;
+		if(g_Config.m_RcWeaponSlots)
+			Value = pSet->m_pControls->GameClient()->m_RClient.GetWeaponSlot(Value);
+		*pSet->m_apVariables[g_Config.m_ClDummy] = Value;
 	}
 }
 

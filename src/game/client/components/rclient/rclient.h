@@ -258,6 +258,8 @@ public:
 	char m_aDuckDuckGoVqd[64] = "";
 	bool m_FetchedDuckDuckGoVqd = false;
 	const char *GetDDGVqd();
+
+	int GetWeaponSlot(int Value);
 };
 
 #endif //GAME_CLIENT_COMPONENTS_RCLIENT_RCLIENT_H

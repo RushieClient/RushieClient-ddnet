@@ -199,3 +199,6 @@ MACRO_CONFIG_INT(RcSaveAlphaInOtherTeamInSpec, rc_save_alpha_in_other_team_in_sp
 // Highlight player
 MACRO_CONFIG_COL(RcHighlightChatBackgroundColor, rc_highlight_chat_background_color, 1348796288, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_COLALPHA, "Chat background color for highlighted")
 MACRO_CONFIG_INT(RcEnableHighlightChat, rc_enable_highlight_chat, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Some peoples can be highlighted")
+
+// Weapon Slots
+MACRO_CONFIG_INT(RcWeaponSlots, rc_weapon_slots, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Slots for weapons")
