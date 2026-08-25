@@ -340,8 +340,11 @@ static int FindPlayerClientId(CGameClient *pGameClient ,const char *Nickname)
 	}
 	if(ClientID == -1)
 	{
-		if(pGameClient->m_aClients[str_toint(Nickname)].m_Active)
-			ClientID = str_toint(Nickname);
+		ClientID = str_toint(Nickname);
+		if(ClientID < 0 || ClientID >= MAX_CLIENTS)
+			return -1;
+		if(!pGameClient->m_aClients[ClientID].m_Active)
+			ClientID = -1;
 	}
 	if(ClientID >= 0 && ClientID < MAX_CLIENTS)
 		return ClientID;
