@@ -1354,6 +1354,11 @@ void CChat::OnRender()
 
 	const float Height = 300.0f;
 	const float Width = Height * (g_Config.m_RcCustomAspectDisable & RcAspectDisable::CHAT ? Graphics()->ScreenAspectReal() : Graphics()->ScreenAspect());
+	if(m_LastRenderWidth != Width)
+	{
+		m_LastRenderWidth = Width;
+		RebuildChat();
+	}
 	Graphics()->MapScreen(0.0f, 0.0f, Width, Height);
 
 	float x = 5.0f;

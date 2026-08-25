@@ -2029,6 +2029,11 @@ void CHud::OnRender()
 		return;
 	m_Width = 300.0f * (g_Config.m_RcCustomAspectDisable & RcAspectDisable::HUD ? Graphics()->ScreenAspectReal() : Graphics()->ScreenAspect());
 	m_Height = 300.0f;
+	if(m_LastWidth != m_Width)
+	{
+		m_LastWidth = m_Width;
+		ResetHudContainers();
+	}
 	Graphics()->MapScreen(0.0f, 0.0f, m_Width, m_Height);
 
 #if defined(CONF_VIDEORECORDER)

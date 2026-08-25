@@ -80,6 +80,7 @@ class CChat : public CComponent
 
 	bool m_PrevScoreBoardShowed;
 	bool m_PrevShowChat;
+	float m_LastRenderWidth = -1.0f;
 
 	CLine m_aLines[MAX_LINES];
 	int m_CurrentLine;
