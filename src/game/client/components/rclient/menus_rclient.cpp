@@ -291,8 +291,8 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		Column.HSplitTop(Margin, &Label, &Column);
 		if(s_CurPlayersCustomTab == PLAYERS_TAB_HITBOX)
 		{
-			Label.VSplitRight(Column.w / NUMBER_OF_PLAYERS_TABS * 2, nullptr, &Label);
-			Label.VSplitRight(Column.w / NUMBER_OF_PLAYERS_TABS, &Label, nullptr);
+			Label.VSplitRight(Column.w / (float)NUMBER_OF_PLAYERS_TABS * 2, nullptr, &Label);
+			Label.VSplitRight(Column.w / (float)NUMBER_OF_PLAYERS_TABS, &Label, nullptr);
 			Ui()->DoLabel(&Label, RCLocalize("idea from BestClient", "RClient"), Margin, TEXTALIGN_MC);
 		}
 
@@ -913,7 +913,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		Column.HSplitTop(Margin, &Label, &Column);
 		if(s_CurAfkCustomTab == AFK_TAB_SPEC)
 		{
-			Label.VSplitRight(Label.w / NUMBER_OF_AFK_TABS, nullptr, &Label);
+			Label.VSplitRight(Column.w / (float)NUMBER_OF_AFK_TABS, nullptr, &Label);
 			Ui()->DoLabel(&Label, RCLocalize("idea from BestClient", "RClient"), Margin, TEXTALIGN_MC);
 		}
 
