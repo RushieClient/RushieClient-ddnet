@@ -2038,7 +2038,7 @@ void CRClient::ConGotoTeleCursor(IConsole::IResult *pResult, void *pUserData)
 
 	int BestIndex = 0;
 	float BestDist = -1.0f;
-	for(int i = 0; i < Targets.size(); i++)
+	for(int i = 0; i < (int)Targets.size(); i++)
 	{
 		const vec2 Pos = vec2(Targets[i].x * 32.0f + 16.0f, Targets[i].y * 32.0f + 16.0f);
 		const float Dist = distance(Pos, Center);
@@ -2118,7 +2118,7 @@ void CRClient::ConGotoFinishCursor(IConsole::IResult *pResult, void *pUserData)
 
 	int BestIndex = 0;
 	float BestDist = -1.0f;
-	for(int i = 0; i < Targets.size(); i++)
+	for(int i = 0; i < (int)Targets.size(); i++)
 	{
 		const vec2 Pos = vec2(Targets[i].x * 32.0f + 16.0f, Targets[i].y * 32.0f + 16.0f);
 		const float Dist = distance(Pos, Center);

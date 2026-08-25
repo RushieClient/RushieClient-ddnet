@@ -13,7 +13,7 @@ class CSwapTimer : public CComponent
 	std::vector<SSwapList> m_vSwapList;
 
 	void AddNewSwapEntry(int FromClientId, int ToClientId);
-	void RemoveSwapEntrySwaped(int ToClientId, int FromClientId);
+	void RemoveSwapEntrySwapped(int ToClientId, int FromClientId);
 	void RemoveSwapEntryId(int FromClientId, int ToClientId);
 	void RemoveSwapEntryIdAll(int ClientId);
 

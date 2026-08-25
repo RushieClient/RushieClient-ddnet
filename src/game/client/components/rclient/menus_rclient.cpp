@@ -752,7 +752,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 				s_StateTranslateBackend.m_SelectionPopupContext.m_pScrollRegion = &s_ScrollRegionTranslateBackend;
 
 				static const char *s_apBackendNames[] = {"ftapi", "libretranslate", "googlegtx", "fedilab", "bing", "duckduckgo"};
-				static const char *s_apBackendNamesVisual[] = {"ftapi (not work)", "libretranslate (need key)", "googlegtx (maybe work)", "fedilab (not work)", "bing (work on upd)", "duckduckgo (work on upd)"};
+				static const char *s_apBackendNamesVisual[] = {RCLocalize("ftapi (not work)"), RCLocalize("libretranslate (need key)"), RCLocalize("googlegtx (maybe work)"), RCLocalize("fedilab (not work)"), RCLocalize("bing (works on upd)"), RCLocalize("duckduckgo (works on upd))")};
 				int BackendSelectedOld = -1;
 				for(size_t i = 0; i < std::size(s_apBackendNames); ++i)
 				{
@@ -767,7 +767,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 				DropDownRect.VSplitMid(&Label, &DropDownRect);
 				Ui()->DoLabel(&Label, RCLocalize("Choose backend", "RClient"), FontSize, TEXTALIGN_ML);
 				const int BackendSelectedNew = Ui()->DoDropDown(&DropDownRect, BackendSelectedOld,
-					s_apBackendNames, std::size(s_apBackendNames), s_StateTranslateBackend);
+					s_apBackendNamesVisual, std::size(s_apBackendNames), s_StateTranslateBackend);
 				if(BackendSelectedOld != BackendSelectedNew)
 				{
 					str_copy(g_Config.m_TcTranslateBackend, s_apBackendNames[BackendSelectedNew]);
@@ -1178,7 +1178,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 
 void CMenus::RenderSettingsRClientRcon(CUIRect MainView)
 {
-	CUIRect Column, LeftView, RightView, Button, Label;
+	CUIRect Column, LeftView, RightView, Label;
 
 	static CScrollRegion s_ScrollRegion;
 	vec2 ScrollOffset(0.0f, 0.0f);

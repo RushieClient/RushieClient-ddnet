@@ -51,7 +51,7 @@ void CSwapTimer::RemoveSwapEntryId(int FromClientId, int ToClientId)
 	}
 }
 
-void CSwapTimer::RemoveSwapEntrySwaped(int ToClientId, int FromClientId)
+void CSwapTimer::RemoveSwapEntrySwapped(int ToClientId, int FromClientId)
 {
 	const int LocalId0 = GameClient()->m_aLocalIds[0];
 	const int LocalId1 = GameClient()->m_aLocalIds[1];
@@ -199,7 +199,7 @@ void CSwapTimer::GameClientMessage(int MsgType, void *pRawMsg, bool Dummy)
 				char aName2[16];
 				str_truncate(aName2, sizeof(aName2), pStart + pStartLen, strlen(pMsg->m_pMessage) - (pStart - pMsg->m_pMessage) - pStartLen - 1);
 
-				RemoveSwapEntrySwaped(FindClientId(aName), FindClientId(aName2));
+				RemoveSwapEntrySwapped(FindClientId(aName), FindClientId(aName2));
 			}
 		}
 	}

@@ -345,7 +345,7 @@ void CSpecWheel::ExecuteBind(int Bind)
 		Command.replace(startnick, old_str.length(), aEscapedName);
 		startnick = Command.find(old_str, startnick + str_length(aEscapedName));
 	}
-	old_str = {"%plid%"};
+	old_str = "%plid%";
 	size_t startid {Command.find(old_str)};
 	while (startid != std::string::npos)
 	{
