@@ -200,6 +200,10 @@ class CChat : public CComponent
 	{
 	public:
 		CChat *m_pChat = nullptr;
+		CButtonContainer m_HighlightAction;
+		CButtonContainer m_SpecAction;
+		CButtonContainer m_MuteAction;
+
 		CButtonContainer m_CopyMessage;
 		CButtonContainer m_CopyLine;
 		CButtonContainer m_CopyFull;

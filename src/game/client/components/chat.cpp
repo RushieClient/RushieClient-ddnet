@@ -1649,7 +1649,17 @@ void CChat::OnRender()
 			Graphics()->TextureClear();
 			if(Line.m_QuadContainerIndex != -1)
 			{
-				Graphics()->SetColor(color_cast<ColorRGBA>(ColorHSLA(g_Config.m_ClChatBackgroundColor, true)).WithMultipliedAlpha(Blend));
+				if(g_Config.m_RcEnableHighlightChat)
+				{
+					if(GameClient()->m_RClient.IsNeedHighlightPlayer(Line.m_aName))
+						Graphics()->SetColor(color_cast<ColorRGBA>(ColorHSLA(g_Config.m_RcHighlightChatBackgroundColor, true)).WithMultipliedAlpha(Blend));
+					else
+						Graphics()->SetColor(color_cast<ColorRGBA>(ColorHSLA(g_Config.m_ClChatBackgroundColor, true)).WithMultipliedAlpha(Blend));
+				}
+				else
+				{
+					Graphics()->SetColor(color_cast<ColorRGBA>(ColorHSLA(g_Config.m_ClChatBackgroundColor, true)).WithMultipliedAlpha(Blend));
+				}
 				Graphics()->RenderQuadContainerEx(Line.m_QuadContainerIndex, 0, -1, 0, ((y + RealMsgPaddingY / 2.0f) - Line.m_TextYOffset));
 			}
 		}
@@ -1907,10 +1917,10 @@ CUi::EPopupMenuFunctionResult CChat::CChatPopupContext::Render(void *pContext, C
 	bool IsClient = false;
 	if(pPopupContext->m_ClientId < 0)
 		IsServer = true;
-		if(pPopupContext->m_ClientId == -2)
-			IsClient = true;
+	if(pPopupContext->m_ClientId == -2)
+		IsClient = true;
 
-	CUIRect Label, Container;
+	CUIRect Label, Container, Action;
 	const float ItemSpacing = 2.0f;
 	const float FontSize = 12.0f;
 
@@ -1922,6 +1932,86 @@ CUi::EPopupMenuFunctionResult CChat::CChatPopupContext::Render(void *pContext, C
 	pUi->DoLabel(&Label, NicknameId, FontSize, TEXTALIGN_TL);
 
 	const float ButtonSize = 17.5f;
+
+	if(!IsServer)
+	{
+		const int ActionsNum = 3;
+		const float ActionSize = 22.5f;
+		const float ActionSpacing = (View.w - (ActionsNum * ActionSize)) / 2;
+		int ActionCorners = IGraphics::CORNER_ALL;
+
+		View.HSplitTop(ItemSpacing, nullptr, &View);
+		View.HSplitTop(ActionSize, &Container, &View);
+
+		Container.VSplitLeft(ActionSize, &Action, &Container);
+
+		const bool IsNeedHighlight = pChat->GameClient()->m_RClient.IsNeedHighlightPlayer(Client.m_aName);
+		ColorRGBA HighlightActionColor = IsNeedHighlight ? ColorRGBA(0.95f, 0.3f, 0.3f, 0.85f * pUi->ButtonColorMul(&pPopupContext->m_HighlightAction)) :
+									ColorRGBA(1.0f, 1.0f, 1.0f, 0.5f * pUi->ButtonColorMul(&pPopupContext->m_HighlightAction));
+		if(pUi->DoButton_FontIcon(&pPopupContext->m_HighlightAction, FontIcon::RC_LIST_TRACK, Client.m_Friend, &Action, BUTTONFLAG_LEFT, ActionCorners, true, HighlightActionColor))
+		{
+			if(IsNeedHighlight)
+			{
+				pChat->GameClient()->m_RClient.RemoveHighlightPlayer(Client.m_aName);
+			}
+			else
+			{
+				pChat->GameClient()->m_RClient.AddHighlightPlayer(Client.m_aName);
+			}
+		}
+
+		Container.VSplitLeft(ActionSpacing, nullptr, &Container);
+		Container.VSplitLeft(ActionSize, &Action, &Container);
+
+		if(pUi->DoButton_FontIcon(&pPopupContext->m_MuteAction, FontIcon::BAN, Client.m_Foe, &Action, BUTTONFLAG_LEFT, ActionCorners))
+		{
+			if(Client.m_Foe)
+				pChat->GameClient()->Client()->Foes()->RemoveFriend(Client.m_aName, Client.m_aClan);
+			else
+				pChat->GameClient()->Client()->Foes()->AddFriend(Client.m_aName, Client.m_aClan);
+		}
+
+		Container.VSplitLeft(ActionSpacing, nullptr, &Container);
+		Container.VSplitLeft(ActionSize, &Action, &Container);
+
+		bool IsSpectating = pChat->GameClient()->m_Snap.m_SpecInfo.m_Active && pChat->GameClient()->m_Snap.m_SpecInfo.m_SpectatorId == pPopupContext->m_ClientId;
+		ColorRGBA SpectatingActionColor = IsSpectating ? ColorRGBA(0.95f, 0.3f, 0.3f, 0.85f * pUi->ButtonColorMul(&pPopupContext->m_SpecAction)) :
+									ColorRGBA(1.0f, 1.0f, 1.0f, 0.5f * pUi->ButtonColorMul(&pPopupContext->m_SpecAction));
+		if(pUi->DoButton_FontIcon(&pPopupContext->m_SpecAction, FontIcon::EYE, Client.m_Friend, &Action, BUTTONFLAG_LEFT, ActionCorners, true, SpectatingActionColor))
+		{
+			if(Client.m_Team != TEAM_SPECTATORS)
+			{
+				if(IsSpectating)
+				{
+					pChat->GameClient()->m_Spectator.Spectate(SPEC_FREEVIEW);
+					pChat->Console()->ExecuteLine("say /spec", IConsole::CLIENT_ID_UNSPECIFIED);
+				}
+				else
+				{
+					if(pChat->GameClient()->m_Snap.m_SpecInfo.m_Active)
+					{
+						pChat->GameClient()->m_Spectator.Spectate(pPopupContext->m_ClientId);
+					}
+					else
+					{
+						// escape the name
+						char aEscapedCommand[2 * MAX_NAME_LENGTH + 32];
+						str_copy(aEscapedCommand, "say /spec \"");
+						char *pDst = aEscapedCommand + str_length(aEscapedCommand);
+						str_escape(&pDst, Client.m_aName, aEscapedCommand + sizeof(aEscapedCommand));
+						str_append(aEscapedCommand, "\"");
+
+						pChat->Console()->ExecuteLine(aEscapedCommand, IConsole::CLIENT_ID_UNSPECIFIED);
+					}
+				}
+			}
+			else
+			{
+				pChat->Echo("Player in spectators");
+			}
+
+		}
+	}
 
 	View.HSplitTop(ItemSpacing, nullptr, &View);
 	View.HSplitTop(ButtonSize, &Container, &View);

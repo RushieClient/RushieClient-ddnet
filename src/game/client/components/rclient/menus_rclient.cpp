@@ -600,6 +600,8 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcCommandsFixLayout, RCLocalize("Fix language commands", "RClient"), &g_Config.m_RcCommandsFixLayout, &Column, LineSize);
 			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcChatScroll, RCLocalize("Enable chat scroll", "RClient"), &g_Config.m_RcChatScroll, &Column, LineSize);
 			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcChatShowScrollbar, RCLocalize("Show scroll bar", "RClient"), &g_Config.m_RcChatShowScrollbar, &Column, LineSize);
+			static CButtonContainer s_HighlightMessageColor;
+			DoButton_ColorPickerAutoVMargin(&s_HighlightMessageColor, RCLocalize("Enable highlight players in chat", "RClient"), &g_Config.m_RcHighlightChatBackgroundColor, color_cast<ColorRGBA>(ColorHSLA(DefaultConfig::RcHighlightChatBackgroundColor, true)), &Column, LineSize, true, &g_Config.m_RcEnableHighlightChat);
 		}
 		if(s_CurChatCustomTab == CHAT_TAB_FILTER)
 		{

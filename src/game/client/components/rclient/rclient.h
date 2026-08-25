@@ -238,6 +238,13 @@ public:
 
 	// Alpha in spec
 	bool IsOtherTeamAlpha(int ClientId) const;
+
+	// Highlight Players
+	bool IsNeedHighlightPlayer(const char *PlayerName);
+	void AddHighlightPlayer(const char *PlayerName);
+	void RemoveHighlightPlayer(const char *PlayerName);
+	void ResetHighlightPlayer();
+	std::vector<std::string> m_HighLightPlayersList;
 };
 
 #endif //GAME_CLIENT_COMPONENTS_RCLIENT_RCLIENT_H

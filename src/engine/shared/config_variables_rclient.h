@@ -195,3 +195,6 @@ MACRO_CONFIG_INT(RcUiShowRClient, rc_ui_show_rclient, 1, 0, 1, CFGFLAG_CLIENT | 
 // Alpha in spec
 MACRO_CONFIG_INT(RcSaveAlphaInOtherTeamInSpec, rc_save_alpha_in_other_team_in_spec, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "fix cl_show_others_alpha")
 
+// Highlight player
+MACRO_CONFIG_COL(RcHighlightChatBackgroundColor, rc_highlight_chat_background_color, 1348796288, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_COLALPHA, "Chat background color for highlighted")
+MACRO_CONFIG_INT(RcEnableHighlightChat, rc_enable_highlight_chat, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Some peoples can be highlighted")

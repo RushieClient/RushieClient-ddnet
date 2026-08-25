@@ -1591,6 +1591,7 @@ float CRClient::GetChatHeight(int ClientId)
 	constexpr float FontSize = 6.0f;
 	constexpr float ItemSpacing = 1.0f;
 	constexpr float ButtonSize = 17.5f / 2.0f;
+	constexpr float ActionSize = 22.5f / 2.0f;
 
 	const bool IsServer = ClientId < 0;
 	const int ButtonsCount = IsServer ? 3 : 6;
@@ -1601,6 +1602,8 @@ float CRClient::GetChatHeight(int ClientId)
 	{
 		ResultSize += ItemSpacing + ButtonSize;
 	}
+	if(!IsServer)
+		ResultSize += ActionSize + ItemSpacing;
 
 	return ResultSize;
 }
@@ -2304,4 +2307,37 @@ bool CRClient::IsOtherTeamAlpha(int ClientId) const
 		return false;
 
 	return GameClient()->m_Teams.Team(ClientId) != GameClient()->m_Teams.Team(GameClient()->m_Snap.m_LocalClientId);
+}
+
+// Highlight Players
+bool CRClient::IsNeedHighlightPlayer(const char *PlayerName)
+{
+	for(std::string &NickTest : m_HighLightPlayersList)
+	{
+		if(!str_utf8_comp_nocase(NickTest.c_str(), PlayerName))
+			return true;
+	}
+	return false;
+}
+
+void CRClient::AddHighlightPlayer(const char *PlayerName)
+{
+	m_HighLightPlayersList.push_back(PlayerName);
+}
+
+void CRClient::RemoveHighlightPlayer(const char *PlayerName)
+{
+	for(size_t i = 0; i < m_HighLightPlayersList.size(); i++)
+	{
+		if(!str_utf8_comp_nocase(m_HighLightPlayersList[i].c_str(), PlayerName))
+		{
+			m_HighLightPlayersList.erase(m_HighLightPlayersList.begin() + i);
+			return;
+		}
+	}
+}
+
+void CRClient::ResetHighlightPlayer()
+{
+	m_HighLightPlayersList.clear();
 }
