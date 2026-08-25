@@ -592,7 +592,8 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		DoMenuSettingsBar(&Column, apTabNames, NUMBER_OF_CHAT_TABS, s_aPageTabs, s_CurChatCustomTab, LineSize);
 		Column.HSplitTop(MarginSmall, nullptr, &Column);
 
-		const float m_BiggestTab = LineSize * 7.0f + (LineSize + 2.0f) + (LineSize + MarginExtraSmall) * 2.0f;
+		// const float m_BiggestTab = LineSize * 7.0f + (LineSize + 2.0f) + (LineSize + MarginExtraSmall) * 2.0f;
+		const float m_BiggestTab = LineSize * 4.0f + (LineSize + MarginSmall) * 4 + (LineSize + MarginExtraSmall) * 2.0f;
 		const float m_CurrentY = Column.y;
 		if(s_CurChatCustomTab == CHAT_TAB_MAIN)
 		{
@@ -745,6 +746,54 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 				}
 			}
 			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcChatShowTranslateFastSettings, RCLocalize("Fast settings in chat", "RClient"), &g_Config.m_RcChatShowTranslateFastSettings, &Column, LineSize);
+			{
+				static CUi::SDropDownState s_StateTranslateBackend;
+				static CScrollRegion s_ScrollRegionTranslateBackend;
+				s_StateTranslateBackend.m_SelectionPopupContext.m_pScrollRegion = &s_ScrollRegionTranslateBackend;
+
+				static const char *s_apBackendNames[] = {"ftapi", "libretranslate", "googlegtx", "fedilab", "bing"};
+				int BackendSelectedOld = -1;
+				for(size_t i = 0; i < std::size(s_apBackendNames); ++i)
+				{
+					if(!str_comp_nocase(s_apBackendNames[i], g_Config.m_TcTranslateBackend))
+					{
+						BackendSelectedOld = i;
+						break;
+					}
+				}
+				CUIRect DropDownRect;
+				Column.HSplitTop(LineSize, &DropDownRect, &Column);
+				DropDownRect.VSplitMid(&Label, &DropDownRect);
+				Ui()->DoLabel(&Label, RCLocalize("Choose backend", "RClient"), FontSize, TEXTALIGN_ML);
+				const int BackendSelectedNew = Ui()->DoDropDown(&DropDownRect, BackendSelectedOld,
+					s_apBackendNames, std::size(s_apBackendNames), s_StateTranslateBackend);
+				if(BackendSelectedOld != BackendSelectedNew)
+				{
+					str_copy(g_Config.m_TcTranslateBackend, s_apBackendNames[BackendSelectedNew]);
+				}
+				Column.HSplitTop(MarginSmall, nullptr, &Column);
+			}
+
+			if(!str_comp(g_Config.m_TcTranslateBackend, "googlegtx"))
+			{
+				static CUi::SDropDownState s_StateTranslateBackend;
+				static CScrollRegion s_ScrollRegionTranslateBackend;
+				s_StateTranslateBackend.m_SelectionPopupContext.m_pScrollRegion = &s_ScrollRegionTranslateBackend;
+
+				static const char *s_apBackendNames[] = {"google", "googleapis", "client5"};
+				int BackendSelectedOld = g_Config.m_RcTranslateGoogleEndpoint;
+				CUIRect DropDownRect;
+				Column.HSplitTop(LineSize, &DropDownRect, &Column);
+				DropDownRect.VSplitMid(&Label, &DropDownRect);
+				Ui()->DoLabel(&Label, RCLocalize("Google backends", "RClient"), FontSize, TEXTALIGN_ML);
+				const int BackendSelectedNew = Ui()->DoDropDown(&DropDownRect, BackendSelectedOld,
+					s_apBackendNames, std::size(s_apBackendNames), s_StateTranslateBackend);
+				if(BackendSelectedOld != BackendSelectedNew)
+				{
+					g_Config.m_RcTranslateGoogleEndpoint = BackendSelectedNew;
+				}
+				Column.HSplitTop(MarginSmall, nullptr, &Column);
+			}
 		}
 		Column.HSplitTop(m_BiggestTab - Column.y + m_CurrentY, nullptr, &Column);
 	}

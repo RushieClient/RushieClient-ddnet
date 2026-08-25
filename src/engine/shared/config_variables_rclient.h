@@ -41,6 +41,7 @@ MACRO_CONFIG_INT(RcMessageFilterInfoMessages, rc_message_filter_infomessages, 1,
 MACRO_CONFIG_INT(RcTranslateSend, rc_translate_send, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Translate sending message")
 MACRO_CONFIG_STR(RcTranslateSendTarget, rc_translate_send_target, 16, "en", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Sending message translate target language (must be 2 character ISO 639 code)")
 MACRO_CONFIG_INT(RcTranslateServerMessages, rc_translate_server_messages, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Translate server message")
+MACRO_CONFIG_INT(RcTranslateGoogleEndpoint, rc_translate_google_endpoint, 0, 0, 2, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Easy switch google endpoint(0-google.com 1-googleapis 2-client5)")
 
 // Heart
 MACRO_CONFIG_INT(RcShowHeartInScoreboard, rc_show_heart_in_scoreboard, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show heart in scoreboard")

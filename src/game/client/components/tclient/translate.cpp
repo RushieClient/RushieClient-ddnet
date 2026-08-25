@@ -419,7 +419,7 @@ public:
 	{
 		char aBuf[4096];
 		str_format(aBuf, sizeof(aBuf), "%s/translate_a/single?client=gtx&sl=auto&tl=%s&dt=t&q=",
-			g_Config.m_TcTranslateEndpoint[0] != '\0' ? g_Config.m_TcTranslateEndpoint : "https://translate.google.com",
+			g_Config.m_TcTranslateEndpoint[0] != '\0' ? g_Config.m_TcTranslateEndpoint : (g_Config.m_RcTranslateGoogleEndpoint == 0 ? "https://translate.google.com" : g_Config.m_RcTranslateGoogleEndpoint == 1 ? "https://translate.googleapis.com" : "https://clients5.google.com"),
 			CTranslateBackendGTX::EncodeTarget(SendTranslate ? g_Config.m_RcTranslateSendTarget : g_Config.m_TcTranslateTarget));
 
 		UrlEncode(pText, aBuf + strlen(aBuf), sizeof(aBuf) - strlen(aBuf));
@@ -544,6 +544,111 @@ public:
 	}
 };
 
+class CTranslateBackendBing : public ITranslateBackendHttp
+{
+private:
+	bool ParseResponseJson(const json_value *pObj, CTranslateResponse &Out)
+	{
+		if(!pObj)
+		{
+			str_copy(Out.m_Text, "Response is not JSON");
+			return false;
+		}
+
+		if(pObj->type != json_array)
+		{
+			str_copy(Out.m_Text, "Response is not array");
+			return false;
+		}
+		const json_value *pMainObj = json_array_get(pObj, 0);
+		if(pMainObj->type != json_object)
+		{
+			str_copy(Out.m_Text, "pMainObj is not object");
+			return false;
+		}
+
+		const json_value *pTransCategory = json_array_get(json_object_get(pMainObj, "translations"),0);
+		if(pTransCategory->type != json_object)
+		{
+			str_copy(Out.m_Text, "pTransCategory is not object");
+			return false;
+		}
+
+		const json_value *pTranslatedText = json_object_get(pTransCategory, "text");
+		if(pTranslatedText == &json_value_none)
+		{
+			str_copy(Out.m_Text, "No destination-text");
+			return false;
+		}
+		if(pTranslatedText->type != json_string)
+		{
+			str_copy(Out.m_Text, "destination-text is not string");
+			return false;
+		}
+
+		const json_value *pLangCategory = json_object_get(pMainObj, "detectedLanguage");
+		if(pTransCategory->type != json_object)
+		{
+			str_copy(Out.m_Text, "pTransCategory is not object");
+			return false;
+		}
+
+		const json_value *pDetectedLanguage = json_object_get(pLangCategory, "language");
+		if(pDetectedLanguage == &json_value_none)
+		{
+			str_copy(Out.m_Text, "No source-language");
+			return false;
+		}
+		if(pDetectedLanguage->type != json_string)
+		{
+			str_copy(Out.m_Text, "source-language is not string");
+			return false;
+		}
+
+		UrlDecode(pTranslatedText->u.string.ptr, Out.m_Text, sizeof(Out.m_Text));
+		str_utf8_fix_truncation(Out.m_Text);
+		str_copy(Out.m_Language, pDetectedLanguage->u.string.ptr);
+
+		return true;
+	}
+
+protected:
+	bool ParseResponse(CTranslateResponse &Out) override
+	{
+		json_value *pObj = m_pHttpRequest->ResultJson();
+		bool Res = ParseResponseJson(pObj, Out);
+		json_value_free(pObj);
+		return Res;
+	}
+
+public:
+	const char *EncodeTarget(const char *pTarget) const override
+	{
+		if(!pTarget || pTarget[0] == '\0')
+			return DefaultConfig::TcTranslateTarget;
+		return pTarget;
+	}
+	const char *Name() const override
+	{
+		return "bing";
+	}
+	CTranslateBackendBing(IHttp &Http, const char *pText, bool SendTranslate = false)
+	{
+		char aBuf[512];
+		CJsonStringWriter Json = CJsonStringWriter();
+		Json.BeginArray();
+		Json.WriteStrValue(pText);
+		Json.EndArray();
+		str_format(aBuf, sizeof(aBuf), "%s/translate/translatetext?to=%s",
+			g_Config.m_TcTranslateEndpoint[0] != '\0' ? g_Config.m_TcTranslateEndpoint : "https://edge.microsoft.com",
+			CTranslateBackendBing::EncodeTarget(SendTranslate ? g_Config.m_RcTranslateSendTarget : g_Config.m_TcTranslateTarget));
+
+		CreateHttpRequest(Http, aBuf);
+		const char *pJson = Json.GetOutputString().c_str();
+		m_pHttpRequest->PostJson(pJson);
+	}
+};
+
 void CTranslate::ConTranslate(IConsole::IResult *pResult, void *pUserData)
 {
 	const char *pName;
@@ -660,6 +765,8 @@ void CTranslate::Translate(CChat::CLine &Line, bool ShowProgress)
 		Job.m_pBackend = std::make_unique<CTranslateBackendGTX>(*Http(), pTextToTranslate);
 	else if(str_comp_nocase(g_Config.m_TcTranslateBackend, "fedilab") == 0)
 		Job.m_pBackend = std::make_unique<CTranslateBackendFedilab>(*Http(), pTextToTranslate);
+	else if(str_comp_nocase(g_Config.m_TcTranslateBackend, "bing") == 0)
+		Job.m_pBackend = std::make_unique<CTranslateBackendBing>(*Http(), pTextToTranslate);
 	else
 	{
 		GameClient()->m_Chat.Echo("Invalid translate backend");
@@ -807,6 +914,8 @@ void CTranslate::TranslateSend(const char *Line, int WorkId, int m_JobIntVariabl
 		Job.m_pBackend = std::make_unique<CTranslateBackendGTX>(*Http(), Job.m_pLineTranslate->m_aText, true);
 	else if(str_comp_nocase(g_Config.m_TcTranslateBackend, "fedilab") == 0)
 		Job.m_pBackend = std::make_unique<CTranslateBackendFedilab>(*Http(), Job.m_pLineTranslate->m_aText, true);
+	else if(str_comp_nocase(g_Config.m_TcTranslateBackend, "bing") == 0)
+		Job.m_pBackend = std::make_unique<CTranslateBackendBing>(*Http(), Job.m_pLineTranslate->m_aText, true);
 	else
 	{
 		GameClient()->m_Chat.Echo("Invalid translate backend");
