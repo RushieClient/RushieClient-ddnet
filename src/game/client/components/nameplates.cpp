@@ -1248,7 +1248,7 @@ void CNamePlates::RenderNamePlateGame(vec2 Position, const CNetObj_PlayerInfo *p
 		}
 		else
 		{
-			if(g_Config.m_RcNamePlatesFirePreInput && Client()->State() != IClient::STATE_DEMOPLAYBACK)
+			if(g_Config.m_RcNamePlatesFirePreInput && Client()->State() != IClient::STATE_DEMOPLAYBACK && GameClient()->m_Teams.Team(pPlayerInfo->m_ClientId) == GameClient()->m_Teams.Team(GameClient()->m_aLocalIds[g_Config.m_ClDummy]))
 			{
 				const CNetMsg_Sv_PreInput &PreInput = GameClient()->m_aClients[pPlayerInfo->m_ClientId].m_aLatestPreInputs;
 				if(PreInput.m_IntendedTick != -1)
