@@ -6,7 +6,7 @@
 #include "rclient_include.h"
 
 #include <base/math.h>
-#include <base/system.h>
+#include <base/time.h>
 #include <base/types.h>
 
 #include <algorithm>
@@ -120,17 +120,15 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	CUIRect Column, LeftView, RightView, Button, Label;
 
 	static CScrollRegion s_ScrollRegion;
-	vec2 ScrollOffset(0.0f, 0.0f);
 	CScrollRegionParams ScrollParams;
 	ScrollParams.m_ScrollUnit = 60.0f;
-	ScrollParams.m_Flags = CScrollRegionParams::FLAG_CONTENT_STATIC_WIDTH;
+	ScrollParams.m_ForceShowScrollbar = true;
 	ScrollParams.m_ScrollbarMargin = 5.0f;
-	s_ScrollRegion.Begin(&MainView, &ScrollOffset, &ScrollParams);
+	s_ScrollRegion.Begin(&MainView, &ScrollParams);
 
 	static std::vector<CUIRect> s_SectionBoxes;
-	static vec2 s_PrevScrollOffset(0.0f, 0.0f);
-
-	MainView.y += ScrollOffset.y;
+	const float ScrollOffset = MainView.y;
+	static float s_PrevScrollOffset = 0.0f;
 
 	MainView.VSplitRight(5.0f, &MainView, nullptr); // Padding for scrollbar
 	MainView.VSplitLeft(5.0f, nullptr, &MainView); // Padding for scrollbar
@@ -146,7 +144,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		Section.h += Padding;
 		Section.x -= Padding * 0.5f;
 		Section.y -= Padding * 0.5f;
-		Section.y -= s_PrevScrollOffset.y - ScrollOffset.y;
+		Section.y -= s_PrevScrollOffset - ScrollOffset;
 		Section.Draw(ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f), IGraphics::CORNER_ALL, 10.0f);
 	}
 	s_PrevScrollOffset = ScrollOffset;
@@ -1187,7 +1185,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	// Scroll
 	CUIRect ScrollRegion;
 	ScrollRegion.x = MainView.x;
-	ScrollRegion.y = maximum(LeftView.y, RightView.y) + MarginSmall * 2.0f;
+	ScrollRegion.y = std::max(LeftView.y, RightView.y) + MarginSmall * 2.0f;
 	ScrollRegion.w = MainView.w;
 	ScrollRegion.h = 0.0f;
 	s_ScrollRegion.AddRect(ScrollRegion);
@@ -1199,17 +1197,15 @@ void CMenus::RenderSettingsRClientRcon(CUIRect MainView)
 	CUIRect Column, LeftView, RightView, Label;
 
 	static CScrollRegion s_ScrollRegion;
-	vec2 ScrollOffset(0.0f, 0.0f);
 	CScrollRegionParams ScrollParams;
 	ScrollParams.m_ScrollUnit = 60.0f;
-	ScrollParams.m_Flags = CScrollRegionParams::FLAG_CONTENT_STATIC_WIDTH;
+	ScrollParams.m_ForceShowScrollbar = true;
 	ScrollParams.m_ScrollbarMargin = 5.0f;
-	s_ScrollRegion.Begin(&MainView, &ScrollOffset, &ScrollParams);
+	s_ScrollRegion.Begin(&MainView, &ScrollParams);
 
 	static std::vector<CUIRect> s_SectionBoxes;
-	static vec2 s_PrevScrollOffset(0.0f, 0.0f);
-
-	MainView.y += ScrollOffset.y;
+	const float ScrollOffset = MainView.y;
+	static float s_PrevScrollOffset = 0.0f;
 
 	MainView.VSplitRight(5.0f, &MainView, nullptr); // Padding for scrollbar
 	MainView.VSplitLeft(5.0f, nullptr, &MainView); // Padding for scrollbar
@@ -1225,7 +1221,7 @@ void CMenus::RenderSettingsRClientRcon(CUIRect MainView)
 		Section.h += Padding;
 		Section.x -= Padding * 0.5f;
 		Section.y -= Padding * 0.5f;
-		Section.y -= s_PrevScrollOffset.y - ScrollOffset.y;
+		Section.y -= s_PrevScrollOffset - ScrollOffset;
 		Section.Draw(ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f), IGraphics::CORNER_ALL, 10.0f);
 	}
 	s_PrevScrollOffset = ScrollOffset;
@@ -1273,7 +1269,7 @@ void CMenus::RenderSettingsRClientRcon(CUIRect MainView)
 	// Scroll
 	CUIRect ScrollRegion;
 	ScrollRegion.x = MainView.x;
-	ScrollRegion.y = maximum(LeftView.y, RightView.y) + MarginSmall * 2.0f;
+	ScrollRegion.y = std::max(LeftView.y, RightView.y) + MarginSmall * 2.0f;
 	ScrollRegion.w = MainView.w;
 	ScrollRegion.h = 0.0f;
 	s_ScrollRegion.AddRect(ScrollRegion);
@@ -1285,19 +1281,16 @@ void CMenus::RenderSettingsRClientChatBinds(CUIRect MainView)
 	CUIRect LeftView, RightView, Button, Label;
 
 	static CScrollRegion s_ScrollRegion;
-	vec2 ScrollOffset(0.0f, 0.0f);
 	CScrollRegionParams ScrollParams;
 	ScrollParams.m_ScrollUnit = 60.0f;
-	ScrollParams.m_Flags = CScrollRegionParams::FLAG_CONTENT_STATIC_WIDTH;
+	ScrollParams.m_ForceShowScrollbar = true;
 	ScrollParams.m_ScrollbarMargin = 5.0f;
-	s_ScrollRegion.Begin(&MainView, &ScrollOffset, &ScrollParams);
+	s_ScrollRegion.Begin(&MainView, &ScrollParams);
 
 	static std::vector<CUIRect> s_SectionBoxes;
-	static vec2 s_PrevScrollOffset(0.0f, 0.0f);
+	const float ScrollOffset = MainView.y;
+	static float s_PrevScrollOffset = 0.0f;
 
-	MainView.y += ScrollOffset.y;
-
-	MainView.HSplitTop(Margin, nullptr, &MainView);
 	MainView.VSplitRight(5.0f, &MainView, nullptr); // Padding for scrollbar
 	MainView.VSplitLeft(5.0f, nullptr, &MainView); // Padding for scrollbar
 
@@ -1312,7 +1305,7 @@ void CMenus::RenderSettingsRClientChatBinds(CUIRect MainView)
 		Section.h += Padding;
 		Section.x -= Padding * 0.5f;
 		Section.y -= Padding * 0.5f;
-		Section.y -= s_PrevScrollOffset.y - ScrollOffset.y;
+		Section.y -= s_PrevScrollOffset - ScrollOffset;
 		Section.Draw(ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f), IGraphics::CORNER_ALL, 10.0f);
 	}
 	s_PrevScrollOffset = ScrollOffset;
@@ -1367,7 +1360,7 @@ void CMenus::RenderSettingsRClientChatBinds(CUIRect MainView)
 		Size += vBindDefaults.size() * (MarginSmall + LineSize) + HeadlineHeight + HeadlineFontSize + MarginSmall * 2.0f;
 	}
 
-	MainView.y = maximum(LeftView.y, RightView.y);
+	MainView.y = std::max(LeftView.y, RightView.y);
 	CUIRect ResetBindsChat;
 	MainView.HSplitTop(FontSize * 1.25f, &ResetBindsChat, &MainView);
 	static CButtonContainer s_ResetBindsChat;
@@ -1379,7 +1372,7 @@ void CMenus::RenderSettingsRClientChatBinds(CUIRect MainView)
 	// Scroll
 	CUIRect ScrollRegion;
 	ScrollRegion.x = MainView.x;
-	ScrollRegion.y = maximum(LeftView.y, RightView.y) + MarginSmall * 2.0f;
+	ScrollRegion.y = std::max(LeftView.y, RightView.y) + MarginSmall * 2.0f;
 	ScrollRegion.w = MainView.w;
 	ScrollRegion.h = 0.0f;
 	s_ScrollRegion.AddRect(ScrollRegion);
@@ -1570,7 +1563,7 @@ void CMenus::RenderSettingsRClientSpecWheel(CUIRect MainView)
 	CUIRect LeftView, RightView, Label, Button;
 	MainView.VSplitLeft(MainView.w / 2.1f, &LeftView, &RightView);
 
-	const float Radius = minimum(RightView.w, RightView.h) / 2.0f;
+	const float Radius = std::min(RightView.w, RightView.h) / 2.0f;
 	vec2 Center = RightView.Center();
 	// Draw Circle
 	Graphics()->TextureClear();

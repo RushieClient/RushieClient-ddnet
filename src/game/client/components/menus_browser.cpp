@@ -1514,7 +1514,7 @@ void CMenus::RenderServerbrowserFriends(CUIRect View)
 
 			for(int ClientIndex = 0; ClientIndex < pEntry->m_NumClients; ++ClientIndex)
 			{
-				const CServerInfo::CClient &CurrentClient = pEntry->m_aClients[ClientIndex];
+				const CServerInfo::CClient &CurrentClient = pEntry->m_vClients[ClientIndex];
 				for(const CWarEntry &War : GameClient()->m_WarList.m_vWarEntries)
 				{
 					const bool NameHit = War.m_aName[0] != '\0' && str_comp(War.m_aName, CurrentClient.m_aName) == 0;
@@ -1839,7 +1839,7 @@ void CMenus::RenderServerbrowserFriends(CUIRect View)
 					else if(WarPlayer.Skin7(protocol7::SKINPART_BODY)[0] != '\0')
 					{
 						CTeeRenderInfo TeeInfo;
-						TeeInfo.m_Size = minimum(Skin.w, Skin.h);
+						TeeInfo.m_Size = std::min(Skin.w, Skin.h);
 						for(int Part = 0; Part < protocol7::NUM_SKINPARTS; Part++)
 						{
 							GameClient()->m_Skins7.FindSkinPart(Part, WarPlayer.Skin7(Part), true)->ApplyTo(TeeInfo.m_aSixup[g_Config.m_ClDummy]);

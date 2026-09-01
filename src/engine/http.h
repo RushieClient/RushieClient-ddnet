@@ -63,6 +63,7 @@ public:
 	void LogProgress(HTTPLOG LogProgress) { m_LogProgress = LogProgress; }
 	void SkipByFileTime(bool SkipByFileTime) { m_SkipByFileTime = SkipByFileTime; }
 	void IpResolve(IPRESOLVE IpResolve) { m_IpResolve = IpResolve; }
+	void InsecureSsl(bool Insecure) { m_InsecureSsl = Insecure; }
 	void FailOnErrorStatus(bool FailOnErrorStatus) { m_FailOnErrorStatus = FailOnErrorStatus; }
 	// Download to memory only. Get the result via `Result*`.
 	void WriteToMemory();
@@ -78,6 +79,7 @@ public:
 	void Head();
 	void Post(const unsigned char *pData, size_t DataLength);
 	void PostJson(const char *pJson);
+	void PostTextPlain(const char *pText);
 
 	virtual void Header(const char *pNameColonValue) = 0;
 	void HeaderString(const char *pName, const char *pValue);
@@ -136,11 +138,12 @@ protected:
 		HEAD,
 		POST,
 		POST_JSON,
+		POST_PLAINTEXT,
 	};
 	static const char *GetRequestType(REQUEST Type);
 
 	// Request
-	char m_aUrl[256] = "";
+	char m_aUrl[4096] = "";
 	REQUEST m_Type = REQUEST::GET;
 	unsigned char *m_pBody = nullptr;
 	size_t m_BodyLength = 0;
@@ -155,6 +158,7 @@ protected:
 	bool m_ValidateBeforeOverwrite = false;
 	std::optional<SHA256_DIGEST> m_ExpectedSha256 = std::nullopt;
 	int64_t m_IfModifiedSince = -1;
+	bool m_InsecureSsl = false;
 
 	// Result
 	std::optional<SHA256_DIGEST> m_ActualSha256 = std::nullopt;

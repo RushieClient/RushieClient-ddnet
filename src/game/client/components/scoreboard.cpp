@@ -1431,8 +1431,7 @@ CUi::EPopupMenuFunctionResult CScoreboard::CScoreboardPopupContext::Render(void 
 	ColorRGBA ProfileButtonColor = ColorRGBA(1.0f, 1.0f, 1.0f, 0.5f * pUi->ButtonColorMul(&pPopupContext->m_ProfileButton));
 	if(pUi->DoButton_PopupMenu(&pPopupContext->m_ProfileButton, Localize("Profile"), &Container, FontSize, TEXTALIGN_MC, 0.0f, false, true, ProfileButtonColor))
 	{
-		CServerInfo ServerInfo;
-		pScoreboard->Client()->GetServerInfo(&ServerInfo);
+		const CServerInfo &ServerInfo = pScoreboard->Client()->ServerInfo();
 		int Community = (str_comp(ServerInfo.m_aCommunityId, "kog") == 0) ? 1 : (str_comp(ServerInfo.m_aCommunityId, "unique") == 0) ? 2 : 0;
 		char aCommunityLink[512];
 		char aEncodedName[256];

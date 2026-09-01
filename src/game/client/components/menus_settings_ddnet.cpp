@@ -27,6 +27,28 @@ void CMenus::RenderSettingsDDNet(CUIRect MainView)
 {
 	CUIRect Button, Left, Right, LeftLeft, Label;
 
+	enum
+	{
+		DDNET_TAB_MAIN = 0,
+		DDNET_TAB_CREDITS,
+		NUMBER_OF_DDNET_TABS
+	};
+
+	static int s_CurDDNetCustomTab = 0;
+	static CButtonContainer s_aPageTabs[NUMBER_OF_DDNET_TABS] = {};
+	const char *apTabNames[NUMBER_OF_DDNET_TABS] = {
+		RCLocalize("Main", "RClient"),
+		RCLocalize("Credits", "RClient")
+	};
+	DoMenuSettingsBar(&MainView, apTabNames, NUMBER_OF_DDNET_TABS, s_aPageTabs, s_CurDDNetCustomTab, 20.0f);
+	MainView.HSplitTop(5.0f, nullptr, &MainView);
+
+	if(s_CurDDNetCustomTab == DDNET_TAB_CREDITS)
+	{
+		RenderSettingsCredits(MainView);
+		return;
+	}
+
 #if defined(CONF_AUTOUPDATE)
 	CUIRect UpdaterRect;
 	MainView.HSplitBottom(20.0f, &MainView, &UpdaterRect);

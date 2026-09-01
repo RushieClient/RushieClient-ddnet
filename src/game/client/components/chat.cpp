@@ -292,8 +292,6 @@ bool CChat::OnInput(const IInput::CEvent &Event)
 			; // Do nothing as bindchat was executed
 		else if(GameClient()->m_TClient.ChatDoSpecId(m_Input.GetString()))
 			; // Do nothing as specid was executed
-		else if(GameClient()->m_Translate.ChatDoTranslateOutgoing(m_Mode == MODE_TEAM ? 1 : 0, m_Input.GetString()))
-			; // Do nothing as outgoing translate was queued
 		else
 			SendChatQueued(m_Input.GetString());
 		m_pHistoryEntry = nullptr;
@@ -545,7 +543,7 @@ bool CChat::OnInput(const IInput::CEvent &Event)
 		const int TotalLines = GetInitializedLineCount();
 		const int RenderLines = TotalLines - m_VisibleLineCount;
 		if(Event.m_Flags & IInput::FLAG_PRESS && Event.m_Key == KEY_MOUSE_WHEEL_UP && TotalLines > m_VisibleLineCount)
-			m_HistoryScrollOffset = minimum(m_HistoryScrollOffset + 1, RenderLines);
+			m_HistoryScrollOffset = std::min(m_HistoryScrollOffset + 1, RenderLines);
 		else if(Event.m_Flags & IInput::FLAG_PRESS && Event.m_Key == KEY_MOUSE_WHEEL_DOWN && m_HistoryScrollOffset > 0)
 			--m_HistoryScrollOffset;
 	}
@@ -752,7 +750,7 @@ void CChat::AddLine(int ClientId, int Team, const char *pLine)
 	   })())
 		return;
 
-	char aFilteredText[MAX_LINE_LENGTH];
+	char aFilteredText[MAX_CHAT_LENGTH];
 	str_copy(aFilteredText, pLine);
 	if(ClientId >= 0 && g_Config.m_RcMessageFilterMode != 0 && g_Config.m_RcMessageFilterChat)
 		str_copy(aFilteredText, GameClient()->m_RClient.FilterMessage(pLine, ClientId >= 0, ClientId));
@@ -1596,7 +1594,7 @@ void CChat::OnRender()
 					}
 				}
 
-				Graphics()->MapScreen(0.0f, 0.0f, Width, Height);
+				Graphics()->MapScreenToSize(Width, Height);
 			}
 		}
 	}
@@ -1745,7 +1743,7 @@ void CChat::OnRender()
 
 		Ui()->RenderPopupMenus();
 		Ui()->FinishCheck();
-		Graphics()->MapScreen(0.0f, 0.0f, Width, Height);
+		Graphics()->MapScreenToSize(Width, Height);
 
 		if(m_MouseUnlocked)
 			RenderTools()->RenderCursor(Ui()->MousePos() / 2.0f, 12.0f);
@@ -2047,7 +2045,7 @@ CUi::EPopupMenuFunctionResult CChat::CChatPopupContext::Render(void *pContext, C
 	ColorRGBA CopyLineButtonColor = ColorRGBA(1.0f, 1.0f, 1.0f, 0.5f * pUi->ButtonColorMul(&pPopupContext->m_CopyLine));
 	if(pUi->DoButton_PopupMenu(&pPopupContext->m_CopyLine, Localize("Copy line"), &Container, FontSize, TEXTALIGN_MC, 0.0f, false, true, CopyLineButtonColor))
 	{
-		char aBuf[MAX_LINE_LENGTH];
+		char aBuf[MAX_CHAT_LENGTH];
 		str_format(aBuf, sizeof(aBuf), "%s: %s", pPopupContext->m_aName, pPopupContext->m_aText);
 		pChat->Input()->SetClipboardText(aBuf);
 	}
@@ -2057,7 +2055,7 @@ CUi::EPopupMenuFunctionResult CChat::CChatPopupContext::Render(void *pContext, C
 	ColorRGBA CopyFullButtonColor = ColorRGBA(1.0f, 1.0f, 1.0f, 0.5f * pUi->ButtonColorMul(&pPopupContext->m_CopyFull));
 	if(pUi->DoButton_PopupMenu(&pPopupContext->m_CopyFull, Localize("Copy Full"), &Container, FontSize, TEXTALIGN_MC, 0.0f, false, true, CopyFullButtonColor))
 	{
-		char aBuf[MAX_LINE_LENGTH];
+		char aBuf[MAX_CHAT_LENGTH];
 		char m_aTimeStamp[80];
 		str_timestamp_ex(pPopupContext->m_Time, m_aTimeStamp, sizeof(m_aTimeStamp), TimestampFormat::SPACE);
 		if(IsServer)
@@ -2074,7 +2072,7 @@ CUi::EPopupMenuFunctionResult CChat::CChatPopupContext::Render(void *pContext, C
 		ColorRGBA ReplyActionButtonColor = ColorRGBA(1.0f, 1.0f, 1.0f, 0.5f * pUi->ButtonColorMul(&pPopupContext->m_ReplyAction));
 		if(pUi->DoButton_PopupMenu(&pPopupContext->m_ReplyAction, Localize("Reply"), &Container, FontSize, TEXTALIGN_MC, 0.0f, false, true, ReplyActionButtonColor))
 		{
-			char aBuf[MAX_LINE_LENGTH];
+			char aBuf[MAX_CHAT_LENGTH];
 			str_format(aBuf, sizeof(aBuf), "chat all \"%s: \"", pPopupContext->m_aName);
 			pChat->Console()->ExecuteLine(aBuf, IConsole::CLIENT_ID_UNSPECIFIED);
 		}

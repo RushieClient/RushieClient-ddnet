@@ -5235,8 +5235,8 @@ void CGameClient::LoadDumActionsSkin(const char *pPath, bool AsDir)
 	}
 	else if(PngLoaded && Graphics()->CheckImageDivisibility(aPath, ImgInfo, g_pData->m_aSprites[SPRITE_RC_DUMMY_ACTIONS_CONTROL].m_pSet->m_Gridx, g_pData->m_aSprites[SPRITE_RC_DUMMY_ACTIONS_CONTROL].m_pSet->m_Gridy, true) && Graphics()->IsImageFormatRgba(aPath, ImgInfo))
 	{
-		m_DumActionsSkin.m_SpriteDumControl = Graphics()->LoadSpriteTexture(ImgInfo, &g_pData->m_aSprites[SPRITE_RC_DUMMY_ACTIONS_CONTROL]);
-		m_DumActionsSkin.m_SpriteDumRemember = Graphics()->LoadSpriteTexture(ImgInfo, &g_pData->m_aSprites[SPRITE_RC_DUMMY_ACTIONS_REMEMBER]);
+		m_DumActionsSkin.m_SpriteDumControl = Graphics()->LoadSpriteTexture(ImgInfo, std::nullopt, &g_pData->m_aSprites[SPRITE_RC_DUMMY_ACTIONS_CONTROL]);
+		m_DumActionsSkin.m_SpriteDumRemember = Graphics()->LoadSpriteTexture(ImgInfo, std::nullopt, &g_pData->m_aSprites[SPRITE_RC_DUMMY_ACTIONS_REMEMBER]);
 
 		m_DumActionSkinLoaded = true;
 	}

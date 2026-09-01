@@ -107,7 +107,7 @@ void CEdgeHelper::RenderEdgeHelper()
 	Base.y = (m_Height - Base.h) * (g_Config.m_RcEdgeInfoPosY / 100.0f);
 
 
-	Graphics()->MapScreen(0.0f, 0.0f, m_Width, m_Height);
+	Graphics()->MapScreenToSize(m_Width, m_Height);
 
 	Base.Draw(SEdgeHelperProperties::WindowColorDark(), IGraphics::CORNER_ALL, SEdgeHelperProperties::ms_Rounding);
 	Base.Margin(SEdgeHelperProperties::ms_Padding, &Base);

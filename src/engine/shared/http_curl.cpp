@@ -133,6 +133,11 @@ bool CHttpRequestCurl::ConfigureHandle(CURL *pHandle)
 #pragma GCC diagnostic pop
 #endif
 	curl_easy_setopt(pHandle, CURLOPT_IPRESOLVE, m_IpResolve == IPRESOLVE::V4 ? CURL_IPRESOLVE_V4 : (m_IpResolve == IPRESOLVE::V6 ? CURL_IPRESOLVE_V6 : CURL_IPRESOLVE_WHATEVER));
+	if(m_InsecureSsl)
+	{
+		curl_easy_setopt(pHandle, CURLOPT_SSL_VERIFYPEER, 0L);
+		curl_easy_setopt(pHandle, CURLOPT_SSL_VERIFYHOST, 0L);
+	}
 	if(g_Config.m_Bindaddr[0] != '\0')
 	{
 		curl_easy_setopt(pHandle, CURLOPT_INTERFACE, g_Config.m_Bindaddr);
@@ -158,9 +163,14 @@ bool CHttpRequestCurl::ConfigureHandle(CURL *pHandle)
 		break;
 	case REQUEST::POST:
 	case REQUEST::POST_JSON:
+	case REQUEST::POST_PLAINTEXT:
 		if(m_Type == REQUEST::POST_JSON)
 		{
 			Header("Content-Type: application/json");
+		}
+		else if(m_Type == REQUEST::POST_PLAINTEXT)
+		{
+			Header("Content-Type: text/plain");
 		}
 		else
 		{

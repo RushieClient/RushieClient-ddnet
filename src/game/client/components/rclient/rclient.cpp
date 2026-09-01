@@ -1,5 +1,6 @@
 #include "rclient.h"
 
+#include "base/io.h"
 #include "base/log.h"
 #include "base/process.h"
 #include "base/str.h"
@@ -9,6 +10,8 @@
 #include "game/localization.h"
 #include "game/version.h"
 #include "rclient_include.h"
+
+#include <base/time.h>
 
 #include <engine/shared/json.h>
 

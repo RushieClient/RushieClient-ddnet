@@ -1,10 +1,14 @@
 #ifndef GAME_CLIENT_COMPONENTS_RCLIENT_RCLIENT_H
 #define GAME_CLIENT_COMPONENTS_RCLIENT_RCLIENT_H
 
+#include "engine/http.h"
 #include "engine/shared/http.h"
+
 #include <engine/shared/console.h>
+
 #include <game/client/component.h>
 #include <game/client/components/chat.h>
+
 #include <array>
 
 namespace ChatThings
@@ -27,7 +31,7 @@ class CRClient : public CComponent
 	static void ConFindPlayer(IConsole::IResult *pResult, void *pUserData);
 	static void ConCopyColor(IConsole::IResult *pResult, void *pUserData);
 	static void ConBackupPlayerProfile(IConsole::IResult *pResult, void *pUserData);
-	std::shared_ptr<CHttpRequest> m_pRClientDDstatsTask = nullptr;
+	std::shared_ptr<IHttpRequest> m_pRClientDDstatsTask = nullptr;
 	void FetchRclientDDstatsProfile();
 	void FinishRclientDDstatsProfile();
 	void ResetRclientDDstatsProfile();
@@ -110,7 +114,7 @@ class CRClient : public CComponent
 	// Fetch bestclient users
 	uint64_t m_LastBCFetchTime = 0;
 	std::vector<int> m_vBcUsers;
-	std::shared_ptr<CHttpRequest> m_pRClientBCFetchListTask = nullptr;
+	std::shared_ptr<IHttpRequest> m_pRClientBCFetchListTask = nullptr;
 	void FetchRclientBCFetchList();
 	void FinishRclientBCFetchList();
 	void ResetRclientBCFetchList();
@@ -119,7 +123,7 @@ class CRClient : public CComponent
 	static void ConRClientTestFunction(IConsole::IResult *pResult, void *pUserData);
 
 	// DuckDuckGo vqd parse
-	std::shared_ptr<CHttpRequest> m_pRClientVqdTask = nullptr;
+	std::shared_ptr<IHttpRequest> m_pRClientVqdTask = nullptr;
 	void FetchDuckDuckGoVqd();
 	void FinishDuckDuckGoVqd();
 	void ResetDuckDuckGoVqdTask();
@@ -171,7 +175,7 @@ public:
 
 
 	// Version
-	std::shared_ptr<CHttpRequest> m_pRClientInfoTask = nullptr;
+	std::shared_ptr<IHttpRequest> m_pRClientInfoTask = nullptr;
 	void FetchRClientInfo();
 	void FinishRClientInfo();
 	void ResetRClientInfoTask();
@@ -187,13 +191,13 @@ public:
 	void ApplyColorToPlayer(const int CustomColor, const int SkinColorBodyint, const int SkinColorFeetint);
 
 	// Find Hours
-	std::shared_ptr<CHttpRequest> m_pRClientDDstatsTaskFindHours = nullptr;
+	std::shared_ptr<IHttpRequest> m_pRClientDDstatsTaskFindHours = nullptr;
 	void FetchRclientDDstatsFindHours(const char *PlayerNickname, const char *WriteInChat);
 	void FinishRclientDDstatsFindHours();
 	void ResetRclientDDstatsFindHours();
 
 	// Find Time
-	std::shared_ptr<CHttpRequest> m_pRClientDDstatsTaskFindTime = nullptr;
+	std::shared_ptr<IHttpRequest> m_pRClientDDstatsTaskFindTime = nullptr;
 	void FetchRclientDDstatsFindTime(const char *PlayerNickname, const char *MapName);
 	void FinishRclientDDstatsFindTime();
 	void ResetRclientDDstatsFindTime();

@@ -150,9 +150,9 @@ bool CAdminPanel::DoEditBoxInUiSpace(CLineInput *pLineInput, const CUIRect *pLoc
 	const float ScaleY = pScreen->h / m_PopupHeight;
 	CUIRect Rect = *pLocalRect;
 	Rect.x *= ScaleX; Rect.y *= ScaleY; Rect.w *= ScaleX; Rect.h *= ScaleY;
-	Graphics()->MapScreen(0.0f, 0.0f, pScreen->w, pScreen->h);
+	Graphics()->MapScreenToSize(pScreen->w, pScreen->h);
 	const bool Result = Ui()->DoEditBox(pLineInput, &Rect, FontSize * ScaleY);
-	Graphics()->MapScreen(0.0f, 0.0f, m_PopupWidth, m_PopupHeight);
+	Graphics()->MapScreenToSize(m_PopupWidth, m_PopupHeight);
 	return Result;
 }
 
@@ -375,7 +375,7 @@ void CAdminPanel::RenderPlayerPanelPopUp()
 	Base.x = m_PopupWidth / 2 - Base.w / 2 - (!m_PlayerPopup.m_LastConfirm ? SAdminPanelProperties::ms_ButtonHeight / 2 : 0);
 	Base.y = m_PopupHeight / 2 - Base.h / 2;
 
-	Graphics()->MapScreen(0.0f, 0.0f, m_PopupWidth, m_PopupHeight);
+	Graphics()->MapScreenToSize(m_PopupWidth, m_PopupHeight);
 
 	Base.VSplitRight(SAdminPanelProperties::ms_ButtonHeight, &Base, &ButtonToggle);
 	if(!m_PlayerPopup.m_LastConfirm)
@@ -889,7 +889,7 @@ void CAdminPanel::RenderPlayerPanelPlayersList()
 	}
 	Base.y = ScreenHeight / 2 - Base.h / 2;
 
-	Graphics()->MapScreen(0.0f, 0.0f, ScreenWidth, ScreenHeight);
+	Graphics()->MapScreenToSize(ScreenWidth, ScreenHeight);
 
 	Base.VSplitRight(SAdminPanelProperties::ms_ButtonHeight, &Base, &OneButton);
 	OneButton.HSplitTop(OneButton.h / 2 - 10.0f, nullptr, &OneButton);

@@ -129,11 +129,6 @@ public:
 		if(m_pHttpRequest)
 			m_pHttpRequest->Abort();
 	}
-	void Wait() override
-	{
-		if(m_pHttpRequest)
-			m_pHttpRequest->Wait();
-	}
 };
 
 class CTranslateBackendLibretranslate : public ITranslateBackendHttp

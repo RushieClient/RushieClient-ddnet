@@ -71,6 +71,10 @@ bool CHttpRequestEmscripten::ConfigureAndRun()
 	{
 		Header("Content-Type: application/json");
 	}
+	else if(m_Type == REQUEST::POST_PLAINTEXT)
+	{
+		Header("Content-Type: text/plain");
+	}
 	else if(m_Type == REQUEST::POST)
 	{
 		Header("Content-Type:");

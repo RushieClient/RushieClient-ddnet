@@ -214,7 +214,7 @@ class CChat : public CComponent
 		int m_ClientId;
 		const void *m_ButtonId = nullptr;
 		char m_aName[64];
-		char m_aText[MAX_LINE_LENGTH];
+		char m_aText[MAX_CHAT_LENGTH];
 		int64_t m_Time;
 		const char *m_From;
 

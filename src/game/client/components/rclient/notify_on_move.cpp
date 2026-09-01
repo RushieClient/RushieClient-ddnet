@@ -146,7 +146,7 @@ void CNotifyOnMove::OnRender()
 
 				int m_Height = 300.0f;
 				int m_Width = m_Height * (g_Config.m_RcCustomAspectDisable & RcAspectDisable::NOTIFYINSPEC ? Graphics()->ScreenAspectReal() : Graphics()->ScreenAspect());
-				Graphics()->MapScreen(0.0f, 0.0f, (float)m_Width, (float)m_Height);
+				Graphics()->MapScreenToSize((float)m_Width, (float)m_Height);
 				CUIRect NotifyBox;
 				NotifyBox.w = 60.0f;
 				NotifyBox.h = 12.0f;
