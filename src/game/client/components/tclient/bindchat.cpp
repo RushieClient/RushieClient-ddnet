@@ -1,7 +1,6 @@
 #include "bindchat.h"
 
 #include <base/log.h>
-#include <base/system.h>
 
 #include <engine/shared/config.h>
 #include <engine/shared/localization.h>
@@ -293,7 +292,7 @@ bool CBindChat::ChatDoAutocomplete(bool ShiftPressed)
 	// insert the command
 	if(pCompletionBind)
 	{
-		char aBuf[CChat::MAX_LINE_LENGTH];
+		char aBuf[MAX_CHAT_LENGTH];
 		// add part before the name
 		str_truncate(aBuf, sizeof(aBuf), Chat.m_Input.GetString(), Chat.m_PlaceholderOffset);
 

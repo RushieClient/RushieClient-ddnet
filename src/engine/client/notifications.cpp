@@ -5,7 +5,7 @@
 #if defined(CONF_PLATFORM_MACOS)
 // Code is in src/macos/notification.mm.
 void NotificationsNotifyMacOsInternal(const char *pTitle, const char *pMessage);
-#elif defined(CONF_FAMILY_UNIX) && !defined(CONF_PLATFORM_ANDROID) && !defined(CONF_PLATFORM_HAIKU) && !defined(CONF_PLATFORM_EMSCRIPTEN)
+#elif defined(CONF_FAMILY_UNIX) && !defined(CONF_PLATFORM_ANDROID) && !defined(CONF_PLATFORM_HAIKU) && !defined(CONF_PLATFORM_EMSCRIPTEN) && !defined(CONF_PLATFORM_IOS)
 #include <libnotify/notify.h>
 #define NOTIFICATIONS_USE_LIBNOTIFY
 #endif
@@ -32,7 +32,7 @@ void CNotifications::Notify(const char *pTitle, const char *pMessage)
 	NotifyNotification *pNotif = notify_notification_new(pTitle, pMessage, "ddnet");
 	if(pNotif)
 	{
-		notify_notification_show(pNotif, NULL);
+		notify_notification_show(pNotif, nullptr);
 		g_object_unref(G_OBJECT(pNotif));
 	}
 #endif

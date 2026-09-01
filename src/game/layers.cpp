@@ -11,7 +11,7 @@ CLayers::CLayers()
 	Unload();
 }
 
-void CLayers::Init(IMap *pMap, bool GameOnly)
+void CLayers::Init(IMap *pMap, bool GameOnly, bool InitializeTilemapSkip)
 {
 	Unload();
 
@@ -29,7 +29,6 @@ void CLayers::Init(IMap *pMap, bool GameOnly)
 				continue;
 
 			CMapItemLayerTilemap *pTilemap = reinterpret_cast<CMapItemLayerTilemap *>(pLayer);
-			bool IsEntities = false;
 
 			if(pTilemap->m_Flags & TILESLAYERFLAG_GAME)
 			{
@@ -50,72 +49,37 @@ void CLayers::Init(IMap *pMap, bool GameOnly)
 					m_pGameGroup->m_ClipW = 0;
 					m_pGameGroup->m_ClipH = 0;
 				}
-
-				IsEntities = true;
 			}
-
-			if(!GameOnly)
+			else if(!GameOnly)
 			{
 				if(pTilemap->m_Flags & TILESLAYERFLAG_TELE)
 				{
-					if(pTilemap->m_Version <= 2)
-					{
-						pTilemap->m_Tele = *((int *)(pTilemap) + 15);
-					}
 					m_pTeleLayer = pTilemap;
-					IsEntities = true;
 				}
-
-				if(pTilemap->m_Flags & TILESLAYERFLAG_SPEEDUP)
+				else if(pTilemap->m_Flags & TILESLAYERFLAG_SPEEDUP)
 				{
-					if(pTilemap->m_Version <= 2)
-					{
-						pTilemap->m_Speedup = *((int *)(pTilemap) + 16);
-					}
 					m_pSpeedupLayer = pTilemap;
-					IsEntities = true;
 				}
-
-				if(pTilemap->m_Flags & TILESLAYERFLAG_FRONT)
+				else if(pTilemap->m_Flags & TILESLAYERFLAG_FRONT)
 				{
-					if(pTilemap->m_Version <= 2)
-					{
-						pTilemap->m_Front = *((int *)(pTilemap) + 17);
-					}
 					m_pFrontLayer = pTilemap;
-					IsEntities = true;
 				}
-
-				if(pTilemap->m_Flags & TILESLAYERFLAG_SWITCH)
+				else if(pTilemap->m_Flags & TILESLAYERFLAG_SWITCH)
 				{
-					if(pTilemap->m_Version <= 2)
-					{
-						pTilemap->m_Switch = *((int *)(pTilemap) + 18);
-					}
 					m_pSwitchLayer = pTilemap;
-					IsEntities = true;
 				}
-
-				if(pTilemap->m_Flags & TILESLAYERFLAG_TUNE)
+				else if(pTilemap->m_Flags & TILESLAYERFLAG_TUNE)
 				{
-					if(pTilemap->m_Version <= 2)
-					{
-						pTilemap->m_Tune = *((int *)(pTilemap) + 19);
-					}
 					m_pTuneLayer = pTilemap;
-					IsEntities = true;
 				}
-			}
-
-			if(IsEntities)
-			{
-				// Ensure default color for entities layers
-				pTilemap->m_Color = CColor(255, 255, 255, 255);
 			}
 		}
 	}
 
-	InitTilemapSkip();
+	if(InitializeTilemapSkip)
+	{
+		InitTilemapSkip();
+	}
 }
 
 void CLayers::Unload()
@@ -148,7 +112,17 @@ void CLayers::InitTilemapSkip()
 				continue;
 
 			const CMapItemLayerTilemap *pTilemap = reinterpret_cast<const CMapItemLayerTilemap *>(pLayer);
+			// Physics layers except the game layer store their tiles in their own data index,
+			// so their m_Data is neither used nor validated when the map is loaded.
+			if((pTilemap->m_Flags & (TILESLAYERFLAG_TELE | TILESLAYERFLAG_SPEEDUP | TILESLAYERFLAG_FRONT | TILESLAYERFLAG_SWITCH | TILESLAYERFLAG_TUNE)) != 0)
+				continue;
+
 			CTile *pTiles = static_cast<CTile *>(m_pMap->GetData(pTilemap->m_Data));
+			if(pTiles == nullptr)
+			{
+				continue;
+			}
+
 			for(int y = 0; y < pTilemap->m_Height; y++)
 			{
 				for(int x = 1; x < pTilemap->m_Width;)

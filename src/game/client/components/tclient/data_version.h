@@ -1,5 +1,6 @@
 #ifndef GAME_CLIENT_COMPONENTS_TCLIENT_DATA_VERSION_H
 #define GAME_CLIENT_COMPONENTS_TCLIENT_DATA_VERSION_H
+#include <base/io.h>
 #else
 #error data_version.h included multiple times
 #endif
@@ -10,8 +11,6 @@
 
 // #include <format>
 // #include <string>
-
-#include <base/system.h>
 
 #include <engine/shared/linereader.h>
 

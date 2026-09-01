@@ -45,12 +45,14 @@ void CDragger::LookForPlayersToDrag()
 		const int &TargetTeam = pTarget->Team();
 
 		// Do not create a dragger beam for super player
-		if(TargetTeam == TEAM_SUPER)
+		if(TargetTeam == pTarget->TeamsCore()->TeamSuper())
 		{
 			continue;
 		}
 		// If the dragger is disabled for the target's team, no dragger beam will be generated
-		if(m_Layer == LAYER_SWITCH && m_Number > 0 &&
+		if(m_Layer == LAYER_SWITCH &&
+			m_Number > 0 &&
+			m_Number < (int)Switchers().size() &&
 			!Switchers()[m_Number].m_aStatus[TargetTeam])
 		{
 			continue;
@@ -100,7 +102,9 @@ void CDragger::DraggerBeamTick()
 
 	if(GameWorld()->GameTick() % (int)(GameWorld()->GameTickSpeed() * 0.15f) == 0)
 	{
-		if(m_Layer == LAYER_SWITCH && m_Number > 0 &&
+		if(m_Layer == LAYER_SWITCH &&
+			m_Number > 0 &&
+			m_Number < (int)Switchers().size() &&
 			!Switchers()[m_Number].m_aStatus[pTarget->Team()])
 		{
 			DraggerBeamReset();
@@ -109,11 +113,10 @@ void CDragger::DraggerBeamTick()
 	}
 
 	// When the dragger can no longer reach the target player, the dragger beam dissolves
-	int IsReachable =
-		m_IgnoreWalls ?
-			!Collision()->IntersectNoLaserNoWalls(m_Pos, pTarget->m_Pos, nullptr, nullptr) :
-			!Collision()->IntersectNoLaser(m_Pos, pTarget->m_Pos, nullptr, nullptr);
-	if(!IsReachable || distance(pTarget->m_Pos, m_Pos) >= g_Config.m_SvDraggerRange)
+	if(distance(pTarget->m_Pos, m_Pos) >= g_Config.m_SvDraggerRange ||
+		(m_IgnoreWalls ?
+				Collision()->IntersectNoLaserNoWalls(m_Pos, pTarget->m_Pos, nullptr, nullptr) :
+				Collision()->IntersectNoLaser(m_Pos, pTarget->m_Pos, nullptr, nullptr)))
 	{
 		DraggerBeamReset();
 		return;

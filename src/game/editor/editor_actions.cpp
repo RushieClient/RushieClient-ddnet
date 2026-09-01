@@ -82,7 +82,6 @@ void CEditorBrushDrawAction::SetInfos()
 
 		if(pLayer->m_Type == LAYERTYPE_TILES)
 		{
-			std::shared_ptr<CLayerTiles> pLayerTiles = std::static_pointer_cast<CLayerTiles>(pLayer);
 			auto Changes = Pair.second;
 			for(auto &Change : Changes)
 			{
@@ -290,37 +289,53 @@ void CEditorActionSoundPlace::Redo()
 
 // ---------------------------------------------------------------------------------------
 
-CEditorActionDeleteQuad::CEditorActionDeleteQuad(CEditorMap *pMap, int GroupIndex, int LayerIndex, std::vector<int> const &vQuadsIndices, std::vector<CQuad> const &vDeletedQuads) :
-	CEditorActionLayerBase(pMap, GroupIndex, LayerIndex), m_vQuadsIndices(vQuadsIndices), m_vDeletedQuads(vDeletedQuads)
+CEditorActionDeleteQuad::CEditorActionDeleteQuad(CEditorMap *pMap, int GroupIndex, int LayerIndex) :
+	CEditorActionLayerBase(pMap, GroupIndex, LayerIndex)
 {
+	std::shared_ptr<CLayerQuads> pLayerQuads = std::static_pointer_cast<CLayerQuads>(m_pLayer);
+	m_vQuadsIndices = Map()->m_vSelectedQuads;
+
+	// make sure the indices are descending
+	std::sort(m_vQuadsIndices.begin(), m_vQuadsIndices.end(), std::greater<>());
+
+	dbg_assert(m_vQuadsIndices[0] < (int)pLayerQuads->m_vQuads.size(), "Tried to delete quad with Id %d, while the layer only contains %d quads", m_vQuadsIndices[0], (int)pLayerQuads->m_vQuads.size());
+	dbg_assert(m_vQuadsIndices.back() >= 0, "Tried to delete quad with negative Id %d", m_vQuadsIndices.back());
+
+	m_vDeletedQuads.reserve(Map()->m_vSelectedQuads.size());
+	for(int QuadId : m_vQuadsIndices)
+	{
+		m_vDeletedQuads.emplace_back(pLayerQuads->m_vQuads[QuadId]);
+	}
+
 	str_format(m_aDisplayText, sizeof(m_aDisplayText), "Delete quad (x%d)", (int)m_vDeletedQuads.size());
 }
 
 void CEditorActionDeleteQuad::Undo()
 {
 	std::shared_ptr<CLayerQuads> pLayerQuads = std::static_pointer_cast<CLayerQuads>(m_pLayer);
-	for(size_t k = 0; k < m_vQuadsIndices.size(); k++)
+
+	// Quad indices are in descending order, so we add them back in ascending order
+	for(int IndexId = (int)m_vQuadsIndices.size() - 1; IndexId >= 0; --IndexId)
 	{
-		pLayerQuads->m_vQuads.insert(pLayerQuads->m_vQuads.begin() + m_vQuadsIndices[k], m_vDeletedQuads[k]);
+		pLayerQuads->m_vQuads.insert(pLayerQuads->m_vQuads.begin() + m_vQuadsIndices[IndexId], m_vDeletedQuads[IndexId]);
 	}
+	Map()->m_vSelectedQuads = m_vQuadsIndices;
+
+	Map()->OnModify();
 }
 
 void CEditorActionDeleteQuad::Redo()
 {
 	std::shared_ptr<CLayerQuads> pLayerQuads = std::static_pointer_cast<CLayerQuads>(m_pLayer);
-	std::vector<int> vQuads(m_vQuadsIndices);
 
-	for(int i = 0; i < (int)vQuads.size(); ++i)
+	// Quad indices are in descending order
+	for(const int &QuadId : m_vQuadsIndices)
 	{
-		pLayerQuads->m_vQuads.erase(pLayerQuads->m_vQuads.begin() + vQuads[i]);
-		for(int j = i + 1; j < (int)vQuads.size(); ++j)
-			if(vQuads[j] > vQuads[i])
-				vQuads[j]--;
-
-		vQuads.erase(vQuads.begin() + i);
-
-		i--;
+		pLayerQuads->m_vQuads.erase(pLayerQuads->m_vQuads.begin() + QuadId);
 	}
+	Map()->m_vSelectedQuads.clear();
+
+	Map()->OnModify();
 }
 
 // ---------------------------------------------------------------------------------------
@@ -698,7 +713,7 @@ CEditorActionGroup::CEditorActionGroup(CEditorMap *pMap, int GroupIndex, bool De
 	if(m_Delete)
 		str_format(m_aDisplayText, sizeof(m_aDisplayText), "Delete group %d", m_GroupIndex);
 	else
-		str_copy(m_aDisplayText, "New group", sizeof(m_aDisplayText));
+		str_copy(m_aDisplayText, "New group");
 }
 
 void CEditorActionGroup::Undo()
@@ -714,7 +729,7 @@ void CEditorActionGroup::Undo()
 	{
 		// Undo: delete the group
 		Map()->DeleteGroup(m_GroupIndex);
-		Map()->m_SelectedGroup = maximum(0, m_GroupIndex - 1);
+		Map()->m_SelectedGroup = std::max(0, m_GroupIndex - 1);
 	}
 
 	Map()->OnModify();
@@ -732,7 +747,7 @@ void CEditorActionGroup::Redo()
 	{
 		// Redo: delete the group
 		Map()->DeleteGroup(m_GroupIndex);
-		Map()->m_SelectedGroup = maximum(0, m_GroupIndex - 1);
+		Map()->m_SelectedGroup = std::max(0, m_GroupIndex - 1);
 	}
 
 	Map()->OnModify();
@@ -759,8 +774,6 @@ CEditorActionEditGroupProp::CEditorActionEditGroupProp(CEditorMap *pMap, int Gro
 
 void CEditorActionEditGroupProp::Undo()
 {
-	auto pGroup = Map()->m_vpGroups[m_GroupIndex];
-
 	if(m_Prop == EGroupProp::ORDER)
 	{
 		Map()->m_SelectedGroup = Map()->MoveGroup(m_Current, m_Previous);
@@ -771,8 +784,6 @@ void CEditorActionEditGroupProp::Undo()
 
 void CEditorActionEditGroupProp::Redo()
 {
-	auto pGroup = Map()->m_vpGroups[m_GroupIndex];
-
 	if(m_Prop == EGroupProp::ORDER)
 	{
 		Map()->m_SelectedGroup = Map()->MoveGroup(m_Previous, m_Current);
@@ -943,7 +954,7 @@ void CEditorActionEditLayerTilesProp::Undo()
 		else
 		{
 			pLayerTiles->m_Image = m_Previous % Map()->m_vpImages.size();
-			pLayerTiles->m_AutoMapperConfig = -1;
+			pLayerTiles->m_AutomapperConfig = -1;
 		}
 	}
 	else if(m_Prop == ETilesProp::COLOR)
@@ -969,7 +980,7 @@ void CEditorActionEditLayerTilesProp::Undo()
 	}
 	else if(m_Prop == ETilesProp::AUTOMAPPER)
 	{
-		pLayerTiles->m_AutoMapperConfig = m_Previous;
+		pLayerTiles->m_AutomapperConfig = m_Previous;
 	}
 	else if(m_Prop == ETilesProp::LIVE_GAMETILES)
 	{
@@ -1027,7 +1038,7 @@ void CEditorActionEditLayerTilesProp::Redo()
 		else
 		{
 			pLayerTiles->m_Image = m_Current % Map()->m_vpImages.size();
-			pLayerTiles->m_AutoMapperConfig = -1;
+			pLayerTiles->m_AutomapperConfig = -1;
 		}
 	}
 	else if(m_Prop == ETilesProp::COLOR)
@@ -1053,7 +1064,7 @@ void CEditorActionEditLayerTilesProp::Redo()
 	}
 	else if(m_Prop == ETilesProp::AUTOMAPPER)
 	{
-		pLayerTiles->m_AutoMapperConfig = m_Current;
+		pLayerTiles->m_AutomapperConfig = m_Current;
 	}
 	else if(m_Prop == ETilesProp::LIVE_GAMETILES)
 	{
@@ -1205,19 +1216,19 @@ void CEditorActionAppendMap::Undo()
 	// - delete added sounds
 
 	// Delete added groups
-	while((int)Map()->m_vpGroups.size() != m_PrevInfo.m_Groups)
+	while((int)Map()->m_vpGroups.size() > m_PrevInfo.m_Groups)
 	{
 		Map()->m_vpGroups.pop_back();
 	}
 
 	// Delete added envelopes
-	while((int)Map()->m_vpEnvelopes.size() != m_PrevInfo.m_Envelopes)
+	while((int)Map()->m_vpEnvelopes.size() > m_PrevInfo.m_Envelopes)
 	{
 		Map()->m_vpEnvelopes.pop_back();
 	}
 
 	// Delete added sounds
-	while((int)Map()->m_vpSounds.size() != m_PrevInfo.m_Sounds)
+	while((int)Map()->m_vpSounds.size() > m_PrevInfo.m_Sounds)
 	{
 		Map()->m_vpSounds.pop_back();
 	}
@@ -1249,10 +1260,12 @@ void CEditorActionAppendMap::Undo()
 		});
 	}
 
-	while((int)Map()->m_vpImages.size() != m_PrevInfo.m_Images)
+	while((int)Map()->m_vpImages.size() > m_PrevInfo.m_Images)
 	{
 		Map()->m_vpImages.pop_back();
 	}
+
+	Map()->OnModify();
 }
 
 void CEditorActionAppendMap::Redo()
@@ -1267,11 +1280,11 @@ void CEditorActionAppendMap::Redo()
 
 // ---------------------------
 
-CEditorActionTileArt::CEditorActionTileArt(CEditorMap *pMap, int PreviousImageCount, const char *pTileArtFile, std::vector<int> &vImageIndexMap) :
+CEditorActionTileArt::CEditorActionTileArt(CEditorMap *pMap, int PreviousImageCount, const char *pFilename, std::vector<int> &vImageIndexMap) :
 	IEditorAction(pMap), m_PreviousImageCount(PreviousImageCount), m_vImageIndexMap(vImageIndexMap)
 {
-	str_copy(m_aTileArtFile, pTileArtFile);
-	str_copy(m_aDisplayText, "Tile art");
+	str_copy(m_aFilename, pFilename);
+	str_copy(m_aDisplayText, "Add tile art");
 }
 
 void CEditorActionTileArt::Undo()
@@ -1306,7 +1319,7 @@ void CEditorActionTileArt::Undo()
 		});
 	}
 
-	while((int)Map()->m_vpImages.size() != m_PreviousImageCount)
+	while((int)Map()->m_vpImages.size() > m_PreviousImageCount)
 	{
 		Map()->m_vpImages.pop_back();
 	}
@@ -1314,41 +1327,37 @@ void CEditorActionTileArt::Undo()
 
 void CEditorActionTileArt::Redo()
 {
-	if(!Graphics()->LoadPng(Editor()->m_TileArtImageInfo, m_aTileArtFile, IStorage::TYPE_ALL))
+	CImageInfo Image;
+	if(!Graphics()->LoadPng(Image, m_aFilename, IStorage::TYPE_ALL))
 	{
-		Editor()->ShowFileDialogError("Failed to load image from file '%s'.", m_aTileArtFile);
+		Editor()->ShowFileDialogError("Failed to load image from file '%s'.", m_aFilename);
 		return;
 	}
-
-	IStorage::StripPathAndExtension(m_aTileArtFile, Editor()->m_aTileArtFilename, sizeof(Editor()->m_aTileArtFilename));
-	Editor()->AddTileArt(true);
+	Map()->AddTileArt(std::move(Image), m_aFilename, true);
 }
 
 // ---------------------------
 
-CEditorActionQuadArt::CEditorActionQuadArt(CEditorMap *pMap, CQuadArtParameters Parameters) :
-	IEditorAction(pMap), m_Parameters(Parameters)
+CEditorActionQuadArt::CEditorActionQuadArt(CEditorMap *pMap, const std::shared_ptr<CLayerGroup> &pGroup) :
+	IEditorAction(pMap), m_pGroup(pGroup)
 {
-	str_copy(m_aDisplayText, "Create quad art");
+	str_copy(m_aDisplayText, "Add quad art");
 }
 
 void CEditorActionQuadArt::Undo()
 {
-	// Delete added group
-	Map()->m_vpGroups.pop_back();
+	// Delete added group (keep pointer for redo)
+	auto &vGroups = Map()->m_vpGroups;
+	auto It = std::find(vGroups.begin(), vGroups.end(), m_pGroup);
+	if(It != vGroups.end())
+		vGroups.erase(It);
 }
 
 void CEditorActionQuadArt::Redo()
 {
-	Editor()->m_QuadArtParameters = m_Parameters;
-	str_copy(Editor()->m_QuadArtParameters.m_aFilename, m_Parameters.m_aFilename, sizeof(Editor()->m_QuadArtParameters.m_aFilename));
-
-	if(!Graphics()->LoadPng(Editor()->m_QuadArtImageInfo, Editor()->m_QuadArtParameters.m_aFilename, IStorage::TYPE_ALL))
-	{
-		Editor()->ShowFileDialogError("Failed to load image from file '%s'.", Editor()->m_QuadArtParameters.m_aFilename);
-		return;
-	}
-	Editor()->AddQuadArt(true);
+	auto &vGroups = Map()->m_vpGroups;
+	if(std::find(vGroups.begin(), vGroups.end(), m_pGroup) == vGroups.end())
+		vGroups.push_back(m_pGroup);
 }
 
 // ---------------------------------
@@ -1730,7 +1739,7 @@ void CEditorActionDeleteEnvelopePoint::Redo()
 	std::shared_ptr<CEnvelope> pEnvelope = Map()->m_vpEnvelopes[m_EnvelopeIndex];
 	pEnvelope->m_vPoints.erase(pEnvelope->m_vPoints.begin() + m_PointIndex);
 
-	auto pSelectedPointIt = std::find_if(Map()->m_vSelectedEnvelopePoints.begin(), Map()->m_vSelectedEnvelopePoints.end(), [this](const std::pair<int, int> Pair) {
+	auto pSelectedPointIt = std::find_if(Map()->m_vSelectedEnvelopePoints.begin(), Map()->m_vSelectedEnvelopePoints.end(), [this](const std::pair<int, int> &Pair) {
 		return Pair.first == m_PointIndex;
 	});
 

@@ -1,5 +1,6 @@
 #include "translate.h"
 
+#include <base/dbg.h>
 #include <base/log.h>
 
 #include <engine/shared/json.h>
@@ -84,19 +85,20 @@ bool ITranslateBackend::CompareTargets(const char *pA, const char *pB) const
 class ITranslateBackendHttp : public ITranslateBackend
 {
 protected:
-	std::shared_ptr<CHttpRequest> m_pHttpRequest = nullptr;
+	using ITranslateBackend::ITranslateBackend;
+	std::shared_ptr<IHttpRequest> m_pHttpRequest = nullptr;
 	virtual bool ParseResponse(CTranslateResponse &Out) = 0;
 	virtual bool ParseHttpError() const { return false; }
 
 	void CreateHttpRequest(IHttp &Http, const char *pUrl)
 	{
-		auto pGet = std::make_shared<CHttpRequest>(pUrl);
+		auto pGet = HttpGet(pUrl);
 		pGet->LogProgress(HTTPLOG::FAILURE);
 		pGet->FailOnErrorStatus(false);
 		pGet->Timeout(CTimeout{10000, 0, 500, 10});
 
-		m_pHttpRequest = pGet;
-		Http.Run(pGet);
+		m_pHttpRequest = std::move(pGet);
+		Http.Run(m_pHttpRequest);
 	}
 
 public:
@@ -236,7 +238,7 @@ public:
 		Json.WriteAttribute("source");
 		Json.WriteStrValue("auto");
 		Json.WriteAttribute("target");
-		Json.WriteStrValue(ITranslateBackend::EncodeTarget(SendTranslate ? g_Config.m_RcTranslateSendTarget : g_Config.m_TcTranslateTarget));
+		Json.WriteStrValue(EncodeTarget(g_Config.m_TcTranslateTarget));
 		Json.WriteAttribute("format");
 		Json.WriteStrValue("text");
 		if(g_Config.m_TcTranslateKey[0] != '\0')
@@ -292,8 +294,7 @@ private:
 			return false;
 		}
 
-		UrlDecode(pTranslatedText->u.string.ptr, Out.m_Text, sizeof(Out.m_Text));
-		str_utf8_fix_truncation(Out.m_Text);
+		str_copy(Out.m_Text, pTranslatedText->u.string.ptr);
 		str_copy(Out.m_Language, pDetectedLanguage->u.string.ptr);
 
 		return true;
@@ -949,12 +950,6 @@ void CTranslate::AutoTranslate(CChat::CLine &Line)
 	{
 		if(Id >= 0 && Id == Line.m_ClientId)
 			return;
-	}
-	if(str_comp(g_Config.m_TcTranslateBackend, "ftapi") == 0)
-	{
-		// FTAPI quickly gets overloaded, please do not disable this
-		// It may shut down if we spam it too hard
-		return;
 	}
 	Translate(Line, false);
 }

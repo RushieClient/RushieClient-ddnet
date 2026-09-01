@@ -34,6 +34,7 @@ class CConsole : public IConsole
 		const char *Name() const override { return m_pName; }
 		const char *Help() const override { return m_pHelp; }
 		const char *Params() const override { return m_pParams; }
+		bool TakesClientId() const override;
 		int Flags() const override { return m_Flags; }
 		EAccessLevel GetAccessLevel() const override { return m_AccessLevel; }
 		void SetAccessLevel(EAccessLevel AccessLevel);
@@ -77,6 +78,9 @@ class CConsole : public IConsole
 
 	void ExecuteLineStroked(int Stroke, const char *pStr, int ClientId = IConsole::CLIENT_ID_UNSPECIFIED, bool InterpretSemicolons = true) override;
 
+	FGetVictimsCommandCallback m_pfnGetVictimsCommandCallback = nullptr;
+	void *m_pGetVictimsCommandUserData = nullptr;
+
 	FTeeHistorianCommandCallback m_pfnTeeHistorianCommandCallback;
 	void *m_pTeeHistorianCommandUserdata;
 
@@ -116,19 +120,18 @@ class CConsole : public IConsole
 
 		// DDRace
 
-		enum
+		class CVictim
 		{
-			VICTIM_NONE = -3,
-			VICTIM_ME = -2,
-			VICTIM_ALL = -1,
+		public:
+			static constexpr unsigned MAX_VICTIM_LENGTH = 16;
+			// symbolic victim like "me" or "all", resolved to ids before the command callback runs
+			char m_aSpecialVictim[MAX_VICTIM_LENGTH] = "";
+			std::optional<int> m_Id;
 		};
-
-		int m_Victim;
-		void ResetVictim();
-		bool HasVictim() const;
-		void SetVictim(int Victim);
-		void SetVictim(const char *pVictim);
-		int GetVictim() const override;
+		std::vector<CVictim> m_vVictims;
+		void AddVictim(const char *pVictim);
+		void SetVictim(unsigned Slot, int Victim);
+		int GetVictim(unsigned Slot) const override;
 	};
 
 	int ParseStart(CResult *pResult, const char *pString, int Length);
@@ -145,12 +148,12 @@ class CConsole : public IConsole
 	int ParseArgs(CResult *pResult, const char *pFormat);
 
 	/*
-	this function will set pFormat to the next parameter (i,s,r,v,?) it contains and
+	this function will set pFormat to the next parameter it contains and
 	return the parameter; descriptions in brackets like [file] will be skipped;
 	returns '\0' if there is no next parameter; expects pFormat to point at a
 	parameter
 	*/
-	char NextParam(const char *&pFormat);
+	static char NextParam(const char *&pFormat);
 
 	class CExecutionQueueEntry
 	{
@@ -192,6 +195,7 @@ public:
 	bool ExecuteFile(const char *pFilename, int ClientId = IConsole::CLIENT_ID_UNSPECIFIED, bool LogFailure = false, int StorageType = IStorage::TYPE_ALL) override;
 
 	void Print(int Level, const char *pFrom, const char *pStr, ColorRGBA PrintColor = CONSOLE_DEFAULT_COLOR) const override;
+	void SetGetVictimsCommandCallback(FGetVictimsCommandCallback pfnCallback, void *pUser) override;
 	void SetTeeHistorianCommandCallback(FTeeHistorianCommandCallback pfnCallback, void *pUser) override;
 	void SetUnknownCommandCallback(FUnknownCommandCallback pfnCallback, void *pUser) override;
 	void SetCanUseCommandCallback(FCanUseCommandCallback pfnCallback, void *pUser) override;

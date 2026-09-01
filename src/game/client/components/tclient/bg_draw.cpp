@@ -1,7 +1,7 @@
 #include "bg_draw.h"
 
+#include <base/dbg.h>
 #include <base/io.h>
-#include <base/system.h>
 
 #include <engine/client.h>
 #include <engine/external/spt.h>
@@ -366,7 +366,7 @@ static IOHANDLE BgDrawOpenFile(CGameClient &This, const char *pFilename, int Fla
 
 bool CBgDraw::Save(const char *pFilename, bool Verbose)
 {
-	if(m_pvItems->size() == 0)
+	if(m_pvItems->empty())
 	{
 		if(Verbose)
 			GameClient()->Echo(TCLocalize("No items to write", "bgdraw"));
@@ -382,12 +382,21 @@ bool CBgDraw::Save(const char *pFilename, bool Verbose)
 	IOHANDLE Handle = BgDrawOpenFile(*GameClient(), pFilename, IOFLAG_WRITE);
 	if(!Handle)
 		return false;
+
+	auto WriteLine = [&Handle](const char *pLine) -> bool {
+		if(!io_write(Handle, pLine, str_length(pLine)))
+			return false;
+		if(!io_write_newline(Handle))
+			return false;
+		return true;
+	};
+
 	int Written = 0;
 	bool Success = true;
 	char aMsg[256];
 	for(const CBgDrawItem &Item : *m_pvItems)
 	{
-		if(!BgDrawFile::Write(Handle, Item.Data()))
+		if(!BgDrawFile::Write(WriteLine, Item.Data()))
 		{
 			str_format(aMsg, sizeof(aMsg), TCLocalize("Writing item %d failed", "bgdraw"), Written);
 			GameClient()->Echo(aMsg);
@@ -412,12 +421,22 @@ bool CBgDraw::Load(const char *pFilename, bool Verbose)
 	IOHANDLE Handle = BgDrawOpenFile(*GameClient(), pFilename, IOFLAG_READ);
 	if(!Handle)
 		return false;
+
+	auto ReadLine = [Handle](char *pBuf, int Length) -> bool {
+		if(!io_read(Handle, pBuf, Length))
+			return false;
+		size_t Len = str_length(pBuf);
+		while(Len > 0 && (pBuf[Len - 1] == '\n' || pBuf[Len - 1] == '\r'))
+			pBuf[--Len] = '\0';
+		return true;
+	};
+
 	std::deque<CBgDrawItemData> Queue;
 	int ItemsLoaded = 0;
 	int ItemsDiscarded = 0;
 	{
 		CBgDrawItemData Data;
-		while(BgDrawFile::Read(Handle, Data) && (ItemsLoaded++) < MAX_ITEMS_TO_LOAD)
+		while(BgDrawFile::Read(ReadLine, Data) && (ItemsLoaded++) < MAX_ITEMS_TO_LOAD)
 		{
 			if((int)Queue.size() > g_Config.m_TcBgDrawMaxItems)
 			{
@@ -550,8 +569,7 @@ void CBgDraw::OnRender()
 	// Remove extra items
 	MakeSpaceFor(0);
 	// Update age of items, delete old items, render items
-	float ScreenX0, ScreenY0, ScreenX1, ScreenY1;
-	Graphics()->GetScreen(&ScreenX0, &ScreenY0, &ScreenX1, &ScreenY1);
+	const CScreenRect ScreenRect = Graphics()->GetScreen();
 	for(CBgDrawItem &Item : *m_pvItems)
 	{
 		// If this item is currently active
@@ -567,10 +585,13 @@ void CBgDraw::OnRender()
 			if(g_Config.m_TcBgDrawFadeTime > 0 && Item.m_SecondsAge > (float)g_Config.m_TcBgDrawFadeTime)
 				Item.m_Killed = true;
 		}
-		const bool InRangeX = Item.BoundingBox().m_Min.x < ScreenX1 || Item.BoundingBox().m_Max.x > ScreenX0;
-		const bool InRangeY = Item.BoundingBox().m_Min.y < ScreenY1 || Item.BoundingBox().m_Max.y > ScreenY0;
-		if(InRangeX && InRangeY)
+		if(Item.BoundingBox().m_Min.x < ScreenRect.m_BottomRight.x &&
+			Item.BoundingBox().m_Max.x > ScreenRect.m_TopLeft.x &&
+			Item.BoundingBox().m_Min.y < ScreenRect.m_BottomRight.y &&
+			Item.BoundingBox().m_Max.y > ScreenRect.m_TopLeft.y)
+		{
 			Item.Render();
+		}
 	}
 	// Remove killed items
 	if(m_pvItems->remove_if([&](CBgDrawItem &Item) { return Item.m_Killed; }))

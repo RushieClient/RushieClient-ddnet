@@ -3,8 +3,9 @@ from collections import namedtuple
 from queue import Queue
 from threading import Thread
 from time import time
-from urllib.request import urlopen
-from uuid import uuid4, UUID
+from urllib import request
+from urllib.request import Request, urlopen
+from uuid import UUID, uuid4
 import io
 import json
 import os
@@ -15,6 +16,19 @@ import subprocess
 import sys
 import tempfile
 import traceback
+
+
+def urlopen_anystatus(url):
+	# Adapted from https://stackoverflow.com/a/74844056:
+	class NonRaisingHttpErrorProcessor(request.HTTPErrorProcessor):
+		def https_response(self, request, response):
+			return response
+
+		def http_response(self, request, response):
+			return response
+
+	return request.build_opener(NonRaisingHttpErrorProcessor).open(url)
+
 
 # TODO: less strict default timeouts?
 
@@ -98,7 +112,7 @@ YELLOW = "\x1b[33m"
 
 
 class TestRunner:
-	def __init__(self, ddnet, ddnet_server, ddnet_mastersrv, repo_dir, test_dir, show_full_output, valgrind_memcheck, keep_tmpdirs, timeout_multiplier):
+	def __init__(self, ddnet, ddnet_server, ddnet_mastersrv, repo_dir, test_dir, show_full_output, test_websockets, valgrind_memcheck, keep_tmpdirs, timeout_multiplier):
 		self.ddnet = ddnet
 		self.ddnet_server = ddnet_server
 		self.ddnet_mastersrv = ddnet_mastersrv
@@ -107,11 +121,17 @@ class TestRunner:
 		self.test_dir = test_dir
 		self.extra_env_vars = {}
 		self.show_full_output = show_full_output
+		self.test_websockets = test_websockets
 		self.keep_tmpdirs = keep_tmpdirs
 		self.timeout_multiplier = timeout_multiplier
 		self.valgrind_memcheck = valgrind_memcheck
 		if self.valgrind_memcheck:
-			self.timeout_multiplier *= 20
+			self.timeout_multiplier *= 25
+		# `conn_timeout` is wall clock inside the engine, so it has to be scaled like
+		# the test timeouts, otherwise a slowed down client or server drops its own
+		# connection while the test is still waiting. 100 is the default of the config
+		# variable, 1000 its maximum.
+		self.conn_timeout = min(1000, round(100 * self.timeout_multiplier))
 
 	def run_test(self, test):
 		tmp_dir = tempfile.mkdtemp(prefix=f"integration_{test.name}_", dir=self.test_dir)
@@ -154,6 +174,10 @@ class TestRunner:
 		num_skipped = 0
 		for test in tests:
 			if test.requires_mastersrv and self.ddnet_mastersrv is None:
+				print(f"{test.name} ... {YELLOW}skipped{RESET}")
+				num_skipped += 1
+				continue
+			if test.requires_websockets and not self.test_websockets:
 				print(f"{test.name} ... {YELLOW}skipped{RESET}")
 				num_skipped += 1
 				continue
@@ -206,7 +230,7 @@ add_path {relpath(self.runner.data_dir, tmp_dir)}
 				"--tool=memcheck",
 				"--gen-suppressions=all",
 				"--suppressions={}".format(relpath(os.path.join(runner.repo_dir, "memcheck.supp"), self.tmp_dir)),
-				"--track-origins=yes",
+				# "--track-origins=yes", # too expensive, makes CI flaky
 			]
 		self.name = name
 		self.num_clients = 0
@@ -393,19 +417,19 @@ class Runnable:
 		while True:
 			event = self.next_event(timeout_id)
 			if isinstance(event, Exit):
-				raise EOFError(f"program exited unexpectedly waiting for {description}")
+				raise EOFError(f"program exited unexpectedly waiting for {description}")  # noqa: TRY004 type-check-without-type-error
 			elif isinstance(event, Log):
 				if fn(event):
 					return event
 
 	def wait_for_log_prefix(self, prefix, timeout=1):
-		self.wait_for_log(lambda l: l.line.startswith(prefix), description=f"log line with prefix `{prefix}`", timeout=timeout)
+		return self.wait_for_log(lambda l: l.line.startswith(prefix), description=f"log line with prefix `{prefix}`", timeout=timeout)
 
 	def wait_for_log_suffix(self, suffix, timeout=1):
-		self.wait_for_log(lambda l: l.line.endswith(suffix), description=f"log line with suffix `{suffix}`", timeout=timeout)
+		return self.wait_for_log(lambda l: l.line.endswith(suffix), description=f"log line with suffix `{suffix}`", timeout=timeout)
 
 	def wait_for_log_exact(self, line, timeout=1):
-		self.wait_for_log(lambda l: l.line == line, description=f"log line exactly matching `{line}`", timeout=timeout)
+		return self.wait_for_log(lambda l: l.line == line, description=f"log line exactly matching `{line}`", timeout=timeout)
 
 	def wait_for_exit(self, timeout=10):
 		timeout_id = self.register_timeout(timeout, "exit")
@@ -447,6 +471,7 @@ class Client(Runnable):
 				f"cl_input_fifo {self.fifo_name}",
 				"gfx_fullscreen 0",
 				"cl_save_settings 0",
+				f"conn_timeout {test_env.runner.conn_timeout}",
 			]
 			+ extra_args,
 		)
@@ -478,6 +503,7 @@ class Server(Runnable):
 				test_env.ddnet_server,
 				f"sv_input_fifo {self.fifo_name}",
 				"sv_register 0",
+				f"conn_timeout {test_env.runner.conn_timeout}",
 			]
 			+ extra_args,
 		)
@@ -513,10 +539,13 @@ class Mastersrv(Runnable):
 			communities_json_filename = f"{name}-communities.json"
 			with open(os.path.join(test_env.tmp_dir, communities_json_filename), "w", encoding="utf-8") as f:
 				f.write(communities_json)
-			config = config + f"""\
+			config = (
+				config
+				+ f"""\
 [communities]
 json = {communities_json_filename!r}
 """
+			)
 		if config is not None:
 			config_filename = f"{name}.toml"
 			with open(os.path.join(test_env.tmp_dir, config_filename), "w", encoding="utf-8") as f:
@@ -555,6 +584,9 @@ json = {communities_json_filename!r}
 	def wait_for_startup(self, timeout=5):
 		self.wait_for_log_prefix("warp::server: listening on http://[::]:", timeout=timeout)
 
+	def register_url(self):
+		return f"http://[::1]:{self.port}/ddnet/15/register"
+
 	def servers_json(self):
 		return json.loads(urlopen(f"http://[::1]:{self.port}/ddnet/15/test-servers.json").read())
 
@@ -562,10 +594,11 @@ json = {communities_json_filename!r}
 ALL_TESTS = []
 
 
-def test(test=None, *, requires_mastersrv=False, timeout=60):
+def test(test=None, *, requires_mastersrv=False, requires_websockets=False, timeout=60):
 	def apply(test):
 		test.name = test.__name__
 		test.requires_mastersrv = requires_mastersrv
+		test.requires_websockets = requires_websockets
 		test.timeout = timeout
 		ALL_TESTS.append(test)
 		return test
@@ -632,7 +665,9 @@ def client_can_connect(test_env):
 	server = test_env.server()
 	wait_for_startup([client, server])
 	client.command(f"connect localhost:{server.port}")
-	server.wait_for_log_prefix("server: player has entered the game", timeout=10)
+	join = server.wait_for_log_prefix("server: player has entered the game", timeout=10).line
+	if "sixup=0" not in join:
+		raise AssertionError(f"sixup=0 not found in {join!r}")
 	server.exit()
 	client.wait_for_log_exact("client: offline error='Server shutdown'")
 	client.exit()
@@ -645,8 +680,28 @@ def client_can_connect_7(test_env):
 	client = test_env.client()
 	server = test_env.server()
 	wait_for_startup([client, server])
-	client.command(f"connect tw-0.7+udp://localhost:{server.port}")
-	server.wait_for_log_prefix("server: player has entered the game", timeout=10)
+	client.command(f"connect tw-0.7+udp://127.0.0.1:{server.port}")  # FIXME(#11693): Work around missing domain support.
+	join = server.wait_for_log_prefix("server: player has entered the game", timeout=10).line
+	if "sixup=1" not in join:
+		raise AssertionError(f"sixup=0 not found in {join!r}")
+	server.exit()
+	client.wait_for_log_exact("client: offline error='Server shutdown'")
+	client.exit()
+	server.wait_for_exit()
+	client.wait_for_exit()
+
+
+@test(requires_websockets=True)
+def client_can_connect_websockets(test_env):
+	client = test_env.client(["dbg_websockets 1", "stdout_output_level 1"])
+	server = test_env.server(["dbg_websockets 1", "stdout_output_level 1"])
+	wait_for_startup([client, server])
+	client.command(f"connect ws://127.0.0.1:{server.port}")  # FIXME(#11693): Work around missing domain support.
+	server.wait_for_log_prefix("websockets: I: lws_handshake_server", timeout=15)  # Connection established
+	client.wait_for_log_prefix("websockets: I: lws_http_client_socket_service", timeout=15)  # Connection established
+	join = server.wait_for_log_prefix("server: player has entered the game", timeout=5).line
+	if "sixup=0" not in join:
+		raise AssertionError(f"sixup=0 not found in {join!r}")
 	server.exit()
 	client.wait_for_log_exact("client: offline error='Server shutdown'")
 	client.exit()
@@ -678,7 +733,7 @@ def smoke_test(test_env):
 	client1.command("stdout_output_level 2; loglevel 2")
 	client1.command(f"connect localhost:{server.port}")
 	server.wait_for_log_prefix("server: player has entered the game", timeout=10)
-	client1.wait_for_log_exact("client: state change. last=2 current=3", timeout=15)
+	client1.wait_for_log_exact("client: state change. last=2 current=3", timeout=30)
 	client1.command("stdout_output_level 0; loglevel 0")
 	client1.command("debug 0")
 	client1.command("record client1")
@@ -693,10 +748,10 @@ def smoke_test(test_env):
 		)
 
 	client1.command("say hello world")
-	server.wait_for_log_exact("chat: 0:-2:client1: hello world")
+	server.wait_for_log_exact("chat: 0:-2:client1: hello world", timeout=15)
 
 	client1.command(f"rcon_auth {server.rcon_password}")
-	server.wait_for_log_exact("server: ClientId=0 authed with key='default_admin' (admin)")
+	server.wait_for_log_exact("server: ClientId=0 authed with key='default_admin' (admin)", timeout=15)
 
 	client1.command(
 		'say "/mc; {}"'.format(
@@ -736,7 +791,7 @@ def smoke_test(test_env):
 	""".strip().split("\n")
 		)
 	)
-	client1.wait_for_log_exact("chat/server: *** the end", timeout=3)
+	client1.wait_for_log_exact("chat/server: *** the end", timeout=15)
 
 	server.command("stoprecord")
 	client1.command("stoprecord")
@@ -894,7 +949,7 @@ ddvc_6DnZq51fypqX9ldrEFCF9aJdpi6wjgh6YA = "ddnet"
 	if len(servers_json["servers"]) != 1 or servers_json["servers"][0]["info"]["map"]["name"] != "Tutorial" or len(servers_json["servers"][0]["addresses"]) != 1:
 		raise AssertionError(f"unexpected servers.json\n{servers_json}")
 	if servers_json["servers"][0]["community"] != "ddnet":
-		raise AssertionError(f"servers.json didn't have \"community\" key\n{servers_json}")
+		raise AssertionError(f'servers.json didn\'t have "community" key\n{servers_json}')
 	server.exit()
 	mastersrv.wait_for_log_prefix("mastersrv: successfully removed", timeout=5)
 	servers_json = mastersrv.servers_json()
@@ -902,6 +957,44 @@ ddvc_6DnZq51fypqX9ldrEFCF9aJdpi6wjgh6YA = "ddnet"
 		raise AssertionError(f"unexpected servers.json\n{servers_json}")
 	mastersrv.exit()
 	mastersrv.wait_for_exit()
+
+
+@test(requires_mastersrv=True)
+def mastersrv_smoke_test(test_env):
+	mastersrv = test_env.mastersrv()
+	wait_for_startup([mastersrv])
+
+	register_url = mastersrv.register_url()
+	register_headers = {
+		"Address": "tw-0.6+udp://connecting-address.invalid:12345",
+		"Secret": "4ab4bc03-5a3c-4a61-9ba0-24da6c4cfa89",
+		"Info-Serial": "0",
+		"Challenge-Secret": "623647f9-dd77-4b98-ac2b-2bff6b283be1",
+		"Content-Type": "application/json",
+	}
+
+	def test_register(http_status, status, message, server_info):
+		with urlopen_anystatus(
+			Request(
+				url=register_url,
+				headers=register_headers,
+				data=server_info,
+				method="POST",
+			)
+		) as response:
+			got_http_status, got_result = response.status, response.read().decode()
+
+		if http_status != got_http_status:
+			raise AssertionError(f"{message}: wanted HTTP status {http_status}, got {got_http_status} ({got_result})")
+
+		if json.loads(got_result)["status"] != status:
+			raise AssertionError(f"{message}: wanted status {status}, got {got_result}")
+
+	test_register(200, "need_challenge", "register should succeed", b"{}")
+	test_register(200, "need_challenge", "register should accept UTF-8", '{"test":"👩"}'.encode())
+	test_register(200, "need_challenge", "register should accept matched surrogates", b'{"test":"\\uD83D\\uDC69"}')
+	test_register(400, "error", "register should reject lone surrogates", b'{"test":"\\uD83D"}')
+	test_register(400, "error", "register should reject invalid UTF-8", b'{"test":"\xff"}')
 
 
 EXE_SUFFIX = ""
@@ -918,6 +1011,7 @@ def main():
 	parser.add_argument("--keep-tmpdirs", action="store_true", help="keep temporary directories used for the tests")
 	parser.add_argument("--show-full-output", action="store_true", help="print the full stdout and stderr on test failures")
 	parser.add_argument("--test-mastersrv", action="store_true", help="enforce testing of mastersrv")
+	parser.add_argument("--test-websockets", action="store_true", help="run tests that require compiling with websockets support")
 	parser.add_argument("--timeout-multiplier", type=float, default=1, help="multiply all timeouts by this value")
 	parser.add_argument("--valgrind-memcheck", action="store_true", help="use valgrind's memcheck on client and server")
 	parser.add_argument("builddir", metavar="BUILDDIR", help="path to ddnet build directory")
@@ -948,6 +1042,7 @@ def main():
 		repo_dir=repo_dir,
 		test_dir=args.builddir,
 		show_full_output=args.show_full_output,
+		test_websockets=args.test_websockets,
 		valgrind_memcheck=args.valgrind_memcheck,
 		keep_tmpdirs=args.keep_tmpdirs,
 		timeout_multiplier=args.timeout_multiplier,

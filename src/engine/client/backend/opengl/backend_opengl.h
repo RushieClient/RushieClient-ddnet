@@ -51,6 +51,11 @@ protected:
 	std::vector<CTexture> m_vTextures;
 	std::atomic<uint64_t> *m_pTextureMemoryUsage;
 
+	// Position of the viewport within the drawable area, with the bottom left origin
+	// that OpenGL uses. The rendered image is aligned to the top left, so this is not
+	// the origin of the drawable area when the viewport is clamped.
+	int m_ViewportX = 0;
+	int m_ViewportY = 0;
 	uint32_t m_CanvasWidth = 0;
 	uint32_t m_CanvasHeight = 0;
 
@@ -143,7 +148,7 @@ class CCommandProcessorFragment_OpenGL2 : public CCommandProcessorFragment_OpenG
 		SBufferObject(TWGLuint BufferObjectId) :
 			m_BufferObjectId(BufferObjectId)
 		{
-			m_pData = NULL;
+			m_pData = nullptr;
 			m_DataSize = 0;
 		}
 		TWGLuint m_BufferObjectId;

@@ -18,7 +18,12 @@
 #ifndef BACKEND_AS_OPENGL_ES
 #include <GL/glew.h>
 #else
+#if defined(CONF_PLATFORM_IOS)
+#include <OpenGLES/ES3/gl.h>
+#include <OpenGLES/ES3/glext.h>
+#else
 #include <GLES3/gl3.h>
+#endif
 #endif
 
 bool CGLSL::LoadShader(CGLSLCompiler *pCompiler, IStorage *pStorage, const char *pFile, int Type)
@@ -40,7 +45,9 @@ bool CGLSL::LoadShader(CGLSLCompiler *pCompiler, IStorage *pStorage, const char 
 		GLShaderStringPostfix = std::string(" es\r\n");
 	//add compiler specific values
 	if(IsNewOpenGL)
+	{
 		vLines.push_back(std::string("#version ") + std::string(std::to_string(pCompiler->m_OpenGLVersionMajor)) + std::string(std::to_string(pCompiler->m_OpenGLVersionMinor)) + std::string(std::to_string(pCompiler->m_OpenGLVersionPatch)) + GLShaderStringPostfix);
+	}
 	else
 	{
 		if(pCompiler->m_OpenGLVersionMajor == 3)
@@ -103,7 +110,7 @@ bool CGLSL::LoadShader(CGLSLCompiler *pCompiler, IStorage *pStorage, const char 
 
 	const TWGLuint ShaderId = glCreateShader(Type);
 
-	glShaderSource(ShaderId, vLines.size(), ShaderCode, NULL);
+	glShaderSource(ShaderId, vLines.size(), ShaderCode, nullptr);
 	glCompileShader(ShaderId);
 
 	delete[] ShaderCode;
@@ -119,7 +126,7 @@ bool CGLSL::LoadShader(CGLSLCompiler *pCompiler, IStorage *pStorage, const char 
 		{
 			std::string Log(LogLength, '\0');
 			glGetShaderInfoLog(ShaderId, Log.size(), nullptr, &Log.front());
-			if(Log[Log.size() - 2] == '\n')
+			if(Log.size() >= 2 && Log[Log.size() - 2] == '\n')
 			{
 				Log[Log.size() - 2] = '\0';
 			}

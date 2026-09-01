@@ -27,7 +27,7 @@
 #define dbg_assert(test, fmt, ...) \
 	do \
 	{ \
-		if(!(test)) \
+		if(!(test)) [[unlikely]] \
 		{ \
 			dbg_assert_imp(__FILE__, __LINE__, fmt, ##__VA_ARGS__); \
 		} \
@@ -44,16 +44,19 @@
  *
  * @see dbg_break
  */
-#define dbg_assert_failed(fmt, ...) dbg_assert_imp(__FILE__, __LINE__, fmt, ##__VA_ARGS__)
+#define dbg_assert_failed(fmt, ...) [[unlikely]] dbg_assert_imp(__FILE__, __LINE__, fmt, ##__VA_ARGS__)
 
 /**
  * Use the @link dbg_assert @endlink function instead!
+ *
+ * This is also used from Rust, if you modify the signature, also look into
+ * src/base/dbg.rs.
  *
  * @ingroup Debug
  *
  * @see dbg_assert
  */
-[[gnu::format(printf, 3, 4)]] [[noreturn]] void
+extern "C" [[gnu::format(printf, 3, 4)]] [[noreturn]] void
 dbg_assert_imp(const char *filename, int line, const char *fmt, ...);
 
 /**

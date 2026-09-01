@@ -13,7 +13,7 @@ class CLayers
 {
 public:
 	CLayers();
-	void Init(IMap *pMap, bool GameOnly);
+	void Init(IMap *pMap, bool GameOnly, bool InitializeTilemapSkip);
 	void Unload();
 
 	int NumGroups() const { return m_GroupsNum; }

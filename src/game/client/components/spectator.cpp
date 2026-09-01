@@ -142,7 +142,7 @@ void CSpectator::ConMultiView(IConsole::IResult *pResult, void *pUserData)
 CSpectator::CSpectator()
 {
 	m_SelectorMouse = vec2(0.0f, 0.0f);
-	OnReset();
+	CSpectator::OnReset();
 }
 
 void CSpectator::OnConsoleInit()
@@ -281,13 +281,23 @@ void CSpectator::OnRender()
 		++TotalPlayers;
 	}
 
-	if(TotalPlayers > 64)
+	if(TotalPlayers > 96)
 	{
-		FontSize = 12.0f;
+		FontSize = 15.0f;
 		LineHeight = 15.0f;
 		TeeSizeMod = 0.3f;
 		PerLine = 32;
 		RoundRadius = 5.0f;
+		BoxMove = 3.0f;
+		BoxOffset = 6.0f;
+	}
+	else if(TotalPlayers > 64)
+	{
+		FontSize = 16.0f;
+		LineHeight = 19.0f;
+		TeeSizeMod = 0.45f;
+		PerLine = 24;
+		RoundRadius = 6.0f;
 		BoxMove = 3.0f;
 		BoxOffset = 6.0f;
 	}
@@ -332,7 +342,7 @@ void CSpectator::OnRender()
 		}
 	}
 
-	Graphics()->MapScreen(0, 0, Width, Height);
+	Graphics()->MapScreenToSize(Width, Height);
 
 	SpectatorRect.Draw(ColorRGBA(0.0f, 0.0f, 0.0f, 0.3f), IGraphics::CORNER_ALL, 20.0f);
 
@@ -556,7 +566,6 @@ void CSpectator::OnRender()
 		if(GameClient()->m_Snap.m_pGameInfoObj && (GameClient()->m_Snap.m_pGameInfoObj->m_GameFlags & GAMEFLAG_FLAGS) &&
 			GameClient()->m_Snap.m_pGameDataObj && (GameClient()->m_Snap.m_pGameDataObj->m_FlagCarrierRed == GameClient()->m_RClient.GetSortedPlayersSpectator(g_Config.m_RcSpectatorSortId, i)->m_ClientId || GameClient()->m_Snap.m_pGameDataObj->m_FlagCarrierBlue == GameClient()->m_RClient.GetSortedPlayersSpectator(g_Config.m_RcSpectatorSortId, i)->m_ClientId))
 		{
-			Graphics()->BlendNormal();
 			if(GameClient()->m_Snap.m_pGameDataObj->m_FlagCarrierBlue == GameClient()->m_RClient.GetSortedPlayersSpectator(g_Config.m_RcSpectatorSortId, i)->m_ClientId)
 				Graphics()->TextureSet(GameClient()->m_GameSkin.m_SpriteFlagBlue);
 			else

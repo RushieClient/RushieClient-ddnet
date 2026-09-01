@@ -1,9 +1,12 @@
 /* (c) DDNet developers. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.  */
 
+#include <base/dbg.h>
+#include <base/fs.h>
+#include <base/io.h>
 #include <base/logger.h>
 #include <base/os.h>
-#include <base/system.h>
+#include <base/str.h>
 
 #include <engine/gfx/image_loader.h>
 #include <engine/shared/datafile.h>
@@ -11,6 +14,8 @@
 
 #include <game/gamecore.h>
 #include <game/mapitems.h>
+
+#include <utility>
 
 /*
 	Usage: map_convert_07 <source map filepath> <dest map filepath>
@@ -20,8 +25,7 @@ static CDataFileReader g_DataReader;
 static CDataFileWriter g_DataWriter;
 
 // global new image data (set by ReplaceImageItem)
-static int g_aNewDataSize[MAX_MAPIMAGES];
-static void *g_apNewData[MAX_MAPIMAGES];
+static CImageInfo g_aNewImageInfos[MAX_MAPIMAGES];
 
 static int g_Index = 0;
 static int g_NextDataItemId = -1;
@@ -96,8 +100,7 @@ static void *ReplaceImageItem(int Index, CMapItemImage *pImgItem, CMapItemImage 
 	pNewImgItem->m_External = false;
 	pNewImgItem->m_ImageData = g_NextDataItemId++;
 
-	g_apNewData[g_Index] = ImgInfo.m_pData;
-	g_aNewDataSize[g_Index] = ImgInfo.DataSize();
+	g_aNewImageInfos[g_Index] = std::move(ImgInfo);
 	g_Index++;
 
 	return (void *)pNewImgItem;
@@ -127,12 +130,12 @@ int main(int argc, const char **argv)
 
 	if(argc == 3)
 	{
-		str_copy(aDestFilename, argv[2], sizeof(aDestFilename));
+		str_copy(aDestFilename, argv[2]);
 	}
 	else
 	{
 		char aBuf[IO_MAX_PATH_LENGTH];
-		IStorage::StripPathAndExtension(pSourceFilename, aBuf, sizeof(aBuf));
+		fs_split_file_extension(fs_filename(pSourceFilename), aBuf, sizeof(aBuf));
 		str_format(aDestFilename, sizeof(aDestFilename), "data/maps7/%s.map", aBuf);
 		if(fs_makedir("data") != 0)
 		{
@@ -218,7 +221,7 @@ int main(int argc, const char **argv)
 
 	for(int Index = 0; Index < g_Index; Index++)
 	{
-		g_DataWriter.AddData(g_aNewDataSize[Index], g_apNewData[Index]);
+		g_DataWriter.AddData(g_aNewImageInfos[Index].DataSize(), g_aNewImageInfos[Index].m_pData);
 	}
 
 	g_DataReader.Close();
