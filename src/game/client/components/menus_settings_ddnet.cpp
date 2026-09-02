@@ -37,9 +37,8 @@ void CMenus::RenderSettingsDDNet(CUIRect MainView)
 	static int s_CurDDNetCustomTab = 0;
 	static CButtonContainer s_aPageTabs[NUMBER_OF_DDNET_TABS] = {};
 	const char *apTabNames[NUMBER_OF_DDNET_TABS] = {
-		RCLocalize("Main", "RClient"),
-		RCLocalize("Credits", "RClient")
-	};
+		"Main",
+		"Credits"};
 	DoMenuSettingsBar(&MainView, apTabNames, NUMBER_OF_DDNET_TABS, s_aPageTabs, s_CurDDNetCustomTab, 20.0f);
 	MainView.HSplitTop(5.0f, nullptr, &MainView);
 
