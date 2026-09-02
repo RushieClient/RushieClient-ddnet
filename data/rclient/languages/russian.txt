@@ -1042,11 +1042,19 @@ Play sound on action
 == Проигрывать звук при действии
 
 [RClient]
+Remove text on any input
+== Убирать текст при любом вводе
+
+[RClient]
 Rcon
 == 
 
 [RClient]
 Popup
+== 
+
+[RClient]
+idea from BestClient
 == 
 
 [RClient]
@@ -1077,17 +1085,35 @@ ru
 en
 == 
 
+ftapi (not work)
+== 
+
+libretranslate (need key)
+== 
+
+googlegtx (maybe work)
+== 
+
+fedilab (not work)
+== 
+
+bing (works on upd)
+== 
+
+duckduckgo (works on upd))
+== 
+
 [RClient]
 Wake up
 == 
 
 [RClient]
-Remove text on any input
-== Убирать текст при любом вводе
-
-[RClient]
 by +KZ/Kaizo Client
 == 
+
+[RClient]
+Weapon slots
+== Слоты оружий
 
 [RClient]
 Monitor(win7-11)
