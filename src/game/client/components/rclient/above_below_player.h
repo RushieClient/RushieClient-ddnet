@@ -11,6 +11,7 @@ class CAboveBelowPlayer : public CComponent
 	bool m_PlayerAbove = false;
 	bool m_PlayerSame = false;
 	bool m_PlayerBelow = false;
+
 public:
 	CAboveBelowPlayer();
 	int Sizeof() const override { return sizeof(*this); }

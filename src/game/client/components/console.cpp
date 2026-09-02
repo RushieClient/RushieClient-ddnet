@@ -23,8 +23,8 @@
 
 #include <generated/client_data.h>
 
-#include <game/client/components/tclient/colored_parts.h>
 #include <game/client/components/rclient/rclient_include.h>
+#include <game/client/components/tclient/colored_parts.h>
 #include <game/client/gameclient.h>
 #include <game/client/ui.h>
 #include <game/localization.h>

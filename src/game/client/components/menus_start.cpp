@@ -162,7 +162,7 @@ void CMenusStart::RenderStartMenu(CUIRect MainView)
 	TClientVersion.VSplitRight(40.0f, &TClientVersion, nullptr);
 	TClientVersion.VSplitRight(125.0f, nullptr, &TClientVersion);
 	char aTBuf[64];
-	str_format(aTBuf, sizeof(aTBuf), "TClient" " %s", TCLIENT_VERSION);
+	str_format(aTBuf, sizeof(aTBuf), "TClient %s", TCLIENT_VERSION);
 	if(GameClient()->m_TClient.NeedUpdate())
 		TextRender()->TextColor(ColorRGBA(1.0f, 0.0f, 0.0f, 1.0f));
 	Ui()->DoLabel(&TClientVersion, aTBuf, 14.0f, TEXTALIGN_MC);
@@ -185,7 +185,7 @@ void CMenusStart::RenderStartMenu(CUIRect MainView)
 	{
 		Ui()->DoLabel(&UpdateToDateText, TCLocalize("(On Latest)"), 14.0f, TEXTALIGN_MC);
 	}
-	else if (!GameClient()->m_RClient.m_FetchedRClientInfo)
+	else if(!GameClient()->m_RClient.m_FetchedRClientInfo)
 	{
 		Ui()->DoLabel(&UpdateToDateText, TCLocalize("(Fetching Update Info)"), 14.0f, TEXTALIGN_MC);
 	}

@@ -1,7 +1,7 @@
 #include "above_below_player.h"
 
-#include "game/client/gameclient.h"
 #include "engine/shared/config.h"
+#include "game/client/gameclient.h"
 #include "rclient_include.h"
 
 CAboveBelowPlayer::CAboveBelowPlayer()
@@ -71,7 +71,12 @@ void CAboveBelowPlayer::OnRender()
 		}
 	}
 
-	m_LinesNum = (m_PlayerAbove ? 1 : m_AboveAnim > m_HideAnim ? 1 : 0) + (m_PlayerSame ? 1 : m_SameAnim > m_HideAnim ? 1 : 0) + (m_PlayerBelow ? 1 : m_BelowAnim > m_HideAnim ? 1 : 0);
+	m_LinesNum = (m_PlayerAbove ? 1 : m_AboveAnim > m_HideAnim ? 1 :
+								     0) +
+		     (m_PlayerSame ? 1 : m_SameAnim > m_HideAnim ? 1 :
+								   0) +
+		     (m_PlayerBelow ? 1 : m_BelowAnim > m_HideAnim ? 1 :
+								     0);
 
 	if(!m_LinesNum)
 		return;

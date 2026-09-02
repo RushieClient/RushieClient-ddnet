@@ -1,7 +1,7 @@
 #include "swaptimer.h"
 
-#include "game/client/gameclient.h"
 #include "engine/shared/config.h"
+#include "game/client/gameclient.h"
 #include "rclient_include.h"
 
 CSwapTimer::CSwapTimer()
@@ -55,7 +55,7 @@ void CSwapTimer::RemoveSwapEntrySwapped(int ToClientId, int FromClientId)
 {
 	const int LocalId0 = GameClient()->m_aLocalIds[0];
 	const int LocalId1 = GameClient()->m_aLocalIds[1];
-	if(ToClientId != LocalId0 && ToClientId != LocalId1 && FromClientId != LocalId0 && FromClientId != LocalId1 )
+	if(ToClientId != LocalId0 && ToClientId != LocalId1 && FromClientId != LocalId0 && FromClientId != LocalId1)
 		return;
 	for(size_t i = 0; i < m_vSwapList.size(); i++)
 	{
@@ -128,7 +128,7 @@ void CSwapTimer::GameClientMessage(int MsgType, void *pRawMsg, bool Dummy)
 				const char *pStart = str_find(pMsg->m_pMessage, " has requested to swap with you. To complete the swap process please wait ");
 				const char *pEnd = str_find(pMsg->m_pMessage, " seconds and then type ");
 
-				if(!pStart || !pEnd )
+				if(!pStart || !pEnd)
 					return;
 
 				char aName[16];
@@ -144,7 +144,7 @@ void CSwapTimer::GameClientMessage(int MsgType, void *pRawMsg, bool Dummy)
 				const char *pStart = str_find(pMsg->m_pMessage, "You have requested to swap with ");
 				const char *pEnd = str_find(pMsg->m_pMessage, ". Use /cancelswap to cancel the request.");
 
-				if(!pStart || !pEnd )
+				if(!pStart || !pEnd)
 					return;
 
 				char aName[16];
@@ -260,8 +260,7 @@ void CSwapTimer::OnRender()
 		if(SwapTime > 0.0f)
 			str_format(aBuf, sizeof(aBuf), "%s → %s. In %d", GameClient()->m_aClients[m_vSwapList[i].m_FromClientId].m_aName, GameClient()->m_aClients[m_vSwapList[i].m_ToClientId].m_aName, SwapTime);
 		else
-			str_format(aBuf, sizeof(aBuf), "%s → %s. Exp %d",GameClient()->m_aClients[m_vSwapList[i].m_FromClientId].m_aName, GameClient()->m_aClients[m_vSwapList[i].m_ToClientId].m_aName, ExpTime);
-
+			str_format(aBuf, sizeof(aBuf), "%s → %s. Exp %d", GameClient()->m_aClients[m_vSwapList[i].m_FromClientId].m_aName, GameClient()->m_aClients[m_vSwapList[i].m_ToClientId].m_aName, ExpTime);
 
 		Ui()->DoLabel(&Line, aBuf, FontSize, g_Config.m_RcEnableSwapTimerOnLeftSide ? TEXTALIGN_ML : TEXTALIGN_MR);
 	}

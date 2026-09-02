@@ -567,8 +567,9 @@ void CChat::EnableMode(int Team)
 		}
 
 		if(!(GameClient()->m_Menus.IsActive() ||
-			GameClient()->m_Scoreboard.IsActive() ||
-			Client()->State() == IClient::STATE_DEMOPLAYBACK) && g_Config.m_RcChatShowMouse)
+			   GameClient()->m_Scoreboard.IsActive() ||
+			   Client()->State() == IClient::STATE_DEMOPLAYBACK) &&
+			g_Config.m_RcChatShowMouse)
 		{
 			const vec2 OldMousePos = Ui()->MousePos();
 
@@ -1483,7 +1484,7 @@ void CChat::OnRender()
 	CUIRect Row;
 
 	if(m_Mode != MODE_NONE &&
-	!GameClient()->m_Menus.IsActive() && !GameClient()->m_Scoreboard.IsActive() && m_MouseUnlocked)
+		!GameClient()->m_Menus.IsActive() && !GameClient()->m_Scoreboard.IsActive() && m_MouseUnlocked)
 	{
 		Ui()->StartCheck();
 		Ui()->m_RcUpdateInputs = false;
@@ -1634,7 +1635,8 @@ void CChat::OnRender()
 				m_ChatPopupContext.m_ButtonId = &Line.m_ButtonId;
 				str_copy(m_ChatPopupContext.m_aText, Line.m_aText);
 				str_copy(m_ChatPopupContext.m_aName, Line.m_aName);
-				m_ChatPopupContext.m_Time = time_timestamp() - (time() - Line.m_Time) / time_freq();;
+				m_ChatPopupContext.m_Time = time_timestamp() - (time() - Line.m_Time) / time_freq();
+				;
 				if(Line.m_Whisper)
 					m_ChatPopupContext.m_From = "chat/whisper";
 				else if(Line.m_Team)
@@ -1966,7 +1968,7 @@ CUi::EPopupMenuFunctionResult CChat::CChatPopupContext::Render(void *pContext, C
 
 		const bool IsNeedHighlight = pChat->GameClient()->m_RClient.IsNeedHighlightPlayer(Client.m_aName);
 		ColorRGBA HighlightActionColor = IsNeedHighlight ? ColorRGBA(0.95f, 0.3f, 0.3f, 0.85f * pUi->ButtonColorMul(&pPopupContext->m_HighlightAction)) :
-									ColorRGBA(1.0f, 1.0f, 1.0f, 0.5f * pUi->ButtonColorMul(&pPopupContext->m_HighlightAction));
+								   ColorRGBA(1.0f, 1.0f, 1.0f, 0.5f * pUi->ButtonColorMul(&pPopupContext->m_HighlightAction));
 		if(pUi->DoButton_FontIcon(&pPopupContext->m_HighlightAction, FontIcon::RC_LIST_TRACK, Client.m_Friend, &Action, BUTTONFLAG_LEFT, ActionCorners, true, HighlightActionColor))
 		{
 			if(IsNeedHighlight)
@@ -1995,7 +1997,7 @@ CUi::EPopupMenuFunctionResult CChat::CChatPopupContext::Render(void *pContext, C
 
 		bool IsSpectating = pChat->GameClient()->m_Snap.m_SpecInfo.m_Active && pChat->GameClient()->m_Snap.m_SpecInfo.m_SpectatorId == pPopupContext->m_ClientId;
 		ColorRGBA SpectatingActionColor = IsSpectating ? ColorRGBA(0.95f, 0.3f, 0.3f, 0.85f * pUi->ButtonColorMul(&pPopupContext->m_SpecAction)) :
-									ColorRGBA(1.0f, 1.0f, 1.0f, 0.5f * pUi->ButtonColorMul(&pPopupContext->m_SpecAction));
+								 ColorRGBA(1.0f, 1.0f, 1.0f, 0.5f * pUi->ButtonColorMul(&pPopupContext->m_SpecAction));
 		if(pUi->DoButton_FontIcon(&pPopupContext->m_SpecAction, FontIcon::EYE, Client.m_Friend, &Action, BUTTONFLAG_LEFT, ActionCorners, true, SpectatingActionColor))
 		{
 			if(Client.m_Team != TEAM_SPECTATORS)
@@ -2028,7 +2030,6 @@ CUi::EPopupMenuFunctionResult CChat::CChatPopupContext::Render(void *pContext, C
 			{
 				pChat->Echo("Player in spectators");
 			}
-
 		}
 	}
 
@@ -2095,8 +2096,6 @@ CUi::EPopupMenuFunctionResult CChat::CChatPopupContext::Render(void *pContext, C
 			pChat->Console()->ExecuteLine(aWhisperBuf, IConsole::CLIENT_ID_UNSPECIFIED);
 		}
 	}
-
-
 
 	return CUi::POPUP_KEEP_OPEN;
 }

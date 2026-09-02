@@ -3,6 +3,8 @@
 
 #include "menus.h"
 
+#include "rclient/rclient_include.h"
+
 #include <base/color.h>
 #include <base/dbg.h>
 #include <base/fs.h>
@@ -42,8 +44,6 @@
 #include <chrono>
 #include <cmath>
 #include <vector>
-
-#include "rclient/rclient_include.h"
 
 using namespace std::chrono_literals;
 
@@ -2740,10 +2740,11 @@ int CMenus::DoMenuSettingsBar(CUIRect *pRect, const char *const *apTabNames, int
 	for(int Tab = 0; Tab < TabCount; ++Tab)
 	{
 		TabBar.VSplitLeft(TabWidth, &Button, &TabBar);
-		const int Corners = Tab == 0 ? IGraphics::CORNER_L :
-				   Tab == TabCount - 1 ? IGraphics::CORNER_R : IGraphics::CORNER_NONE;
+		const int Corners = Tab == 0            ? IGraphics::CORNER_L :
+				    Tab == TabCount - 1 ? IGraphics::CORNER_R :
+							  IGraphics::CORNER_NONE;
 		if(DoButton_MenuTab(&apPageTabs[Tab], apTabNames[Tab], CurTab == Tab,
-			&Button, Corners, nullptr, &DefaultColor, &ActiveColor, &HoverColor, 4.0f))
+			   &Button, Corners, nullptr, &DefaultColor, &ActiveColor, &HoverColor, 4.0f))
 			CurTab = Tab;
 	}
 	return CurTab;

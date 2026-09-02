@@ -1,7 +1,7 @@
 #include "notify_on_move.h"
 
-#include "game/client/gameclient.h"
 #include "engine/shared/config.h"
+#include "game/client/gameclient.h"
 #include "rclient_include.h"
 
 CNotifyOnMove::CNotifyOnMove()
@@ -47,9 +47,9 @@ void CNotifyOnMove::OnRender()
 		if(!m_pGraphics->WindowActive())
 		{
 			const bool LocalCharacterMoved = GameClient()->m_Snap.m_pLocalCharacter &&
-			GameClient()->m_Snap.m_pLocalPrevCharacter &&
-			(GameClient()->m_Snap.m_pLocalCharacter->m_X != GameClient()->m_Snap.m_pLocalPrevCharacter->m_X ||
-				GameClient()->m_Snap.m_pLocalCharacter->m_Y != GameClient()->m_Snap.m_pLocalPrevCharacter->m_Y);
+							 GameClient()->m_Snap.m_pLocalPrevCharacter &&
+							 (GameClient()->m_Snap.m_pLocalCharacter->m_X != GameClient()->m_Snap.m_pLocalPrevCharacter->m_X ||
+								 GameClient()->m_Snap.m_pLocalCharacter->m_Y != GameClient()->m_Snap.m_pLocalPrevCharacter->m_Y);
 
 			if(!m_SoundPlayedWindow && LocalCharacterMoved)
 			{

@@ -372,7 +372,7 @@ private:
 			return false;
 		}
 
-		const json_value *pDetectedLanguage = json_array_get(pObj,2);
+		const json_value *pDetectedLanguage = json_array_get(pObj, 2);
 		if(pDetectedLanguage == &json_value_none)
 		{
 			str_copy(Out.m_Text, "No source-language");
@@ -415,7 +415,8 @@ public:
 	{
 		char aBuf[4096];
 		str_format(aBuf, sizeof(aBuf), "%s/translate_a/single?client=gtx&sl=auto&tl=%s&dt=t&q=",
-			g_Config.m_TcTranslateEndpoint[0] != '\0' ? g_Config.m_TcTranslateEndpoint : (g_Config.m_RcTranslateGoogleEndpoint == 0 ? "https://translate.google.com" : g_Config.m_RcTranslateGoogleEndpoint == 1 ? "https://translate.googleapis.com" : "https://clients5.google.com"),
+			g_Config.m_TcTranslateEndpoint[0] != '\0' ? g_Config.m_TcTranslateEndpoint : (g_Config.m_RcTranslateGoogleEndpoint == 0 ? "https://translate.google.com" : g_Config.m_RcTranslateGoogleEndpoint == 1 ? "https://translate.googleapis.com" :
+																											       "https://clients5.google.com"),
 			CTranslateBackendGTX::EncodeTarget(SendTranslate ? g_Config.m_RcTranslateSendTarget : g_Config.m_TcTranslateTarget));
 
 		UrlEncode(pText, aBuf + strlen(aBuf), sizeof(aBuf) - strlen(aBuf));
@@ -563,7 +564,7 @@ private:
 			return false;
 		}
 
-		const json_value *pTransCategory = json_array_get(json_object_get(pMainObj, "translations"),0);
+		const json_value *pTransCategory = json_array_get(json_object_get(pMainObj, "translations"), 0);
 		if(pTransCategory->type != json_object)
 		{
 			str_copy(Out.m_Text, "pTransCategory is not object");

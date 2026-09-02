@@ -10,6 +10,7 @@ class CLastSaves : public CComponent
 	int m_SavesMapCount = 0;
 	float m_AppearAnim = 0.0f;
 	int64_t m_DisappearTime = 0;
+
 public:
 	CLastSaves();
 	int Sizeof() const override { return sizeof(*this); }

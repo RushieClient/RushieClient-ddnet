@@ -5,6 +5,7 @@
 #include "binds.h"
 #include "camera.h"
 #include "controls.h"
+#include "rclient/rclient_include.h"
 #include "voting.h"
 
 #include <base/color.h>
@@ -26,8 +27,6 @@
 #include <game/localization.h>
 
 #include <cmath>
-
-#include "rclient/rclient_include.h"
 CHud::CHud()
 {
 	m_FPSTextContainerIndex.Reset();
@@ -1634,20 +1633,31 @@ inline float CHud::GetMovementInformationBoxHeight()
 	float BoxHeight = 0.0f;
 	if(GameClient()->m_Snap.m_SpecInfo.m_Active && (GameClient()->m_Snap.m_SpecInfo.m_SpectatorId == SPEC_FREEVIEW || GameClient()->m_aClients[GameClient()->m_Snap.m_SpecInfo.m_SpectatorId].m_SpecCharPresent))
 	{
-		if(GameClient()->m_RClient.m_vPlayersInTracker.size() > 0) BoxHeight += GameClient()->m_RClient.m_vPlayersInTracker.size() * MOVEMENT_INFORMATION_LINE_HEIGHT * 3.0f;
-		if(g_Config.m_ClShowhudPlayerPosition) BoxHeight += MOVEMENT_INFORMATION_LINE_HEIGHT * 3.0f;
-		if(g_Config.m_ClShowhudPlayerPosition && g_Config.m_TcShowhudDummyPosition && Client()->DummyConnected()) BoxHeight += MOVEMENT_INFORMATION_LINE_HEIGHT * 2.0f;
+		if(GameClient()->m_RClient.m_vPlayersInTracker.size() > 0)
+			BoxHeight += GameClient()->m_RClient.m_vPlayersInTracker.size() * MOVEMENT_INFORMATION_LINE_HEIGHT * 3.0f;
+		if(g_Config.m_ClShowhudPlayerPosition)
+			BoxHeight += MOVEMENT_INFORMATION_LINE_HEIGHT * 3.0f;
+		if(g_Config.m_ClShowhudPlayerPosition && g_Config.m_TcShowhudDummyPosition && Client()->DummyConnected())
+			BoxHeight += MOVEMENT_INFORMATION_LINE_HEIGHT * 2.0f;
 	}
 	else
 	{
-		if(GameClient()->m_RClient.m_vPlayersInTracker.size() > 0) BoxHeight += GameClient()->m_RClient.m_vPlayersInTracker.size() * MOVEMENT_INFORMATION_LINE_HEIGHT * 3.0f;
-		if(g_Config.m_ClShowhudPlayerPosition) BoxHeight += MOVEMENT_INFORMATION_LINE_HEIGHT * 3.0f;
-		if(g_Config.m_ClShowhudPlayerPosition && g_Config.m_TcShowhudDummyPosition && Client()->DummyConnected()) BoxHeight += MOVEMENT_INFORMATION_LINE_HEIGHT * 2.0f;
-		if(g_Config.m_ClShowhudPlayerSpeed) BoxHeight += MOVEMENT_INFORMATION_LINE_HEIGHT * 3.0f;
-		if(g_Config.m_ClShowhudPlayerSpeed && g_Config.m_TcShowhudDummySpeed && Client()->DummyConnected()) BoxHeight += MOVEMENT_INFORMATION_LINE_HEIGHT * 2.0f;
-		if(g_Config.m_ClShowhudPlayerAngle) BoxHeight += MOVEMENT_INFORMATION_LINE_HEIGHT * (g_Config.m_RcShowhudSmallerHud ? 1.0f : 2.0f);
-		if(g_Config.m_ClShowhudPlayerAngle && g_Config.m_TcShowhudDummyAngle && Client()->DummyConnected()) BoxHeight += MOVEMENT_INFORMATION_LINE_HEIGHT;
-		if(g_Config.m_RcShowhudPlayerCheckpoint) BoxHeight += MOVEMENT_INFORMATION_LINE_HEIGHT * (g_Config.m_RcShowhudSmallerHud ? 1.0f : 2.0f);
+		if(GameClient()->m_RClient.m_vPlayersInTracker.size() > 0)
+			BoxHeight += GameClient()->m_RClient.m_vPlayersInTracker.size() * MOVEMENT_INFORMATION_LINE_HEIGHT * 3.0f;
+		if(g_Config.m_ClShowhudPlayerPosition)
+			BoxHeight += MOVEMENT_INFORMATION_LINE_HEIGHT * 3.0f;
+		if(g_Config.m_ClShowhudPlayerPosition && g_Config.m_TcShowhudDummyPosition && Client()->DummyConnected())
+			BoxHeight += MOVEMENT_INFORMATION_LINE_HEIGHT * 2.0f;
+		if(g_Config.m_ClShowhudPlayerSpeed)
+			BoxHeight += MOVEMENT_INFORMATION_LINE_HEIGHT * 3.0f;
+		if(g_Config.m_ClShowhudPlayerSpeed && g_Config.m_TcShowhudDummySpeed && Client()->DummyConnected())
+			BoxHeight += MOVEMENT_INFORMATION_LINE_HEIGHT * 2.0f;
+		if(g_Config.m_ClShowhudPlayerAngle)
+			BoxHeight += MOVEMENT_INFORMATION_LINE_HEIGHT * (g_Config.m_RcShowhudSmallerHud ? 1.0f : 2.0f);
+		if(g_Config.m_ClShowhudPlayerAngle && g_Config.m_TcShowhudDummyAngle && Client()->DummyConnected())
+			BoxHeight += MOVEMENT_INFORMATION_LINE_HEIGHT;
+		if(g_Config.m_RcShowhudPlayerCheckpoint)
+			BoxHeight += MOVEMENT_INFORMATION_LINE_HEIGHT * (g_Config.m_RcShowhudSmallerHud ? 1.0f : 2.0f);
 	}
 	if(BoxHeight > 0.0f)
 		BoxHeight += 2.0f;
@@ -1761,7 +1771,6 @@ void CHud::RenderMovementInformation()
 	bool IsPositionGreen = false;
 	if(Info.m_Pos.x == DummyInfo.m_Pos.x)
 		IsPositionGreen = true;
-
 
 	float y = StartY + LineSpacer * 2.0f;
 	const float LeftX = StartX + 2.0f;

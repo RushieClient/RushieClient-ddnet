@@ -1337,7 +1337,8 @@ CUi::EPopupMenuFunctionResult CScoreboard::CScoreboardPopupContext::Render(void 
 		//Tracker
 		const bool IsTracked = pScoreboard->GameClient()->m_RClient.TrackerIsTracked(Client.ClientId());
 		ColorRGBA TrackerActionColor = pUi->HotItem() == &pPopupContext->m_TrackerAction ? IsTracked ? ColorRGBA(1.0f, 0.42f, 0.42f, 0.8f * pUi->ButtonColorMul(&pPopupContext->m_TrackerAction)) : ColorRGBA(0.53f, 0.78f, 0.53f, 0.8f * pUi->ButtonColorMul(&pPopupContext->m_TrackerAction)) :
-								IsTracked ? ColorRGBA(0.53f, 0.78f, 0.53f, 0.8f) : ColorRGBA(1.0f, 1.0f, 1.0f, 0.5f);
+					       IsTracked                                         ? ColorRGBA(0.53f, 0.78f, 0.53f, 0.8f) :
+												   ColorRGBA(1.0f, 1.0f, 1.0f, 0.5f);
 		if(pUi->DoButton_FontIcon(&pPopupContext->m_TrackerAction, FontIcon::RC_LIST_TRACK, IsTracked, &Action, BUTTONFLAG_LEFT, ActionCorners, true, TrackerActionColor))
 		{
 			if(IsTracked)
@@ -1356,7 +1357,8 @@ CUi::EPopupMenuFunctionResult CScoreboard::CScoreboardPopupContext::Render(void 
 
 		const bool IsInTeamList = pScoreboard->GameClient()->m_RClient.IsInWarlist(Client.ClientId(), 2);
 		ColorRGBA TeamActionColor = pUi->HotItem() == &pPopupContext->m_TeamAction ? IsInTeamList ? ColorRGBA(1.0f, 0.42f, 0.42f, 0.8f * pUi->ButtonColorMul(&pPopupContext->m_TeamAction)) : ColorRGBA(0.53f, 0.78f, 0.53f, 0.8f * pUi->ButtonColorMul(&pPopupContext->m_TeamAction)) :
-								IsInTeamList ? ColorRGBA(0.53f, 0.78f, 0.53f, 0.8f) : ColorRGBA(1.0f, 1.0f, 1.0f, 0.5f);
+					    IsInTeamList                                   ? ColorRGBA(0.53f, 0.78f, 0.53f, 0.8f) :
+											     ColorRGBA(1.0f, 1.0f, 1.0f, 0.5f);
 		if(pUi->DoButton_FontIcon(&pPopupContext->m_TeamAction, FontIcon::ICON_USERS, IsInTeamList, &Action, BUTTONFLAG_LEFT, ActionCorners, true, TeamActionColor))
 		{
 			if(IsInTeamList)
@@ -1375,7 +1377,8 @@ CUi::EPopupMenuFunctionResult CScoreboard::CScoreboardPopupContext::Render(void 
 
 		const bool IsInWarList = pScoreboard->GameClient()->m_RClient.IsInWarlist(Client.ClientId(), 1);
 		ColorRGBA WarActionColor = pUi->HotItem() == &pPopupContext->m_WarAction ? IsInWarList ? ColorRGBA(0.53f, 0.78f, 0.53f, 0.8f * pUi->ButtonColorMul(&pPopupContext->m_TrackerAction)) : ColorRGBA(1.0f, 0.42f, 0.42f, 0.8f * pUi->ButtonColorMul(&pPopupContext->m_TrackerAction)) :
-								IsInWarList ? ColorRGBA(1.0f, 0.42f, 0.42f, 0.8f) : ColorRGBA(1.0f, 1.0f, 1.0f, 0.5f);
+					   IsInWarList                                   ? ColorRGBA(1.0f, 0.42f, 0.42f, 0.8f) :
+											   ColorRGBA(1.0f, 1.0f, 1.0f, 0.5f);
 		if(pUi->DoButton_FontIcon(&pPopupContext->m_WarAction, FontIcon::RC_PERSON_RIFLE, IsInTeamList, &Action, BUTTONFLAG_LEFT, ActionCorners, true, WarActionColor))
 		{
 			if(IsInWarList)
@@ -1433,7 +1436,8 @@ CUi::EPopupMenuFunctionResult CScoreboard::CScoreboardPopupContext::Render(void 
 	if(pUi->DoButton_PopupMenu(&pPopupContext->m_ProfileButton, Localize("Profile"), &Container, FontSize, TEXTALIGN_MC, 0.0f, false, true, ProfileButtonColor))
 	{
 		const CServerInfo &ServerInfo = pScoreboard->Client()->ServerInfo();
-		int Community = (str_comp(ServerInfo.m_aCommunityId, "kog") == 0) ? 1 : (str_comp(ServerInfo.m_aCommunityId, "unique") == 0) ? 2 : 0;
+		int Community = (str_comp(ServerInfo.m_aCommunityId, "kog") == 0) ? 1 : (str_comp(ServerInfo.m_aCommunityId, "unique") == 0) ? 2 :
+																	       0;
 		char aCommunityLink[512];
 		char aEncodedName[256];
 		EscapeUrl(aEncodedName, sizeof(aEncodedName), Client.m_aName);

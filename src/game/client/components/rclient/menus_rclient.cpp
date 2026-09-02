@@ -282,8 +282,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		const char *apTabNames[NUMBER_OF_PLAYERS_TABS] = {
 			RCLocalize("Effects", "RClient"),
 			RCLocalize("AFK", "RClient"),
-			RCLocalize("Hitbox", "RClient")
-		};
+			RCLocalize("Hitbox", "RClient")};
 		DoMenuSettingsBar(&Column, apTabNames, NUMBER_OF_PLAYERS_TABS, s_aPageTabs, s_CurPlayersCustomTab, LineSize);
 		Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
 		Column.HSplitTop(Margin, &Label, &Column);
@@ -302,16 +301,16 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcShowSparkleEffect, RCLocalize("Always show sparkles", "RClient"), &g_Config.m_RcShowSparkleEffect, &Column, LineSize);
 			static std::vector<CButtonContainer> s_vButtonContainersStepEffects = {{}, {}, {}, {}};
 			DoLine_RadioMenu(Column, RCLocalize("Show step effects", "RClient"),
-				   s_vButtonContainersStepEffects,
-				   {RCLocalize("Off", "RClient"), RCLocalize("Others", "RClient"), RCLocalize("Everyone", "RClient"), RCLocalize("Own", "RClient")},
-				   {0, 1, 2, 3},
-				   g_Config.m_RcShowStepEffects);
+				s_vButtonContainersStepEffects,
+				{RCLocalize("Off", "RClient"), RCLocalize("Others", "RClient"), RCLocalize("Everyone", "RClient"), RCLocalize("Own", "RClient")},
+				{0, 1, 2, 3},
+				g_Config.m_RcShowStepEffects);
 			static std::vector<CButtonContainer> s_vButtonContainersHammerHitEffect = {{}, {}, {}};
 			DoLine_RadioMenu(Column, RCLocalize("Remove hammer hit effect", "RClient"),
-				   s_vButtonContainersHammerHitEffect,
-				   {RCLocalize("Default", "RClient"), RCLocalize("Visual", "RClient"), RCLocalize("Full", "RClient")},
-				   {0, 1, 2},
-				   g_Config.m_RcRemoveHammerHitEffect);
+				s_vButtonContainersHammerHitEffect,
+				{RCLocalize("Default", "RClient"), RCLocalize("Visual", "RClient"), RCLocalize("Full", "RClient")},
+				{0, 1, 2},
+				g_Config.m_RcRemoveHammerHitEffect);
 		}
 		if(s_CurPlayersCustomTab == PLAYERS_TAB_AFK)
 		{
@@ -334,10 +333,10 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		{
 			static std::vector<CButtonContainer> s_vButtonContainersPlayersHitbox = {{}, {}, {}, {}};
 			DoLine_RadioMenu(Column, RCLocalize("Show player hitbox", "RClient"),
-				   s_vButtonContainersPlayersHitbox,
-				   {RCLocalize("Off", "RClient"), RCLocalize("Others", "RClient"), RCLocalize("Everyone", "RClient"), RCLocalize("Own", "RClient")},
-				   {0, 1, 2, 3},
-				   g_Config.m_RcShowHitbox);
+				s_vButtonContainersPlayersHitbox,
+				{RCLocalize("Off", "RClient"), RCLocalize("Others", "RClient"), RCLocalize("Everyone", "RClient"), RCLocalize("Own", "RClient")},
+				{0, 1, 2, 3},
+				g_Config.m_RcShowHitbox);
 			Column.HSplitTop(LineSize, &Button, &Column);
 			Ui()->DoScrollbarOption(&g_Config.m_RcShowHitboxSize, &g_Config.m_RcShowHitboxSize, &Button, RCLocalize("Size of hitbox", "RClient"), 1, 100, &CUi::ms_LinearScrollbarScale, 0);
 			Column.HSplitTop(LineSize, &Button, &Column);
@@ -492,7 +491,6 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		static int s_AspectDisableAboveBelow = 0;
 		if(DoButton_CheckBox(&s_AspectDisableAboveBelow, RCLocalize("Disable for Above/Below Player", "RClient"), g_Config.m_RcCustomAspectDisable & RcAspectDisable::ABOVEBELOWPL, &Button))
 			g_Config.m_RcCustomAspectDisable ^= RcAspectDisable::ABOVEBELOWPL;
-
 	}
 	else
 		Column.HSplitTop(LineSize * 5, nullptr, &Column);
@@ -554,18 +552,16 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	Column.HSplitTop(LineSize, &Button, &Column);
 	Ui()->DoScrollbarOption(&g_Config.m_RcSpectatorMoveSpeed, &g_Config.m_RcSpectatorMoveSpeed, &Button, RCLocalize("Spectator Speed", "RClient"), 1, 200, &CUi::ms_LinearScrollbarScale, 0);
 	static CButtonContainer s_ReaderButtonSpecGoLeft, s_ClearButtonSpecGoLeft,
-				s_ReaderButtonSpecGoRight, s_ClearButtonSpecGoRight,
-				s_ReaderButtonSpecGoUp, s_ClearButtonSpecGoUp,
-				s_ReaderButtonSpecGoDown, s_ClearButtonSpecGoDown;
+		s_ReaderButtonSpecGoRight, s_ClearButtonSpecGoRight,
+		s_ReaderButtonSpecGoUp, s_ClearButtonSpecGoUp,
+		s_ReaderButtonSpecGoDown, s_ClearButtonSpecGoDown;
 	DoLine_KeyReader(Column, s_ReaderButtonSpecGoLeft, s_ClearButtonSpecGoLeft, RCLocalize("Spec go Left", "RClient"), "+rc_spec_go_left");
 	DoLine_KeyReader(Column, s_ReaderButtonSpecGoRight, s_ClearButtonSpecGoRight, RCLocalize("Spec go Right", "RClient"), "+rc_spec_go_right");
 	DoLine_KeyReader(Column, s_ReaderButtonSpecGoUp, s_ClearButtonSpecGoUp, RCLocalize("Spec go Up", "RClient"), "+rc_spec_go_up");
 	DoLine_KeyReader(Column, s_ReaderButtonSpecGoDown, s_ClearButtonSpecGoDown, RCLocalize("Spec go Down", "RClient"), "+rc_spec_go_down");
 
-
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
 	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;
-
 
 	// ***** RightView ***** //
 	LeftView = Column;
@@ -592,8 +588,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		const char *apTabNames[NUMBER_OF_CHAT_TABS] = {
 			RCLocalize("Main", "RClient"),
 			RCLocalize("Filter", "RClient"),
-			RCLocalize("Translate", "RClient")
-		};
+			RCLocalize("Translate", "RClient")};
 
 		DoMenuSettingsBar(&Column, apTabNames, NUMBER_OF_CHAT_TABS, s_aPageTabs, s_CurChatCustomTab, LineSize);
 		Column.HSplitTop(MarginSmall, nullptr, &Column);
@@ -614,10 +609,10 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		{
 			static std::vector<CButtonContainer> s_vButtonContainersChatFilter = {{}, {}, {}, {}};
 			DoLine_RadioMenu(Column, RCLocalize("Chat Filter Mode", "RClient"),
-				   s_vButtonContainersChatFilter,
-				   {RCLocalize("Off", "RClient"), RCLocalize("Partial", "RClient"), RCLocalize("Full", "RClient"), RCLocalize("Both", "RClient")},
-				   {0, 1, 2, 3},
-				   g_Config.m_RcMessageFilterMode);
+				s_vButtonContainersChatFilter,
+				{RCLocalize("Off", "RClient"), RCLocalize("Partial", "RClient"), RCLocalize("Full", "RClient"), RCLocalize("Both", "RClient")},
+				{0, 1, 2, 3},
+				g_Config.m_RcMessageFilterMode);
 			static CButtonContainer s_BlockedMessageColor;
 			DoButton_ColorPickerAutoVMargin(&s_BlockedMessageColor, RCLocalize("Print Blocked Message", "RClient"), &g_Config.m_RcMessageFilterPrintBlockedMessageColor, color_cast<ColorRGBA>(ColorHSLA(DefaultConfig::RcMessageFilterPrintBlockedMessageColor)), &Column, LineSize, false, &g_Config.m_RcMessageFilterPrintBlockedMessage);
 			if(g_Config.m_RcMessageFilterMode == 1 || g_Config.m_RcMessageFilterMode == 3)
@@ -828,8 +823,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		const char *apTabNames[NUMBER_OF_NAMEPLATES_TABS] = {
 			RCLocalize("Hook", "RClient"),
 			RCLocalize("Fire", "RClient"),
-			RCLocalize("Weapons", "RClient")
-		};
+			RCLocalize("Weapons", "RClient")};
 		DoMenuSettingsBar(&Column, apTabNames, NUMBER_OF_NAMEPLATES_TABS, s_aPageTabs, s_CurNameplatesCustomTab, LineSize);
 		Column.HSplitTop(MarginSmall, nullptr, &Column);
 
@@ -839,10 +833,10 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		{
 			static std::vector<CButtonContainer> s_vButtonContainersHookDetection = {{}, {}, {}, {}, {}};
 			DoLine_RadioMenu(Column, RCLocalize("Hook Detection", "RClient"),
-				   s_vButtonContainersHookDetection,
-				   {RCLocalize("Off", "RClient"), RCLocalize("Others", "RClient"), RCLocalize("All", "RClient"), RCLocalize("Own", "RClient"), RCLocalize("Dummy", "RClient")},
-				   {0, 1, 2, 3, 4},
-				   g_Config.m_RcNamePlatesHook);
+				s_vButtonContainersHookDetection,
+				{RCLocalize("Off", "RClient"), RCLocalize("Others", "RClient"), RCLocalize("All", "RClient"), RCLocalize("Own", "RClient"), RCLocalize("Dummy", "RClient")},
+				{0, 1, 2, 3, 4},
+				g_Config.m_RcNamePlatesHook);
 			Column.HSplitTop(LineSize, &Button, &Column);
 			Ui()->DoScrollbarOption(&g_Config.m_RcNamePlatesHookSize, &g_Config.m_RcNamePlatesHookSize, &Button, RCLocalize("Hook size", "RClient"), -50, 100, &CUi::ms_LinearScrollbarScale, 0);
 			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcNamePlatesHookShiftOnInvis, RCLocalize("Hook shift on invis", "RClient"), &g_Config.m_RcNamePlatesHookShiftOnInvis, &Column, LineSize);
@@ -851,10 +845,10 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		{
 			static std::vector<CButtonContainer> s_vButtonContainersFireDetection = {{}, {}, {}, {}, {}};
 			DoLine_RadioMenu(Column, RCLocalize("Fire Detection", "RClient"),
-				   s_vButtonContainersFireDetection,
-				   {RCLocalize("Off", "RClient"), RCLocalize("Others(*)", "RClient"), RCLocalize("All(*)", "RClient"), RCLocalize("Own", "RClient"), RCLocalize("Dummy", "RClient")},
-				   {0, 1, 2, 3, 4},
-				   g_Config.m_RcNamePlatesFire);
+				s_vButtonContainersFireDetection,
+				{RCLocalize("Off", "RClient"), RCLocalize("Others(*)", "RClient"), RCLocalize("All(*)", "RClient"), RCLocalize("Own", "RClient"), RCLocalize("Dummy", "RClient")},
+				{0, 1, 2, 3, 4},
+				g_Config.m_RcNamePlatesFire);
 			Column.HSplitTop(LineSize, &Button, &Column);
 			Ui()->DoScrollbarOption(&g_Config.m_RcNamePlatesFireSize, &g_Config.m_RcNamePlatesFireSize, &Button, RCLocalize("Fire size", "RClient"), -50, 100, &CUi::ms_LinearScrollbarScale, 0);
 			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcNamePlatesFireShiftOnInvis, RCLocalize("Fire shift on invis", "RClient"), &g_Config.m_RcNamePlatesFireShiftOnInvis, &Column, LineSize);
@@ -866,10 +860,10 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		{
 			static std::vector<CButtonContainer> s_vButtonContainersWeaponsShow = {{}, {}, {}, {}};
 			DoLine_RadioMenu(Column, RCLocalize("Weapons in nameplates", "RClient"),
-				   s_vButtonContainersWeaponsShow,
-				   {RCLocalize("Off", "RClient"), RCLocalize("Others", "RClient"), RCLocalize("All", "RClient"), RCLocalize("Dummy", "RClient")},
-				   {0, 1, 2, 3},
-				   g_Config.m_RcNamePlatesWeapons);
+				s_vButtonContainersWeaponsShow,
+				{RCLocalize("Off", "RClient"), RCLocalize("Others", "RClient"), RCLocalize("All", "RClient"), RCLocalize("Dummy", "RClient")},
+				{0, 1, 2, 3},
+				g_Config.m_RcNamePlatesWeapons);
 			Column.HSplitTop(LineSize, &Button, &Column);
 			Ui()->DoScrollbarOption(&g_Config.m_RcNamePlatesWeaponsSize, &g_Config.m_RcNamePlatesWeaponsSize, &Button, RCLocalize("Weapons size", "RClient"), -50, 100, &CUi::ms_LinearScrollbarScale, 0);
 			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcNamePlatesWeaponsOwn, RCLocalize("Show own weapons", "RClient"), &g_Config.m_RcNamePlatesWeaponsOwn, &Column, LineSize);
@@ -903,8 +897,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		static CButtonContainer s_aPageTabs[NUMBER_OF_AFK_TABS] = {};
 		const char *apTabNames[NUMBER_OF_AFK_TABS] = {
 			RCLocalize("NonActive", "RClient"),
-			RCLocalize("Spec", "RClient")
-		};
+			RCLocalize("Spec", "RClient")};
 
 		DoMenuSettingsBar(&Column, apTabNames, NUMBER_OF_AFK_TABS, s_aPageTabs, s_CurAfkCustomTab, LineSize);
 		Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
@@ -925,10 +918,10 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 			{
 				static std::vector<CButtonContainer> s_vButtonContainersNonActive = {{}, {}, {}};
 				DoLine_RadioMenu(Column, RCLocalize("Choose sound non active", "RClient"),
-					   s_vButtonContainersNonActive,
-					   {RCLocalize("Wake up", "RClient"), RCLocalize("Grenade", "RClient"), RCLocalize("Tag", "RClient")},
-					   {0, 1, 2},
-					   g_Config.m_RcSoundOnMoveNonInactive);
+					s_vButtonContainersNonActive,
+					{RCLocalize("Wake up", "RClient"), RCLocalize("Grenade", "RClient"), RCLocalize("Tag", "RClient")},
+					{0, 1, 2},
+					g_Config.m_RcSoundOnMoveNonInactive);
 			}
 		}
 		if(s_CurAfkCustomTab == AFK_TAB_SPEC)
@@ -939,10 +932,10 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 				DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcPlayOnMoveInSpec, RCLocalize("Play sound when moved in spec", "RClient"), &g_Config.m_RcPlayOnMoveInSpec, &Column, LineSize);
 				static std::vector<CButtonContainer> s_vButtonContainersInSpec = {{}, {}, {}};
 				DoLine_RadioMenu(Column, RCLocalize("Choose sound in spec", "RClient"),
-					   s_vButtonContainersInSpec,
-					   {RCLocalize("Wake up", "RClient"), RCLocalize("Grenade", "RClient"), RCLocalize("Tag", "RClient")},
-					   {0, 1, 2},
-					   g_Config.m_RcSoundOnMoveInSpec);
+					s_vButtonContainersInSpec,
+					{RCLocalize("Wake up", "RClient"), RCLocalize("Grenade", "RClient"), RCLocalize("Tag", "RClient")},
+					{0, 1, 2},
+					g_Config.m_RcSoundOnMoveInSpec);
 				DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcTextOnMoveInSpec, RCLocalize("Show text when moved in spec", "RClient"), &g_Config.m_RcTextOnMoveInSpec, &Column, LineSize);
 				Column.HSplitTop(LineSize, &Button, &Column);
 				Ui()->DoScrollbarOption(&g_Config.m_RcTextOnMoveInSpecPosX, &g_Config.m_RcTextOnMoveInSpecPosX, &Button, RCLocalize("Text pos x", "RClient"), 0, 100, &CUi::ms_LinearScrollbarScale, 0);
@@ -970,10 +963,10 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcCustomClientsCollectClientType, RCLocalize("Detect other clients", "RClient"), &g_Config.m_RcCustomClientsCollectClientType, &Column, LineSize);
 	static std::vector<CButtonContainer> s_vButtonContainersCustomInNameplates = {{}, {}, {}, {}};
 	DoLine_RadioMenu(Column, RCLocalize("Show client type in nameplates", "RClient"),
-		   s_vButtonContainersCustomInNameplates,
-		   {RCLocalize("Off", "RClient"), RCLocalize("Others", "RClient"), RCLocalize("Everyone", "RClient"), RCLocalize("Only you", "RClient")},
-		   {0, 1, 2, 3},
-		   g_Config.m_RcCustomClientsInNameplates);
+		s_vButtonContainersCustomInNameplates,
+		{RCLocalize("Off", "RClient"), RCLocalize("Others", "RClient"), RCLocalize("Everyone", "RClient"), RCLocalize("Only you", "RClient")},
+		{0, 1, 2, 3},
+		g_Config.m_RcCustomClientsInNameplates);
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcCustomClientsInScoreboard, RCLocalize("Show client type in scoreboard", "RClient"), &g_Config.m_RcCustomClientsInScoreboard, &Column, LineSize);
 	Column.HSplitTop(LineSize, &Button, &Column);
 	Ui()->DoScrollbarOption(&g_Config.m_RcCustomClientsInNameplatesSize, &g_Config.m_RcCustomClientsInNameplatesSize, &Button, RCLocalize("Icons size in nameplates", "RClient"), -50, 100, &CUi::ms_LinearScrollbarScale, 0);
@@ -992,11 +985,11 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	Column.HSplitTop(MarginSmall, nullptr, &Column);
 
 	static CButtonContainer s_ReaderButtonDeepfly, s_ClearButtonDeepfly,
-				s_ReaderButtonPseudofly, s_ClearButtonPseudofly,
-				s_ReaderButton45degrees, s_ClearButton45degrees,
-				s_ReaderButtonSmallsens, s_ClearButtonSmallsens,
-				s_ReaderButtonFindTeleport, s_ClearButtonFindTeleport,
-				s_ReaderButtonFindFinish, s_ClearButtonFindFinish;
+		s_ReaderButtonPseudofly, s_ClearButtonPseudofly,
+		s_ReaderButton45degrees, s_ClearButton45degrees,
+		s_ReaderButtonSmallsens, s_ClearButtonSmallsens,
+		s_ReaderButtonFindTeleport, s_ClearButtonFindTeleport,
+		s_ReaderButtonFindFinish, s_ClearButtonFindFinish;
 	DoLine_KeyReader(Column, s_ReaderButtonDeepfly, s_ClearButtonDeepfly, RCLocalize("Toggle deepfly", "RClient"), "rc_toggle_deepfly");
 	{
 		CUIRect RightSide;
@@ -1040,10 +1033,10 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	Ui()->DoLabel(&Label, RCLocalize("Only windows", "RClient"), FontSize, TEXTALIGN_ML);
 	static std::vector<CButtonContainer> s_vButtonContainersScreenShare = {{}, {}, {}};
 	DoLine_RadioMenu(Column, RCLocalize("Hide window from capture when RCON opened", "RClient"),
-		   s_vButtonContainersScreenShare,
-		   {RCLocalize("Off", "RClient"), RCLocalize("Monitor(win7-11)", "RClient"), RCLocalize("Exclude(win10-11)", "RClient")},
-		   {0, 1, 2},
-		   g_Config.m_RcRconSteamerMode);
+		s_vButtonContainersScreenShare,
+		{RCLocalize("Off", "RClient"), RCLocalize("Monitor(win7-11)", "RClient"), RCLocalize("Exclude(win10-11)", "RClient")},
+		{0, 1, 2},
+		g_Config.m_RcRconSteamerMode);
 
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
 	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;
@@ -1123,8 +1116,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		static CButtonContainer s_aPageTabs[NUMBER_OF_HELP_TABS] = {};
 		const char *apTabNames[NUMBER_OF_HELP_TABS] = {
 			RCLocalize("Main", "RClient"),
-			RCLocalize("Sort", "RClient")
-		};
+			RCLocalize("Sort", "RClient")};
 		DoMenuSettingsBar(&Column, apTabNames, NUMBER_OF_HELP_TABS, s_aPageTabs, s_CurHelpCustomTab, LineSize);
 		Column.HSplitTop(MarginSmall, nullptr, &Column);
 
@@ -1135,20 +1127,20 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		{
 			static std::vector<CButtonContainer> s_vButtonContainersAutoLock = {{}, {}, {}};
 			DoLine_RadioMenu(Column, RCLocalize("Auto Lock Team", "RClient"),
-				   s_vButtonContainersAutoLock,
-				   {RCLocalize("Off", "RClient"), RCLocalize("Empty", "RClient"), RCLocalize("Any", "RClient")},
-				   {0, 1, 2},
-				   g_Config.m_RcAutoLockTeam);
+				s_vButtonContainersAutoLock,
+				{RCLocalize("Off", "RClient"), RCLocalize("Empty", "RClient"), RCLocalize("Any", "RClient")},
+				{0, 1, 2},
+				g_Config.m_RcAutoLockTeam);
 			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcAntiUnSpec, RCLocalize("Anti UnSpec in player", "RClient"), &g_Config.m_RcAntiUnSpec, &Column, LineSize);
 			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcShowRechargeBars, RCLocalize("Show Recharge bars (by +KZ/Kaizo Client)", "RClient"), &g_Config.m_RcShowRechargeBars, &Column, LineSize);
 			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcClearConfigsInUnknownFile, RCLocalize("Clear ddnet config from unknown configs on exit", "RClient"), &g_Config.m_RcClearConfigsInUnknownFile, &Column, LineSize);
 			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcShowOpenSecondClientButton, RCLocalize("Show open second client button", "RClient"), &g_Config.m_RcShowOpenSecondClientButton, &Column, LineSize);
 			static std::vector<CButtonContainer> s_vButtonContainersSaveCount = {{}, {}, {}};
 			DoLine_RadioMenu(Column, RCLocalize("Show Save Count", "RClient"),
-				   s_vButtonContainersSaveCount,
-				   {RCLocalize("Off", "RClient"), RCLocalize("File", "RClient"), RCLocalize("/load", "RClient")},
-				   {0, 1, 2},
-				   g_Config.m_RcShowSavesCount);
+				s_vButtonContainersSaveCount,
+				{RCLocalize("Off", "RClient"), RCLocalize("File", "RClient"), RCLocalize("/load", "RClient")},
+				{0, 1, 2},
+				g_Config.m_RcShowSavesCount);
 			Column.HSplitTop(LineSize, &Button, &Column);
 			Ui()->DoScrollbarOption(&g_Config.m_RcSndGunFireVolume, &g_Config.m_RcSndGunFireVolume, &Button, RCLocalize("Gun fire volume", "RClient"), 0, 100, &CUi::ms_LinearScrollbarScale, 0);
 			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcSaveAlphaInOtherTeamInSpec, RCLocalize("Fix cl_show_others_alpha in spec", "RClient"), &g_Config.m_RcSaveAlphaInOtherTeamInSpec, &Column, LineSize);
@@ -1160,17 +1152,17 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		{
 			static std::vector<CButtonContainer> s_vButtonContainersSortScoreboard = {{}, {}, {}, {}, {}};
 			DoLine_RadioMenu_WLabelSize(Column, RCLocalize("Sort Scoreboard", "RClient"), Column.w / 4,
-				   s_vButtonContainersSortScoreboard,
-				   {RCLocalize("name-team-score", "RClient"), RCLocalize("id-team-score", "RClient"), RCLocalize("id-score", "RClient"), RCLocalize("id-team", "RClient"), RCLocalize("id", "RClient")},
-				   {0, 1, 2, 3, 4},
-				   g_Config.m_RcScoreboardSortId);
+				s_vButtonContainersSortScoreboard,
+				{RCLocalize("name-team-score", "RClient"), RCLocalize("id-team-score", "RClient"), RCLocalize("id-score", "RClient"), RCLocalize("id-team", "RClient"), RCLocalize("id", "RClient")},
+				{0, 1, 2, 3, 4},
+				g_Config.m_RcScoreboardSortId);
 
 			static std::vector<CButtonContainer> s_vButtonContainersSortSpectator = {{}, {}, {}};
 			DoLine_RadioMenu_WLabelSize(Column, RCLocalize("Sort Spectator", "RClient"), Column.w / 4,
-				   s_vButtonContainersSortSpectator,
-				   {RCLocalize("name-team", "RClient"), RCLocalize("id-team", "RClient"), RCLocalize("id", "RClient")},
-				   {0, 1, 2},
-				   g_Config.m_RcSpectatorSortId);
+				s_vButtonContainersSortSpectator,
+				{RCLocalize("name-team", "RClient"), RCLocalize("id-team", "RClient"), RCLocalize("id", "RClient")},
+				{0, 1, 2},
+				g_Config.m_RcSpectatorSortId);
 		}
 
 		Column.HSplitTop(m_BiggestTab - Column.y + m_CurrentY, nullptr, &Column);

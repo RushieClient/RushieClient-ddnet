@@ -2,6 +2,7 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include "ui.h"
 
+#include "components/rclient/rclient_include.h"
 #include "ui_scrollregion.h"
 
 #include <base/dbg.h>
@@ -19,8 +20,6 @@
 #include <game/localization.h>
 
 #include <limits>
-
-#include "components/rclient/rclient_include.h"
 
 void CUIElement::Init(CUi *pUI, int RequestedRectCount)
 {

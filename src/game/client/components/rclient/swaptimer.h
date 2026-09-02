@@ -18,6 +18,7 @@ class CSwapTimer : public CComponent
 	void RemoveSwapEntryIdAll(int ClientId);
 
 	int FindClientId(const char *pName) const;
+
 public:
 	CSwapTimer();
 	int Sizeof() const override { return sizeof(*this); }

@@ -26,58 +26,56 @@ namespace ChatThings
 	};
 	// 1-3 -- russian
 	static const SChatLetter s_aLineLayout[] = {
-		{"й",'q'}, {"ц", 'w'}, {"у", 'e'}, {"к", 'r'}, {"е", 't'}, {"н", 'y'}, {"г", 'u'}, {"ш", 'i'}, {"щ", 'o'}, {"з", 'p'}, {"х", '['}, {"ъ", ']'},
-		{"ф",'a'}, {"ы", 's'}, {"в", 'd'}, {"а", 'f'}, {"п", 'g'}, {"р", 'h'}, {"о", 'j'}, {"л", 'k'}, {"д", 'l'}, {"ж", ';'}, {"э", '\''},
-		{"я",'z'}, {"ч", 'x'}, {"с", 'c'}, {"м", 'v'}, {"и", 'b'}, {"т", 'n'}, {"ь", 'm'}, {"б", ','}, {"ю", '.'}, {"ё", '`'}
-	};
+		{"й", 'q'}, {"ц", 'w'}, {"у", 'e'}, {"к", 'r'}, {"е", 't'}, {"н", 'y'}, {"г", 'u'}, {"ш", 'i'}, {"щ", 'o'}, {"з", 'p'}, {"х", '['}, {"ъ", ']'},
+		{"ф", 'a'}, {"ы", 's'}, {"в", 'd'}, {"а", 'f'}, {"п", 'g'}, {"р", 'h'}, {"о", 'j'}, {"л", 'k'}, {"д", 'l'}, {"ж", ';'}, {"э", '\''},
+		{"я", 'z'}, {"ч", 'x'}, {"с", 'c'}, {"м", 'v'}, {"и", 'b'}, {"т", 'n'}, {"ь", 'm'}, {"б", ','}, {"ю", '.'}, {"ё", '`'}};
 	static const STranslateLangs g_LangsList[] = {
-	    {"aa", "Afar"}, {"ab", "Abkhazian"}, {"ae", "Avestan"}, {"af", "Afrikaans"},
-	    {"ak", "Akan"}, {"am", "Amharic"}, {"an", "Aragonese"}, {"ar", "Arabic"},
-	    {"as", "Assamese"}, {"av", "Avaric"}, {"ay", "Aymara"}, {"az", "Azerbaijani"},
-	    {"ba", "Bashkir"}, {"be", "Belarusian"}, {"bg", "Bulgarian"}, {"bi", "Bislama"},
-	    {"bm", "Bambara"}, {"bn", "Bengali"}, {"bo", "Tibetan"}, {"br", "Breton"},
-	    {"bs", "Bosnian"}, {"ca", "Catalan"}, {"ce", "Chechen"}, {"ch", "Chamorro"},
-	    {"co", "Corsican"}, {"cr", "Cree"}, {"cs", "Czech"}, {"cu", "Church Slavic"},
-	    {"cv", "Chuvash"}, {"cy", "Welsh"}, {"da", "Danish"}, {"de", "German"},
-	    {"dv", "Divehi"}, {"dz", "Dzongkha"}, {"ee", "Ewe"}, {"el", "Greek"},
-	    {"en", "English"}, {"eo", "Esperanto"}, {"es", "Spanish"}, {"et", "Estonian"},
-	    {"eu", "Basque"}, {"fa", "Persian"}, {"ff", "Fulah"}, {"fi", "Finnish"},
-	    {"fj", "Fijian"}, {"fo", "Faroese"}, {"fr", "French"}, {"fy", "Western Frisian"},
-	    {"ga", "Irish"}, {"gd", "Gaelic"}, {"gl", "Galician"}, {"gn", "Guarani"},
-	    {"gu", "Gujarati"}, {"gv", "Manx"}, {"ha", "Hausa"}, {"he", "Hebrew"},
-	    {"hi", "Hindi"}, {"ho", "Hiri Motu"}, {"hr", "Croatian"}, {"ht", "Haitian"},
-	    {"hu", "Hungarian"}, {"hy", "Armenian"}, {"hz", "Herero"}, {"ia", "Interlingua"},
-	    {"id", "Indonesian"}, {"ie", "Interlingue"}, {"ig", "Igbo"}, {"ii", "Sichuan Yi"},
-	    {"ik", "Inupiaq"}, {"io", "Ido"}, {"is", "Icelandic"}, {"it", "Italian"},
-	    {"iu", "Inuktitut"}, {"ja", "Japanese"}, {"jv", "Javanese"}, {"ka", "Georgian"},
-	    {"kg", "Kongo"}, {"ki", "Kikuyu"}, {"kj", "Kuanyama"}, {"kk", "Kazakh"},
-	    {"kl", "Kalaallisut"}, {"km", "Central Khmer"}, {"kn", "Kannada"}, {"ko", "Korean"},
-	    {"kr", "Kanuri"}, {"ks", "Kashmiri"}, {"ku", "Kurdish"}, {"kv", "Komi"},
-	    {"kw", "Cornish"}, {"ky", "Kirghiz"}, {"la", "Latin"}, {"lb", "Luxembourgish"},
-	    {"lg", "Ganda"}, {"li", "Limburgan"}, {"ln", "Lingala"}, {"lo", "Lao"},
-	    {"lt", "Lithuanian"}, {"lu", "Luba-Katanga"}, {"lv", "Latvian"}, {"mg", "Malagasy"},
-	    {"mh", "Marshallese"}, {"mi", "Maori"}, {"mk", "Macedonian"}, {"ml", "Malayalam"},
-	    {"mn", "Mongolian"}, {"mr", "Marathi"}, {"ms", "Malay"}, {"mt", "Maltese"},
-	    {"my", "Burmese"}, {"na", "Nauru"}, {"nb", "Bokmål, Norwegian"}, {"nd", "Ndebele, North"},
-	    {"ne", "Nepali"}, {"ng", "Ndonga"}, {"nl", "Dutch"}, {"nn", "Norwegian Nynorsk"},
-	    {"no", "Norwegian"}, {"nr", "Ndebele, South"}, {"nv", "Navajo"}, {"ny", "Chichewa"},
-	    {"oc", "Occitan"}, {"oj", "Ojibwa"}, {"om", "Oromo"}, {"or", "Oriya"},
-	    {"os", "Ossetian"}, {"pa", "Panjabi"}, {"pi", "Pali"}, {"pl", "Polish"},
-	    {"ps", "Pushto"}, {"pt", "Portuguese"}, {"qu", "Quechua"}, {"rm", "Romansh"},
-	    {"rn", "Rundi"}, {"ro", "Romanian"}, {"ru", "Russian"}, {"rw", "Kinyarwanda"},
-	    {"sa", "Sanskrit"}, {"sc", "Sardinian"}, {"sd", "Sindhi"}, {"se", "Northern Sami"},
-	    {"sg", "Sango"}, {"si", "Sinhala"}, {"sk", "Slovak"}, {"sl", "Slovenian"},
-	    {"sm", "Samoan"}, {"sn", "Shona"}, {"so", "Somali"}, {"sq", "Albanian"},
-	    {"sr", "Serbian"}, {"ss", "Swati"}, {"st", "Sotho, Southern"}, {"su", "Sundanese"},
-	    {"sv", "Swedish"}, {"sw", "Swahili"}, {"ta", "Tamil"}, {"te", "Telugu"},
-	    {"tg", "Tajik"}, {"th", "Thai"}, {"ti", "Tigrinya"}, {"tk", "Turkmen"},
-	    {"tl", "Tagalog"}, {"tn", "Tswana"}, {"to", "Tonga"}, {"tr", "Turkish"},
-	    {"ts", "Tsonga"}, {"tt", "Tatar"}, {"tw", "Twi"}, {"ty", "Tahitian"},
-	    {"ug", "Uighur"}, {"uk", "Ukrainian"}, {"ur", "Urdu"}, {"uz", "Uzbek"},
-	    {"ve", "Venda"}, {"vi", "Vietnamese"}, {"vo", "Volapük"}, {"wa", "Walloon"},
-	    {"wo", "Wolof"}, {"xh", "Xhosa"}, {"yi", "Yiddish"}, {"yo", "Yoruba"},
-	    {"za", "Zhuang"}, {"zh", "Chinese"}, {"zu", "Zulu"}
-	};
+		{"aa", "Afar"}, {"ab", "Abkhazian"}, {"ae", "Avestan"}, {"af", "Afrikaans"},
+		{"ak", "Akan"}, {"am", "Amharic"}, {"an", "Aragonese"}, {"ar", "Arabic"},
+		{"as", "Assamese"}, {"av", "Avaric"}, {"ay", "Aymara"}, {"az", "Azerbaijani"},
+		{"ba", "Bashkir"}, {"be", "Belarusian"}, {"bg", "Bulgarian"}, {"bi", "Bislama"},
+		{"bm", "Bambara"}, {"bn", "Bengali"}, {"bo", "Tibetan"}, {"br", "Breton"},
+		{"bs", "Bosnian"}, {"ca", "Catalan"}, {"ce", "Chechen"}, {"ch", "Chamorro"},
+		{"co", "Corsican"}, {"cr", "Cree"}, {"cs", "Czech"}, {"cu", "Church Slavic"},
+		{"cv", "Chuvash"}, {"cy", "Welsh"}, {"da", "Danish"}, {"de", "German"},
+		{"dv", "Divehi"}, {"dz", "Dzongkha"}, {"ee", "Ewe"}, {"el", "Greek"},
+		{"en", "English"}, {"eo", "Esperanto"}, {"es", "Spanish"}, {"et", "Estonian"},
+		{"eu", "Basque"}, {"fa", "Persian"}, {"ff", "Fulah"}, {"fi", "Finnish"},
+		{"fj", "Fijian"}, {"fo", "Faroese"}, {"fr", "French"}, {"fy", "Western Frisian"},
+		{"ga", "Irish"}, {"gd", "Gaelic"}, {"gl", "Galician"}, {"gn", "Guarani"},
+		{"gu", "Gujarati"}, {"gv", "Manx"}, {"ha", "Hausa"}, {"he", "Hebrew"},
+		{"hi", "Hindi"}, {"ho", "Hiri Motu"}, {"hr", "Croatian"}, {"ht", "Haitian"},
+		{"hu", "Hungarian"}, {"hy", "Armenian"}, {"hz", "Herero"}, {"ia", "Interlingua"},
+		{"id", "Indonesian"}, {"ie", "Interlingue"}, {"ig", "Igbo"}, {"ii", "Sichuan Yi"},
+		{"ik", "Inupiaq"}, {"io", "Ido"}, {"is", "Icelandic"}, {"it", "Italian"},
+		{"iu", "Inuktitut"}, {"ja", "Japanese"}, {"jv", "Javanese"}, {"ka", "Georgian"},
+		{"kg", "Kongo"}, {"ki", "Kikuyu"}, {"kj", "Kuanyama"}, {"kk", "Kazakh"},
+		{"kl", "Kalaallisut"}, {"km", "Central Khmer"}, {"kn", "Kannada"}, {"ko", "Korean"},
+		{"kr", "Kanuri"}, {"ks", "Kashmiri"}, {"ku", "Kurdish"}, {"kv", "Komi"},
+		{"kw", "Cornish"}, {"ky", "Kirghiz"}, {"la", "Latin"}, {"lb", "Luxembourgish"},
+		{"lg", "Ganda"}, {"li", "Limburgan"}, {"ln", "Lingala"}, {"lo", "Lao"},
+		{"lt", "Lithuanian"}, {"lu", "Luba-Katanga"}, {"lv", "Latvian"}, {"mg", "Malagasy"},
+		{"mh", "Marshallese"}, {"mi", "Maori"}, {"mk", "Macedonian"}, {"ml", "Malayalam"},
+		{"mn", "Mongolian"}, {"mr", "Marathi"}, {"ms", "Malay"}, {"mt", "Maltese"},
+		{"my", "Burmese"}, {"na", "Nauru"}, {"nb", "Bokmål, Norwegian"}, {"nd", "Ndebele, North"},
+		{"ne", "Nepali"}, {"ng", "Ndonga"}, {"nl", "Dutch"}, {"nn", "Norwegian Nynorsk"},
+		{"no", "Norwegian"}, {"nr", "Ndebele, South"}, {"nv", "Navajo"}, {"ny", "Chichewa"},
+		{"oc", "Occitan"}, {"oj", "Ojibwa"}, {"om", "Oromo"}, {"or", "Oriya"},
+		{"os", "Ossetian"}, {"pa", "Panjabi"}, {"pi", "Pali"}, {"pl", "Polish"},
+		{"ps", "Pushto"}, {"pt", "Portuguese"}, {"qu", "Quechua"}, {"rm", "Romansh"},
+		{"rn", "Rundi"}, {"ro", "Romanian"}, {"ru", "Russian"}, {"rw", "Kinyarwanda"},
+		{"sa", "Sanskrit"}, {"sc", "Sardinian"}, {"sd", "Sindhi"}, {"se", "Northern Sami"},
+		{"sg", "Sango"}, {"si", "Sinhala"}, {"sk", "Slovak"}, {"sl", "Slovenian"},
+		{"sm", "Samoan"}, {"sn", "Shona"}, {"so", "Somali"}, {"sq", "Albanian"},
+		{"sr", "Serbian"}, {"ss", "Swati"}, {"st", "Sotho, Southern"}, {"su", "Sundanese"},
+		{"sv", "Swedish"}, {"sw", "Swahili"}, {"ta", "Tamil"}, {"te", "Telugu"},
+		{"tg", "Tajik"}, {"th", "Thai"}, {"ti", "Tigrinya"}, {"tk", "Turkmen"},
+		{"tl", "Tagalog"}, {"tn", "Tswana"}, {"to", "Tonga"}, {"tr", "Turkish"},
+		{"ts", "Tsonga"}, {"tt", "Tatar"}, {"tw", "Twi"}, {"ty", "Tahitian"},
+		{"ug", "Uighur"}, {"uk", "Ukrainian"}, {"ur", "Urdu"}, {"uz", "Uzbek"},
+		{"ve", "Venda"}, {"vi", "Vietnamese"}, {"vo", "Volapük"}, {"wa", "Walloon"},
+		{"wo", "Wolof"}, {"xh", "Xhosa"}, {"yi", "Yiddish"}, {"yo", "Yoruba"},
+		{"za", "Zhuang"}, {"zh", "Chinese"}, {"zu", "Zulu"}};
 	static const STranslateLangs g_EmptyLang = {"", ""};
 	static const char *g_LangsListDefaultCodes[] = {"ru", "en", "kk", "de", "uk"};
 }
@@ -89,7 +87,6 @@ CRClient::CRClient()
 
 void CRClient::OnReset()
 {
-
 }
 
 void CRClient::OnInit()
@@ -274,7 +271,6 @@ void CRClient::OnStateChange(int NewState, int OldState)
 
 void CRClient::OnShutdown()
 {
-
 }
 
 void CRClient::OnNewSnapshot()
@@ -306,10 +302,10 @@ void CRClient::ConfigSaveCallback(IConfigManager *pConfigManager, void *pUserDat
 	}
 	if(pSelf->m_DeepflyEnabled && str_find_nocase(pSelf->GameClient()->m_Binds.Get(g_Config.m_RcDeepFlyOnRMB ? KEY_MOUSE_2 : KEY_MOUSE_1, 0), "+toggle cl_dummy_hammer 1 0"))
 	{
-		std::string Text {pSelf->GameClient()->m_Binds.Get(g_Config.m_RcDeepFlyOnRMB ? KEY_MOUSE_2 : KEY_MOUSE_1, 0)};
+		std::string Text{pSelf->GameClient()->m_Binds.Get(g_Config.m_RcDeepFlyOnRMB ? KEY_MOUSE_2 : KEY_MOUSE_1, 0)};
 		std::string ToDelete{"; +toggle cl_dummy_hammer 1 0"};
-		size_t Start {Text.find(ToDelete)};
-		while (Start != std::string::npos)
+		size_t Start{Text.find(ToDelete)};
+		while(Start != std::string::npos)
 		{
 			Text.erase(Start, ToDelete.length());
 			Start = Text.find(ToDelete, Start + ToDelete.length());
@@ -330,7 +326,7 @@ void CRClient::ConfigSaveCallback(IConfigManager *pConfigManager, void *pUserDat
 }
 
 // Need things
-static int FindPlayerClientId(CGameClient *pGameClient ,const char *Nickname)
+static int FindPlayerClientId(CGameClient *pGameClient, const char *Nickname)
 {
 	int ClientID = -1;
 	for(int i = 0; i < MAX_CLIENTS; i++)
@@ -480,7 +476,6 @@ void CRClient::DummyConnectedClan(const bool IsDummyConnected)
 	}
 }
 
-
 // Find/Copy Skin
 static std::string TrimRight(const char *aInput)
 {
@@ -529,17 +524,17 @@ void CRClient::FetchRclientDDstatsProfile()
 	Http()->Run(m_pRClientDDstatsTask);
 }
 
-static void PrintPlayerInfo(CGameClient *pGameClient , const char *Nickname, const char *Skin, const char *Clan, const int Country, const int CustomColor, const int SkinColorBodyint, const int SkinColorFeetint)
+static void PrintPlayerInfo(CGameClient *pGameClient, const char *Nickname, const char *Skin, const char *Clan, const int Country, const int CustomColor, const int SkinColorBodyint, const int SkinColorFeetint)
 {
-	FastPrint(pGameClient , "Info","- Nickname: %s", Nickname);
-	FastPrint(pGameClient , "Info","- Skin name: %s", Skin);
-	FastPrint(pGameClient , "Info","- Clan: %s", Clan);
-	FastPrint(pGameClient , "Info","- Country: %d", Country);
+	FastPrint(pGameClient, "Info", "- Nickname: %s", Nickname);
+	FastPrint(pGameClient, "Info", "- Skin name: %s", Skin);
+	FastPrint(pGameClient, "Info", "- Clan: %s", Clan);
+	FastPrint(pGameClient, "Info", "- Country: %d", Country);
 	if(CustomColor)
 	{
 		pGameClient->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "Info", "- Custom Color: 1");
-		FastPrint(pGameClient , "Info","- Body Color: %d", SkinColorBodyint);
-		FastPrint(pGameClient , "Info","- Feet Color: %d", SkinColorFeetint);
+		FastPrint(pGameClient, "Info", "- Body Color: %d", SkinColorBodyint);
+		FastPrint(pGameClient, "Info", "- Feet Color: %d", SkinColorFeetint);
 	}
 	else
 		pGameClient->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "Info", "- Custom Color: 0");
@@ -547,12 +542,12 @@ static void PrintPlayerInfo(CGameClient *pGameClient , const char *Nickname, con
 
 static void PrintSkinInfo(CGameClient *pGameClient, const char *Skin, const int CustomColor, const int SkinColorBodyint, const int SkinColorFeetint)
 {
-	FastPrint(pGameClient , "Info","- Skin name: %s", Skin);
+	FastPrint(pGameClient, "Info", "- Skin name: %s", Skin);
 	if(CustomColor)
 	{
 		pGameClient->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "Info", "- Custom Color: 1");
-		FastPrint(pGameClient , "Info","- Body Color: %d", SkinColorBodyint);
-		FastPrint(pGameClient , "Info","- Feet Color: %d", SkinColorFeetint);
+		FastPrint(pGameClient, "Info", "- Body Color: %d", SkinColorBodyint);
+		FastPrint(pGameClient, "Info", "- Feet Color: %d", SkinColorFeetint);
 	}
 	else
 		pGameClient->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "Info", "- Custom Color: 0");
@@ -563,8 +558,8 @@ static void PrintColorInfo(CGameClient *pGameClient, const int CustomColor, cons
 	if(CustomColor)
 	{
 		pGameClient->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "Info", "- Custom Color: 1");
-		FastPrint(pGameClient , "Info","- Body Color: %d", SkinColorBodyint);
-		FastPrint(pGameClient , "Info","- Feet Color: %d", SkinColorFeetint);
+		FastPrint(pGameClient, "Info", "- Body Color: %d", SkinColorBodyint);
+		FastPrint(pGameClient, "Info", "- Feet Color: %d", SkinColorFeetint);
 	}
 	else
 		pGameClient->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "Info", "- Custom Color: 0");
@@ -1055,10 +1050,10 @@ void CRClient::ToggleDeepFly(bool Enable, const char *CurBind, bool NeedEcho)
 	if(!Enable)
 	{
 		m_DeepflyEnabled = false;
-		std::string Text {CurBind};
+		std::string Text{CurBind};
 		std::string ToDelete{"; +toggle cl_dummy_hammer 1 0"};
-		size_t Start {Text.find(ToDelete)};
-		while (Start != std::string::npos)
+		size_t Start{Text.find(ToDelete)};
+		while(Start != std::string::npos)
 		{
 			Text.erase(Start, ToDelete.length());
 			Start = Text.find(ToDelete, Start + ToDelete.length());
@@ -1069,7 +1064,7 @@ void CRClient::ToggleDeepFly(bool Enable, const char *CurBind, bool NeedEcho)
 	else
 	{
 		m_DeepflyEnabled = true;
-		std::string Text {CurBind};
+		std::string Text{CurBind};
 		Text.append("; +toggle cl_dummy_hammer 1 0");
 		GameClient()->Echo("[[green]] Deepfly on");
 		GameClient()->m_Binds.Bind(g_Config.m_RcDeepFlyOnRMB ? KEY_MOUSE_2 : KEY_MOUSE_1, Text.c_str(), false, 0);
@@ -1135,7 +1130,7 @@ const char *CRClient::FilterMessage(const char *Message, bool IsChat, int Client
 		return It->second.c_str();
 
 	bool CensorFoundInMessage = false;
-	std::string text {Message};
+	std::string text{Message};
 	if(g_Config.m_RcMessageFilterMode == 1)
 	{
 		for(size_t i = 0; i < CensorWordsList.size(); i++)
@@ -1206,7 +1201,8 @@ const char *CRClient::FilterMessage(const char *Message, bool IsChat, int Client
 				size_t word_start = text.find_last_of(' ', start);
 				if(word_start == std::string::npos)
 					word_start = 0;
-				else word_start++;
+				else
+					word_start++;
 				size_t word_end = text.find_first_of(' ', start + to_delete.length());
 				if(word_end == std::string::npos)
 					word_end = text.length();
@@ -1270,7 +1266,8 @@ const char *CRClient::FilterMessage(const char *Message, bool IsChat, int Client
 				size_t word_start = text.find_last_of(' ', start);
 				if(word_start == std::string::npos)
 					word_start = 0;
-				else word_start++;
+				else
+					word_start++;
 				size_t word_end = text.find_first_of(' ', start + to_delete.length());
 				if(word_end == std::string::npos)
 					word_end = text.length();
@@ -1376,7 +1373,6 @@ void CRClient::DoTranslateWork(CTranslateResponse &TranslatedClass, CLineTransla
 	{
 		GameClient()->m_Chat.SendChat(LineForTranslate.m_JobIntVariable, TranslatedClass.m_Text, true);
 	}
-
 }
 
 // WarList
@@ -1564,7 +1560,7 @@ void CRClient::ResetRclientDDstatsFindTime()
 }
 
 // Scoreboard/Chat height
-float CRClient::GetScoreboardHeight(bool IsDefaultRender ,bool IsBigger, int ClientId)
+float CRClient::GetScoreboardHeight(bool IsDefaultRender, bool IsBigger, int ClientId)
 {
 	// Default: m_ScoreboardPopupContext.m_IsLocal ? 30.0f : 60.0f
 	// Default: m_ScoreboardPopupContext.m_IsLocal ? 58.5f : 87.5f
@@ -1603,7 +1599,7 @@ float CRClient::GetScoreboardHeight(bool IsDefaultRender ,bool IsBigger, int Cli
 	}
 	ScoreboardHeight += ButtonRows * (ButtonHeight + ItemSpacing * 2.0f);
 
-	if (ExtraButtonRows != 0)
+	if(ExtraButtonRows != 0)
 		ScoreboardHeight += ItemSpacing * 4.0f;
 
 	return ScoreboardHeight;
@@ -1803,7 +1799,7 @@ void CRClient::ChatCheckingMessages(CNetMsg_Sv_Chat *pMsg)
 		{
 			char aBuf[128];
 			str_format(aBuf, sizeof(aBuf), "\'%s\' joined team ", g_Config.m_ClDummy ? g_Config.m_ClDummyName : g_Config.m_PlayerName);
-			if(str_utf8_find_nocase(pMsg->m_pMessage ,aBuf))
+			if(str_utf8_find_nocase(pMsg->m_pMessage, aBuf))
 			{
 				const int Team = GameClient()->m_Teams.Team(GameClient()->m_Snap.m_LocalClientId);
 				if(Team != 0)
@@ -1849,12 +1845,10 @@ bool CRClient::AntiUnSpec()
 			if(i == GameClient()->m_aLocalIds[g_Config.m_ClDummy] || i == GameClient()->m_aLocalIds[!g_Config.m_ClDummy])
 				continue;
 
-			if(!GameClient()->m_aClients[i].m_Active ||GameClient()->m_aClients[i].m_Spec)
+			if(!GameClient()->m_aClients[i].m_Active || GameClient()->m_aClients[i].m_Spec)
 				continue;
 
-			bool PlTeamCanCollide = !GameClient()->m_aClients[LocalClientId].m_CollisionDisabled && !GameClient()->m_aClients[i].m_CollisionDisabled
-						&& GameClient()->m_aTuning[g_Config.m_ClDummy].m_PlayerCollision
-						&& GameClient()->m_Teams.CanCollide(LocalClientId, i);
+			bool PlTeamCanCollide = !GameClient()->m_aClients[LocalClientId].m_CollisionDisabled && !GameClient()->m_aClients[i].m_CollisionDisabled && GameClient()->m_aTuning[g_Config.m_ClDummy].m_PlayerCollision && GameClient()->m_Teams.CanCollide(LocalClientId, i);
 			if(!PlTeamCanCollide)
 				continue;
 
@@ -1997,7 +1991,11 @@ void CRClient::ConGotoTeleCursor(IConsole::IResult *pResult, void *pUserData)
 				bool Match = false;
 				for(size_t i = 0; i < Count; i++)
 				{
-					if(Tile.m_Type == Types[i]) { Match = true; break; }
+					if(Tile.m_Type == Types[i])
+					{
+						Match = true;
+						break;
+					}
 				}
 				if(Tile.m_Number == TeleTile.m_Number && Match)
 					Targets.emplace_back(x, y);
@@ -2287,7 +2285,7 @@ int CRClient::GetSavesAmount(const char *MapName)
 		if(!PredOffset)
 			continue;
 
-		const char *pStart =  str_find(pLine + PredOffset - 1, ",");
+		const char *pStart = str_find(pLine + PredOffset - 1, ",");
 
 		char aMapNameSave[128];
 		str_truncate(aMapNameSave, sizeof(aMapNameSave), pStart + 1, Offset - PredOffset - 1);

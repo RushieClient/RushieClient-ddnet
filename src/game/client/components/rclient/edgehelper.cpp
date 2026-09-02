@@ -13,10 +13,9 @@
 #include <game/client/components/console.h>
 #include <game/client/components/controls.h>
 #include <game/client/components/menus.h>
+#include <game/client/components/rclient/rclient_include.h>
 #include <game/client/gameclient.h>
 #include <game/client/ui.h>
-
-#include <game/client/components/rclient/rclient_include.h>
 
 struct SEdgeHelperProperties
 {
@@ -31,11 +30,11 @@ struct SEdgeHelperProperties
 	static constexpr float ms_CircleRadius = 8.0f;
 	static constexpr float ms_CircleThickness = 2.0f;
 
-	static ColorRGBA WindowColorDark() { return ColorRGBA(0.2f, 0.2f, 0.2f, 0.9f); };
-	static ColorRGBA WindowColorMedium() { return ColorRGBA(0.35f, 0.35f, 0.35f, 0.9f); };
+	static ColorRGBA WindowColorDark() { return ColorRGBA(0.2f, 0.2f, 0.2f, 0.9f); }
+	static ColorRGBA WindowColorMedium() { return ColorRGBA(0.35f, 0.35f, 0.35f, 0.9f); }
 
-	static ColorRGBA ActionActiveButtonColor() { return ColorRGBA(0.53f, 0.78f, 0.53f, 0.8f); };
-	static ColorRGBA ActionWhiteButtonColor() { return ColorRGBA(1.0f, 1.0f, 1.0f, 0.8f); };
+	static ColorRGBA ActionActiveButtonColor() { return ColorRGBA(0.53f, 0.78f, 0.53f, 0.8f); }
+	static ColorRGBA ActionWhiteButtonColor() { return ColorRGBA(1.0f, 1.0f, 1.0f, 0.8f); }
 };
 
 CEdgeHelper::CEdgeHelper()
@@ -106,7 +105,6 @@ void CEdgeHelper::RenderEdgeHelper()
 	Base.x = (m_Width - Base.w) * (g_Config.m_RcEdgeInfoPosX / 100.0f);
 	Base.y = (m_Height - Base.h) * (g_Config.m_RcEdgeInfoPosY / 100.0f);
 
-
 	Graphics()->MapScreenToSize(m_Width, m_Height);
 
 	Base.Draw(SEdgeHelperProperties::WindowColorDark(), IGraphics::CORNER_ALL, SEdgeHelperProperties::ms_Rounding);
@@ -158,8 +156,12 @@ void CEdgeHelper::RenderEdgeHelperEdgeInfo(CUIRect *pBase)
 	RightZone.VSplitLeft(ActionSpacing + 2, nullptr, &RightZone);
 	LeftZone.Margin(SEdgeHelperProperties::ms_ItemSpacing, &LeftZone);
 	RightZone.Margin(SEdgeHelperProperties::ms_ItemSpacing, &RightZone);
-	LeftZone.Draw(m_Pos_x >= 44 ? color_cast<ColorRGBA>(ColorHSLA(g_Config.m_RcEdgeInfoColorKill)) : m_Pos_x >= 28 ? color_cast<ColorRGBA>(ColorHSLA(g_Config.m_RcEdgeInfoColorSafe)) : color_cast<ColorRGBA>(ColorHSLA(g_Config.m_RcEdgeInfoColorFreeze)), IGraphics::CORNER_ALL, SEdgeHelperProperties::ms_Rounding);
-	RightZone.Draw(m_Pos_x <= 53 ? color_cast<ColorRGBA>(ColorHSLA(g_Config.m_RcEdgeInfoColorKill)) : m_Pos_x <= 69 ? color_cast<ColorRGBA>(ColorHSLA(g_Config.m_RcEdgeInfoColorSafe)) : color_cast<ColorRGBA>(ColorHSLA(g_Config.m_RcEdgeInfoColorFreeze)), IGraphics::CORNER_ALL, SEdgeHelperProperties::ms_Rounding);
+	LeftZone.Draw(m_Pos_x >= 44 ? color_cast<ColorRGBA>(ColorHSLA(g_Config.m_RcEdgeInfoColorKill)) : m_Pos_x >= 28 ? color_cast<ColorRGBA>(ColorHSLA(g_Config.m_RcEdgeInfoColorSafe)) :
+															 color_cast<ColorRGBA>(ColorHSLA(g_Config.m_RcEdgeInfoColorFreeze)),
+		IGraphics::CORNER_ALL, SEdgeHelperProperties::ms_Rounding);
+	RightZone.Draw(m_Pos_x <= 53 ? color_cast<ColorRGBA>(ColorHSLA(g_Config.m_RcEdgeInfoColorKill)) : m_Pos_x <= 69 ? color_cast<ColorRGBA>(ColorHSLA(g_Config.m_RcEdgeInfoColorSafe)) :
+															  color_cast<ColorRGBA>(ColorHSLA(g_Config.m_RcEdgeInfoColorFreeze)),
+		IGraphics::CORNER_ALL, SEdgeHelperProperties::ms_Rounding);
 	CenterZone.VSplitLeft(SEdgeHelperProperties::ms_WallWidth + ActionSpacing, &LeftZone, &CenterZone);
 	CenterZone.VSplitRight(SEdgeHelperProperties::ms_WallWidth + ActionSpacing, &CenterZone, &RightZone);
 	LeftZone.VSplitRight(ActionSpacing - 3, &LeftZone, nullptr);
@@ -236,10 +238,11 @@ void CEdgeHelper::RenderEdgeHelperJumpInfo(CUIRect *pBase)
 	int lower = -1;
 	int upper = -1;
 
-	for (int v : values)
+	for(int v : values)
 	{
-		if (v <= m_Pos_x) lower = v;
-		if (v >= m_Pos_x)
+		if(v <= m_Pos_x)
+			lower = v;
+		if(v >= m_Pos_x)
 		{
 			upper = v;
 			break;

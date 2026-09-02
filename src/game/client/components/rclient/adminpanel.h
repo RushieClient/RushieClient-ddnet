@@ -99,8 +99,8 @@ public:
 	bool OnInput(const IInput::CEvent &Event) override;
 
 	bool IsActive() const { return m_Active; }
-	bool IsActivePopup() const { return m_PlayerPopup.m_Visible; };
-	bool IsActivePlrList() const { return m_PlayerList.m_Active; };
+	bool IsActivePopup() const { return m_PlayerPopup.m_Visible; }
+	bool IsActivePlrList() const { return m_PlayerList.m_Active; }
 };
 
 #endif

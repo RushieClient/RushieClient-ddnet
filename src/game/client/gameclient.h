@@ -68,16 +68,16 @@
 #include "components/statboard.h"
 
 //RClient
-#include "components/rclient/rclient.h"
 #include "components/entity/chat_bubbles.h"
-#include "components/rclient/edgehelper.h"
-#include "components/rclient/notify_on_move.h"
-#include "components/rclient/adminpanel.h"
 #include "components/rclient/above_below_player.h"
+#include "components/rclient/adminpanel.h"
+#include "components/rclient/edgehelper.h"
+#include "components/rclient/last_saves.h"
+#include "components/rclient/notify_on_move.h"
+#include "components/rclient/rclient.h"
+#include "components/rclient/rechargebars.h"
 #include "components/rclient/specwheel.h"
 #include "components/rclient/swaptimer.h"
-#include "components/rclient/rechargebars.h"
-#include "components/rclient/last_saves.h"
 
 //TClient
 #include "components/tclient/bg_draw.h"

@@ -437,7 +437,7 @@ void CVoting::RenderBars(CUIRect Bars) const
 			NoArea.Draw(ColorRGBA(0.9f, 0.2f, 0.2f, 0.85f), IGraphics::CORNER_ALL, NoArea.h / 2.0f);
 			if(g_Config.m_RcShowhudVotingPercent)
 			{
-				str_format(PercentChar, sizeof(PercentChar), "%i%%", m_No * 100 / m_Total); 
+				str_format(PercentChar, sizeof(PercentChar), "%i%%", m_No * 100 / m_Total);
 				Ui()->DoLabel(&NoArea, PercentChar, NoArea.h, TEXTALIGN_MC);
 			}
 		}

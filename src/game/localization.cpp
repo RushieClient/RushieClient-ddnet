@@ -261,7 +261,7 @@ bool CLocalizationDatabase::Load(const char *pFilename, IStorage *pStorage, ICon
 void CLocalizationDatabase::AddString(const char *pOrgStr, const char *pNewStr, const char *pContext)
 {
 	m_vStrings.emplace_back(str_quickhash(pOrgStr), str_quickhash(pContext),
-	m_StringsHeap.StoreString(*pNewStr ? pNewStr : pOrgStr));
+		m_StringsHeap.StoreString(*pNewStr ? pNewStr : pOrgStr));
 }
 
 const char *CLocalizationDatabase::FindString(unsigned Hash, unsigned ContextHash) const

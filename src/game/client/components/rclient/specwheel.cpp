@@ -1,5 +1,7 @@
 #include "specwheel.h"
 
+#include "../rclient/rclient_include.h"
+
 #include <engine/graphics.h>
 #include <engine/shared/config.h>
 
@@ -7,8 +9,6 @@
 #include <game/client/gameclient.h>
 #include <game/client/render.h>
 #include <game/client/ui.h>
-
-#include "../rclient/rclient_include.h"
 
 CSpecWheel::CSpecWheel()
 {
@@ -339,15 +339,15 @@ void CSpecWheel::ExecuteBind(int Bind)
 
 	std::string Command{m_vSpecBinds[Bind].m_aCommand};
 	std::string old_str{"%plnick%"};
-	size_t startnick {Command.find(old_str)};
-	while (startnick != std::string::npos)
+	size_t startnick{Command.find(old_str)};
+	while(startnick != std::string::npos)
 	{
 		Command.replace(startnick, old_str.length(), aEscapedName);
 		startnick = Command.find(old_str, startnick + str_length(aEscapedName));
 	}
 	old_str = "%plid%";
-	size_t startid {Command.find(old_str)};
-	while (startid != std::string::npos)
+	size_t startid{Command.find(old_str)};
+	while(startid != std::string::npos)
 	{
 		Command.replace(startid, old_str.length(), std::to_string(GameClient()->m_Snap.m_SpecInfo.m_SpectatorId));
 		startid = Command.find(old_str, startid + std::to_string(GameClient()->m_Snap.m_SpecInfo.m_SpectatorId).length());

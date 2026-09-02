@@ -1510,7 +1510,8 @@ void CMenus::RenderServerbrowserFriends(CUIRect View)
 		for(int ServerIndex = 0; ServerIndex < ServerBrowser()->NumServers(); ++ServerIndex)
 		{
 			const CServerInfo *pEntry = ServerBrowser()->Get(ServerIndex);
-			if(!pEntry->m_NumClients) continue;
+			if(!pEntry->m_NumClients)
+				continue;
 
 			for(int ClientIndex = 0; ClientIndex < pEntry->m_NumClients; ++ClientIndex)
 			{
@@ -1929,7 +1930,7 @@ void CMenus::RenderServerbrowserFriends(CUIRect View)
 			}
 		}
 	}
-		s_ScrollRegion.End();
+	s_ScrollRegion.End();
 
 	if(m_pRemoveFriend != nullptr)
 	{

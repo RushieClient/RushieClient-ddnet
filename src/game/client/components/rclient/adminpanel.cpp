@@ -37,22 +37,22 @@ struct SAdminPanelProperties
 
 	static constexpr float ms_PlayerBtnWidth = 60.0f;
 
-	static ColorRGBA WindowColor() { return ColorRGBA(0.451f, 0.451f, 0.451f, 0.9f); };
-	static ColorRGBA WindowColorDark() { return ColorRGBA(0.2f, 0.2f, 0.2f, 0.9f); };
-	static ColorRGBA GeneralButtonColor() { return ColorRGBA(0.541f, 0.561f, 0.48f, 0.8f); };
-	static ColorRGBA GeneralActiveButtonColor() { return ColorRGBA(0.53f, 0.78f, 0.53f, 0.8f); };
+	static ColorRGBA WindowColor() { return ColorRGBA(0.451f, 0.451f, 0.451f, 0.9f); }
+	static ColorRGBA WindowColorDark() { return ColorRGBA(0.2f, 0.2f, 0.2f, 0.9f); }
+	static ColorRGBA GeneralButtonColor() { return ColorRGBA(0.541f, 0.561f, 0.48f, 0.8f); }
+	static ColorRGBA GeneralActiveButtonColor() { return ColorRGBA(0.53f, 0.78f, 0.53f, 0.8f); }
 
-	static ColorRGBA ActionGeneralButtonColor() { return ColorRGBA(0.541f, 0.561f, 0.48f, 0.8f); };
-	static ColorRGBA ActionActiveButtonColor() { return ColorRGBA(0.53f, 0.78f, 0.53f, 0.8f); };
+	static ColorRGBA ActionGeneralButtonColor() { return ColorRGBA(0.541f, 0.561f, 0.48f, 0.8f); }
+	static ColorRGBA ActionActiveButtonColor() { return ColorRGBA(0.53f, 0.78f, 0.53f, 0.8f); }
 
-	static ColorRGBA ActionBanAltButtonColor() { return ColorRGBA(0.7f, 0.1f, 0.1f, 0.8f); };
-	static ColorRGBA ActionBanButtonColor() { return ColorRGBA(1.0f, 0.24f, 0.24f, 0.8f); };
-	static ColorRGBA ActionKillAltButtonColor() { return ColorRGBA(0.5f, 0.45f, 0.0f, 0.8f); };
-	static ColorRGBA ActionKillButtonColor() { return ColorRGBA(1.0f, 0.902f, 0.0f, 0.8f); };
-	static ColorRGBA ActionKickAltButtonColor() { return ColorRGBA(0.5f, 0.27f, 0.0f, 0.8f); };
-	static ColorRGBA ActionKickButtonColor() { return ColorRGBA(1.0f, 0.549f, 0.0f, 0.8f); };
-	static ColorRGBA ActionMuteAltButtonColor() { return ColorRGBA(0.25f, 0.0f, 0.25f, 0.8f); };
-	static ColorRGBA ActionMuteButtonColor() { return ColorRGBA(0.502f, 0.0f, 0.502f, 0.8f); };
+	static ColorRGBA ActionBanAltButtonColor() { return ColorRGBA(0.7f, 0.1f, 0.1f, 0.8f); }
+	static ColorRGBA ActionBanButtonColor() { return ColorRGBA(1.0f, 0.24f, 0.24f, 0.8f); }
+	static ColorRGBA ActionKillAltButtonColor() { return ColorRGBA(0.5f, 0.45f, 0.0f, 0.8f); }
+	static ColorRGBA ActionKillButtonColor() { return ColorRGBA(1.0f, 0.902f, 0.0f, 0.8f); }
+	static ColorRGBA ActionKickAltButtonColor() { return ColorRGBA(0.5f, 0.27f, 0.0f, 0.8f); }
+	static ColorRGBA ActionKickButtonColor() { return ColorRGBA(1.0f, 0.549f, 0.0f, 0.8f); }
+	static ColorRGBA ActionMuteAltButtonColor() { return ColorRGBA(0.25f, 0.0f, 0.25f, 0.8f); }
+	static ColorRGBA ActionMuteButtonColor() { return ColorRGBA(0.502f, 0.0f, 0.502f, 0.8f); }
 };
 
 void CAdminPanel::DoIconLabeledButton(CUIRect *pRect, const char *pTitle, const char *pIcon, float TextSize, float Height, ColorRGBA IconColor) const
@@ -149,7 +149,10 @@ bool CAdminPanel::DoEditBoxInUiSpace(CLineInput *pLineInput, const CUIRect *pLoc
 	const float ScaleX = pScreen->w / m_PopupWidth;
 	const float ScaleY = pScreen->h / m_PopupHeight;
 	CUIRect Rect = *pLocalRect;
-	Rect.x *= ScaleX; Rect.y *= ScaleY; Rect.w *= ScaleX; Rect.h *= ScaleY;
+	Rect.x *= ScaleX;
+	Rect.y *= ScaleY;
+	Rect.w *= ScaleX;
+	Rect.h *= ScaleY;
 	Graphics()->MapScreenToSize(pScreen->w, pScreen->h);
 	const bool Result = Ui()->DoEditBox(pLineInput, &Rect, FontSize * ScaleY);
 	Graphics()->MapScreenToSize(m_PopupWidth, m_PopupHeight);
@@ -264,12 +267,12 @@ bool CAdminPanel::OnInput(const IInput::CEvent &Event)
 	}
 
 	if(m_PlayerPopup.m_Visible && Event.m_Flags & IInput::FLAG_PRESS && Event.m_Key == KEY_MOUSE_1 && CLineInput::GetActiveInput() != nullptr &&
-	!Hovered(&m_PopupTimerInputRect) &&
-	!Hovered(&m_PopupReasonInputRect))
+		!Hovered(&m_PopupTimerInputRect) &&
+		!Hovered(&m_PopupReasonInputRect))
 	{
 		Ui()->SetActiveItem(&m_PlayerPopup);
 		Ui()->SetActiveItem(nullptr);
-		Ui()->SetHotItem(nullptr); 
+		Ui()->SetHotItem(nullptr);
 	}
 
 	if(m_PlayerPopup.m_Visible && CLineInput::GetActiveInput() != nullptr)

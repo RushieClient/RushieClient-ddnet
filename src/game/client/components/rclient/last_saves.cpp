@@ -105,7 +105,7 @@ void CLastSaves::OnMessage(int MsgType, void *pRawMsg)
 				const char *pStart = str_find(pMsg->m_pMessage, " has ");
 				const char *pEnd = str_find(pMsg->m_pMessage, " saves on ");
 
-				if(!pStart || !pEnd )
+				if(!pStart || !pEnd)
 					return;
 
 				char aSaveCount[8];
@@ -120,7 +120,7 @@ void CLastSaves::OnMessage(int MsgType, void *pRawMsg)
 				const char *pStart = str_find(pMsg->m_pMessage, " has ");
 				const char *pEnd = str_find(pMsg->m_pMessage, " save on ");
 
-				if(!pStart || !pEnd )
+				if(!pStart || !pEnd)
 					return;
 
 				char aSaveCount[8];

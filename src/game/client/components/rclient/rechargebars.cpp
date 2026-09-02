@@ -1,8 +1,7 @@
 #include "rechargebars.h"
 
-#include <game/client/prediction/entities/character.h>
-
 #include <game/client/gameclient.h>
+#include <game/client/prediction/entities/character.h>
 
 void CRechargeBars::RenderRechargeBar(const int ClientId)
 {
@@ -12,7 +11,7 @@ void CRechargeBars::RenderRechargeBar(const int ClientId)
 
 	// pCharacter contains the predicted character for local players or the last snap for players who are spectated
 	CCharacterCore *pCharacterPred = &GameClient()->m_aClients[ClientId].m_Predicted; // RClient
-	CCharacter * pWorldChar = g_Config.m_ClAntiPingWeapons ? GameClient()->m_PredictedWorld.GetCharacterById(ClientId) : GameClient()->m_GameWorld.GetCharacterById(ClientId);
+	CCharacter *pWorldChar = g_Config.m_ClAntiPingWeapons ? GameClient()->m_PredictedWorld.GetCharacterById(ClientId) : GameClient()->m_GameWorld.GetCharacterById(ClientId);
 
 	if(!pWorldChar)
 		return;

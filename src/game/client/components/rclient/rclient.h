@@ -128,7 +128,8 @@ class CRClient : public CComponent
 	void FinishDuckDuckGoVqd();
 	void ResetDuckDuckGoVqdTask();
 	static void ConchainCheckBackend(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
-	uint64_t m_LastDDGFetchTime  = 0;
+	uint64_t m_LastDDGFetchTime = 0;
+
 public:
 	CRClient();
 	int Sizeof() const override { return sizeof(*this); }
@@ -173,7 +174,6 @@ public:
 	};
 	void DoTranslateWork(CTranslateResponse &TranslatedClass, CLineTranslate &LineForTranslate);
 
-
 	// Version
 	std::shared_ptr<IHttpRequest> m_pRClientInfoTask = nullptr;
 	void FetchRClientInfo();
@@ -203,7 +203,7 @@ public:
 	void ResetRclientDDstatsFindTime();
 
 	// Scoreboard/Chat height
-	float GetScoreboardHeight(bool IsDefaultRender ,bool IsBigger, int ClientId = -1);
+	float GetScoreboardHeight(bool IsDefaultRender, bool IsBigger, int ClientId = -1);
 	float GetChatHeight(int ClientId);
 
 	// Hud
@@ -228,7 +228,8 @@ public:
 	void ResetLanguages();
 
 	// Animation
-	static float EaseInOutQuad(const float T) { return T == 0.0f ? 0.0f : T == 1.0f ? 1.0f : ((T < 0.5f) ? (2.0f * T * T) : (1.0f - std::pow(-2.0f * T + 2.0f, 2) / 2.0f)); }
+	static float EaseInOutQuad(const float T) { return T == 0.0f ? 0.0f : T == 1.0f ? 1.0f :
+											  ((T < 0.5f) ? (2.0f * T * T) : (1.0f - std::pow(-2.0f * T + 2.0f, 2) / 2.0f)); }
 
 	// Chat Checking
 	void ChatCheckingMessages(CNetMsg_Sv_Chat *pMsg);
