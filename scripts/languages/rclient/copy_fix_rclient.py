@@ -5,9 +5,16 @@ import sys
 import twlang_rclient as twlang
 
 def copy_fix(infile, delete_unused, append_missing, delete_empty):
-	with open(infile, encoding="utf-8") as f:
-		content = f.readlines()
-	trans = twlang.translations(infile)
+	if os.path.exists(infile):
+		trans = twlang.translations(infile)
+		with open(infile, encoding="utf-8") as f:
+			content = f.readlines()
+	else:
+		trans = {}
+		content = []
+	if not trans:
+		# missing, empty or garbage file: regenerate from scratch
+		content = []
 	if delete_unused or append_missing:
 		local = twlang.localizes()
 	else:
@@ -27,7 +34,7 @@ def copy_fix(infile, delete_unused, append_missing, delete_empty):
 	if append_missing:
 		missing = [index for index in range(len(local)) if index not in supported]
 		if missing:
-			if content[-1] != "\n":
+			if content and content[-1] != "\n":
 				content.append("\n")
 			for miss in missing:
 				if local[miss][1] != "":

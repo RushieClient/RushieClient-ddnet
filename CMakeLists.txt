@@ -1831,6 +1831,7 @@ set(EXPECTED_DATA
   rclient/icons/license.txt
   rclient/languages/index.txt
   rclient/languages/russian.txt
+  rclient/languages/simplified_chinese.txt
   rclient/menu_afk.png
   rclient/rcactions.png
   rclient/rchammer.png

@@ -1,0 +1,1152 @@
+[RClient]
+Settings
+== 
+
+[RClient]
+Rcon
+== 
+
+[RClient]
+Chat Binds
+== 
+
+[RClient]
+Spec Wheel
+== 
+
+[RClient]
+Info
+== 
+
+[RClient]
+Dummy
+== 
+
+[RClient]
+Position
+== 
+
+[RClient]
+Clan Change
+== 
+
+[RClient]
+Show dummy position
+== 
+
+[RClient]
+Show dummy speed
+== 
+
+[RClient]
+Show dummy target angle
+== 
+
+[RClient]
+Show advanced dummy actions
+== 
+
+[RClient]
+Auto change clan
+== 
+
+[RClient]
+With Dummy
+== 
+
+[RClient]
+Without Dummy
+== 
+
+[RClient]
+Scoreboard
+== 
+
+[RClient]
+Popup
+== 
+
+[RClient]
+Friends
+== 
+
+[RClient]
+Enable scoreboard mouse
+== 
+
+[RClient]
+Always show quick actions in popup
+== 
+
+[RClient]
+Freeze inputs when popup opened
+== 
+
+[RClient]
+Show friend's heart in scoreboard
+== 
+
+[RClient]
+Heart size
+== 
+
+[RClient]
+Players
+== 
+
+[RClient]
+Effects
+== 
+
+[RClient]
+AFK
+== 
+
+[RClient]
+Hitbox
+== 
+
+[RClient]
+idea from BestClient
+== 
+
+[RClient]
+Hide frozen flakes
+== 
+
+[RClient]
+Always show sparkles
+== 
+
+[RClient]
+Show step effects
+== 
+
+[RClient]
+Off
+== 
+
+[RClient]
+Others
+== 
+
+[RClient]
+Everyone
+== 
+
+[RClient]
+Own
+== 
+
+[RClient]
+Remove hammer hit effect
+== 
+
+[RClient]
+Default
+== 
+
+[RClient]
+Visual
+== 
+
+[RClient]
+Full
+== 
+
+[RClient]
+Show AFK emote in menu
+== 
+
+[RClient]
+Show texture instead emote in menu
+== 
+
+[RClient]
+Show AFK emote in spec
+== 
+
+[RClient]
+Show texture instead emote in spec
+== 
+
+[RClient]
+Show player hitbox
+== 
+
+[RClient]
+Size of hitbox
+== 
+
+[RClient]
+Quality of hitbox
+== 
+
+[RClient]
+Hitbox color
+== 
+
+[RClient]
+Chat Bubbles
+== 
+
+[RClient]
+by qxdFox/Entity Client
+== 
+
+[RClient]
+Enable Chat Bubbles
+== 
+
+[RClient]
+Show Chat Bubbles Yourself Input
+== 
+
+[RClient]
+Show Chat Bubbles Above Yourself
+== 
+
+[RClient]
+Chat bubble size
+== 
+
+[RClient]
+Show time
+== 
+
+[RClient]
+Fade out time
+== 
+
+[RClient]
+Fade in time
+== 
+
+[RClient]
+Master Servers
+== 
+
+[RClient]
+Use Rushie master server mirror
+== 
+
+[RClient]
+Use BestClient master server mirror
+== 
+
+[RClient]
+Integrations
+== 
+
+[RClient]
+Discord RPC
+== 
+
+[RClient]
+Steam
+== 
+
+[RClient]
+Aspect Ratio
+== 
+
+[RClient]
+Enable custom aspect ratio
+== 
+
+[RClient]
+Width
+== 
+
+[RClient]
+Height
+== 
+
+[RClient]
+Apply
+== 
+
+[RClient]
+Disable for almost all UI
+== 
+
+[RClient]
+Disable for Wheels
+== 
+
+[RClient]
+Disable for Menus
+== 
+
+[RClient]
+Disable for Scoreboard
+== 
+
+[RClient]
+Disable for Console
+== 
+
+[RClient]
+Disable for Above/Below Player
+== 
+
+[RClient]
+Disable for Hud
+== 
+
+[RClient]
+Disable for Chat
+== 
+
+[RClient]
+Disable for Edge info
+== 
+
+[RClient]
+Disable for Info messages
+== 
+
+[RClient]
+Disable for Notify in spec
+== 
+
+[RClient]
+Above/Below Player
+== 
+
+[RClient]
+Notify when above player
+== 
+
+[RClient]
+Notify when same pos as player
+== 
+
+[RClient]
+Notify when below player
+== 
+
+[RClient]
+Text pos x
+== 
+
+[RClient]
+Text pos y
+== 
+
+[RClient]
+Spectator
+== 
+
+[RClient]
+Enable spectator movement
+== 
+
+[RClient]
+Spectator Speed
+== 
+
+[RClient]
+Spec go Left
+== 
+
+[RClient]
+Spec go Right
+== 
+
+[RClient]
+Spec go Up
+== 
+
+[RClient]
+Spec go Down
+== 
+
+[RClient]
+Chat
+== 
+
+[RClient]
+Main
+== 
+
+[RClient]
+Filter
+== 
+
+[RClient]
+Translate
+== 
+
+[RClient]
+Show mouse when open chat
+== 
+
+[RClient]
+Fix language commands
+== 
+
+[RClient]
+Enable chat scroll
+== 
+
+[RClient]
+Show scroll bar
+== 
+
+[RClient]
+Enable highlight players in chat
+== 
+
+[RClient]
+Chat Filter Mode
+== 
+
+[RClient]
+Partial
+== 
+
+[RClient]
+Both
+== 
+
+[RClient]
+Print Blocked Message
+== 
+
+[RClient]
+Multiply Partial Match
+== 
+
+[RClient]
+Partial Word Replacement
+== 
+
+[RClient]
+*
+== 
+
+[RClient]
+Multiply Full Match
+== 
+
+[RClient]
+Full Word Replacement
+== 
+
+[RClient]
+^
+== 
+
+[RClient]
+Filter Chat
+== 
+
+[RClient]
+Filter Nameplates
+== 
+
+[RClient]
+Filter Scoreboard
+== 
+
+[RClient]
+Filter Info messages
+== 
+
+[RClient]
+Use auto translate
+== 
+
+[RClient]
+Translate server messages
+== 
+
+[RClient]
+Latest languages
+== 
+
+[RClient]
+Your language target (in ISO 639-1 code)
+== 
+
+[RClient]
+ru
+== 
+
+[RClient]
+Unknown language
+== 
+
+[RClient]
+Translate your messages
+== 
+
+[RClient]
+Send language target (in ISO 639-1 code)
+== 
+
+[RClient]
+en
+== 
+
+[RClient]
+Fast settings in chat
+== 
+
+ftapi (not work)
+== 
+
+libretranslate (need key)
+== 
+
+googlegtx (maybe work)
+== 
+
+fedilab (not work)
+== 
+
+bing (works on upd)
+== 
+
+duckduckgo (works on upd))
+== 
+
+[RClient]
+Choose backend
+== 
+
+[RClient]
+Google backends
+== 
+
+[RClient]
+Nameplates
+== 
+
+[RClient]
+Hook
+== 
+
+[RClient]
+Fire
+== 
+
+[RClient]
+Weapons
+== 
+
+[RClient]
+Hook Detection
+== 
+
+[RClient]
+All
+== 
+
+[RClient]
+Hook size
+== 
+
+[RClient]
+Hook shift on invis
+== 
+
+[RClient]
+Fire Detection
+== 
+
+[RClient]
+Others(*)
+== 
+
+[RClient]
+All(*)
+== 
+
+[RClient]
+Fire size
+== 
+
+[RClient]
+Fire shift on invis
+== 
+
+[RClient]
+Use preinput for fire
+== 
+
+* - Can be fake info in some cases. Better when preinput enabled
+== 
+
+[RClient]
+Weapons in nameplates
+== 
+
+[RClient]
+Weapons size
+== 
+
+[RClient]
+Show own weapons
+== 
+
+[RClient]
+Show shotgun
+== 
+
+[RClient]
+Show grenade
+== 
+
+[RClient]
+Show ninja
+== 
+
+[RClient]
+Show laser
+== 
+
+[RClient]
+Anti AFK
+== 
+
+[RClient]
+NonActive
+== 
+
+[RClient]
+Spec
+== 
+
+[RClient]
+Play sound when moved and window non active
+== 
+
+[RClient]
+Choose sound non active
+== 
+
+[RClient]
+Wake up
+== 
+
+[RClient]
+Grenade
+== 
+
+[RClient]
+Tag
+== 
+
+[RClient]
+Notify when moved in spec
+== 
+
+[RClient]
+Play sound when moved in spec
+== 
+
+[RClient]
+Choose sound in spec
+== 
+
+[RClient]
+Show text when moved in spec
+== 
+
+[RClient]
+Remove text on any input
+== 
+
+[RClient]
+Client Indicator
+== 
+
+[RClient]
+by +KZ/Kaizo Client
+== 
+
+[RClient]
+Send to server that u use RClient
+== 
+
+[RClient]
+Detect other clients
+== 
+
+[RClient]
+Show client type in nameplates
+== 
+
+[RClient]
+Only you
+== 
+
+[RClient]
+Show client type in scoreboard
+== 
+
+[RClient]
+Icons size in nameplates
+== 
+
+[RClient]
+Icons size in scoreboard
+== 
+
+[RClient]
+Detect BestClient users
+== 
+
+[RClient]
+Binds
+== 
+
+[RClient]
+Toggle deepfly
+== 
+
+[RClient]
+Deepfly on rmb
+== 
+
+[RClient]
+Pseudo fly
+== 
+
+[RClient]
+Toggle 45 degrees
+== 
+
+[RClient]
+Echo 45 degrees
+== 
+
+[RClient]
+Toggle small sens
+== 
+
+[RClient]
+Echo small sens
+== 
+
+[RClient]
+Find Teleport
+== 
+
+[RClient]
+Find Finish
+== 
+
+[RClient]
+Weapon slots
+== 
+
+[RClient]
+Streamer mode
+== 
+
+[RClient]
+Only windows
+== 
+
+[RClient]
+Hide window from capture when RCON opened
+== 
+
+[RClient]
+Monitor(win7-11)
+== 
+
+[RClient]
+Exclude(win10-11)
+== 
+
+[RClient]
+Edge info
+== 
+
+[RClient]
+Toggle Edge info
+== 
+
+[RClient]
+Show coordinates info
+== 
+
+[RClient]
+Show jump info
+== 
+
+[RClient]
+Edge info X pos
+== 
+
+[RClient]
+Edge info Y pos
+== 
+
+[RClient]
+Above Freeze color
+== 
+
+[RClient]
+Above Kill color
+== 
+
+[RClient]
+Above Save color
+== 
+
+[RClient]
+Hud
+== 
+
+[RClient]
+Show checkpoint
+== 
+
+[RClient]
+Smaller hud (angle,checkpoint)
+== 
+
+[RClient]
+Show percent in vote
+== 
+
+[RClient]
+Swap Timer
+== 
+
+[RClient]
+Enable swap timer
+== 
+
+[RClient]
+Swap timer on left side
+== 
+
+[RClient]
+Swap timer pos y
+== 
+
+[RClient]
+Helpful Functions
+== 
+
+[RClient]
+Sort
+== 
+
+[RClient]
+Auto Lock Team
+== 
+
+[RClient]
+Empty
+== 
+
+[RClient]
+Any
+== 
+
+[RClient]
+Anti UnSpec in player
+== 
+
+[RClient]
+Show Recharge bars (by +KZ/Kaizo Client)
+== 
+
+[RClient]
+Clear ddnet config from unknown configs on exit
+== 
+
+[RClient]
+Show open second client button
+== 
+
+[RClient]
+Show Save Count
+== 
+
+[RClient]
+File
+== 
+
+[RClient]
+/load
+== 
+
+[RClient]
+Gun fire volume
+== 
+
+[RClient]
+Fix cl_show_others_alpha in spec
+== 
+
+[RClient]
+Sort Scoreboard
+== 
+
+[RClient]
+name-team-score
+== 
+
+[RClient]
+id-team-score
+== 
+
+[RClient]
+id-score
+== 
+
+[RClient]
+id-team
+== 
+
+[RClient]
+id
+== 
+
+[RClient]
+Sort Spectator
+== 
+
+[RClient]
+name-team
+== 
+
+[RClient]
+Auto login rcon on dummy
+== 
+
+[RClient]
+Admin Panel
+== 
+
+[RClient]
+Open Admin Panel
+== 
+
+[RClient]
+Play sound on action
+== 
+
+[RClient]
+Reset RClient chatbinds
+== 
+
+[RClient]
+RClient Links
+== 
+
+[RClient]
+Discord
+== 
+
+[RClient]
+Website
+== 
+
+[RClient]
+Github
+== 
+
+[RClient]
+Config Files
+== 
+
+[RClient]
+RClient Settings
+== 
+
+[RClient]
+RClient Developers
+== 
+
+[RClient]
+Big Thanks To
+== 
+
+[test]
+Hide Settings Tabs
+== 
+
+[RClient]
+Integration
+== 
+
+[RClient]
+Enable Discord Integration
+== 
+
+[RClient]
+Keep this settings?
+== 
+
+[RClient]
+Confirm
+== 
+
+[RClient]
+Deny
+== 
+
+[RClient]
+Name:
+== 
+
+[RClient]
+Name
+== 
+
+[RClient]
+Command:
+== 
+
+[RClient]
+Command
+== 
+
+[RClient]
+Override Selected
+== 
+
+[RClient]
+Add Bind
+== 
+
+[RClient]
+Remove Bind
+== 
+
+[RClient]
+The command is ran in console not chat
+== 
+
+[RClient]
+Use left mouse to select
+== 
+
+[RClient]
+Use right mouse to swap with selected
+== 
+
+[RClient]
+Use middle mouse select without copy
+== 
+
+[RClient]
+RClient \\/
+== 
+
+[RClient]
+Use %plnick% for replacing with nickname
+== 
+
+[RClient]
+Use %plid% for replacing with client id
+== 
+
+[RClient]
+Use bracket yourself "%plnick%"
+== 
+
+[RClient]
+Example: echo "\\"%plnick%\\" %plid%"
+== 
+
+[RClient]
+Spec Wheel Key
+== 
+
+[RClient]
+Reset position of mouse when opening specwheel
+== 
+
+[RClient]
+Player Inspector
+== 
+
+[RClient]
+Find time:
+== 
+
+[RClient]
+Find hours:
+== 
+
+[RClient]
+Find Player:
+== 
+
+[RClient]
+Find Skin:
+== 
+
+[RClient]
+Copy Skin:
+== 
+
+[RClient]
+Copy Color:
+== 
+
+[RClient]
+Backup Profile:
+== 
+
+[RClient]
+Find Player DDstats
+== 
+
+[RClient]
+Find Skin DDstats
+== 
+
+[RClient]
+Copy Skin DDstats
+== 
+
+[RClient]
+Message Filter
+== 
+
+[RClient]
+Add word in filter:
+== 
+
+[RClient]
+Remove word from filter:
+== 
+
+[RClient]
+Tracker
+== 
+
+[RClient]
+Add Tracker:
+== 
+
+[RClient]
+Remove Tracker:
+== 
+
+[RClient]
+Reset Tracker:
+== 
+
+[RClient]
+Map Search
+== 
+
+[RClient]
+Find Teleport:
+== 
+
+[RClient]
+Find Finish:
+== 

@@ -1046,6 +1046,10 @@ Remove text on any input
 == Убирать текст при любом вводе
 
 [RClient]
+Weapon slots
+== Слоты оружий
+
+[RClient]
 Rcon
 == 
 
@@ -1110,10 +1114,6 @@ Wake up
 [RClient]
 by +KZ/Kaizo Client
 == 
-
-[RClient]
-Weapon slots
-== Слоты оружий
 
 [RClient]
 Monitor(win7-11)
