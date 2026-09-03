@@ -1,241 +1,956 @@
 [RClient]
 Settings
-== 
+== 设置
 
 [RClient]
 Rcon
-== 
+== 远程控制台
 
 [RClient]
 Chat Binds
-== 
+== 聊天绑键
 
 [RClient]
 Spec Wheel
-== 
+== 旁观轮盘
 
 [RClient]
 Info
-== 
+== 信息
 
 [RClient]
 Dummy
-== 
+== 分身
 
 [RClient]
 Position
-== 
+== 坐标
 
 [RClient]
 Clan Change
-== 
+== 战队更改
 
 [RClient]
 Show dummy position
-== 
+== 显示分身坐标
 
 [RClient]
 Show dummy speed
-== 
+== 显示分身速度
 
 [RClient]
 Show dummy target angle
-== 
+== 显示分身瞄准角度
 
 [RClient]
 Show advanced dummy actions
-== 
+== 显示高级分身动作
 
 [RClient]
 Auto change clan
-== 
+== 自动更改战队
 
 [RClient]
 With Dummy
-== 
+== 有分身时
 
 [RClient]
 Without Dummy
-== 
+== 无分身时
 
 [RClient]
 Scoreboard
-== 
+== 计分板
 
 [RClient]
 Popup
-== 
+== 弹窗
 
 [RClient]
 Friends
-== 
+== 好友
 
 [RClient]
 Enable scoreboard mouse
-== 
+== 启用计分板鼠标
 
 [RClient]
 Always show quick actions in popup
-== 
+== 始终在弹窗中显示快捷操作
 
 [RClient]
 Freeze inputs when popup opened
-== 
+== 弹窗打开时禁止游戏操作
 
 [RClient]
 Show friend's heart in scoreboard
-== 
+== 在计分板显示好友的红心
 
 [RClient]
 Heart size
-== 
+== 红心大小
 
 [RClient]
 Players
-== 
+== 玩家
 
 [RClient]
 Effects
-== 
+== 特效
 
 [RClient]
 AFK
-== 
+== 挂机
 
 [RClient]
 Hitbox
-== 
+== 碰撞箱
 
 [RClient]
 idea from BestClient
-== 
+== 想法来自 BestClient
 
 [RClient]
 Hide frozen flakes
-== 
+== 隐藏冻结雪花
 
 [RClient]
 Always show sparkles
-== 
+== 总是显示闪光
 
 [RClient]
 Show step effects
-== 
+== 显示脚步效果
 
 [RClient]
 Off
-== 
+== 关闭
 
 [RClient]
 Others
-== 
+== 其他人
 
 [RClient]
 Everyone
-== 
+== 所有人
 
 [RClient]
 Own
-== 
+== 自己
 
 [RClient]
 Remove hammer hit effect
-== 
+== 移除锤击特效
 
 [RClient]
 Default
-== 
+== 默认
 
 [RClient]
 Visual
-== 
+== 移除视觉
 
 [RClient]
 Full
-== 
+== 全部
 
 [RClient]
 Show AFK emote in menu
-== 
+== 在菜单时显示挂机的表情
 
 [RClient]
 Show texture instead emote in menu
-== 
+== 当玩家在菜单时其显示贴图而非表情
 
 [RClient]
 Show AFK emote in spec
-== 
+== 在观战时显示挂机表情
 
 [RClient]
 Show texture instead emote in spec
-== 
+== 当玩家在观战时其显示贴图而非表情
 
 [RClient]
 Show player hitbox
-== 
+== 显示玩家碰撞箱
 
 [RClient]
 Size of hitbox
-== 
+== 碰撞箱大小
 
 [RClient]
 Quality of hitbox
-== 
+== 碰撞箱透明度
 
 [RClient]
 Hitbox color
-== 
+== 碰撞箱颜色
 
 [RClient]
 Chat Bubbles
-== 
-
-[RClient]
-by qxdFox/Entity Client
-== 
+== 聊天气泡
 
 [RClient]
 Enable Chat Bubbles
-== 
+== 启用聊天气泡
 
 [RClient]
 Show Chat Bubbles Yourself Input
-== 
+== 显示你输入文本的聊天气泡
 
 [RClient]
 Show Chat Bubbles Above Yourself
-== 
+== 显示你的聊天气泡
 
 [RClient]
 Chat bubble size
-== 
+== 聊天气泡大小
 
 [RClient]
 Show time
-== 
+== 显示时间
 
 [RClient]
 Fade out time
-== 
+== 淡出时间
 
 [RClient]
 Fade in time
-== 
+== 淡入时间
 
 [RClient]
 Master Servers
-== 
+== 主服务器
 
 [RClient]
 Use Rushie master server mirror
-== 
+== 使用 Rushie 的镜像主服务器
 
 [RClient]
 Use BestClient master server mirror
-== 
+== 使用 BestClient 的镜像主服务器
 
 [RClient]
 Integrations
+== 集成
+
+[RClient]
+Aspect Ratio
+== 宽高比
+
+[RClient]
+Enable custom aspect ratio
+== 启用自定义宽高比
+
+[RClient]
+Width
+== 宽度
+
+[RClient]
+Height
+== 高度
+
+[RClient]
+Apply
+== 启用
+
+[RClient]
+Disable for almost all UI
+== 禁用几乎所有UI
+
+[RClient]
+Disable for Wheels
+== 禁用轮盘
+
+[RClient]
+Disable for Menus
+== 禁用菜单
+
+[RClient]
+Disable for Scoreboard
+== 禁用计分板
+
+[RClient]
+Disable for Console
+== 禁用控制台
+
+[RClient]
+Disable for Above/Below Player
+== 禁用 顶部/底部 的玩家
+
+[RClient]
+Disable for Hud
+== 禁用 Hud
+
+[RClient]
+Disable for Chat
+== 禁用聊天
+
+[RClient]
+Disable for Edge info
+== 禁用边缘跳信息
+
+[RClient]
+Disable for Info messages
+== 禁用信息消息
+
+[RClient]
+Disable for Notify in spec
+== 旁观时禁用通知
+
+[RClient]
+Above/Below Player
+== 顶部/底部 的玩家
+
+[RClient]
+Notify when above player
+== 当顶部有玩家时通知
+
+[RClient]
+Notify when same pos as player
+== 当与玩家处于相同坐标时通知
+
+[RClient]
+Notify when below player
+== 当底部有玩家时通知
+
+[RClient]
+Text pos x
+== 文本的 X 位置
+
+[RClient]
+Text pos y
+== 文本的 Y 位置
+
+[RClient]
+Spectator
+== 旁观
+
+[RClient]
+Enable spectator movement
+== 启动旁观移动
+
+[RClient]
+Spectator Speed
+== 旁观速度
+
+[RClient]
+Spec go Left
+== 向左旁观
+
+[RClient]
+Spec go Right
+== 向右旁观
+
+[RClient]
+Spec go Up
+== 向上旁观
+
+[RClient]
+Spec go Down
+== 向下旁观
+
+[RClient]
+Chat
+== 聊天
+
+[RClient]
+Main
+== 主要
+
+[RClient]
+Filter
+== 过滤器
+
+[RClient]
+Translate
+== 翻译器
+
+[RClient]
+Show mouse when open chat
+== 在打开聊天时显示鼠标
+
+[RClient]
+Fix language commands
+== 修复语言指令
+
+[RClient]
+Enable chat scroll
+== 启动聊天滚动
+
+[RClient]
+Show scroll bar
+== 显示滚动条
+
+[RClient]
+Enable highlight players in chat
+== 在聊天中启用提及玩家
+
+[RClient]
+Chat Filter Mode
+== 聊天过滤模式
+
+[RClient]
+Partial
+== 部分
+
+[RClient]
+Both
+== 两者
+
+[RClient]
+Print Blocked Message
+== 显示被屏蔽的消息
+
+[RClient]
+Multiply Partial Match
+== 多项部分匹配
+
+[RClient]
+Partial Word Replacement
+== 部分文本替换
+
+[RClient]
+Multiply Full Match
+== 多项完整匹配
+
+[RClient]
+Full Word Replacement
+== 替换完整文本
+
+[RClient]
+Filter Chat
+== 聊天过滤器
+
+[RClient]
+Filter Nameplates
+== 昵称栏过滤器
+
+[RClient]
+Filter Scoreboard
+== 计分板过滤器
+
+[RClient]
+Filter Info messages
+== 信息消息过滤器
+
+[RClient]
+Use auto translate
+== 使用自动翻译
+
+[RClient]
+Translate server messages
+== 翻译服务器消息
+
+[RClient]
+Latest languages
+== 最近使用的语言
+
+[RClient]
+Your language target (in ISO 639-1 code)
+== 你的语言 (in ISO 639-1 code)
+
+[RClient]
+Unknown language
+== 未知的语言
+
+[RClient]
+Translate your messages
+== 翻译你的消息
+
+[RClient]
+Send language target (in ISO 639-1 code)
+== 发送的语言 (in ISO 639-1 code)
+
+[RClient]
+Fast settings in chat
+== 在聊天栏中快速设置
+
+[RClient]
+Choose backend
+== 选择后端
+
+[RClient]
+Google backends
+== Google 后端
+
+[RClient]
+Nameplates
+== 昵称栏
+
+[RClient]
+Hook
+== 钩锁
+
+[RClient]
+Fire
+== 开火
+
+[RClient]
+Weapons
+== 武器
+
+[RClient]
+Hook Detection
+== 检测出钩
+
+[RClient]
+All
+== 全部
+
+[RClient]
+Hook size
+== 钩锁图标大小
+
+[RClient]
+Hook shift on invis
+== 冻结时偏移钩锁图标
+
+[RClient]
+Fire Detection
+== 检测开火
+
+[RClient]
+Others(*)
+== 其他人(*)
+
+[RClient]
+All(*)
+== 所有人(*)
+
+[RClient]
+Fire size
+== 开火图标大小
+
+[RClient]
+Fire shift on invis
+== 冻结时偏移开火图标
+
+[RClient]
+Use preinput for fire
+== 使用预输入开火
+
+* - Can be fake info in some cases. Better when preinput enabled
+== * - 正常在某些情况会是虚假的信息，若启用预输入效果更好
+
+[RClient]
+Weapons in nameplates
+== 显示武器在名称栏
+
+[RClient]
+Weapons size
+== 武器图标大小
+
+[RClient]
+Show own weapons
+== 显示拥有的武器
+
+[RClient]
+Show shotgun
+== 显示散弹枪
+
+[RClient]
+Show grenade
+== 显示榴弹枪
+
+[RClient]
+Show ninja
+== 显示武士刀
+
+[RClient]
+Show laser
+== 显示激光枪
+
+[RClient]
+Anti AFK
+== 挂机提醒
+
+[RClient]
+NonActive
+== 未活跃时
+
+[RClient]
+Spec
+== 旁观时
+
+[RClient]
+Play sound when moved and window non active
+== 在窗口不活跃时被移动时播放音效
+
+[RClient]
+Choose sound non active
+== 选择不活跃时的音效
+
+[RClient]
+Grenade
+== 榴弹
+
+[RClient]
+Notify when moved in spec
+== 当在旁观时被移动通知
+
+[RClient]
+Play sound when moved in spec
+== 当在旁观时被移动时播放音效
+
+[RClient]
+Choose sound in spec
+== 选择音效
+
+[RClient]
+Show text when moved in spec
+== 当在旁观时被移动时显示文本
+
+[RClient]
+Remove text on any input
+== 若有任何输入移除文本
+
+[RClient]
+Client Indicator
+== 客户端标识
+
+[RClient]
+Send to server that u use RClient
+== 向服务器发送你使用 RClient
+
+[RClient]
+Detect other clients
+== 识别其他的客户端
+
+[RClient]
+Show client type in nameplates
+== 在昵称栏显示客户端类型
+
+[RClient]
+Only you
+== 只有你
+
+[RClient]
+Show client type in scoreboard
+== 在计分板显示客户端类型
+
+[RClient]
+Icons size in nameplates
+== 图标在名称栏的大小
+
+[RClient]
+Icons size in scoreboard
+== 图标在计分板的大小
+
+[RClient]
+Detect BestClient users
+== 识别 BestClient 用户
+
+[RClient]
+Binds
+== 绑键
+
+[RClient]
+Toggle deepfly
+== 切换 deepfly
+
+[RClient]
+Deepfly on rmb
+== deepfly 作为右键
+
+[RClient]
+Toggle 45 degrees
+== 开关 45 度
+
+[RClient]
+Toggle small sens
+== 开关低灵敏度
+
+[RClient]
+Find Teleport
+== 寻找传送
+
+[RClient]
+Find Finish
+== 寻找终点
+
+[RClient]
+Streamer mode
+== 直播模式
+
+[RClient]
+Hide window from capture when RCON opened
+== 打开远程控制台时隐藏窗口内容
+
+[RClient]
+Edge info
+== 边缘跳信息
+
+[RClient]
+Toggle Edge info
+== 开关边缘跳信息
+
+[RClient]
+Show coordinates info
+== 显示坐标信息
+
+[RClient]
+Show jump info
+== 显示跳跃信息
+
+[RClient]
+Edge info X pos
+== 边缘跳信息的 X 坐标
+
+[RClient]
+Edge info Y pos
+== 边缘跳信息的 Y 坐标
+
+[RClient]
+Above Freeze color
+== 将落入冻结时的颜色
+
+[RClient]
+Above Kill color
+== 将落入死亡时的颜色
+
+[RClient]
+Above Save color
+== 将落入安全时的颜色
+
+[RClient]
+Show checkpoint
+== 显示检查点
+
+[RClient]
+Smaller hud (angle,checkpoint)
+== 更小的hud (角度, 检查点)
+
+[RClient]
+Show percent in vote
+== 显示投票百分比
+
+[RClient]
+Swap Timer
+== 换位计时器
+
+[RClient]
+Enable swap timer
+== 启动换位计时器
+
+[RClient]
+Swap timer on left side
+== 设置换位计时器在左侧
+
+[RClient]
+Swap timer pos y
+== 换位计时器的 Y 坐标
+
+[RClient]
+Helpful Functions
+== 实用功能
+
+[RClient]
+Sort
+== 排序
+
+[RClient]
+Auto Lock Team
+== 自动锁定队伍
+
+[RClient]
+Empty
+== 空的队伍
+
+[RClient]
+Any
+== 任何队伍
+
+[RClient]
+Anti UnSpec in player
+== 和玩家接触时阻止退出 Spec
+
+[RClient]
+Show Recharge bars (by +KZ/Kaizo Client)
+== 显示开火冷却条 (by +KZ/Kaizo Client)
+
+[RClient]
+Clear ddnet config from unknown configs on exit
+== 在退出时清除未知的 ddnet configs
+
+[RClient]
+Show open second client button
+== 显示开启第二个客户端的按钮
+
+[RClient]
+Show Save Count
+== 显示存档数
+
+[RClient]
+Sort Scoreboard
+== 排序计分板
+
+[RClient]
+Sort Spectator
+== 排序旁观者
+
+[RClient]
+Reset RClient chatbinds
+== 重置 RClient 聊天绑键
+
+[RClient]
+RClient Links
+== RClient 链接
+
+[RClient]
+RClient Settings
+== RClient 设置
+
+[RClient]
+RClient Developers
+== RClient 开发者
+
+[RClient]
+Big Thanks To
+== 特别感谢
+
+[test]
+Hide Settings Tabs
+== 隐藏设置栏
+
+[RClient]
+Keep this settings?
+== 保存当前设置？
+
+[RClient]
+Name:
+== 昵称:
+
+[RClient]
+Command:
+== 指令:
+
+[RClient]
+Override Selected
+== 覆盖所选项
+
+[RClient]
+Add Bind
+== 添加绑键
+
+[RClient]
+Remove Bind
+== 移除绑键
+
+[RClient]
+The command is ran in console not chat
+== 指令会在控制台运行而非聊天栏
+
+[RClient]
+Use left mouse to select
+== 使用鼠标左键选择
+
+[RClient]
+Use right mouse to swap with selected
+== 使用鼠标右键与所选项交换
+
+[RClient]
+Use middle mouse select without copy
+== 使用鼠标中间选择而不复制
+
+[RClient]
+Use %plnick% for replacing with nickname
+== 使用 %plnick% 以替代昵称
+
+[RClient]
+Use %plid% for replacing with client id
+== 使用 %plid% 以替代客户端 id
+
+[RClient]
+Use bracket yourself "%plnick%"
+== 使用括号括住以代表自己 "%plnick%"
+
+[RClient]
+Example: echo "\\"%plnick%\\" %plid%"
+== 例如: echo "\\"%plnick%\\" %plid%"
+
+[RClient]
+Spec Wheel Key
+== 旁观轮盘绑键
+
+[RClient]
+Reset position of mouse when opening specwheel
+== 当打开旁观轮盘时重置鼠标角度
+
+[RClient]
+Player Inspector
+== 玩家检查器
+
+[RClient]
+Find time:
+== 寻找时间:
+
+[RClient]
+Find hours:
+== 寻找游戏时间:
+
+[RClient]
+Find Player:
+== 寻找玩家:
+
+[RClient]
+Find Skin:
+== 寻找皮肤:
+
+[RClient]
+Copy Skin:
+== 复制皮肤:
+
+[RClient]
+Copy Color:
+== 复制颜色:
+
+[RClient]
+Backup Profile:
+== 个人资料:
+
+[RClient]
+Message Filter
+== 消息过滤器
+
+[RClient]
+Add word in filter:
+== 向过滤器中添加词语:
+
+[RClient]
+Remove word from filter:
+== 从过滤器中移除词语:
+
+[RClient]
+Tracker
+== 跟踪器
+
+[RClient]
+Add Tracker:
+== 添加跟踪器:
+
+[RClient]
+Remove Tracker:
+== 移除跟踪器:
+
+[RClient]
+Reset Tracker:
+== 重置跟踪器:
+
+[RClient]
+Map Search
+== 搜索地图
+
+[RClient]
+Find Teleport:
+== 寻找传送:
+
+[RClient]
+Find Finish:
+== 寻找终点:
+
+[RClient]
+by qxdFox/Entity Client
 == 
 
 [RClient]
@@ -247,191 +962,7 @@ Steam
 == 
 
 [RClient]
-Aspect Ratio
-== 
-
-[RClient]
-Enable custom aspect ratio
-== 
-
-[RClient]
-Width
-== 
-
-[RClient]
-Height
-== 
-
-[RClient]
-Apply
-== 
-
-[RClient]
-Disable for almost all UI
-== 
-
-[RClient]
-Disable for Wheels
-== 
-
-[RClient]
-Disable for Menus
-== 
-
-[RClient]
-Disable for Scoreboard
-== 
-
-[RClient]
-Disable for Console
-== 
-
-[RClient]
-Disable for Above/Below Player
-== 
-
-[RClient]
-Disable for Hud
-== 
-
-[RClient]
-Disable for Chat
-== 
-
-[RClient]
-Disable for Edge info
-== 
-
-[RClient]
-Disable for Info messages
-== 
-
-[RClient]
-Disable for Notify in spec
-== 
-
-[RClient]
-Above/Below Player
-== 
-
-[RClient]
-Notify when above player
-== 
-
-[RClient]
-Notify when same pos as player
-== 
-
-[RClient]
-Notify when below player
-== 
-
-[RClient]
-Text pos x
-== 
-
-[RClient]
-Text pos y
-== 
-
-[RClient]
-Spectator
-== 
-
-[RClient]
-Enable spectator movement
-== 
-
-[RClient]
-Spectator Speed
-== 
-
-[RClient]
-Spec go Left
-== 
-
-[RClient]
-Spec go Right
-== 
-
-[RClient]
-Spec go Up
-== 
-
-[RClient]
-Spec go Down
-== 
-
-[RClient]
-Chat
-== 
-
-[RClient]
-Main
-== 
-
-[RClient]
-Filter
-== 
-
-[RClient]
-Translate
-== 
-
-[RClient]
-Show mouse when open chat
-== 
-
-[RClient]
-Fix language commands
-== 
-
-[RClient]
-Enable chat scroll
-== 
-
-[RClient]
-Show scroll bar
-== 
-
-[RClient]
-Enable highlight players in chat
-== 
-
-[RClient]
-Chat Filter Mode
-== 
-
-[RClient]
-Partial
-== 
-
-[RClient]
-Both
-== 
-
-[RClient]
-Print Blocked Message
-== 
-
-[RClient]
-Multiply Partial Match
-== 
-
-[RClient]
-Partial Word Replacement
-== 
-
-[RClient]
 *
-== 
-
-[RClient]
-Multiply Full Match
-== 
-
-[RClient]
-Full Word Replacement
 == 
 
 [RClient]
@@ -439,59 +970,11 @@ Full Word Replacement
 == 
 
 [RClient]
-Filter Chat
-== 
-
-[RClient]
-Filter Nameplates
-== 
-
-[RClient]
-Filter Scoreboard
-== 
-
-[RClient]
-Filter Info messages
-== 
-
-[RClient]
-Use auto translate
-== 
-
-[RClient]
-Translate server messages
-== 
-
-[RClient]
-Latest languages
-== 
-
-[RClient]
-Your language target (in ISO 639-1 code)
-== 
-
-[RClient]
 ru
 == 
 
 [RClient]
-Unknown language
-== 
-
-[RClient]
-Translate your messages
-== 
-
-[RClient]
-Send language target (in ISO 639-1 code)
-== 
-
-[RClient]
 en
-== 
-
-[RClient]
-Fast settings in chat
 == 
 
 ftapi (not work)
@@ -513,126 +996,7 @@ duckduckgo (works on upd))
 == 
 
 [RClient]
-Choose backend
-== 
-
-[RClient]
-Google backends
-== 
-
-[RClient]
-Nameplates
-== 
-
-[RClient]
-Hook
-== 
-
-[RClient]
-Fire
-== 
-
-[RClient]
-Weapons
-== 
-
-[RClient]
-Hook Detection
-== 
-
-[RClient]
-All
-== 
-
-[RClient]
-Hook size
-== 
-
-[RClient]
-Hook shift on invis
-== 
-
-[RClient]
-Fire Detection
-== 
-
-[RClient]
-Others(*)
-== 
-
-[RClient]
-All(*)
-== 
-
-[RClient]
-Fire size
-== 
-
-[RClient]
-Fire shift on invis
-== 
-
-[RClient]
-Use preinput for fire
-== 
-
-* - Can be fake info in some cases. Better when preinput enabled
-== 
-
-[RClient]
-Weapons in nameplates
-== 
-
-[RClient]
-Weapons size
-== 
-
-[RClient]
-Show own weapons
-== 
-
-[RClient]
-Show shotgun
-== 
-
-[RClient]
-Show grenade
-== 
-
-[RClient]
-Show ninja
-== 
-
-[RClient]
-Show laser
-== 
-
-[RClient]
-Anti AFK
-== 
-
-[RClient]
-NonActive
-== 
-
-[RClient]
-Spec
-== 
-
-[RClient]
-Play sound when moved and window non active
-== 
-
-[RClient]
-Choose sound non active
-== 
-
-[RClient]
 Wake up
-== 
-
-[RClient]
-Grenade
 == 
 
 [RClient]
@@ -640,75 +1004,7 @@ Tag
 == 
 
 [RClient]
-Notify when moved in spec
-== 
-
-[RClient]
-Play sound when moved in spec
-== 
-
-[RClient]
-Choose sound in spec
-== 
-
-[RClient]
-Show text when moved in spec
-== 
-
-[RClient]
-Remove text on any input
-== 
-
-[RClient]
-Client Indicator
-== 
-
-[RClient]
 by +KZ/Kaizo Client
-== 
-
-[RClient]
-Send to server that u use RClient
-== 
-
-[RClient]
-Detect other clients
-== 
-
-[RClient]
-Show client type in nameplates
-== 
-
-[RClient]
-Only you
-== 
-
-[RClient]
-Show client type in scoreboard
-== 
-
-[RClient]
-Icons size in nameplates
-== 
-
-[RClient]
-Icons size in scoreboard
-== 
-
-[RClient]
-Detect BestClient users
-== 
-
-[RClient]
-Binds
-== 
-
-[RClient]
-Toggle deepfly
-== 
-
-[RClient]
-Deepfly on rmb
 == 
 
 [RClient]
@@ -716,15 +1012,7 @@ Pseudo fly
 == 
 
 [RClient]
-Toggle 45 degrees
-== 
-
-[RClient]
 Echo 45 degrees
-== 
-
-[RClient]
-Toggle small sens
 == 
 
 [RClient]
@@ -732,27 +1020,11 @@ Echo small sens
 == 
 
 [RClient]
-Find Teleport
-== 
-
-[RClient]
-Find Finish
-== 
-
-[RClient]
 Weapon slots
 == 
 
 [RClient]
-Streamer mode
-== 
-
-[RClient]
 Only windows
-== 
-
-[RClient]
-Hide window from capture when RCON opened
 == 
 
 [RClient]
@@ -764,111 +1036,7 @@ Exclude(win10-11)
 == 
 
 [RClient]
-Edge info
-== 
-
-[RClient]
-Toggle Edge info
-== 
-
-[RClient]
-Show coordinates info
-== 
-
-[RClient]
-Show jump info
-== 
-
-[RClient]
-Edge info X pos
-== 
-
-[RClient]
-Edge info Y pos
-== 
-
-[RClient]
-Above Freeze color
-== 
-
-[RClient]
-Above Kill color
-== 
-
-[RClient]
-Above Save color
-== 
-
-[RClient]
 Hud
-== 
-
-[RClient]
-Show checkpoint
-== 
-
-[RClient]
-Smaller hud (angle,checkpoint)
-== 
-
-[RClient]
-Show percent in vote
-== 
-
-[RClient]
-Swap Timer
-== 
-
-[RClient]
-Enable swap timer
-== 
-
-[RClient]
-Swap timer on left side
-== 
-
-[RClient]
-Swap timer pos y
-== 
-
-[RClient]
-Helpful Functions
-== 
-
-[RClient]
-Sort
-== 
-
-[RClient]
-Auto Lock Team
-== 
-
-[RClient]
-Empty
-== 
-
-[RClient]
-Any
-== 
-
-[RClient]
-Anti UnSpec in player
-== 
-
-[RClient]
-Show Recharge bars (by +KZ/Kaizo Client)
-== 
-
-[RClient]
-Clear ddnet config from unknown configs on exit
-== 
-
-[RClient]
-Show open second client button
-== 
-
-[RClient]
-Show Save Count
 == 
 
 [RClient]
@@ -885,10 +1053,6 @@ Gun fire volume
 
 [RClient]
 Fix cl_show_others_alpha in spec
-== 
-
-[RClient]
-Sort Scoreboard
 == 
 
 [RClient]
@@ -912,10 +1076,6 @@ id
 == 
 
 [RClient]
-Sort Spectator
-== 
-
-[RClient]
 name-team
 == 
 
@@ -936,14 +1096,6 @@ Play sound on action
 == 
 
 [RClient]
-Reset RClient chatbinds
-== 
-
-[RClient]
-RClient Links
-== 
-
-[RClient]
 Discord
 == 
 
@@ -960,31 +1112,11 @@ Config Files
 == 
 
 [RClient]
-RClient Settings
-== 
-
-[RClient]
-RClient Developers
-== 
-
-[RClient]
-Big Thanks To
-== 
-
-[test]
-Hide Settings Tabs
-== 
-
-[RClient]
 Integration
 == 
 
 [RClient]
 Enable Discord Integration
-== 
-
-[RClient]
-Keep this settings?
 == 
 
 [RClient]
@@ -996,15 +1128,7 @@ Deny
 == 
 
 [RClient]
-Name:
-== 
-
-[RClient]
 Name
-== 
-
-[RClient]
-Command:
 == 
 
 [RClient]
@@ -1012,91 +1136,7 @@ Command
 == 
 
 [RClient]
-Override Selected
-== 
-
-[RClient]
-Add Bind
-== 
-
-[RClient]
-Remove Bind
-== 
-
-[RClient]
-The command is ran in console not chat
-== 
-
-[RClient]
-Use left mouse to select
-== 
-
-[RClient]
-Use right mouse to swap with selected
-== 
-
-[RClient]
-Use middle mouse select without copy
-== 
-
-[RClient]
 RClient \\/
-== 
-
-[RClient]
-Use %plnick% for replacing with nickname
-== 
-
-[RClient]
-Use %plid% for replacing with client id
-== 
-
-[RClient]
-Use bracket yourself "%plnick%"
-== 
-
-[RClient]
-Example: echo "\\"%plnick%\\" %plid%"
-== 
-
-[RClient]
-Spec Wheel Key
-== 
-
-[RClient]
-Reset position of mouse when opening specwheel
-== 
-
-[RClient]
-Player Inspector
-== 
-
-[RClient]
-Find time:
-== 
-
-[RClient]
-Find hours:
-== 
-
-[RClient]
-Find Player:
-== 
-
-[RClient]
-Find Skin:
-== 
-
-[RClient]
-Copy Skin:
-== 
-
-[RClient]
-Copy Color:
-== 
-
-[RClient]
-Backup Profile:
 == 
 
 [RClient]
@@ -1109,44 +1149,4 @@ Find Skin DDstats
 
 [RClient]
 Copy Skin DDstats
-== 
-
-[RClient]
-Message Filter
-== 
-
-[RClient]
-Add word in filter:
-== 
-
-[RClient]
-Remove word from filter:
-== 
-
-[RClient]
-Tracker
-== 
-
-[RClient]
-Add Tracker:
-== 
-
-[RClient]
-Remove Tracker:
-== 
-
-[RClient]
-Reset Tracker:
-== 
-
-[RClient]
-Map Search
-== 
-
-[RClient]
-Find Teleport:
-== 
-
-[RClient]
-Find Finish:
 == 

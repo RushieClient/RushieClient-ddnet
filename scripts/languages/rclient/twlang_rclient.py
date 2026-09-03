@@ -26,11 +26,11 @@ def decode(fileobj, elements_per_key):
 			if line[-1] != "]":
 				raise LanguageDecodeError("Invalid context string", fileobj.name, index)
 			current_context = line[1:-1]
-		elif line[:3] == "== ":
+		elif line[:2] == "==":
 			if len(data[current_key]) >= 1+elements_per_key:
 				raise LanguageDecodeError("Wrong number of elements per key", fileobj.name, index)
 			if current_key:
-				translation = line[3:]
+				translation = line[3:] if line[:3] == "== " else line[2:]
 				data[current_key].extend([translation])
 			else:
 				raise LanguageDecodeError("Element before key given", fileobj.name, index)
