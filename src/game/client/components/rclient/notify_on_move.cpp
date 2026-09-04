@@ -42,6 +42,8 @@ bool CNotifyOnMove::OnInput(const IInput::CEvent &Event)
 
 void CNotifyOnMove::OnRender()
 {
+	m_IsWindowActive = m_pGraphics->WindowActive();
+
 	if(g_Config.m_RcPlayOnMoveNonInactive)
 	{
 		if(!m_pGraphics->WindowActive())

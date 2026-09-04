@@ -23,6 +23,8 @@ public:
 	void OnReset() override;
 	void OnRender() override;
 	bool OnInput(const IInput::CEvent &Event) override;
+
+	bool m_IsWindowActive = true;
 };
 
 #endif //GAME_CLIENT_COMPONENTS_RCLIENT_NOTIFY_ON_MOVE_H

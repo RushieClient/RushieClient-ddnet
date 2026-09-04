@@ -232,6 +232,11 @@ int CControls::SnapInput(int *pData)
 		for(auto &InputData : m_aInputData)
 			InputData.m_PlayerFlags |= PLAYERFLAG_SCOREBOARD;
 
+	// RClient
+	if(g_Config.m_RcSendInMenuInfoWhenInactive && !GameClient()->m_NotifyOnMove.m_IsWindowActive)
+		for(auto &InputData : m_aInputData)
+			InputData.m_PlayerFlags |= PLAYERFLAG_IN_MENU;
+
 	bool Send = m_aLastData[g_Config.m_ClDummy].m_PlayerFlags != m_aInputData[g_Config.m_ClDummy].m_PlayerFlags;
 
 	m_aLastData[g_Config.m_ClDummy].m_PlayerFlags = m_aInputData[g_Config.m_ClDummy].m_PlayerFlags;

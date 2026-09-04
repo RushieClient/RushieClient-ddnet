@@ -914,6 +914,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		if(s_CurAfkCustomTab == AFK_TAB_NONACTIVE)
 		{
 			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcPlayOnMoveNonInactive, RCLocalize("Play sound when moved and window non active", "RClient"), &g_Config.m_RcPlayOnMoveNonInactive, &Column, LineSize);
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcSendInMenuInfoWhenInactive, RCLocalize("Send in menu info when inactive", "RClient"), &g_Config.m_RcSendInMenuInfoWhenInactive, &Column, LineSize);
 			if(g_Config.m_RcPlayOnMoveNonInactive)
 			{
 				static std::vector<CButtonContainer> s_vButtonContainersNonActive = {{}, {}, {}};
