@@ -20,4 +20,4 @@ public:
 	void OnRender() override;
 };
 
-#endif //GAME_CLIENT_COMPONENTS_RCLIENT_LASTSAVES_H
+#endif // GAME_CLIENT_COMPONENTS_RCLIENT_LASTSAVES_H

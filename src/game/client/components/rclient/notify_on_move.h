@@ -27,4 +27,4 @@ public:
 	bool m_IsWindowActive = true;
 };
 
-#endif //GAME_CLIENT_COMPONENTS_RCLIENT_NOTIFY_ON_MOVE_H
+#endif // GAME_CLIENT_COMPONENTS_RCLIENT_NOTIFY_ON_MOVE_H

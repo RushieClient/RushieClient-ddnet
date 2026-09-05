@@ -4,6 +4,7 @@ import sys
 
 import twlang_rclient as twlang
 
+
 def copy_fix(infile, delete_unused, append_missing, delete_empty):
 	if os.path.exists(infile):
 		trans = twlang.translations(infile)
@@ -22,14 +23,14 @@ def copy_fix(infile, delete_unused, append_missing, delete_empty):
 	supported = []
 	for tran, (start, expr, end) in trans.items():
 		if delete_unused and tran not in local:
-			content[start:end] = [None]*(end-start)
+			content[start:end] = [None] * (end - start)
 		if append_missing and tran in local:
 			if expr or (not expr and delete_empty):
 				supported.append(local.index(tran))
 			else:
-				content[start:end] = [None]*(end-start)
+				content[start:end] = [None] * (end - start)
 		if delete_empty and not expr:
-			content[start:end] = [None]*(end-start)
+			content[start:end] = [None] * (end - start)
 	content = [line for line in content if line is not None]
 	if append_missing:
 		missing = [index for index in range(len(local)) if index not in supported]
@@ -38,10 +39,11 @@ def copy_fix(infile, delete_unused, append_missing, delete_empty):
 				content.append("\n")
 			for miss in missing:
 				if local[miss][1] != "":
-					content.append("["+local[miss][1]+"]\n")
-				content.append(local[miss][0]+"\n== \n\n")
+					content.append("[" + local[miss][1] + "]\n")
+				content.append(local[miss][0] + "\n== \n\n")
 			content[-1] = content[-1][:-1]
 	return "".join(content)
+
 
 def main(argv):
 	os.chdir(os.path.dirname(__file__) + "/../..")
@@ -63,7 +65,7 @@ def main(argv):
 		elif arg == "--delete-empty":
 			delete_empty = True
 		else:
-			print("No such argument '"+arg+"'.")
+			print("No such argument '" + arg + "'.")
 			sys.exit()
 
 	content = copy_fix(infile, delete_unused, append_missing, delete_empty)
@@ -72,5 +74,6 @@ def main(argv):
 		f.write("".join(content))
 	print("Successfully created '" + outfile + "'.")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
 	main(sys.argv)

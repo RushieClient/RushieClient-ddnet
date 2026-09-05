@@ -20,6 +20,7 @@ IGNORE_FILES = []
 IGNORE_DIRS = [
 	"src/game/generated",
 	"src/rust-bridge",
+	"src/game/client/components/rclient/external",
 ]
 
 
