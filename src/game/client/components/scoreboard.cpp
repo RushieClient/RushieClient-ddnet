@@ -127,6 +127,7 @@ void CScoreboard::ResetTexts()
 		Player.m_Score.Reset(TextRender());
 		Player.m_ScoreMillis.Reset(TextRender());
 		Player.m_Name.Reset(TextRender());
+		Player.m_MuteMark.Reset(TextRender());
 		Player.m_ReadyMark.Reset(TextRender());
 		Player.m_Clan.Reset(TextRender());
 		Player.m_Ping.Reset(TextRender());
@@ -901,7 +902,6 @@ void CScoreboard::RenderScoreboard(CUIRect Scoreboard, int Team, int CountStart,
 					str_copy(aBuf, ClientData.m_aName);
 				}
 				const float NameTextLength = std::max(0.0f, NameLength - (Cursor.m_X - NameOffset));
-				Player.m_Name.Update(TextRender(), aBuf, FontSize, NameTextLength, TEXTFLAG_RENDER | TEXTFLAG_ELLIPSIS_AT_END);
 
 				ColorRGBA NameColor = TextColor;
 				if(ClientData.m_AuthLevel)
@@ -913,13 +913,25 @@ void CScoreboard::RenderScoreboard(CUIRect Scoreboard, int Team, int CountStart,
 				{
 					NameColor = GameClient()->m_WarList.GetNameplateColor(pInfo->m_ClientId);
 				}
-				Player.m_Name.Render(TextRender(), vec2(Cursor.m_X, TextY), NameColor);
+
+				float NameTextOffset = NameOffset;
+				const bool Muted = pInfo->m_ClientId >= 0 && (GameClient()->m_aClients[pInfo->m_ClientId].m_Foe || GameClient()->m_aClients[pInfo->m_ClientId].m_ChatIgnore);
+				if(Muted)
+				{
+					TextRender()->SetFontPreset(EFontPreset::ICON_FONT);
+					Player.m_MuteMark.Update(TextRender(), FontIcon::COMMENT_SLASH, FontSize);
+					TextRender()->SetFontPreset(EFontPreset::DEFAULT_FONT);
+					Player.m_MuteMark.Render(TextRender(), vec2(NameTextOffset, TextY), NameColor);
+					NameTextOffset += Player.m_MuteMark.Width();
+				}
+				Player.m_Name.Update(TextRender(), aBuf, FontSize, std::max(NameLength - (NameTextOffset - NameOffset), 0.0f), TEXTFLAG_RENDER | TEXTFLAG_ELLIPSIS_AT_END);
+				Player.m_Name.Render(TextRender(), vec2(NameTextOffset, TextY), NameColor);
 
 				// ready / watching
 				if(Client()->IsSixup() && Client()->m_TranslationContext.m_aClients[pInfo->m_ClientId].m_PlayerFlags7 & protocol7::PLAYERFLAG_READY)
 				{
 					Player.m_ReadyMark.Update(TextRender(), "✓", FontSize);
-					Player.m_ReadyMark.Render(TextRender(), vec2(Cursor.m_X + Player.m_Name.Width(), TextY), ColorRGBA(0.1f, 1.0f, 0.1f, TextColor.a));
+					Player.m_ReadyMark.Render(TextRender(), vec2(NameTextOffset + Player.m_Name.Width(), TextY), ColorRGBA(0.1f, 1.0f, 0.1f, TextColor.a));
 				}
 			}
 

@@ -720,11 +720,10 @@ public:
 		SETTINGS_SOUND,
 		SETTINGS_DDNET,
 		SETTINGS_ASSETS,
-		SETTINGS_TCLIENT,
-		SETTINGS_RCLIENT,
-		SETTINGS_PROFILES,
-		SETTINGS_CONFIGS,
-
+		SETTINGS_TCLIENT, // TClient
+		SETTINGS_RCLIENT, // RClient
+		SETTINGS_PROFILES, // TClient
+		SETTINGS_CONFIGS, // TClient
 		SETTINGS_LENGTH,
 	};
 
@@ -895,7 +894,7 @@ private:
 	void RenderSettingsRClientInfo(CUIRect MainView);
 	void RenderSettingsRClientSpecWheel(CUIRect MainView);
 
-	// TCLient
+	// TClient
 	const CWarType *m_pRemoveWarType = nullptr;
 	void PopupConfirmRemoveWarType();
 	void RenderDevSkin(vec2 RenderPos, float Size, const char *pSkinName, const char *pBackupSkin, bool CustomColors, int FeetColor, int BodyColor, int Emote, bool Rainbow, bool Cute,

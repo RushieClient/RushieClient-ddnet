@@ -220,7 +220,7 @@ public:
 		pClient->Connect(pSecret);
 	}
 
-	~CDiscord()
+	~CDiscord() override
 	{
 		if(m_pCore)
 			m_pCore->destroy(m_pCore);
