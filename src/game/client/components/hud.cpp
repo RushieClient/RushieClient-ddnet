@@ -119,7 +119,8 @@ void CHud::OnInit()
 
 void CHud::RenderGameTimer()
 {
-	float Half = m_Width / 2.0f;
+	float Half = m_Width / 2.0f + g_Config.m_RcHudTimerPosX;
+	float PosY = g_Config.m_RcHudTimerPosY;
 
 	if(!(GameClient()->m_Snap.m_pGameInfoObj->m_GameStateFlags & GAMESTATEFLAG_SUDDENDEATH))
 	{
@@ -156,7 +157,7 @@ void CHud::RenderGameTimer()
 			float Alpha = Time <= 10 && (2 * time() / time_freq()) % 2 ? 0.5f : 1.0f;
 			TextRender()->TextColor(1.0f, 0.25f, 0.25f, Alpha);
 		}
-		TextRender()->Text(Half - w / 2, 2, FontSize, aBuf, -1.0f);
+		TextRender()->Text(Half - w / 2, PosY, FontSize, aBuf, -1.0f);
 		TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
 	}
 }

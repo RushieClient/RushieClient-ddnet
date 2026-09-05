@@ -80,6 +80,8 @@ class CChat : public CComponent
 	bool m_PrevScoreBoardShowed;
 	bool m_PrevShowChat;
 	float m_LastRenderWidth = -1.0f;
+	float m_PrevChatPosX = -1.0f;
+	float m_PrevChatPosY = -1.0f;
 
 	CLine m_aLines[MAX_LINES];
 	int m_CurrentLine;
@@ -245,7 +247,7 @@ public:
 	void OnConsoleInit() override;
 	void OnStateChange(int NewState, int OldState) override;
 	void OnRender() override;
-	void OnPrepareLines(float y);
+	void OnPrepareLines(float y, float x);
 	void Reset();
 	void OnRelease() override;
 	void OnMessage(int MsgType, void *pRawMsg) override;

@@ -1018,16 +1018,18 @@ void CChat::AddLine(int ClientId, int Team, const char *pLine)
 	GameClient()->m_Translate.AutoTranslate(CurrentLine);
 }
 
-void CChat::OnPrepareLines(float y)
+void CChat::OnPrepareLines(float y, float x)
 {
-	float x = 5.0f;
 	float FontSize = this->FontSize();
 
 	const bool IsScoreBoardOpen = GameClient()->m_Scoreboard.IsActive() && (Graphics()->ScreenAspect() > 1.7f); // only assume scoreboard when screen ratio is widescreen(something around 16:9)
 	const bool ShowLargeArea = m_Show || (m_Mode != MODE_NONE && g_Config.m_ClShowChat == 1) || g_Config.m_ClShowChat == 2;
-	const bool ForceRecreate = IsScoreBoardOpen != m_PrevScoreBoardShowed || ShowLargeArea != m_PrevShowChat;
+	const bool LayoutChanged = x != m_PrevChatPosX || y != m_PrevChatPosY;
+	const bool ForceRecreate = IsScoreBoardOpen != m_PrevScoreBoardShowed || ShowLargeArea != m_PrevShowChat || LayoutChanged;
 	m_PrevScoreBoardShowed = IsScoreBoardOpen;
 	m_PrevShowChat = ShowLargeArea;
+	m_PrevChatPosX = x;
+	m_PrevChatPosY = y;
 
 	const int TeeSize = MessageTeeSize();
 	float RealMsgPaddingX = MessagePaddingX();
@@ -1377,10 +1379,10 @@ void CChat::OnRender()
 	}
 	Graphics()->MapScreenToSize(Width, Height);
 
-	float x = 5.0f;
+	float x = g_Config.m_RcChatPosX;
 
 	// TClient
-	float y = 300.0f - (20.0f * FontSize() / 6.0f + (g_Config.m_TcStatusBar ? g_Config.m_TcStatusBarHeight : 0.0f));
+	float y = Height - (20.0f * FontSize() / 6.0f + (g_Config.m_TcStatusBar ? g_Config.m_TcStatusBarHeight : 0.0f)) - g_Config.m_RcChatPosY;
 	// float y = 300.0f - 20.0f * FontSize() / 6.0f;
 
 	float ScaledFontSize = FontSize() * (8.0f / 6.0f);
@@ -1464,7 +1466,20 @@ void CChat::OnRender()
 
 	y -= ScaledFontSize;
 
-	OnPrepareLines(y);
+	OnPrepareLines(y, x);
+
+	const float UiScale = 2.0f;
+	const float FontScale = FontSize() / 6.0f;
+	const float ChatMargin = 3.0f;
+	const float ChatRightX = x + g_Config.m_ClChatWidth;
+	const float ChatBottomY = y;
+	const float SettingsRowW = 76.0f * FontScale;
+	const float SettingsRowH = 10.0f * FontScale;
+	const float SettingsButtonW = 30.0f * FontScale;
+	const float HistoryBottomY = ChatBottomY - SettingsRowH;
+	const float SettingsPopupLineH = 8.0f * FontScale;
+	const float SettingsPopupPad = 2.0f * FontScale;
+	const float SettingsPopupSize = SettingsPopupLineH * 5.0f + SettingsPopupPad * 2.0f;
 
 	bool IsScoreBoardOpen = GameClient()->m_Scoreboard.IsActive() && (Graphics()->ScreenAspect() > 1.7f); // only assume scoreboard when screen ratio is widescreen(something around 16:9)
 
@@ -1494,24 +1509,22 @@ void CChat::OnRender()
 
 	if(m_Mode != MODE_NONE)
 	{
+		const vec2 ChatMousePos = Ui()->MousePos() / UiScale;
 		if(m_MouseUnlocked && g_Config.m_RcChatShowTranslateFastSettings)
 		{
-			const float HistoryBottomY = y - 10.0f;
-			const float LineWidth = g_Config.m_ClChatWidth;
-			const float MarginSmall = 3.0f;
 			CUIRect TranslateYour, TranslateOthers;
-			CUIRect Settings = {LineWidth + MarginSmall, HistoryBottomY, 76.0f, 10.0f}; // W - Settings 10, Others - 30, 30
-			Settings.VSplitLeft(30.0f, &TranslateYour, &Settings);
-			Settings.VSplitLeft(MarginSmall, nullptr, &Settings);
-			Settings.VSplitLeft(30.0f, &TranslateOthers, &Settings);
-			Settings.VSplitRight(10.0f, nullptr, &Settings);
-			Settings.Draw(Settings.Inside(Ui()->MousePos() / 2.0f) ? ColorRGBA(0.5f, 0.5f, 0.5f, 0.5f) : ColorRGBA(0.3f, 0.3f, 0.3f, 0.5f), IGraphics::CORNER_ALL, 3.0f);
-			if(TranslateYour.Inside(Ui()->MousePos() / 2.0f))
+			CUIRect Settings = {ChatRightX + ChatMargin, HistoryBottomY, SettingsRowW, SettingsRowH};
+			Settings.VSplitLeft(SettingsButtonW, &TranslateYour, &Settings);
+			Settings.VSplitLeft(ChatMargin, nullptr, &Settings);
+			Settings.VSplitLeft(SettingsButtonW, &TranslateOthers, &Settings);
+			Settings.VSplitRight(10.0f * FontScale, nullptr, &Settings);
+			Settings.Draw(Settings.Inside(ChatMousePos) ? ColorRGBA(0.5f, 0.5f, 0.5f, 0.5f) : ColorRGBA(0.3f, 0.3f, 0.3f, 0.5f), IGraphics::CORNER_ALL, 3.0f);
+			if(TranslateYour.Inside(ChatMousePos))
 				TranslateYour.Draw(g_Config.m_RcTranslateSend ? ColorRGBA(1.0f, 0.1f, 0.1f, 0.5f * 1.5f) : ColorRGBA(0.1f, 1.0f, 0.1f, 0.5f * 1.5f), IGraphics::CORNER_ALL, 3.0f);
 			else
 				TranslateYour.Draw(g_Config.m_RcTranslateSend ? ColorRGBA(0.1f, 1.0f, 0.1f, 0.5f) : ColorRGBA(1.0f, 0.1f, 0.1f, 0.5f), IGraphics::CORNER_ALL, 3.0f);
 
-			if(TranslateOthers.Inside(Ui()->MousePos() / 2.0f))
+			if(TranslateOthers.Inside(ChatMousePos))
 				TranslateOthers.Draw(g_Config.m_TcTranslateAuto ? ColorRGBA(1.0f, 0.1f, 0.1f, 0.5f * 1.5f) : ColorRGBA(0.1f, 1.0f, 0.1f, 0.5f * 1.5f), IGraphics::CORNER_ALL, 3.0f);
 			else
 				TranslateOthers.Draw(g_Config.m_TcTranslateAuto ? ColorRGBA(0.1f, 1.0f, 0.1f, 0.5f) : ColorRGBA(1.0f, 0.1f, 0.1f, 0.5f), IGraphics::CORNER_ALL, 3.0f);
@@ -1519,10 +1532,10 @@ void CChat::OnRender()
 			Ui()->DoLabel(&TranslateYour, "Your", TranslateYour.h / 2.0f, TEXTALIGN_MC);
 			Ui()->DoLabel(&TranslateOthers, "Others", TranslateYour.h / 2.0f, TEXTALIGN_MC);
 
-			if(TranslateYour.Inside(Ui()->MousePos() / 2.0f) && Ui()->MouseButtonClicked(0))
+			if(TranslateYour.Inside(ChatMousePos) && Ui()->MouseButtonClicked(0))
 				g_Config.m_RcTranslateSend = !g_Config.m_RcTranslateSend;
 
-			if(TranslateOthers.Inside(Ui()->MousePos() / 2.0f) && Ui()->MouseButtonClicked(0))
+			if(TranslateOthers.Inside(ChatMousePos) && Ui()->MouseButtonClicked(0))
 				g_Config.m_TcTranslateAuto = !g_Config.m_TcTranslateAuto;
 
 			TextRender()->SetFontPreset(EFontPreset::ICON_FONT);
@@ -1532,19 +1545,18 @@ void CChat::OnRender()
 			TextRender()->SetRenderFlags(0);
 			TextRender()->SetFontPreset(EFontPreset::DEFAULT_FONT);
 
-			if(Settings.Inside(Ui()->MousePos() / 2.0f) && Ui()->MouseButtonClicked(0))
+			if(Settings.Inside(ChatMousePos) && Ui()->MouseButtonClicked(0))
 				m_SettingsOpened = !m_SettingsOpened;
 
 			if(m_SettingsOpened)
 			{
 				Ui()->MapScreen();
 
-				const float Scale = 2.0f;
-				const float LineSize = 16.0f;
-				const float WindowSize = LineSize * 5.0f + 4.0f * 2.0f;
-				Settings = {(LineWidth + MarginSmall) * Scale, (HistoryBottomY - MarginSmall) * Scale - WindowSize, 76.0f * Scale, WindowSize};
+				const float LineSize = SettingsPopupLineH * UiScale;
+				const float WindowSize = SettingsPopupSize * UiScale;
+				Settings = {(ChatRightX + ChatMargin) * UiScale, (HistoryBottomY - ChatMargin) * UiScale - WindowSize, SettingsRowW * UiScale, WindowSize};
 				Settings.Draw(ColorRGBA(0.3f, 0.3f, 0.3f, 0.5f), IGraphics::CORNER_ALL, 6.0f);
-				Settings.Margin(4.0f, &Settings);
+				Settings.Margin(SettingsPopupPad * UiScale, &Settings);
 
 				GameClient()->m_Menus.DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_TcTranslateAuto, "Translate Others Msgs", &g_Config.m_TcTranslateAuto, &Settings, LineSize);
 				GameClient()->m_Menus.DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcTranslateServerMessages, "Translate server messages", &g_Config.m_RcTranslateServerMessages, &Settings, LineSize);
@@ -1721,15 +1733,18 @@ void CChat::OnRender()
 			if(TotalLines > m_VisibleLineCount)
 			{
 				float RenderLines = TotalLines - m_VisibleLineCount;
-				const float SettingsSize = 16.0f * 5.0f + 4.0f * 2.0f;
-				float ScrollY = 600.0f - 40.0f * FontSize() / 3.0f;
+				const float HandleSize = 15.0f * FontScale * UiScale;
+				const bool ShowFastSettings = m_MouseUnlocked && g_Config.m_RcChatShowTranslateFastSettings;
+				float RailBottom = ChatBottomY * UiScale;
+				if(ShowFastSettings)
+					RailBottom -= (SettingsRowH + ChatMargin) * UiScale;
+				if(m_SettingsOpened)
+					RailBottom -= (SettingsPopupSize + ChatMargin) * UiScale;
 				const float RailTop = HeightLimit * 2.0f;
-				const int LineWidth = g_Config.m_ClChatWidth;
-				const float MarginSmall = 6.0f;
-				const CUIRect Rail = {(LineWidth * 2.0f + MarginSmall), RailTop, ScrollBar::SCROLLBAR_WIDTH, ScrollY - 10.0f - MarginSmall - (m_SettingsOpened ? SettingsSize + MarginSmall : 0) - RailTop};
-				const float MaxY = std::max(0.0f, Rail.h - 30.0f);
+				const CUIRect Rail = {(ChatRightX + ChatMargin) * UiScale, RailTop, ScrollBar::SCROLLBAR_WIDTH, std::max(0.0f, RailBottom - RailTop)};
+				const float MaxY = std::max(0.0f, Rail.h - HandleSize);
 				const float Value = 1.0f - m_HistoryScrollOffset / RenderLines;
-				const CUIRect Handle = {Rail.x, Rail.y + Value * MaxY, Rail.w, 30.0f};
+				const CUIRect Handle = {Rail.x, Rail.y + Value * MaxY, Rail.w, HandleSize};
 				ScrollbarActive = (Input()->NativeMousePressed(1) && Ui()->MouseX() >= Rail.x && Ui()->MouseX() <= Rail.x + Rail.w) || (ScrollbarActive && Input()->NativeMousePressed(1));
 
 				if(ScrollbarActive)
