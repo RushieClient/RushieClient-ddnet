@@ -127,6 +127,7 @@ void CScoreboard::ResetTexts()
 		Player.m_Score.Reset(TextRender());
 		Player.m_ScoreMillis.Reset(TextRender());
 		Player.m_Name.Reset(TextRender());
+		Player.m_FriendMark.Reset(TextRender());
 		Player.m_MuteMark.Reset(TextRender());
 		Player.m_ReadyMark.Reset(TextRender());
 		Player.m_Clan.Reset(TextRender());
@@ -812,84 +813,6 @@ void CScoreboard::RenderScoreboard(CUIRect Scoreboard, int Team, int CountStart,
 
 			// name
 			{
-				CTextCursor Cursor;
-				Cursor.SetPosition(vec2(NameOffset, Row.y + (Row.h - FontSize) / 2.0f));
-				Cursor.m_FontSize = FontSize;
-				Cursor.m_Flags |= TEXTFLAG_ELLIPSIS_AT_END;
-				Cursor.m_LineWidth = NameLength;
-
-				// RClient custom clients
-				if(g_Config.m_RcCustomClientsInScoreboard && g_Config.m_RcCustomClientsCollectClientType)
-				{
-					int Type = ClientData.m_CustomClient;
-					const float IconSize = FontSize * g_Config.m_RcCustomClientsInScoreboardSize / 50.0f;
-					if(Type != 0)
-					{
-						int m_Texture = 0;
-						switch(Type)
-						{
-						case CUSTOM_CLIENT_ID_KAIZO_NETWORK:
-							m_Texture = IMAGE_RCKAZIOICON;
-							break;
-						case CUSTOM_CLIENT_ID_RUSHIECLIENT:
-							m_Texture = IMAGE_RCRUSHIEICON;
-							break;
-						case CUSTOM_CLIENT_ID_CHILLERBOTUX:
-							m_Texture = IMAGE_RCCHILLERICON;
-							break;
-						case CUSTOM_CLIENT_ID_DUCK_N_INFCLASS_CLIENT:
-							m_Texture = IMAGE_RCDUCKICON;
-							break;
-						case CUSTOM_CLIENT_ID_ASCENDCLIENT:
-							m_Texture = IMAGE_RCASCENDICON;
-							break;
-						case CUSTOM_CLIENT_ID_BESTCLIENT:
-							m_Texture = IMAGE_RCBCICON;
-							break;
-						default:
-							break;
-						}
-						const float OriginalY = Cursor.m_Y;
-						Cursor.m_Y = Row.y + (Row.h - IconSize) / 2.0f;
-						Graphics()->BlendNormal();
-						Graphics()->TextureSet(g_pData->m_aImages[m_Texture].m_Id);
-						Graphics()->QuadsBegin();
-						IGraphics::CQuadItem QuadItem(Cursor.m_X, Cursor.m_Y, IconSize, IconSize);
-						Graphics()->QuadsDrawTL(&QuadItem, 1);
-						Graphics()->QuadsEnd();
-						Cursor.m_X += IconSize;
-						Cursor.m_Y = OriginalY;
-					}
-					else
-					{
-						Cursor.m_X += IconSize;
-					}
-				}
-
-				// RClient Heart
-				if(g_Config.m_RcShowHeartInScoreboard)
-				{
-					const float HeartFontSize = FontSize / 100.0f * g_Config.m_RcSizeOfHeart;
-					if(GameClient()->m_aClients[pInfo->m_ClientId].m_Friend)
-					{
-						const float OriginalY = Cursor.m_Y;
-						Cursor.m_Y = Row.y + (Row.h - HeartFontSize) / 2.0f;
-						Cursor.m_FontSize = HeartFontSize;
-						TextRender()->TextColor(ColorRGBA(1.0f, 0.0f, 0.0f, 1.0f));
-						TextRender()->SetFontPreset(EFontPreset::ICON_FONT);
-						TextRender()->TextEx(&Cursor, FontIcon::HEART);
-						TextRender()->SetFontPreset(EFontPreset::DEFAULT_FONT);
-						TextRender()->TextColor(TextRender()->DefaultTextColor());
-						TextRender()->TextEx(&Cursor, " ");
-						Cursor.m_Y = OriginalY;
-						Cursor.m_FontSize = FontSize;
-					}
-					else
-					{
-						Cursor.m_X += HeartFontSize;
-					}
-				}
-
 				if(g_Config.m_ClShowIds)
 				{
 					char aClientId[16];
@@ -901,8 +824,6 @@ void CScoreboard::RenderScoreboard(CUIRect Scoreboard, int Team, int CountStart,
 				{
 					str_copy(aBuf, ClientData.m_aName);
 				}
-				const float NameTextLength = std::max(0.0f, NameLength - (Cursor.m_X - NameOffset));
-
 				ColorRGBA NameColor = TextColor;
 				if(ClientData.m_AuthLevel)
 				{
@@ -915,6 +836,59 @@ void CScoreboard::RenderScoreboard(CUIRect Scoreboard, int Team, int CountStart,
 				}
 
 				float NameTextOffset = NameOffset;
+
+				// RClient custom clients
+				if(g_Config.m_RcCustomClientsInScoreboard && g_Config.m_RcCustomClientsCollectClientType)
+				{
+					int Type = ClientData.m_CustomClient;
+					const float IconSize = FontSize * g_Config.m_RcCustomClientsInScoreboardSize / 50.0f;
+					if(Type != 0)
+					{
+						int MTexture = 0;
+						switch(Type)
+						{
+						case CUSTOM_CLIENT_ID_KAIZO_NETWORK:
+							MTexture = IMAGE_RCKAZIOICON;
+							break;
+						case CUSTOM_CLIENT_ID_RUSHIECLIENT:
+							MTexture = IMAGE_RCRUSHIEICON;
+							break;
+						case CUSTOM_CLIENT_ID_CHILLERBOTUX:
+							MTexture = IMAGE_RCCHILLERICON;
+							break;
+						case CUSTOM_CLIENT_ID_DUCK_N_INFCLASS_CLIENT:
+							MTexture = IMAGE_RCDUCKICON;
+							break;
+						case CUSTOM_CLIENT_ID_ASCENDCLIENT:
+							MTexture = IMAGE_RCASCENDICON;
+							break;
+						case CUSTOM_CLIENT_ID_BESTCLIENT:
+							MTexture = IMAGE_RCBCICON;
+							break;
+						default:
+							break;
+						}
+						Graphics()->BlendNormal();
+						Graphics()->TextureSet(g_pData->m_aImages[MTexture].m_Id);
+						Graphics()->QuadsBegin();
+						IGraphics::CQuadItem QuadItem(NameTextOffset, TextY, IconSize, IconSize);
+						Graphics()->QuadsDrawTL(&QuadItem, 1);
+						Graphics()->QuadsEnd();
+					}
+					NameTextOffset += IconSize;
+				}
+
+				// RClient Heart
+				if(g_Config.m_RcShowHeartInScoreboard)
+				{
+					TextRender()->SetFontPreset(EFontPreset::ICON_FONT);
+					Player.m_FriendMark.Update(TextRender(), FontIcon::HEART, FontSize);
+					TextRender()->SetFontPreset(EFontPreset::DEFAULT_FONT);
+					if(GameClient()->m_aClients[pInfo->m_ClientId].m_Friend)
+						Player.m_FriendMark.Render(TextRender(), vec2(NameTextOffset, TextY), ColorRGBA(1.0f, 0.0f, 0.0f, 1.0f));
+					NameTextOffset += Player.m_FriendMark.Width();
+				}
+
 				const bool Muted = pInfo->m_ClientId >= 0 && (GameClient()->m_aClients[pInfo->m_ClientId].m_Foe || GameClient()->m_aClients[pInfo->m_ClientId].m_ChatIgnore);
 				if(Muted)
 				{
