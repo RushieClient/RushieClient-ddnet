@@ -606,7 +606,7 @@ void CPlayers::RenderPlayer(
 	Player = *pPlayerChar;
 
 	const bool Local = GameClient()->m_Snap.m_LocalClientId == ClientId;
-	const bool OtherTeam = GameClient()->IsOtherTeam(ClientId);
+	const bool OtherTeam = GameClient()->m_RClient.IsOtherTeamAlpha(ClientId);
 	const bool Spec = GameClient()->m_Snap.m_SpecInfo.m_Active;
 	const bool FrozenSwappingHide = ClientId >= 0 && GameClient()->m_aClients[ClientId].m_FreezeEnd > 0 && g_Config.m_TcHideFrozenGhosts && g_Config.m_TcSwapGhosts;
 
