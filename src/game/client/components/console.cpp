@@ -319,7 +319,7 @@ void CGameConsole::CInstance::PumpBacklogPending()
 
 	// Update text attributes and count number of added lines
 	m_pGameConsole->Ui()->MapScreen();
-	RcBacklogTotalLines = 0;
+	m_RcBacklogTotalLines = 0;
 	for(CBacklogEntry *pEntry = m_Backlog.First(); pEntry; pEntry = m_Backlog.Next(pEntry))
 	{
 		if(pEntry->m_LineCount == -1)
@@ -327,7 +327,7 @@ void CGameConsole::CInstance::PumpBacklogPending()
 			UpdateEntryTextAttributes(pEntry);
 			m_NewLineCounter += pEntry->m_LineCount;
 		}
-		RcBacklogTotalLines += pEntry->m_LineCount;
+		m_RcBacklogTotalLines += pEntry->m_LineCount;
 	}
 }
 
@@ -1482,7 +1482,7 @@ void CGameConsole::OnRender()
 			pConsole->m_BacklogLastActiveLine = pConsole->m_BacklogCurLine;
 
 		// RClient
-		float TotalLines = pConsole->RcBacklogTotalLines - pConsole->m_LinesRendered;
+		float TotalLines = pConsole->m_RcBacklogTotalLines - pConsole->m_LinesRendered;
 		const CUIRect Rail = {Screen.w - ScrollBar::SCROLLBAR_MARGIN - ScrollBar::SCROLLBAR_WIDTH, 6.0f, ScrollBar::SCROLLBAR_WIDTH, ConsoleHeight - 12.0f};
 		const float MaxY = std::max(0.0f, Rail.h - 30.0f);
 		const float Value = 1.0f - pConsole->m_BacklogCurLine / TotalLines;

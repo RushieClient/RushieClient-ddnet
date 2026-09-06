@@ -8,8 +8,6 @@
 #include <game/client/component.h>
 #include <game/client/components/chat.h>
 
-#include <array>
-
 namespace ChatThings
 {
 	struct STranslateLangs
@@ -36,14 +34,14 @@ class CRClient : public CComponent
 	void ResetRclientDDstatsProfile();
 	char m_DDstatsSearchNickname[32];
 	int m_DDstatsSearchType = 0; //1-FindPlayer 2-FindSkin 3-CopySkin
-	char PlayerSkinBeforeCopyPlayer[42];
-	int PlayerUseCustomColorBeforeCopyPlayer = 0;
-	int PlayerBodyColorBeforeCopyPlayer = 0;
-	int PlayerFeetColorBeforeCopyPlayer = 0;
-	char DummySkinBeforeCopyPlayer[42];
-	int DummyUseCustomColorBeforeCopyPlayer = 0;
-	int DummyBodyColorBeforeCopyPlayer = 0;
-	int DummyFeetColorBeforeCopyPlayer = 0;
+	char m_PlayerSkinBeforeCopyPlayer[42];
+	int m_PlayerUseCustomColorBeforeCopyPlayer = 0;
+	int m_PlayerBodyColorBeforeCopyPlayer = 0;
+	int m_PlayerFeetColorBeforeCopyPlayer = 0;
+	char m_DummySkinBeforeCopyPlayer[42];
+	int m_DummyUseCustomColorBeforeCopyPlayer = 0;
+	int m_DummyBodyColorBeforeCopyPlayer = 0;
+	int m_DummyFeetColorBeforeCopyPlayer = 0;
 
 	//Dummy clan
 	void DummyConnectedClan(bool IsDummyConnected);
@@ -71,20 +69,20 @@ class CRClient : public CComponent
 	static void ConAddCensorWord(IConsole::IResult *pResult, void *pUserData);
 	static void ConRemoveCensorWord(IConsole::IResult *pResult, void *pUserData);
 	static void ConPrintCensorList(IConsole::IResult *pResult, void *pUserData);
-	std::vector<std::string> CensorWordsList;
+	std::vector<std::string> m_CensorWordsList;
 	std::unordered_map<std::string, std::string> m_FilteredMessagesCache;
 	static void ConchainResetCensorListCache(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
 
 	// FindHours
 	static void ConPlayerFindHours(IConsole::IResult *pResult, void *pUserData);
-	bool FindHoursWriteInChat = false;
+	bool m_FindHoursWriteInChat = false;
 
 	// Find time
 	static void ConPlayerFindTime(IConsole::IResult *pResult, void *pUserData);
-	char MapNameH[256];
+	char m_MapNameH[256];
 
 	// Streamer mod
-	bool ScreenSharePrivacyOld = false;
+	bool m_ScreenSharePrivacyOld = false;
 
 	//Aspect Ratio
 	static void ConForceAspect(IConsole::IResult *pResult, void *pUserData);
@@ -186,8 +184,8 @@ public:
 	bool IsInWarlist(int ClientId, int Index);
 
 	// Copy Skin
-	void ApplySkinToPlayer(const char *Skin, const int CustomColor, const int SkinColorBodyint, const int SkinColorFeetint);
-	void ApplyColorToPlayer(const int CustomColor, const int SkinColorBodyint, const int SkinColorFeetint);
+	void ApplySkinToPlayer(const char *Skin, int CustomColor, int SkinColorBodyint, int SkinColorFeetint);
+	void ApplyColorToPlayer(int CustomColor, int SkinColorBodyint, int SkinColorFeetint);
 
 	// Find Hours
 	std::shared_ptr<IHttpRequest> m_pRClientDDstatsTaskFindHours = nullptr;
@@ -221,7 +219,7 @@ public:
 
 	// Translate
 	std::vector<ChatThings::STranslateLangs> m_LatestLangsList;
-	std::vector<const char *> s_LangDropDownNames;
+	std::vector<const char *> m_SLangDropDownNames;
 	void AddNewLanguage(ChatThings::STranslateLangs Lang);
 	ChatThings::STranslateLangs GetLanguageName(const char *pCode);
 	void ResetLanguages();
@@ -235,7 +233,7 @@ public:
 
 	// Anti UnSpec
 	bool AntiUnSpec();
-	bool ConfirmUnSpec = false;
+	bool m_ConfirmUnSpec = false;
 
 	// Sorting players
 	const CNetObj_PlayerInfo *GetSortedPlayersScoreboard(int Config, int ClientId);

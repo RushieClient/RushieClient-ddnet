@@ -76,7 +76,7 @@ namespace ChatThings
 		{"ve", "Venda"}, {"vi", "Vietnamese"}, {"vo", "Volapük"}, {"wa", "Walloon"},
 		{"wo", "Wolof"}, {"xh", "Xhosa"}, {"yi", "Yiddish"}, {"yo", "Yoruba"},
 		{"za", "Zhuang"}, {"zh", "Chinese"}, {"zu", "Zulu"}};
-	static const STranslateLangs g_EmptyLang = {"", ""};
+	static constexpr STranslateLangs g_EmptyLang = {"", ""};
 	static const char *g_LangsListDefaultCodes[] = {"ru", "en", "kk", "de", "uk"};
 }
 
@@ -134,18 +134,18 @@ void CRClient::OnRender()
 	{
 		if(GameClient()->m_GameConsole.IsActive() && GameClient()->m_GameConsole.GetConsoleType() == CGameConsole::CONSOLETYPE_REMOTE)
 		{
-			if(!ScreenSharePrivacyOld)
+			if(!m_ScreenSharePrivacyOld)
 			{
 				GameClient()->Graphics()->SetWindowScreenCaptureProtect(g_Config.m_RcRconSteamerMode);
-				ScreenSharePrivacyOld = true;
+				m_ScreenSharePrivacyOld = true;
 			}
 		}
 		else
 		{
-			if(ScreenSharePrivacyOld)
+			if(m_ScreenSharePrivacyOld)
 			{
 				GameClient()->Graphics()->SetWindowScreenCaptureProtect(0);
-				ScreenSharePrivacyOld = false;
+				m_ScreenSharePrivacyOld = false;
 			}
 		}
 	}
@@ -286,7 +286,7 @@ void CRClient::OnNewSnapshot()
 
 void CRClient::ConfigSaveCallback(IConfigManager *pConfigManager, void *pUserData)
 {
-	CRClient *pSelf = (CRClient *)pUserData;
+	const CRClient *pSelf = (CRClient *)pUserData;
 	char aBuf[128];
 	if(pSelf->m_45degreesEnabled)
 	{
@@ -313,9 +313,9 @@ void CRClient::ConfigSaveCallback(IConfigManager *pConfigManager, void *pUserDat
 		str_format(aBuf, sizeof(aBuf), "bind %s \"%s\"", g_Config.m_RcDeepFlyOnRMB ? "mouse2" : "mouse1", Text.c_str());
 		pConfigManager->WriteLine(aBuf, ConfigDomain::RCLIENT);
 	}
-	for(size_t i = 0; i < pSelf->CensorWordsList.size(); i++)
+	for(const std::string& i : pSelf->m_CensorWordsList)
 	{
-		str_format(aBuf, sizeof(aBuf), "rc_message_filter_add_word %s", pSelf->CensorWordsList[i].c_str());
+		str_format(aBuf, sizeof(aBuf), "rc_message_filter_add_word %s", i.c_str());
 		pConfigManager->WriteLine(aBuf, ConfigDomain::RCLIENTCENSORLIST);
 	}
 	for(ChatThings::STranslateLangs Item : pSelf->m_LatestLangsList)
@@ -550,7 +550,9 @@ static void PrintSkinInfo(CGameClient *pGameClient, const char *Skin, const int 
 		FastPrint(pGameClient, "Info", "- Feet Color: %d", SkinColorFeetint);
 	}
 	else
+	{
 		pGameClient->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "Info", "- Custom Color: 0");
+	}
 }
 
 static void PrintColorInfo(CGameClient *pGameClient, const int CustomColor, const int SkinColorBodyint, const int SkinColorFeetint)
@@ -562,17 +564,19 @@ static void PrintColorInfo(CGameClient *pGameClient, const int CustomColor, cons
 		FastPrint(pGameClient, "Info", "- Feet Color: %d", SkinColorFeetint);
 	}
 	else
+	{
 		pGameClient->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "Info", "- Custom Color: 0");
+	}
 }
 
 void CRClient::ApplySkinToPlayer(const char *Skin, const int CustomColor, const int SkinColorBodyint, const int SkinColorFeetint)
 {
 	if(g_Config.m_ClDummy == 1)
 	{
-		str_copy(DummySkinBeforeCopyPlayer, g_Config.m_ClDummySkin, sizeof(DummySkinBeforeCopyPlayer));
-		DummyUseCustomColorBeforeCopyPlayer = g_Config.m_ClDummyUseCustomColor;
-		DummyBodyColorBeforeCopyPlayer = g_Config.m_ClDummyColorBody;
-		DummyFeetColorBeforeCopyPlayer = g_Config.m_ClDummyColorFeet;
+		str_copy(m_DummySkinBeforeCopyPlayer, g_Config.m_ClDummySkin, sizeof(m_DummySkinBeforeCopyPlayer));
+		m_DummyUseCustomColorBeforeCopyPlayer = g_Config.m_ClDummyUseCustomColor;
+		m_DummyBodyColorBeforeCopyPlayer = g_Config.m_ClDummyColorBody;
+		m_DummyFeetColorBeforeCopyPlayer = g_Config.m_ClDummyColorFeet;
 		str_copy(g_Config.m_ClDummySkin, Skin, sizeof(g_Config.m_ClDummySkin));
 		g_Config.m_ClDummyUseCustomColor = CustomColor;
 		g_Config.m_ClDummyColorBody = SkinColorBodyint;
@@ -581,10 +585,10 @@ void CRClient::ApplySkinToPlayer(const char *Skin, const int CustomColor, const 
 	}
 	if(g_Config.m_ClDummy == 0)
 	{
-		str_copy(PlayerSkinBeforeCopyPlayer, g_Config.m_ClPlayerSkin, sizeof(PlayerSkinBeforeCopyPlayer));
-		PlayerUseCustomColorBeforeCopyPlayer = g_Config.m_ClPlayerUseCustomColor;
-		PlayerBodyColorBeforeCopyPlayer = g_Config.m_ClPlayerColorBody;
-		PlayerFeetColorBeforeCopyPlayer = g_Config.m_ClPlayerColorFeet;
+		str_copy(m_PlayerSkinBeforeCopyPlayer, g_Config.m_ClPlayerSkin, sizeof(m_PlayerSkinBeforeCopyPlayer));
+		m_PlayerUseCustomColorBeforeCopyPlayer = g_Config.m_ClPlayerUseCustomColor;
+		m_PlayerBodyColorBeforeCopyPlayer = g_Config.m_ClPlayerColorBody;
+		m_PlayerFeetColorBeforeCopyPlayer = g_Config.m_ClPlayerColorFeet;
 		str_copy(g_Config.m_ClPlayerSkin, Skin, sizeof(g_Config.m_ClPlayerSkin));
 		g_Config.m_ClPlayerUseCustomColor = CustomColor;
 		g_Config.m_ClPlayerColorBody = SkinColorBodyint;
@@ -597,10 +601,10 @@ void CRClient::ApplyColorToPlayer(const int CustomColor, const int SkinColorBody
 {
 	if(g_Config.m_ClDummy == 1)
 	{
-		str_copy(DummySkinBeforeCopyPlayer, g_Config.m_ClDummySkin, sizeof(DummySkinBeforeCopyPlayer));
-		DummyUseCustomColorBeforeCopyPlayer = g_Config.m_ClDummyUseCustomColor;
-		DummyBodyColorBeforeCopyPlayer = g_Config.m_ClDummyColorBody;
-		DummyFeetColorBeforeCopyPlayer = g_Config.m_ClDummyColorFeet;
+		str_copy(m_DummySkinBeforeCopyPlayer, g_Config.m_ClDummySkin, sizeof(m_DummySkinBeforeCopyPlayer));
+		m_DummyUseCustomColorBeforeCopyPlayer = g_Config.m_ClDummyUseCustomColor;
+		m_DummyBodyColorBeforeCopyPlayer = g_Config.m_ClDummyColorBody;
+		m_DummyFeetColorBeforeCopyPlayer = g_Config.m_ClDummyColorFeet;
 		g_Config.m_ClDummyUseCustomColor = CustomColor;
 		g_Config.m_ClDummyColorBody = SkinColorBodyint;
 		g_Config.m_ClDummyColorFeet = SkinColorFeetint;
@@ -608,10 +612,10 @@ void CRClient::ApplyColorToPlayer(const int CustomColor, const int SkinColorBody
 	}
 	if(g_Config.m_ClDummy == 0)
 	{
-		str_copy(PlayerSkinBeforeCopyPlayer, g_Config.m_ClPlayerSkin, sizeof(PlayerSkinBeforeCopyPlayer));
-		PlayerUseCustomColorBeforeCopyPlayer = g_Config.m_ClPlayerUseCustomColor;
-		PlayerBodyColorBeforeCopyPlayer = g_Config.m_ClPlayerColorBody;
-		PlayerFeetColorBeforeCopyPlayer = g_Config.m_ClPlayerColorFeet;
+		str_copy(m_PlayerSkinBeforeCopyPlayer, g_Config.m_ClPlayerSkin, sizeof(m_PlayerSkinBeforeCopyPlayer));
+		m_PlayerUseCustomColorBeforeCopyPlayer = g_Config.m_ClPlayerUseCustomColor;
+		m_PlayerBodyColorBeforeCopyPlayer = g_Config.m_ClPlayerColorBody;
+		m_PlayerFeetColorBeforeCopyPlayer = g_Config.m_ClPlayerColorFeet;
 		g_Config.m_ClPlayerUseCustomColor = CustomColor;
 		g_Config.m_ClPlayerColorBody = SkinColorBodyint;
 		g_Config.m_ClPlayerColorFeet = SkinColorFeetint;
@@ -740,12 +744,12 @@ void CRClient::ConBackupPlayerProfile(IConsole::IResult *pResult, void *pUserDat
 	CRClient *pSelf = (CRClient *)pUserData;
 	if(g_Config.m_ClDummy == 1)
 	{
-		if(str_length(pSelf->DummySkinBeforeCopyPlayer) > 0)
+		if(str_length(pSelf->m_DummySkinBeforeCopyPlayer) > 0)
 		{
-			str_copy(g_Config.m_ClDummySkin, pSelf->DummySkinBeforeCopyPlayer, sizeof(g_Config.m_ClDummySkin));
-			g_Config.m_ClDummyUseCustomColor = pSelf->DummyUseCustomColorBeforeCopyPlayer;
-			g_Config.m_ClDummyColorBody = pSelf->DummyBodyColorBeforeCopyPlayer;
-			g_Config.m_ClDummyColorFeet = pSelf->DummyFeetColorBeforeCopyPlayer;
+			str_copy(g_Config.m_ClDummySkin, pSelf->m_DummySkinBeforeCopyPlayer, sizeof(g_Config.m_ClDummySkin));
+			g_Config.m_ClDummyUseCustomColor = pSelf->m_DummyUseCustomColorBeforeCopyPlayer;
+			g_Config.m_ClDummyColorBody = pSelf->m_DummyBodyColorBeforeCopyPlayer;
+			g_Config.m_ClDummyColorFeet = pSelf->m_DummyFeetColorBeforeCopyPlayer;
 			pSelf->GameClient()->SendDummyInfo(false);
 		}
 		else
@@ -755,12 +759,12 @@ void CRClient::ConBackupPlayerProfile(IConsole::IResult *pResult, void *pUserDat
 	}
 	if(g_Config.m_ClDummy == 0)
 	{
-		if(str_length(pSelf->PlayerSkinBeforeCopyPlayer) > 0)
+		if(str_length(pSelf->m_PlayerSkinBeforeCopyPlayer) > 0)
 		{
-			str_copy(g_Config.m_ClPlayerSkin, pSelf->PlayerSkinBeforeCopyPlayer, sizeof(g_Config.m_ClPlayerSkin));
-			g_Config.m_ClPlayerUseCustomColor = pSelf->PlayerUseCustomColorBeforeCopyPlayer;
-			g_Config.m_ClPlayerColorBody = pSelf->PlayerBodyColorBeforeCopyPlayer;
-			g_Config.m_ClPlayerColorFeet = pSelf->PlayerFeetColorBeforeCopyPlayer;
+			str_copy(g_Config.m_ClPlayerSkin, pSelf->m_PlayerSkinBeforeCopyPlayer, sizeof(g_Config.m_ClPlayerSkin));
+			g_Config.m_ClPlayerUseCustomColor = pSelf->m_PlayerUseCustomColorBeforeCopyPlayer;
+			g_Config.m_ClPlayerColorBody = pSelf->m_PlayerBodyColorBeforeCopyPlayer;
+			g_Config.m_ClPlayerColorFeet = pSelf->m_PlayerFeetColorBeforeCopyPlayer;
 			pSelf->GameClient()->SendInfo(false);
 		}
 		else
@@ -842,9 +846,9 @@ void CRClient::TrackerClientIdRemove(int ClientId)
 }
 bool CRClient::TrackerIsTracked(int ClientId)
 {
-	for(size_t i = 0; i < m_vPlayersInTracker.size(); i++)
+	for(SPlayerList &i : m_vPlayersInTracker)
 	{
-		if(ClientId == m_vPlayersInTracker[i].m_ClientId)
+		if(ClientId == i.m_ClientId)
 		{
 			return true;
 		}
@@ -882,17 +886,17 @@ void CRClient::ResetBinds()
 void CRClient::ConToggle45Degrees(IConsole::IResult *pResult, void *pUserData)
 {
 	CRClient *pSelf = static_cast<CRClient *>(pUserData);
-	bool m_45degreestoggle = pResult->GetInteger(0) != 0;
+	bool M45degreestoggle = pResult->GetInteger(0) != 0;
 	if(pSelf->m_SmallSensEnabled)
 	{
-		if(m_45degreestoggle && !pSelf->m_45degreestogglelastinput)
+		if(M45degreestoggle && !pSelf->m_45degreestogglelastinput)
 			pSelf->GameClient()->Echo("[[red]] Cant enable 45 degrees. Small send enabled");
-		pSelf->m_45degreestogglelastinput = m_45degreestoggle;
+		pSelf->m_45degreestogglelastinput = M45degreestoggle;
 		return;
 	}
 	if(g_Config.m_RcToggle45degrees)
 	{
-		if(m_45degreestoggle && !pSelf->m_45degreestogglelastinput)
+		if(M45degreestoggle && !pSelf->m_45degreestogglelastinput)
 		{
 			if(!pSelf->m_45degreesEnabled)
 			{
@@ -903,19 +907,19 @@ void CRClient::ConToggle45Degrees(IConsole::IResult *pResult, void *pUserData)
 				pSelf->Toggle45Degrees(false);
 			}
 		}
-		pSelf->m_45degreestogglelastinput = m_45degreestoggle;
+		pSelf->m_45degreestogglelastinput = M45degreestoggle;
 	}
 	else
 	{
-		if(m_45degreestoggle && !pSelf->m_45degreestogglelastinput && !pSelf->m_45degreesEnabled)
+		if(M45degreestoggle && !pSelf->m_45degreestogglelastinput && !pSelf->m_45degreesEnabled)
 		{
 			pSelf->Toggle45Degrees(true);
 		}
-		else if(!m_45degreestoggle && pSelf->m_45degreesEnabled)
+		else if(!M45degreestoggle && pSelf->m_45degreesEnabled)
 		{
 			pSelf->Toggle45Degrees(false);
 		}
-		pSelf->m_45degreestogglelastinput = m_45degreestoggle;
+		pSelf->m_45degreestogglelastinput = M45degreestoggle;
 	}
 }
 void CRClient::Toggle45Degrees(bool Enable, bool NeedEcho)
@@ -965,17 +969,17 @@ void CRClient::Toggle45Degrees(bool Enable, bool NeedEcho)
 void CRClient::ConToggleSmallSens(IConsole::IResult *pResult, void *pUserData)
 {
 	CRClient *pSelf = static_cast<CRClient *>(pUserData);
-	bool m_SmallSenstoggle = pResult->GetInteger(0) != 0;
+	bool MSmallSenstoggle = pResult->GetInteger(0) != 0;
 	if(pSelf->m_45degreesEnabled)
 	{
-		if(m_SmallSenstoggle && !pSelf->m_Smallsenstogglelastinput)
+		if(MSmallSenstoggle && !pSelf->m_Smallsenstogglelastinput)
 			pSelf->GameClient()->Echo("[[red]] Cant enable small sens. 45 degrees enabled");
-		pSelf->m_Smallsenstogglelastinput = m_SmallSenstoggle;
+		pSelf->m_Smallsenstogglelastinput = MSmallSenstoggle;
 		return;
 	}
 	if(g_Config.m_RcToggleSmallSens)
 	{
-		if(m_SmallSenstoggle && !pSelf->m_Smallsenstogglelastinput)
+		if(MSmallSenstoggle && !pSelf->m_Smallsenstogglelastinput)
 		{
 			if(!pSelf->m_SmallSensEnabled)
 			{
@@ -986,19 +990,19 @@ void CRClient::ConToggleSmallSens(IConsole::IResult *pResult, void *pUserData)
 				pSelf->ToggleSmallSens(false);
 			}
 		}
-		pSelf->m_Smallsenstogglelastinput = m_SmallSenstoggle;
+		pSelf->m_Smallsenstogglelastinput = MSmallSenstoggle;
 	}
 	else
 	{
-		if(m_SmallSenstoggle && !pSelf->m_Smallsenstogglelastinput && !pSelf->m_SmallSensEnabled)
+		if(MSmallSenstoggle && !pSelf->m_Smallsenstogglelastinput && !pSelf->m_SmallSensEnabled)
 		{
 			pSelf->ToggleSmallSens(true);
 		}
-		else if(!m_SmallSenstoggle && pSelf->m_SmallSensEnabled)
+		else if(!MSmallSenstoggle && pSelf->m_SmallSensEnabled)
 		{
 			pSelf->ToggleSmallSens(false);
 		}
-		pSelf->m_Smallsenstogglelastinput = m_SmallSenstoggle;
+		pSelf->m_Smallsenstogglelastinput = MSmallSenstoggle;
 	}
 }
 void CRClient::ToggleSmallSens(bool Enable, bool NeedEcho)
@@ -1083,7 +1087,7 @@ void CRClient::ConAddCensorWord(IConsole::IResult *pResult, void *pUserData)
 	CRClient *pSelf = static_cast<CRClient *>(pUserData);
 	char aBuf[256];
 	str_utf8_tolower(pResult->GetString(0), aBuf, sizeof(aBuf));
-	pSelf->CensorWordsList.push_back(aBuf);
+	pSelf->m_CensorWordsList.push_back(aBuf);
 	pSelf->m_FilteredMessagesCache.clear();
 }
 
@@ -1091,12 +1095,12 @@ void CRClient::ConRemoveCensorWord(IConsole::IResult *pResult, void *pUserData)
 {
 	CRClient *pSelf = static_cast<CRClient *>(pUserData);
 	const char *CensorWord = pResult->GetString(0);
-	for(size_t i = 0; i < pSelf->CensorWordsList.size(); i++)
+	for(size_t i = 0; i < pSelf->m_CensorWordsList.size(); i++)
 	{
-		if(!str_utf8_comp_nocase(CensorWord, pSelf->CensorWordsList[i].c_str()))
+		if(!str_utf8_comp_nocase(CensorWord, pSelf->m_CensorWordsList[i].c_str()))
 		{
-			FastPrint(pSelf->GameClient(), "Censor", "Removed word: %s", pSelf->CensorWordsList[i].c_str());
-			pSelf->CensorWordsList.erase(pSelf->CensorWordsList.begin() + i);
+			FastPrint(pSelf->GameClient(), "Censor", "Removed word: %s", pSelf->m_CensorWordsList[i].c_str());
+			pSelf->m_CensorWordsList.erase(pSelf->m_CensorWordsList.begin() + i);
 			pSelf->m_FilteredMessagesCache.clear();
 			return;
 		}
@@ -1109,11 +1113,11 @@ void CRClient::ConPrintCensorList(IConsole::IResult *pResult, void *pUserData)
 {
 	CRClient *pSelf = static_cast<CRClient *>(pUserData);
 	std::string AllWords;
-	for(size_t i = 0; i < pSelf->CensorWordsList.size(); i++)
+	for(size_t i = 0; i < pSelf->m_CensorWordsList.size(); i++)
 	{
 		if(i != 0)
 			AllWords.append(", ");
-		AllWords.append(pSelf->CensorWordsList[i]);
+		AllWords.append(pSelf->m_CensorWordsList[i]);
 	}
 	FastPrint(pSelf->GameClient(), "All words", "%s", AllWords.c_str());
 }
@@ -1130,41 +1134,41 @@ const char *CRClient::FilterMessage(const char *Message, bool IsChat, int Client
 		return It->second.c_str();
 
 	bool CensorFoundInMessage = false;
-	std::string text{Message};
+	std::string Text{Message};
 	if(g_Config.m_RcMessageFilterMode == 1)
 	{
-		for(size_t i = 0; i < CensorWordsList.size(); i++)
+		for(size_t i = 0; i < m_CensorWordsList.size(); i++)
 		{
-			std::string to_delete{CensorWordsList[i]};
-			const char *pFound = str_utf8_find_nocase(text.c_str(), to_delete.c_str());
+			std::string ToDelete{m_CensorWordsList[i]};
+			const char *pFound = str_utf8_find_nocase(Text.c_str(), ToDelete.c_str());
 			while(pFound)
 			{
 				CensorFoundInMessage = true;
-				size_t start = pFound - text.c_str();
+				size_t Start = pFound - Text.c_str();
 				if(g_Config.m_RcMessageFilterMultiplyChangeWordOnPartialMatch)
 				{
 					size_t CharCount = 0;
 					size_t BytesCount = 0;
-					str_utf8_stats(to_delete.c_str(), to_delete.size(), to_delete.size(), &BytesCount, &CharCount);
+					str_utf8_stats(ToDelete.c_str(), ToDelete.size(), ToDelete.size(), &BytesCount, &CharCount);
 					if(strlen(g_Config.m_RcMessageFilterWordOnPartialMatch) < 2)
 					{
-						text.replace(start, to_delete.length(), CharCount + 1, g_Config.m_RcMessageFilterWordOnPartialMatch[0]);
-						pFound = str_utf8_find_nocase(text.c_str() + start + CharCount + 1, to_delete.c_str());
+						Text.replace(Start, ToDelete.length(), CharCount + 1, g_Config.m_RcMessageFilterWordOnPartialMatch[0]);
+						pFound = str_utf8_find_nocase(Text.c_str() + Start + CharCount + 1, ToDelete.c_str());
 					}
 					else
 					{
-						std::string to_change;
-						to_change.reserve((CharCount + 1) * strlen(g_Config.m_RcMessageFilterWordOnPartialMatch));
+						std::string ToChange;
+						ToChange.reserve((CharCount + 1) * strlen(g_Config.m_RcMessageFilterWordOnPartialMatch));
 						for(size_t j = 0; j < CharCount + 1; j++)
-							to_change += g_Config.m_RcMessageFilterWordOnPartialMatch;
-						text.replace(start, to_delete.length(), to_change);
-						pFound = str_utf8_find_nocase(text.c_str() + start + to_change.size(), to_delete.c_str());
+							ToChange += g_Config.m_RcMessageFilterWordOnPartialMatch;
+						Text.replace(Start, ToDelete.length(), ToChange);
+						pFound = str_utf8_find_nocase(Text.c_str() + Start + ToChange.size(), ToDelete.c_str());
 					}
 				}
 				else
 				{
-					text.replace(start, to_delete.length(), g_Config.m_RcMessageFilterWordOnPartialMatch);
-					pFound = str_utf8_find_nocase(text.c_str() + start + strlen(g_Config.m_RcMessageFilterWordOnPartialMatch), to_delete.c_str());
+					Text.replace(Start, ToDelete.length(), g_Config.m_RcMessageFilterWordOnPartialMatch);
+					pFound = str_utf8_find_nocase(Text.c_str() + Start + strlen(g_Config.m_RcMessageFilterWordOnPartialMatch), ToDelete.c_str());
 				}
 			}
 		}
@@ -1185,51 +1189,51 @@ const char *CRClient::FilterMessage(const char *Message, bool IsChat, int Client
 		}
 		if(m_FilteredMessagesCache.size() > 512)
 			m_FilteredMessagesCache.clear();
-		auto [It, _] = m_FilteredMessagesCache.try_emplace(Message, std::move(text));
+		auto [It, _] = m_FilteredMessagesCache.try_emplace(Message, std::move(Text));
 		return It->second.c_str();
 	}
 	if(g_Config.m_RcMessageFilterMode == 2)
 	{
-		for(size_t i = 0; i < CensorWordsList.size(); i++)
+		for(size_t i = 0; i < m_CensorWordsList.size(); i++)
 		{
-			std::string to_delete{CensorWordsList[i]};
-			const char *pFound = str_utf8_find_nocase(text.c_str(), to_delete.c_str());
+			std::string ToDelete{m_CensorWordsList[i]};
+			const char *pFound = str_utf8_find_nocase(Text.c_str(), ToDelete.c_str());
 			while(pFound)
 			{
 				CensorFoundInMessage = true;
-				size_t start = pFound - text.c_str();
-				size_t word_start = text.find_last_of(' ', start);
+				size_t Start = pFound - Text.c_str();
+				size_t word_start = Text.find_last_of(' ', Start);
 				if(word_start == std::string::npos)
 					word_start = 0;
 				else
 					word_start++;
-				size_t word_end = text.find_first_of(' ', start + to_delete.length());
+				size_t word_end = Text.find_first_of(' ', Start + ToDelete.length());
 				if(word_end == std::string::npos)
-					word_end = text.length();
+					word_end = Text.length();
 				if(g_Config.m_RcMessageFilterMultiplyChangeWordOnFullMatch)
 				{
 					size_t CharCount = 0;
 					size_t BytesCount = 0;
-					str_utf8_stats(text.c_str() + word_start, word_end - word_start, word_end - word_start, &BytesCount, &CharCount);
+					str_utf8_stats(Text.c_str() + word_start, word_end - word_start, word_end - word_start, &BytesCount, &CharCount);
 					if(strlen(g_Config.m_RcMessageFilterWordOnFullMatch) < 2)
 					{
-						text.replace(word_start, word_end - word_start, CharCount + 1, g_Config.m_RcMessageFilterWordOnFullMatch[0]);
-						pFound = str_utf8_find_nocase(text.c_str() + word_start + (CharCount + 1), to_delete.c_str());
+						Text.replace(word_start, word_end - word_start, CharCount + 1, g_Config.m_RcMessageFilterWordOnFullMatch[0]);
+						pFound = str_utf8_find_nocase(Text.c_str() + word_start + (CharCount + 1), ToDelete.c_str());
 					}
 					else
 					{
-						std::string to_change;
-						to_change.reserve((CharCount + 1) * strlen(g_Config.m_RcMessageFilterWordOnFullMatch));
+						std::string ToChange;
+						ToChange.reserve((CharCount + 1) * strlen(g_Config.m_RcMessageFilterWordOnFullMatch));
 						for(size_t j = 0; j < CharCount + 1; j++)
-							to_change += g_Config.m_RcMessageFilterWordOnFullMatch;
-						text.replace(word_start, word_end - word_start, to_change);
-						pFound = str_utf8_find_nocase(text.c_str() + word_start + to_change.size(), to_delete.c_str());
+							ToChange += g_Config.m_RcMessageFilterWordOnFullMatch;
+						Text.replace(word_start, word_end - word_start, ToChange);
+						pFound = str_utf8_find_nocase(Text.c_str() + word_start + ToChange.size(), ToDelete.c_str());
 					}
 				}
 				else
 				{
-					text.replace(word_start, word_end - word_start, g_Config.m_RcMessageFilterWordOnFullMatch);
-					pFound = str_utf8_find_nocase(text.c_str() + word_start + strlen(g_Config.m_RcMessageFilterWordOnFullMatch), to_delete.c_str());
+					Text.replace(word_start, word_end - word_start, g_Config.m_RcMessageFilterWordOnFullMatch);
+					pFound = str_utf8_find_nocase(Text.c_str() + word_start + strlen(g_Config.m_RcMessageFilterWordOnFullMatch), ToDelete.c_str());
 				}
 			}
 		}
@@ -1250,53 +1254,53 @@ const char *CRClient::FilterMessage(const char *Message, bool IsChat, int Client
 		}
 		if(m_FilteredMessagesCache.size() > 512)
 			m_FilteredMessagesCache.clear();
-		auto [It, _] = m_FilteredMessagesCache.try_emplace(Message, std::move(text));
+		auto [It, _] = m_FilteredMessagesCache.try_emplace(Message, std::move(Text));
 		return It->second.c_str();
 	}
 	if(g_Config.m_RcMessageFilterMode == 3)
 	{
-		for(size_t i = 0; i < CensorWordsList.size(); i++)
+		for(size_t i = 0; i < m_CensorWordsList.size(); i++)
 		{
-			std::string to_delete{CensorWordsList[i]};
-			const char *pFound = str_utf8_find_nocase(text.c_str(), to_delete.c_str());
+			std::string ToDelete{m_CensorWordsList[i]};
+			const char *pFound = str_utf8_find_nocase(Text.c_str(), ToDelete.c_str());
 			while(pFound)
 			{
 				CensorFoundInMessage = true;
-				size_t start = pFound - text.c_str();
-				size_t word_start = text.find_last_of(' ', start);
+				size_t Start = pFound - Text.c_str();
+				size_t word_start = Text.find_last_of(' ', Start);
 				if(word_start == std::string::npos)
 					word_start = 0;
 				else
 					word_start++;
-				size_t word_end = text.find_first_of(' ', start + to_delete.length());
+				size_t word_end = Text.find_first_of(' ', Start + ToDelete.length());
 				if(word_end == std::string::npos)
-					word_end = text.length();
-				if(!str_utf8_comp_nocase(text.c_str() + word_start, to_delete.c_str()))
+					word_end = Text.length();
+				if(!str_utf8_comp_nocase(Text.c_str() + word_start, ToDelete.c_str()))
 				{
 					if(g_Config.m_RcMessageFilterMultiplyChangeWordOnFullMatch)
 					{
 						size_t CharCount = 0;
 						size_t BytesCount = 0;
-						str_utf8_stats(text.c_str() + word_start, word_end - word_start, word_end - word_start, &BytesCount, &CharCount);
+						str_utf8_stats(Text.c_str() + word_start, word_end - word_start, word_end - word_start, &BytesCount, &CharCount);
 						if(strlen(g_Config.m_RcMessageFilterWordOnFullMatch) < 2)
 						{
-							text.replace(word_start, word_end - word_start, CharCount + 1, g_Config.m_RcMessageFilterWordOnFullMatch[0]);
-							pFound = str_utf8_find_nocase(text.c_str() + word_start + (CharCount + 1), to_delete.c_str());
+							Text.replace(word_start, word_end - word_start, CharCount + 1, g_Config.m_RcMessageFilterWordOnFullMatch[0]);
+							pFound = str_utf8_find_nocase(Text.c_str() + word_start + (CharCount + 1), ToDelete.c_str());
 						}
 						else
 						{
-							std::string to_change;
-							to_change.reserve((CharCount + 1) * strlen(g_Config.m_RcMessageFilterWordOnFullMatch));
+							std::string ToChange;
+							ToChange.reserve((CharCount + 1) * strlen(g_Config.m_RcMessageFilterWordOnFullMatch));
 							for(size_t j = 0; j < CharCount + 1; j++)
-								to_change += g_Config.m_RcMessageFilterWordOnFullMatch;
-							text.replace(word_start, word_end - word_start, to_change);
-							pFound = str_utf8_find_nocase(text.c_str() + word_start + to_change.size(), to_delete.c_str());
+								ToChange += g_Config.m_RcMessageFilterWordOnFullMatch;
+							Text.replace(word_start, word_end - word_start, ToChange);
+							pFound = str_utf8_find_nocase(Text.c_str() + word_start + ToChange.size(), ToDelete.c_str());
 						}
 					}
 					else
 					{
-						text.replace(word_start, word_end - word_start, g_Config.m_RcMessageFilterWordOnFullMatch);
-						pFound = str_utf8_find_nocase(text.c_str() + word_start + strlen(g_Config.m_RcMessageFilterWordOnFullMatch), to_delete.c_str());
+						Text.replace(word_start, word_end - word_start, g_Config.m_RcMessageFilterWordOnFullMatch);
+						pFound = str_utf8_find_nocase(Text.c_str() + word_start + strlen(g_Config.m_RcMessageFilterWordOnFullMatch), ToDelete.c_str());
 					}
 				}
 				else
@@ -1305,26 +1309,26 @@ const char *CRClient::FilterMessage(const char *Message, bool IsChat, int Client
 					{
 						size_t CharCount = 0;
 						size_t BytesCount = 0;
-						str_utf8_stats(to_delete.c_str(), to_delete.size(), to_delete.size(), &BytesCount, &CharCount);
+						str_utf8_stats(ToDelete.c_str(), ToDelete.size(), ToDelete.size(), &BytesCount, &CharCount);
 						if(strlen(g_Config.m_RcMessageFilterWordOnPartialMatch) < 2)
 						{
-							text.replace(start, to_delete.length(), CharCount + 1, g_Config.m_RcMessageFilterWordOnPartialMatch[0]);
-							pFound = str_utf8_find_nocase(text.c_str() + start + (CharCount + 1), to_delete.c_str());
+							Text.replace(Start, ToDelete.length(), CharCount + 1, g_Config.m_RcMessageFilterWordOnPartialMatch[0]);
+							pFound = str_utf8_find_nocase(Text.c_str() + Start + (CharCount + 1), ToDelete.c_str());
 						}
 						else
 						{
-							std::string to_change;
-							to_change.reserve((CharCount + 1) * strlen(g_Config.m_RcMessageFilterWordOnPartialMatch));
+							std::string ToChange;
+							ToChange.reserve((CharCount + 1) * strlen(g_Config.m_RcMessageFilterWordOnPartialMatch));
 							for(size_t j = 0; j < CharCount + 1; j++)
-								to_change += g_Config.m_RcMessageFilterWordOnPartialMatch;
-							text.replace(start, to_delete.length(), to_change);
-							pFound = str_utf8_find_nocase(text.c_str() + start + to_change.size(), to_delete.c_str());
+								ToChange += g_Config.m_RcMessageFilterWordOnPartialMatch;
+							Text.replace(Start, ToDelete.length(), ToChange);
+							pFound = str_utf8_find_nocase(Text.c_str() + Start + ToChange.size(), ToDelete.c_str());
 						}
 					}
 					else
 					{
-						text.replace(start, to_delete.length(), g_Config.m_RcMessageFilterWordOnPartialMatch);
-						pFound = str_utf8_find_nocase(text.c_str() + start + strlen(g_Config.m_RcMessageFilterWordOnPartialMatch), to_delete.c_str());
+						Text.replace(Start, ToDelete.length(), g_Config.m_RcMessageFilterWordOnPartialMatch);
+						pFound = str_utf8_find_nocase(Text.c_str() + Start + strlen(g_Config.m_RcMessageFilterWordOnPartialMatch), ToDelete.c_str());
 					}
 				}
 			}
@@ -1346,7 +1350,7 @@ const char *CRClient::FilterMessage(const char *Message, bool IsChat, int Client
 		}
 		if(m_FilteredMessagesCache.size() > 512)
 			m_FilteredMessagesCache.clear();
-		auto [It, _] = m_FilteredMessagesCache.try_emplace(Message, std::move(text));
+		auto [It, _] = m_FilteredMessagesCache.try_emplace(Message, std::move(Text));
 		return It->second.c_str();
 	}
 	return Message;
@@ -1405,9 +1409,9 @@ void CRClient::FetchRclientDDstatsFindHours(const char *PlayerNickname, const ch
 	char Nickname[256];
 	EscapeUrl(Nickname, sizeof(Nickname), PlayerNickname);
 	if(!str_find_nocase("w", WriteInChat))
-		FindHoursWriteInChat = true;
+		m_FindHoursWriteInChat = true;
 	else
-		FindHoursWriteInChat = false;
+		m_FindHoursWriteInChat = false;
 	str_format(aUrl, sizeof(aUrl), "https://ddstats.tw/player/json?player=%s", Nickname);
 	m_pRClientDDstatsTaskFindHours = HttpGet(aUrl);
 	m_pRClientDDstatsTaskFindHours->Timeout(CTimeout{10000, 0, 500, 10});
@@ -1436,7 +1440,7 @@ void CRClient::FinishRclientDDstatsFindHours()
 			char aBuf[128];
 			str_format(aBuf, sizeof(aBuf), "Player %s has %d hours and %d points", Nickname, Hours, PointsFinal);
 			GameClient()->Echo(aBuf);
-			if(FindHoursWriteInChat)
+			if(m_FindHoursWriteInChat)
 				GameClient()->m_Chat.SendChat(0, aBuf);
 			Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "FindHours", aBuf);
 		}
@@ -1486,7 +1490,7 @@ void CRClient::FetchRclientDDstatsFindTime(const char *PlayerNickname, const cha
 	char aUrl[256];
 	char Nickname[256];
 	EscapeUrl(Nickname, sizeof(Nickname), PlayerNickname);
-	str_copy(MapNameH, MapName);
+	str_copy(m_MapNameH, MapName);
 	str_format(aUrl, sizeof(aUrl), "https://ddstats.tw/player/json?player=%s", Nickname);
 	m_pRClientDDstatsTaskFindTime = HttpGet(aUrl);
 	m_pRClientDDstatsTaskFindTime->Timeout(CTimeout{10000, 0, 500, 10});
@@ -1512,7 +1516,7 @@ void CRClient::FinishRclientDDstatsFindTime()
 			if(MapInfo->type == json_object && json_object_get(MapInfo, "map")->type == json_string)
 			{
 				const char *MapNameStr = json_object_get(MapInfo, "map")->u.string.ptr;
-				if(str_find_nocase(MapNameStr, MapNameH))
+				if(str_find_nocase(MapNameStr, m_MapNameH))
 				{
 					const json_value *Time = json_object_get(Finish, "time");
 					const json_value *Rank = json_object_get(Finish, "rank");
@@ -1537,7 +1541,7 @@ void CRClient::FinishRclientDDstatsFindTime()
 		if(!FoundFinish)
 		{
 			char aBuf[128];
-			str_format(aBuf, sizeof(aBuf), "Map %s not found for %s", MapNameH, PlayerNickname->u.string.ptr);
+			str_format(aBuf, sizeof(aBuf), "Map %s not found for %s", m_MapNameH, PlayerNickname->u.string.ptr);
 			GameClient()->Echo(aBuf);
 			Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "FindTime", aBuf);
 		}
@@ -1637,7 +1641,9 @@ int CRClient::GetCheckpointId()
 		PlayerId = Player.ClientId();
 	}
 	else if(!GameClient()->m_Snap.m_SpecInfo.m_Active)
+	{
 		PlayerId = GameClient()->m_Snap.m_LocalClientId;
+	}
 
 	if(PlayerId != -1)
 	{
@@ -1746,9 +1752,9 @@ void CRClient::AddNewLanguage(ChatThings::STranslateLangs Lang)
 	if(m_LatestLangsList.size() > 5)
 		m_LatestLangsList.erase(m_LatestLangsList.cbegin());
 
-	s_LangDropDownNames.clear();
+	m_SLangDropDownNames.clear();
 	for(ChatThings::STranslateLangs Item : m_LatestLangsList)
-		s_LangDropDownNames.push_back(Item.m_LangName);
+		m_SLangDropDownNames.push_back(Item.m_LangName);
 }
 
 ChatThings::STranslateLangs CRClient::GetLanguageName(const char *pCode)
@@ -1861,21 +1867,21 @@ bool CRClient::AntiUnSpec()
 
 		if(CanCollidePhysical)
 		{
-			if(ConfirmUnSpec)
+			if(m_ConfirmUnSpec)
 			{
-				ConfirmUnSpec = false;
+				m_ConfirmUnSpec = false;
 				return false;
 			}
 			else
 			{
 				GameClient()->Echo("Are u sure want unspec? Press again to unspec");
-				ConfirmUnSpec = true;
+				m_ConfirmUnSpec = true;
 				return true;
 			}
 		}
 	}
 
-	ConfirmUnSpec = false;
+	m_ConfirmUnSpec = false;
 	return false;
 }
 

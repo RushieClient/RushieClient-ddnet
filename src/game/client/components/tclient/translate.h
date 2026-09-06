@@ -52,7 +52,7 @@ public:
 	void Translate(CChat::CLine &Line, bool ShowProgress = true);
 
 	void AutoTranslate(CChat::CLine &Line);
-	void TranslateSend(const char *Line, int WorkId, int m_JobIntVariable = -1);
+	void TranslateSend(const char *Line, int WorkId, int JobIntVariable = -1);
 };
 
 #endif

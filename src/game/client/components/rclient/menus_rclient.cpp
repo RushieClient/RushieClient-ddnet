@@ -668,7 +668,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 				DropDownRect.VSplitMid(&Label, &DropDownRect);
 				Ui()->DoLabel(&Label, RCLocalize("Latest languages", "RClient"), FontSize, TEXTALIGN_ML);
 				const int LangSelectedNew = Ui()->DoDropDown(&DropDownRect, LangSelectedOld,
-					GameClient()->m_RClient.s_LangDropDownNames.data(), GameClient()->m_RClient.s_LangDropDownNames.size(), s_StateTranslateOthers);
+					GameClient()->m_RClient.m_SLangDropDownNames.data(), GameClient()->m_RClient.m_SLangDropDownNames.size(), s_StateTranslateOthers);
 				if(LangSelectedOld != LangSelectedNew)
 				{
 					str_copy(g_Config.m_TcTranslateTarget, GameClient()->m_RClient.m_LatestLangsList[LangSelectedNew].m_LangCode);
@@ -717,7 +717,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 				DropDownRect.VSplitMid(&Label, &DropDownRect);
 				Ui()->DoLabel(&Label, RCLocalize("Latest languages", "RClient"), FontSize, TEXTALIGN_ML);
 				const int LangSelectedNew = Ui()->DoDropDown(&DropDownRect, LangSelectedOldYour,
-					GameClient()->m_RClient.s_LangDropDownNames.data(), GameClient()->m_RClient.s_LangDropDownNames.size(), s_StateTranslateYour);
+					GameClient()->m_RClient.m_SLangDropDownNames.data(), GameClient()->m_RClient.m_SLangDropDownNames.size(), s_StateTranslateYour);
 				if(LangSelectedOldYour != LangSelectedNew)
 				{
 					str_copy(g_Config.m_RcTranslateSendTarget, GameClient()->m_RClient.m_LatestLangsList[LangSelectedNew].m_LangCode);

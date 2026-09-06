@@ -951,7 +951,7 @@ void CTranslate::AutoTranslate(CChat::CLine &Line)
 }
 
 // Rushie
-void CTranslate::TranslateSend(const char *Line, int WorkId, int m_JobIntVariable)
+void CTranslate::TranslateSend(const char *Line, int WorkId, int JobIntVariable)
 {
 	if(m_vJobs.size() > 15)
 	{
@@ -960,7 +960,7 @@ void CTranslate::TranslateSend(const char *Line, int WorkId, int m_JobIntVariabl
 
 	CTranslateJob Job;
 	Job.m_pLineTranslate = std::make_unique<CRClient::CLineTranslate>();
-	Job.m_pLineTranslate->m_JobIntVariable = m_JobIntVariable;
+	Job.m_pLineTranslate->m_JobIntVariable = JobIntVariable;
 	Job.m_pIsTextTranslate = true;
 	Job.m_pLineTranslate->m_WorkId = WorkId;
 

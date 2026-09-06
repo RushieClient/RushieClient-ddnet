@@ -9,15 +9,13 @@
 #include <generated/protocol.h>
 
 #include <game/client/components/camera.h>
-#include <game/client/components/chat.h>
-#include <game/client/components/console.h>
 #include <game/client/components/controls.h>
 #include <game/client/components/menus.h>
 #include <game/client/components/rclient/rclient_include.h>
 #include <game/client/gameclient.h>
 #include <game/client/ui.h>
 
-struct SEdgeHelperProperties
+namespace SEdgeHelperProperties
 {
 	static constexpr float ms_Padding = 3.0f;
 	static constexpr float ms_Rounding = 3.0f;
@@ -39,7 +37,7 @@ struct SEdgeHelperProperties
 
 CEdgeHelper::CEdgeHelper()
 {
-	OnReset();
+	CEdgeHelper::OnReset();
 }
 
 void CEdgeHelper::OnConsoleInit()
@@ -75,13 +73,11 @@ void CEdgeHelper::SetActive(bool Active)
 
 void CEdgeHelper::OnReset()
 {
-	RIReset();
 	SetActive(false);
 }
 
 void CEdgeHelper::OnRelease()
 {
-	RIReset();
 	SetActive(false);
 }
 
@@ -110,7 +106,7 @@ void CEdgeHelper::RenderEdgeHelper()
 	Base.Draw(SEdgeHelperProperties::WindowColorDark(), IGraphics::CORNER_ALL, SEdgeHelperProperties::ms_Rounding);
 	Base.Margin(SEdgeHelperProperties::ms_Padding, &Base);
 	const int ClientId = GameClient()->m_Snap.m_SpecInfo.m_Active ? GameClient()->m_Snap.m_SpecInfo.m_SpectatorId : GameClient()->m_Snap.m_LocalClientId;
-	m_Pos_x = GetPositionEdgeHelper(ClientId, g_Config.m_ClDummy);
+	m_PosX = GetPositionEdgeHelper(ClientId, g_Config.m_ClDummy);
 
 	if(g_Config.m_RcEdgeInfoCords && g_Config.m_RcEdgeInfoJump)
 		Base.HSplitMid(&EdgeInfo, &JumpInfo);
@@ -156,10 +152,10 @@ void CEdgeHelper::RenderEdgeHelperEdgeInfo(CUIRect *pBase)
 	RightZone.VSplitLeft(ActionSpacing + 2, nullptr, &RightZone);
 	LeftZone.Margin(SEdgeHelperProperties::ms_ItemSpacing, &LeftZone);
 	RightZone.Margin(SEdgeHelperProperties::ms_ItemSpacing, &RightZone);
-	LeftZone.Draw(m_Pos_x >= 44 ? color_cast<ColorRGBA>(ColorHSLA(g_Config.m_RcEdgeInfoColorKill)) : m_Pos_x >= 28 ? color_cast<ColorRGBA>(ColorHSLA(g_Config.m_RcEdgeInfoColorSafe)) :
+	LeftZone.Draw(m_PosX >= 44 ? color_cast<ColorRGBA>(ColorHSLA(g_Config.m_RcEdgeInfoColorKill)) : m_PosX >= 28 ? color_cast<ColorRGBA>(ColorHSLA(g_Config.m_RcEdgeInfoColorSafe)) :
 															 color_cast<ColorRGBA>(ColorHSLA(g_Config.m_RcEdgeInfoColorFreeze)),
 		IGraphics::CORNER_ALL, SEdgeHelperProperties::ms_Rounding);
-	RightZone.Draw(m_Pos_x <= 53 ? color_cast<ColorRGBA>(ColorHSLA(g_Config.m_RcEdgeInfoColorKill)) : m_Pos_x <= 69 ? color_cast<ColorRGBA>(ColorHSLA(g_Config.m_RcEdgeInfoColorSafe)) :
+	RightZone.Draw(m_PosX <= 53 ? color_cast<ColorRGBA>(ColorHSLA(g_Config.m_RcEdgeInfoColorKill)) : m_PosX <= 69 ? color_cast<ColorRGBA>(ColorHSLA(g_Config.m_RcEdgeInfoColorSafe)) :
 															  color_cast<ColorRGBA>(ColorHSLA(g_Config.m_RcEdgeInfoColorFreeze)),
 		IGraphics::CORNER_ALL, SEdgeHelperProperties::ms_Rounding);
 	CenterZone.VSplitLeft(SEdgeHelperProperties::ms_WallWidth + ActionSpacing, &LeftZone, &CenterZone);
@@ -168,16 +164,16 @@ void CEdgeHelper::RenderEdgeHelperEdgeInfo(CUIRect *pBase)
 	LeftZone.VSplitLeft(3, nullptr, &LeftZone);
 	RightZone.VSplitLeft(ActionSpacing - 3, nullptr, &RightZone);
 	RightZone.VSplitRight(3, &RightZone, nullptr);
-	LeftZone.Draw(m_Pos_x >= 44 && m_Pos_x < 53 ? SEdgeHelperProperties::ActionWhiteButtonColor() : SEdgeHelperProperties::WindowColorMedium(), IGraphics::CORNER_NONE, 0);
-	RightZone.Draw(m_Pos_x <= 53 && m_Pos_x > 44 ? SEdgeHelperProperties::ActionWhiteButtonColor() : SEdgeHelperProperties::WindowColorMedium(), IGraphics::CORNER_NONE, 0);
+	LeftZone.Draw(m_PosX >= 44 && m_PosX < 53 ? SEdgeHelperProperties::ActionWhiteButtonColor() : SEdgeHelperProperties::WindowColorMedium(), IGraphics::CORNER_NONE, 0);
+	RightZone.Draw(m_PosX <= 53 && m_PosX > 44 ? SEdgeHelperProperties::ActionWhiteButtonColor() : SEdgeHelperProperties::WindowColorMedium(), IGraphics::CORNER_NONE, 0);
 	CenterZone.Margin(SEdgeHelperProperties::ms_ItemSpacing, &CenterZone);
 	Graphics()->TextureClear();
 	Graphics()->QuadsBegin();
-	Graphics()->SetColor(m_Pos_x > 44 && m_Pos_x < 53 ? SEdgeHelperProperties::ActionWhiteButtonColor() : SEdgeHelperProperties::WindowColorMedium());
+	Graphics()->SetColor(m_PosX > 44 && m_PosX < 53 ? SEdgeHelperProperties::ActionWhiteButtonColor() : SEdgeHelperProperties::WindowColorMedium());
 	Graphics()->DrawCircle(CenterZone.x + CenterZone.w / 2, CenterZone.y + CenterZone.h / 2, SEdgeHelperProperties::ms_CircleRadius, 16);
 	Graphics()->QuadsEnd();
 	//
-	if(m_Pos_x == 44 || m_Pos_x == 53)
+	if(m_PosX == 44 || m_PosX == 53)
 	{
 		Graphics()->TextureClear();
 		Graphics()->QuadsBegin();
@@ -215,14 +211,14 @@ void CEdgeHelper::RenderEdgeHelperJumpInfo(CUIRect *pBase)
 	RightZone.VSplitLeft(ActionSpacing, nullptr, &RightZone);
 	LeftZone.Margin(SEdgeHelperProperties::ms_ItemSpacing, &LeftZone);
 	RightZone.Margin(SEdgeHelperProperties::ms_ItemSpacing, &RightZone);
-	DoIconButton(&RightZone, FontIcon::RC_ANGLES_UP, SEdgeHelperProperties::ms_ArrowsSize, (m_Pos_x == 56 || m_Pos_x == 69 || m_Pos_x == 72 || m_Pos_x == 84) ? SEdgeHelperProperties::ActionWhiteButtonColor() : SEdgeHelperProperties::WindowColorMedium());
-	if(m_Pos_x == 62 || m_Pos_x == 63 || m_Pos_x == 66 || m_Pos_x == 81)
+	DoIconButton(&RightZone, FontIcon::RC_ANGLES_UP, SEdgeHelperProperties::ms_ArrowsSize, (m_PosX == 56 || m_PosX == 69 || m_PosX == 72 || m_PosX == 84) ? SEdgeHelperProperties::ActionWhiteButtonColor() : SEdgeHelperProperties::WindowColorMedium());
+	if(m_PosX == 62 || m_PosX == 63 || m_PosX == 66 || m_PosX == 81)
 	{
 		RightZone.HSplitTop(5, nullptr, &RightZone);
 		DoIconButton(&RightZone, FontIcon::RC_ANGLE_UP, SEdgeHelperProperties::ms_ArrowsSize, SEdgeHelperProperties::ActionWhiteButtonColor());
 	}
-	DoIconButton(&LeftZone, FontIcon::RC_ANGLES_UP, SEdgeHelperProperties::ms_ArrowsSize, (m_Pos_x == 13 || m_Pos_x == 25 || m_Pos_x == 28 || m_Pos_x == 41) ? SEdgeHelperProperties::ActionWhiteButtonColor() : SEdgeHelperProperties::WindowColorMedium());
-	if(m_Pos_x == 16 || m_Pos_x == 31)
+	DoIconButton(&LeftZone, FontIcon::RC_ANGLES_UP, SEdgeHelperProperties::ms_ArrowsSize, (m_PosX == 13 || m_PosX == 25 || m_PosX == 28 || m_PosX == 41) ? SEdgeHelperProperties::ActionWhiteButtonColor() : SEdgeHelperProperties::WindowColorMedium());
+	if(m_PosX == 16 || m_PosX == 31)
 	{
 		LeftZone.HSplitTop(5, nullptr, &LeftZone);
 		DoIconButton(&LeftZone, FontIcon::RC_ANGLE_UP, SEdgeHelperProperties::ms_ArrowsSize, SEdgeHelperProperties::ActionWhiteButtonColor());
@@ -233,16 +229,16 @@ void CEdgeHelper::RenderEdgeHelperJumpInfo(CUIRect *pBase)
 	LeftZone.VSplitLeft(3, nullptr, &LeftZone);
 	RightZone.VSplitLeft(ActionSpacing - 3, nullptr, &RightZone);
 	RightZone.VSplitRight(3, &RightZone, nullptr);
-	std::sort(values.begin(), values.end());
+	std::sort(m_Values.begin(), m_Values.end());
 
 	int lower = -1;
 	int upper = -1;
 
-	for(int v : values)
+	for(int v : m_Values)
 	{
-		if(v <= m_Pos_x)
+		if(v <= m_PosX)
 			lower = v;
-		if(v >= m_Pos_x)
+		if(v >= m_PosX)
 		{
 			upper = v;
 			break;
@@ -250,8 +246,8 @@ void CEdgeHelper::RenderEdgeHelperJumpInfo(CUIRect *pBase)
 	}
 
 	char aBuf[64];
-	str_format(aBuf, sizeof(aBuf), "%02i", m_Pos_x);
-	if(m_Pos_x == lower)
+	str_format(aBuf, sizeof(aBuf), "%02i", m_PosX);
+	if(m_PosX == lower)
 		TextRender()->TextColor(SEdgeHelperProperties::ActionActiveButtonColor());
 	Ui()->DoLabel(&CenterZone, aBuf, 12, TEXTALIGN_MC);
 	TextRender()->TextColor(TextRender()->DefaultTextColor());
@@ -260,7 +256,7 @@ void CEdgeHelper::RenderEdgeHelperJumpInfo(CUIRect *pBase)
 		str_copy(aBuf, "- |");
 	else
 		str_format(aBuf, sizeof(aBuf), "%i |", lower);
-	if(m_Pos_x == lower || m_Pos_x == upper)
+	if(m_PosX == lower || m_PosX == upper)
 		TextRender()->TextColor(SEdgeHelperProperties::ActionActiveButtonColor());
 	Ui()->DoLabel(&LeftZone, aBuf, 12, TEXTALIGN_MC);
 	TextRender()->TextColor(TextRender()->DefaultTextColor());
@@ -269,7 +265,7 @@ void CEdgeHelper::RenderEdgeHelperJumpInfo(CUIRect *pBase)
 		str_copy(aBuf, "| -");
 	else
 		str_format(aBuf, sizeof(aBuf), "| %i", upper);
-	if(m_Pos_x == upper)
+	if(m_PosX == upper)
 		TextRender()->TextColor(SEdgeHelperProperties::ActionActiveButtonColor());
 	Ui()->DoLabel(&RightZone, aBuf, 12, TEXTALIGN_MC);
 	TextRender()->TextColor(TextRender()->DefaultTextColor());

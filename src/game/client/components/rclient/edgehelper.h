@@ -10,15 +10,11 @@ class CEdgeHelper : public CComponent
 {
 	bool m_Active = false;
 
-	int m_Pos_x;
+	int m_PosX;
 	void DoIconButton(CUIRect *pRect, const char *pIcon, float TextSize, ColorRGBA IconColor) const;
 	static void ConToggleEdgeHelper(IConsole::IResult *pResult, void *pUserData);
 
-	std::vector<int> values = {41, 31, 28, 25, 16, 13, 56, 62, 63, 66, 69, 72, 81, 84};
-
-	void RIReset()
-	{
-	}
+	std::vector<int> m_Values = {41, 31, 28, 25, 16, 13, 56, 62, 63, 66, 69, 72, 81, 84};
 
 	float GetPositionEdgeHelper(int ClientId, int Conn);
 

@@ -1576,7 +1576,7 @@ void CChat::OnRender()
 					CUIRect DropDownRect;
 					Settings.HSplitTop(LineSize, &DropDownRect, &Settings);
 					const int LangSelectedNew = Ui()->DoDropDown(&DropDownRect, LangSelectedOld,
-						GameClient()->m_RClient.s_LangDropDownNames.data(), GameClient()->m_RClient.s_LangDropDownNames.size(), s_StateTranslateOthers);
+						GameClient()->m_RClient.m_SLangDropDownNames.data(), GameClient()->m_RClient.m_SLangDropDownNames.size(), s_StateTranslateOthers);
 					if(LangSelectedOld != LangSelectedNew)
 					{
 						str_copy(g_Config.m_TcTranslateTarget, GameClient()->m_RClient.m_LatestLangsList[LangSelectedNew].m_LangCode);
@@ -1600,7 +1600,7 @@ void CChat::OnRender()
 					CUIRect DropDownRect;
 					Settings.HSplitTop(LineSize, &DropDownRect, &Settings);
 					const int LangSelectedNew = Ui()->DoDropDown(&DropDownRect, LangSelectedOldYour,
-						GameClient()->m_RClient.s_LangDropDownNames.data(), GameClient()->m_RClient.s_LangDropDownNames.size(), s_StateTranslateYour);
+						GameClient()->m_RClient.m_SLangDropDownNames.data(), GameClient()->m_RClient.m_SLangDropDownNames.size(), s_StateTranslateYour);
 					if(LangSelectedOldYour != LangSelectedNew)
 					{
 						str_copy(g_Config.m_RcTranslateSendTarget, GameClient()->m_RClient.m_LatestLangsList[LangSelectedNew].m_LangCode);
@@ -1745,16 +1745,16 @@ void CChat::OnRender()
 				const float MaxY = std::max(0.0f, Rail.h - HandleSize);
 				const float Value = 1.0f - m_HistoryScrollOffset / RenderLines;
 				const CUIRect Handle = {Rail.x, Rail.y + Value * MaxY, Rail.w, HandleSize};
-				ScrollbarActive = (Input()->NativeMousePressed(1) && Ui()->MouseX() >= Rail.x && Ui()->MouseX() <= Rail.x + Rail.w) || (ScrollbarActive && Input()->NativeMousePressed(1));
+				m_ScrollbarActive = (Input()->NativeMousePressed(1) && Ui()->MouseX() >= Rail.x && Ui()->MouseX() <= Rail.x + Rail.w) || (m_ScrollbarActive && Input()->NativeMousePressed(1));
 
-				if(ScrollbarActive)
+				if(m_ScrollbarActive)
 				{
 					const float ClickedValue = std::clamp((Ui()->MouseY() - Rail.y - Handle.h / 2) / MaxY, 0.0f, 1.0f);
 					m_HistoryScrollOffset = std::round((1.0f - ClickedValue) * RenderLines);
 				}
 
 				Rail.Draw(ColorRGBA(1.0f, 1.0f, 1.0f, 0.25f), IGraphics::CORNER_ALL, Rail.w / 2.0f);
-				Handle.Draw(Handle.Inside(Ui()->MousePos()) || ScrollbarActive ? ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f) : ColorRGBA(0.8f, 0.8f, 0.8f, 1.0f), IGraphics::CORNER_ALL, Handle.w / 2.0f);
+				Handle.Draw(Handle.Inside(Ui()->MousePos()) || m_ScrollbarActive ? ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f) : ColorRGBA(0.8f, 0.8f, 0.8f, 1.0f), IGraphics::CORNER_ALL, Handle.w / 2.0f);
 			}
 		}
 

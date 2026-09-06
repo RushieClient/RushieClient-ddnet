@@ -140,7 +140,7 @@ class CGameConsole : public CComponent
 		void UpdateCompletionSuggestions();
 
 		//RClient
-		int RcBacklogTotalLines = 0;
+		int m_RcBacklogTotalLines = 0;
 
 	private:
 		void SetSearching(bool Searching);

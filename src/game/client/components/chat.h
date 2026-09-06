@@ -184,7 +184,7 @@ class CChat : public CComponent
 	void LockMouse();
 	bool m_SettingsOpened = false;
 	int m_HistoryScrollOffset = 0;
-	bool ScrollbarActive;
+	bool m_ScrollbarActive;
 	int m_VisibleLineCount = 0;
 	int GetInitializedLineCount() const
 	{
