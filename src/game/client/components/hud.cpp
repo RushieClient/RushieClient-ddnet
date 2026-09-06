@@ -120,7 +120,7 @@ void CHud::OnInit()
 void CHud::RenderGameTimer()
 {
 	float Half = m_Width / 2.0f + g_Config.m_RcHudTimerPosX;
-	float PosY = g_Config.m_RcHudTimerPosY;
+	float PosY = 2.0f + g_Config.m_RcHudTimerPosY;
 
 	if(!(GameClient()->m_Snap.m_pGameInfoObj->m_GameStateFlags & GAMESTATEFLAG_SUDDENDEATH))
 	{

@@ -1379,10 +1379,10 @@ void CChat::OnRender()
 	}
 	Graphics()->MapScreenToSize(Width, Height);
 
-	float x = g_Config.m_RcChatPosX;
+	float x = 5.0f + g_Config.m_RcChatPosX;
 
 	// TClient
-	float y = Height - (20.0f * FontSize() / 6.0f + (g_Config.m_TcStatusBar ? g_Config.m_TcStatusBarHeight : 0.0f)) - g_Config.m_RcChatPosY;
+	float y = Height - (20.0f * FontSize() / 6.0f + (g_Config.m_TcStatusBar ? g_Config.m_TcStatusBarHeight : 0.0f)) + g_Config.m_RcChatPosY;
 	// float y = 300.0f - 20.0f * FontSize() / 6.0f;
 
 	float ScaledFontSize = FontSize() * (8.0f / 6.0f);

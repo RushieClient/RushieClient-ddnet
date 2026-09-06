@@ -74,6 +74,8 @@ MACRO_CONFIG_INT(RcShowhudPlayerCheckpoint, rc_showhud_player_checkpoint, 1, 0, 
 MACRO_CONFIG_INT(RcShowhudSmallerHud, rc_showhud_smaller_hud, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "checkpoint and hud will be oneline")
 MACRO_CONFIG_INT(RcShowhudAdvancedDummyActions, rc_showhud_advanced_dummy_actions, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show advanced ingame HUD (Dummy Actions)")
 MACRO_CONFIG_INT(RcShowhudVotingPercent, rc_showhud_voting_percent, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show percent in hud")
+MACRO_CONFIG_INT(RcHudTimerPosX, rc_hud_timer_pos_x, 0, -600, 600, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Game timer X offset in HUD units from center")
+MACRO_CONFIG_INT(RcHudTimerPosY, rc_hud_timer_pos_y, 0, -600, 600, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Game timer Y position in HUD units from top")
 
 // Nameplates
 MACRO_CONFIG_INT(RcNamePlatesHook, rc_nameplates_hook, 0, 0, 4, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show hook detection in name plates (1 = other players', 2 = everyone, 3 = only your own, 4 = your and dummy")
@@ -140,12 +142,8 @@ MACRO_CONFIG_INT(RcChatShowMouse, rc_chat_show_mouse, 1, 0, 1, CFGFLAG_CLIENT | 
 MACRO_CONFIG_INT(RcChatShowTranslateFastSettings, rc_chat_show_translate_fast_settings, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show translate settings when chat")
 MACRO_CONFIG_INT(RcChatScroll, rc_chat_scroll, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Enable scroll when chat")
 MACRO_CONFIG_INT(RcChatShowScrollbar, rc_chat_scrollbar, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Enable scroll when chat")
-MACRO_CONFIG_INT(RcChatPosX, rc_chat_pos_x, 5, -300, 600, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Chat X position in HUD units from left")
-MACRO_CONFIG_INT(RcChatPosY, rc_chat_pos_y, 0, -300, 300, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Chat Y offset in HUD units from bottom")
-
-// HUD
-MACRO_CONFIG_INT(RcHudTimerPosX, rc_hud_timer_pos_x, 0, -300, 300, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Game timer X offset in HUD units from center")
-MACRO_CONFIG_INT(RcHudTimerPosY, rc_hud_timer_pos_y, 2, -100, 300, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Game timer Y position in HUD units from top")
+MACRO_CONFIG_INT(RcChatPosX, rc_chat_pos_x, 0, -600, 600, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Chat X position in HUD units from left")
+MACRO_CONFIG_INT(RcChatPosY, rc_chat_pos_y, 0, -600, 600, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Chat Y offset in HUD units from bottom")
 
 // Integration
 MACRO_CONFIG_INT(RcSteam, rc_steam, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Enable steam integration")
