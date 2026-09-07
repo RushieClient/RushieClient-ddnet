@@ -1756,14 +1756,14 @@ void CHud::RenderMovementInformation()
 	float BoxHeight = GetMovementInformationBoxHeight();
 	const float BoxWidth = 62.0f;
 
-	float StartX = m_Width - BoxWidth;
-	float StartY = 285.0f - BoxHeight - 4.0f; // 4 units distance to the next display;
+	float StartX = m_Width - BoxWidth + g_Config.m_RcHudPlayerMovementPosX;
+	float StartY = 285.0f - BoxHeight - 4.0f + g_Config.m_RcHudPlayerMovementPosY; // 4 units distance to the next display;
 	if(g_Config.m_ClShowhudScore)
 	{
 		StartY -= 56.0f;
 	}
 
-	Graphics()->DrawRect(StartX, StartY, BoxWidth, BoxHeight, ColorRGBA(0.0f, 0.0f, 0.0f, 0.4f), IGraphics::CORNER_L, 5.0f);
+	Graphics()->DrawRect(StartX, StartY, BoxWidth, BoxHeight, ColorRGBA(0.0f, 0.0f, 0.0f, 0.4f), !g_Config.m_RcHudPlayerMovementPosX ? IGraphics::CORNER_L : IGraphics::CORNER_ALL, 5.0f);
 
 	const CMovementInformation Info = GetMovementInformation(ClientId, g_Config.m_ClDummy);
 	CMovementInformation DummyInfo{};
@@ -1775,7 +1775,7 @@ void CHud::RenderMovementInformation()
 
 	float y = StartY + LineSpacer * 2.0f;
 	const float LeftX = StartX + 2.0f;
-	const float RightX = m_Width - 2.0f;
+	const float RightX = m_Width - 2.0f + g_Config.m_RcHudPlayerMovementPosX;
 
 	for(size_t i = 0; i < GameClient()->m_RClient.m_vPlayersInTracker.size(); i++)
 	{
