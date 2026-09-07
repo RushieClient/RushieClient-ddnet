@@ -15,6 +15,7 @@ namespace EditorSettingsOpened
 	{
 		CHAT = 1 << 0,
 		HUDTIMER = 1 << 1,
+		HUDDUMACTIONS = 1 << 2,
 	};
 }
 
@@ -67,7 +68,7 @@ void CHudEditor::OnRender()
 	Ui()->DoLabel(pScreen, "Hold 0.25s to move. Click for settings", 16.0f, TEXTALIGN_MC);
 
 	vec2 BoxSize = vec2(60.0f, 14.0f);
-	CUIRect ChatBox, HudTimerBox;
+	CUIRect ChatBox, HudTimerBox, DumActionsBox;
 
 	const float RealAspect = Graphics()->ScreenAspectReal();
 	const float ChatAspect = (g_Config.m_RcCustomAspectDisable & RcAspectDisable::CHAT)
@@ -135,6 +136,54 @@ void CHudEditor::OnRender()
 		Ui()->DoLabel(&PosLabel, aBuf, 12.0f, TEXTALIGN_MC);
 	}
 
+	// ChatRender
+	{
+		const float BoxHeight = 13.0f * 2 + 3.0f + (g_Config.m_RcShowhudAdvancedDummyActions ? 13.0f * 2 : 0.0f); // 13.0f - icon, 3.0f - spacing(once)
+		const float BoxWidth = 16.0f;
+		m_DumActionsPos.x = (300.0f * RealAspect - BoxWidth + g_Config.m_RcHudDummyActionsPosX) * 2;
+		m_DumActionsPos.y = (285.0f - BoxHeight - 4 + g_Config.m_RcHudDummyActionsPosY) * 2;
+
+		if(g_Config.m_ClShowhudPlayerPosition || g_Config.m_ClShowhudPlayerSpeed || g_Config.m_ClShowhudPlayerAngle)
+		{
+			m_DumActionsPos.y -= 4 * 2;
+		}
+		m_DumActionsPos.y -= GameClient()->m_Hud.GetMovementInformationBoxHeight() * 2;
+
+		if(g_Config.m_ClShowhudScore)
+		{
+			m_DumActionsPos.y -= 56 * 2;
+		}
+
+		if(g_Config.m_ClShowhudDummyActions && !(GameClient()->m_Snap.m_pGameInfoObj->m_GameStateFlags & GAMESTATEFLAG_GAMEOVER) && Client()->DummyConnected())
+		{
+			m_DumActionsPos.y = m_DumActionsPos.y - (29.0f - (g_Config.m_RcShowhudAdvancedDummyActions ? 13.0f * 2 : 0.0f) - 4) * 2; // dummy actions height and padding
+		}
+
+		pScreen->VSplitLeft(m_DumActionsPos.x - BoxSize.x / 2, nullptr, &DumActionsBox);
+		DumActionsBox.VSplitLeft(BoxSize.x, &DumActionsBox, nullptr);
+		DumActionsBox.HSplitTop(m_DumActionsPos.y + BoxHeight / 2 - BoxSize.y / 2, nullptr, &DumActionsBox);
+		DumActionsBox.HSplitTop(BoxSize.y, &DumActionsBox, nullptr);
+		DumActionsBox.DrawOutline(ColorRGBA(1.0f, 1.0f, 1.0f, 0.5f));
+		DumActionsBox.Draw(ColorRGBA(1.0f, 1.0f, 1.0f, 0.25f), IGraphics::CORNER_NONE, 0.0f);
+		Ui()->DoLabel(&DumActionsBox, "DumActions", 12.0f, TEXTALIGN_MC);
+		if(m_OpenedSettings & EditorSettingsOpened::HUDDUMACTIONS)
+		{
+			CUIRect ResetButton = {DumActionsBox.x, DumActionsBox.y + DumActionsBox.h + SmallMargin, DumActionsBox.w, 12.0f};
+			if(GameClient()->m_Menus.DoButton_Menu(&m_ResetButtonDumActions, "Reset", 0, &ResetButton))
+			{
+				g_Config.m_RcHudDummyActionsPosX = 0;
+				g_Config.m_RcHudDummyActionsPosY = 0;
+			}
+			CUIRect PosLabel = {DumActionsBox.x, DumActionsBox.y + (DumActionsBox.h + SmallMargin) * 2, DumActionsBox.w, 12.0f};
+			char aBuf[32];
+			str_format(aBuf, sizeof(aBuf), "x: %.0f, y: %.0f", PosLabel.x, PosLabel.y);
+			Ui()->DoLabel(&PosLabel, aBuf, 12.0f, TEXTALIGN_MC);
+			PosLabel.y = DumActionsBox.y + (DumActionsBox.h + SmallMargin) * 3;
+			str_format(aBuf, sizeof(aBuf), "cx: %i, cy: %i", g_Config.m_RcHudDummyActionsPosX, g_Config.m_RcHudDummyActionsPosY);
+			Ui()->DoLabel(&PosLabel, aBuf, 12.0f, TEXTALIGN_MC);
+		}
+	}
+
 	// Drag
 	const bool Pressed = Ui()->MouseButton(0);
 	if(Pressed && !m_MouseWasPressed)
@@ -149,6 +198,11 @@ void CHudEditor::OnRender()
 			m_DragElement = 1;
 			m_DragPos = vec2(g_Config.m_RcChatPosX, g_Config.m_RcChatPosY);
 		}
+		else if(DumActionsBox.Inside(Ui()->MousePos()))
+		{
+			m_DragElement = 3;
+			m_DragPos = vec2(g_Config.m_RcHudDummyActionsPosX, g_Config.m_RcHudDummyActionsPosY);
+		}
 	}
 	if(m_DragElement != 0 && Pressed && !m_MouseWasPressed)
 		m_TimeLatestPressedNeed = time_get() + time_freq() * 0.25f;
@@ -160,6 +214,7 @@ void CHudEditor::OnRender()
 			{
 			case 1: m_OpenedSettings ^= EditorSettingsOpened::CHAT; break;
 			case 2: m_OpenedSettings ^= EditorSettingsOpened::HUDTIMER; break;
+			case 3: m_OpenedSettings ^= EditorSettingsOpened::HUDDUMACTIONS; break;
 			default:;
 			}
 		}
@@ -169,7 +224,8 @@ void CHudEditor::OnRender()
 	else if(m_TimeLatestPressedNeed > time_get())
 	{
 		if(!(HudTimerBox.Inside(Ui()->MousePos()) ||
-			ChatBox.Inside(Ui()->MousePos())
+			ChatBox.Inside(Ui()->MousePos()) ||
+			DumActionsBox.Inside(Ui()->MousePos())
 		))
 		{
 			m_DragElement = 0;
@@ -187,6 +243,12 @@ void CHudEditor::OnRender()
 		m_DragPos += vec2(ConfDelta.x * RealAspect / ChatAspect, ConfDelta.y);
 		g_Config.m_RcChatPosX = round_to_int(m_DragPos.x);
 		g_Config.m_RcChatPosY = round_to_int(m_DragPos.y);
+	}
+	else if(m_DragElement == 3)
+	{
+		m_DragPos += ConfDelta;
+		g_Config.m_RcHudDummyActionsPosX = round_to_int(m_DragPos.x);
+		g_Config.m_RcHudDummyActionsPosY = round_to_int(m_DragPos.y);
 	}
 
 	m_MouseWasPressed = Pressed;

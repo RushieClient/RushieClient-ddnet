@@ -124,6 +124,9 @@ public:
 	void OnMessage(int MsgType, void *pRawMsg) override;
 	void RenderNinjaBarPos(float x, float y, float Width, float Height, float Progress, float Alpha = 1.0f);
 
+	// RClient
+	inline float GetMovementInformationBoxHeight();
+
 private:
 	void RenderRecord();
 	void RenderDDRaceEffects();
@@ -135,7 +138,7 @@ private:
 	int m_TimeCpLastReceivedTick;
 	bool m_ShowFinishTime;
 
-	inline float GetMovementInformationBoxHeight();
+	// inline float GetMovementInformationBoxHeight();
 	inline int GetDigitsIndex(int Value, int Max);
 
 	// Quad Offsets

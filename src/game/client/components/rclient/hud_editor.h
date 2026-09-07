@@ -10,12 +10,13 @@ class CHudEditor : public CComponent
 	static void ConToggleHudEditor(IConsole::IResult *pResult, void *pUserData);
 	vec2 m_ChatPos;
 	vec2 m_HudTimerPos;
+	vec2 m_DumActionsPos;
 
 	std::optional<vec2> m_LastMousePos;
 	void SetUiMousePos(vec2 Pos);
 	void LockMouse();
 
-	int m_DragElement = 0; // 1-chat 2-hudtimer
+	int m_DragElement = 0; // 1-chat 2-hudtimer 3-dumactions
 	vec2 m_DragPos;
 	bool m_MouseWasPressed = false;
 	int64_t m_TimeLatestPressedNeed = 0;
@@ -23,6 +24,7 @@ class CHudEditor : public CComponent
 
 	CButtonContainer m_ResetButtonChat;
 	CButtonContainer m_ResetButtonHudTimer;
+	CButtonContainer m_ResetButtonDumActions;
 
 	bool m_Active = false;
 	void SetActive(bool Active);

@@ -1527,7 +1527,7 @@ void CHud::RenderSpectatorCount()
 
 	if(g_Config.m_ClShowhudDummyActions && !(GameClient()->m_Snap.m_pGameInfoObj->m_GameStateFlags & GAMESTATEFLAG_GAMEOVER) && Client()->DummyConnected())
 	{
-		StartY = StartY - 29.0f - 4; // dummy actions height and padding
+		StartY = StartY - 29.0f - (g_Config.m_RcShowhudAdvancedDummyActions ? 13.0f * 2 : 0.0f) - 4; // dummy actions height and padding
 	}
 
 	Graphics()->DrawRect(StartX, StartY, BoxWidth, BoxHeight, ColorRGBA(0.0f, 0.0f, 0.0f, 0.4f), IGraphics::CORNER_L, 5.0f);
@@ -1551,8 +1551,8 @@ void CHud::RenderDummyActions()
 	const float BoxHeight = 13.0f * 2 + 3.0f + (g_Config.m_RcShowhudAdvancedDummyActions ? 13.0f * 2 : 0.0f); // 13.0f - icon, 3.0f - spacing(once)
 	const float BoxWidth = 16.0f;
 
-	float StartX = m_Width - BoxWidth;
-	float StartY = 285.0f - BoxHeight - 4; // 4 units distance to the next display;
+	float StartX = m_Width - BoxWidth + g_Config.m_RcHudDummyActionsPosX;
+	float StartY = 285.0f - BoxHeight - 4 + g_Config.m_RcHudDummyActionsPosY; // 4 units distance to the next display;
 	if(g_Config.m_ClShowhudPlayerPosition || g_Config.m_ClShowhudPlayerSpeed || g_Config.m_ClShowhudPlayerAngle)
 	{
 		StartY -= 4;
@@ -1564,7 +1564,7 @@ void CHud::RenderDummyActions()
 		StartY -= 56;
 	}
 
-	Graphics()->DrawRect(StartX, StartY, BoxWidth, BoxHeight, ColorRGBA(0.0f, 0.0f, 0.0f, 0.4f), IGraphics::CORNER_L, 5.0f);
+	Graphics()->DrawRect(StartX, StartY, BoxWidth, BoxHeight, ColorRGBA(0.0f, 0.0f, 0.0f, 0.4f), !g_Config.m_RcHudDummyActionsPosX ? IGraphics::CORNER_L : IGraphics::CORNER_ALL, 5.0f);
 
 	float y = StartY + 2;
 	float x = StartX + 2;
@@ -1634,7 +1634,7 @@ inline float CHud::GetMovementInformationBoxHeight()
 	float BoxHeight = 0.0f;
 	if(GameClient()->m_Snap.m_SpecInfo.m_Active && (GameClient()->m_Snap.m_SpecInfo.m_SpectatorId == SPEC_FREEVIEW || GameClient()->m_aClients[GameClient()->m_Snap.m_SpecInfo.m_SpectatorId].m_SpecCharPresent))
 	{
-		if(GameClient()->m_RClient.m_vPlayersInTracker.size() > 0)
+		if(!GameClient()->m_RClient.m_vPlayersInTracker.empty())
 			BoxHeight += GameClient()->m_RClient.m_vPlayersInTracker.size() * MOVEMENT_INFORMATION_LINE_HEIGHT * 3.0f;
 		if(g_Config.m_ClShowhudPlayerPosition)
 			BoxHeight += MOVEMENT_INFORMATION_LINE_HEIGHT * 3.0f;
@@ -1643,7 +1643,7 @@ inline float CHud::GetMovementInformationBoxHeight()
 	}
 	else
 	{
-		if(GameClient()->m_RClient.m_vPlayersInTracker.size() > 0)
+		if(!GameClient()->m_RClient.m_vPlayersInTracker.empty())
 			BoxHeight += GameClient()->m_RClient.m_vPlayersInTracker.size() * MOVEMENT_INFORMATION_LINE_HEIGHT * 3.0f;
 		if(g_Config.m_ClShowhudPlayerPosition)
 			BoxHeight += MOVEMENT_INFORMATION_LINE_HEIGHT * 3.0f;
