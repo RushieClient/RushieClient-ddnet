@@ -1,11 +1,22 @@
 #include "hud_editor.h"
 
+#include "base/time.h"
 #include "engine/shared/config.h"
-#include <engine/graphics.h>
+#include "rclient_include.h"
+
 #include <engine/console.h>
+#include <engine/graphics.h>
 
 #include <game/client/gameclient.h>
-#include "rclient_include.h"
+
+namespace EditorSettingsOpened
+{
+	enum
+	{
+		CHAT = 1 << 0,
+		HUDTIMER = 1 << 1,
+	};
+}
 
 CHudEditor::CHudEditor()
 {
@@ -20,6 +31,10 @@ void CHudEditor::OnConsoleInit()
 void CHudEditor::OnReset()
 {
 	m_LastMousePos = std::nullopt;
+	m_DragElement = 0;
+	m_TimeLatestPressedNeed = 0;
+	m_MouseWasPressed = false;
+	m_OpenedSettings = 0;
 }
 
 void CHudEditor::OnRender()
@@ -37,9 +52,19 @@ void CHudEditor::OnRender()
 	Ui()->MapScreen();
 
 	CUIRect *pScreen = GameClient()->m_RClient.GetRealScreen();
+	const auto ScreenMid = (pScreen->TopLeft() + pScreen->Size() + pScreen->TopLeft()) / 2.0f;
+
 	pScreen->Draw(ColorRGBA(0.0f, 0.0f, 0.0f, 0.4f), IGraphics::CORNER_NONE, 0.0f);
 
-	Ui()->DoLabel(pScreen, "Hold 1s to move. Click for settings", 16.0f, TEXTALIGN_MC);
+	Graphics()->LinesBegin();
+	IGraphics::CLineItem aLines[2] = {
+		{ScreenMid.x, pScreen->TopLeft().y, ScreenMid.x, (pScreen->TopLeft() + pScreen->Size()).y},
+		{pScreen->TopLeft().x, ScreenMid.y, (pScreen->TopLeft() + pScreen->Size()).x, ScreenMid.y}};
+	Graphics()->SetColor(color_cast<ColorRGBA>(ColorHSLA(g_Config.m_TcShowCenterColor, true)));
+	Graphics()->LinesDraw(aLines, std::size(aLines));
+	Graphics()->LinesEnd();
+
+	Ui()->DoLabel(pScreen, "Hold 0.25s to move. Click for settings", 16.0f, TEXTALIGN_MC);
 
 	vec2 BoxSize = vec2(60.0f, 14.0f);
 	CUIRect ChatBox, HudTimerBox;
@@ -50,6 +75,7 @@ void CHudEditor::OnRender()
 	const float FontSize = g_Config.m_ClChatFontSize / 10.0f;
 	const vec2 WindowSize = vec2(Graphics()->WindowWidth(), Graphics()->WindowHeight());
 	vec2 ConfDelta = Ui()->MouseDelta() / WindowSize * vec2(pScreen->w, pScreen->h) / 2.0f;
+	const float SmallMargin = 2.0f;
 
 	// ChatRender
 	m_ChatPos.x = (5.0f + g_Config.m_RcChatPosX) * 2.0f * RealAspect / ChatAspect;
@@ -65,6 +91,22 @@ void CHudEditor::OnRender()
 	ChatBox.DrawOutline(ColorRGBA(1.0f, 1.0f, 1.0f, 0.5f));
 	ChatBox.Draw(ColorRGBA(1.0f, 1.0f, 1.0f, 0.25f), IGraphics::CORNER_NONE, 0.0f);
 	Ui()->DoLabel(&ChatBox, "Chat", 12.0f, TEXTALIGN_MC);
+	if(m_OpenedSettings & EditorSettingsOpened::CHAT)
+	{
+		CUIRect ResetButton = {ChatBox.x, ChatBox.y + ChatBox.h + SmallMargin, ChatBox.w, 12.0f};
+		if(GameClient()->m_Menus.DoButton_Menu(&m_ResetButtonChat, "Reset", 0, &ResetButton))
+		{
+			g_Config.m_RcChatPosX = 0;
+			g_Config.m_RcChatPosY = 0;
+		}
+		CUIRect PosLabel = {ChatBox.x, ChatBox.y + (ChatBox.h + SmallMargin) * 2, ChatBox.w, 12.0f};
+		char aBuf[32];
+		str_format(aBuf, sizeof(aBuf), "x: %.0f, y: %.0f", PosLabel.x, PosLabel.y);
+		Ui()->DoLabel(&PosLabel, aBuf, 12.0f, TEXTALIGN_MC);
+		PosLabel.y = ChatBox.y + (ChatBox.h + SmallMargin) * 3;
+		str_format(aBuf, sizeof(aBuf), "cx: %i, cy: %i", g_Config.m_RcChatPosX, g_Config.m_RcChatPosY);
+		Ui()->DoLabel(&PosLabel, aBuf, 12.0f, TEXTALIGN_MC);
+	}
 
 	// HudRender
 	m_HudTimerPos.x = (300.0f * RealAspect/ 2.0f + g_Config.m_RcHudTimerPosX) * 2.0f;
@@ -76,6 +118,22 @@ void CHudEditor::OnRender()
 	HudTimerBox.DrawOutline(ColorRGBA(1.0f, 1.0f, 1.0f, 0.5f));
 	HudTimerBox.Draw(ColorRGBA(1.0f, 1.0f, 1.0f, 0.25f), IGraphics::CORNER_NONE, 0.0f);
 	Ui()->DoLabel(&HudTimerBox, "Hud Timer", 12.0f, TEXTALIGN_MC);
+	if(m_OpenedSettings & EditorSettingsOpened::HUDTIMER)
+	{
+		CUIRect ResetButton = {HudTimerBox.x, HudTimerBox.y + HudTimerBox.h + SmallMargin, HudTimerBox.w, 12.0f};
+		if(GameClient()->m_Menus.DoButton_Menu(&m_ResetButtonHudTimer, "Reset", 0, &ResetButton))
+		{
+			g_Config.m_RcHudTimerPosX = 0;
+			g_Config.m_RcHudTimerPosY = 0;
+		}
+		CUIRect PosLabel = {HudTimerBox.x, HudTimerBox.y + (HudTimerBox.h + SmallMargin) * 2, HudTimerBox.w, 12.0f};
+		char aBuf[32];
+		str_format(aBuf, sizeof(aBuf), "x: %.0f, y: %.0f", PosLabel.x, PosLabel.y);
+		Ui()->DoLabel(&PosLabel, aBuf, 12.0f, TEXTALIGN_MC);
+		PosLabel.y = HudTimerBox.y + (HudTimerBox.h + SmallMargin) * 3;
+		str_format(aBuf, sizeof(aBuf), "cx: %i, cy: %i", g_Config.m_RcHudTimerPosX, g_Config.m_RcHudTimerPosY);
+		Ui()->DoLabel(&PosLabel, aBuf, 12.0f, TEXTALIGN_MC);
+	}
 
 	// Drag
 	const bool Pressed = Ui()->MouseButton(0);
@@ -92,10 +150,33 @@ void CHudEditor::OnRender()
 			m_DragPos = vec2(g_Config.m_RcChatPosX, g_Config.m_RcChatPosY);
 		}
 	}
-	m_MouseWasPressed = Pressed;
+	if(m_DragElement != 0 && Pressed && !m_MouseWasPressed)
+		m_TimeLatestPressedNeed = time_get() + time_freq() * 0.25f;
+
 	if(m_DragElement != 0 && !Pressed) {
+		if(m_TimeLatestPressedNeed > time_get())
+		{
+			switch(m_DragElement)
+			{
+			case 1: m_OpenedSettings ^= EditorSettingsOpened::CHAT; break;
+			case 2: m_OpenedSettings ^= EditorSettingsOpened::HUDTIMER; break;
+			default:;
+			}
+		}
 		m_DragElement = 0;
-	} else if(m_DragElement == 2)
+		m_TimeLatestPressedNeed = 0;
+	}
+	else if(m_TimeLatestPressedNeed > time_get())
+	{
+		if(!(HudTimerBox.Inside(Ui()->MousePos()) ||
+			ChatBox.Inside(Ui()->MousePos())
+		))
+		{
+			m_DragElement = 0;
+			m_TimeLatestPressedNeed = 0;
+		}
+	}
+	else if(m_DragElement == 2)
 	{
 		m_DragPos += ConfDelta;
 		g_Config.m_RcHudTimerPosX = round_to_int(m_DragPos.x);
@@ -107,6 +188,8 @@ void CHudEditor::OnRender()
 		g_Config.m_RcChatPosX = round_to_int(m_DragPos.x);
 		g_Config.m_RcChatPosY = round_to_int(m_DragPos.y);
 	}
+
+	m_MouseWasPressed = Pressed;
 
 	RenderTools()->RenderCursor(Ui()->MousePos(), 24.0f);
 	Ui()->FinishCheck();

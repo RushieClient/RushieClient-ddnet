@@ -3,6 +3,7 @@
 
 #include "engine/console.h"
 #include "game/client/component.h"
+#include "game/client/ui.h"
 
 class CHudEditor : public CComponent
 {
@@ -17,6 +18,11 @@ class CHudEditor : public CComponent
 	int m_DragElement = 0; // 1-chat 2-hudtimer
 	vec2 m_DragPos;
 	bool m_MouseWasPressed = false;
+	int64_t m_TimeLatestPressedNeed = 0;
+	int m_OpenedSettings = 0;
+
+	CButtonContainer m_ResetButtonChat;
+	CButtonContainer m_ResetButtonHudTimer;
 
 	bool m_Active = false;
 	void SetActive(bool Active);
