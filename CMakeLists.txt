@@ -2881,6 +2881,8 @@ if(CLIENT)
     components/rclient/edgehelper.cpp
     components/rclient/edgehelper.h
     components/rclient/external/ddnet-custom-clients/custom_clients_ids.h
+    components/rclient/hud_editor.cpp
+    components/rclient/hud_editor.h
     components/rclient/last_saves.cpp
     components/rclient/last_saves.h
     components/rclient/menus_rclient.cpp

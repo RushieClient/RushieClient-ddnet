@@ -78,6 +78,7 @@
 #include "components/rclient/rechargebars.h"
 #include "components/rclient/specwheel.h"
 #include "components/rclient/swaptimer.h"
+#include "components/rclient/hud_editor.h"
 
 //TClient
 #include "components/tclient/bg_draw.h"
@@ -249,6 +250,7 @@ public:
 	CSwapTimer m_RcSwapTimer;
 	CRechargeBars m_RcRechargeBars;
 	CLastSaves m_RcLastSaves;
+	CHudEditor m_RcHudEditor;
 
 	// TClient Components
 	CSkinProfiles m_SkinProfiles;

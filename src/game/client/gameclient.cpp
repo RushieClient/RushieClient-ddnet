@@ -165,7 +165,7 @@ void CGameClient::OnConsoleInit()
 					      &m_Particles.m_RenderExtra,
 					      &m_Particles.m_RenderGeneral,
 					      &m_FreezeBars,
-					      &m_RcRechargeBars,
+					      &m_RcRechargeBars, // RClient
 					      &m_DamageInd,
 					      &m_PlayerIndicator, // TClient
 					      &m_Mod, // TClient
@@ -195,6 +195,7 @@ void CGameClient::OnConsoleInit()
 					      &m_Motd,
 					      &m_Menus,
 					      &m_Tooltips,
+					      &m_RcHudEditor, // RClient
 					      &m_Scripting, // TClient
 					      &m_KeyBinder,
 					      &m_GameConsole,
@@ -204,8 +205,9 @@ void CGameClient::OnConsoleInit()
 	m_vpInput.insert(m_vpInput.end(), {&m_KeyBinder, // this will take over all input when we want to bind a key
 						  &m_Binds.m_SpecialBinds,
 						  &m_GameConsole,
+						  &m_RcHudEditor, // RClient
 						  &m_Chat, // chat has higher prio, due to that you can quit it by pressing esc
-						  &m_RcAdminPanel,
+						  &m_RcAdminPanel, // RClient
 						  &m_Scoreboard,
 						  &m_Motd, // for pressing esc to remove it
 						  &m_Spectator,

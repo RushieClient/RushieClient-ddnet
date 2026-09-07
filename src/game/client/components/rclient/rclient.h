@@ -262,6 +262,10 @@ public:
 	const char *GetDDGVqd();
 
 	int GetWeaponSlot(int Value);
+
+	// Ui
+	CUIRect *GetRealScreen();
+	CUIRect m_RealScreen;
 };
 
 #endif // GAME_CLIENT_COMPONENTS_RCLIENT_RCLIENT_H

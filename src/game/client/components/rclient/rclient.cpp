@@ -2446,3 +2446,10 @@ int CRClient::GetWeaponSlot(int Value)
 	}
 	return LastOwned;
 }
+
+CUIRect *CRClient::GetRealScreen()
+{
+	m_RealScreen.h = 600.0f;
+	m_RealScreen.w = Graphics()->ScreenAspectReal() * m_RealScreen.h;
+	return &m_RealScreen;
+}
