@@ -996,6 +996,10 @@ duckduckgo (works on upd))
 == 
 
 [RClient]
+Send in menu info when inactive
+== 
+
+[RClient]
 Wake up
 == 
 
