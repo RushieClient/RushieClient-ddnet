@@ -990,6 +990,8 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		s_ReaderButton45degrees, s_ClearButton45degrees,
 		s_ReaderButtonSmallsens, s_ClearButtonSmallsens,
 		s_ReaderButtonFindTeleport, s_ClearButtonFindTeleport,
+		s_ReaderButtonLJump, s_ClearButtonLJump,
+		s_ReaderButtonRJump, s_ClearButtonRJump,
 		s_ReaderButtonFindFinish, s_ClearButtonFindFinish;
 	DoLine_KeyReader(Column, s_ReaderButtonDeepfly, s_ClearButtonDeepfly, RCLocalize("Toggle deepfly", "RClient"), "rc_toggle_deepfly");
 	{
@@ -1017,6 +1019,8 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	}
 	DoLine_KeyReader(Column, s_ReaderButtonFindTeleport, s_ClearButtonFindTeleport, RCLocalize("Find Teleport", "RClient"), "rc_goto_tele_cursor");
 	DoLine_KeyReader(Column, s_ReaderButtonFindFinish, s_ClearButtonFindFinish, RCLocalize("Find Finish", "RClient"), "rc_goto_finish_cursor");
+	DoLine_KeyReader(Column, s_ReaderButtonLJump, s_ClearButtonLJump, RCLocalize("Left jump", "RClient"), "\"+left;+jump\"");
+	DoLine_KeyReader(Column, s_ReaderButtonRJump, s_ClearButtonRJump, RCLocalize("Right jump", "RClient"), "\"+right;+jump\"");
 	static int s_WeaponSlotsBindsId = 0;
 	DoButton_CheckBoxAutoVMarginAndSet(&s_WeaponSlotsBindsId, RCLocalize("Weapon slots", "RClient"), &g_Config.m_RcWeaponSlots, &Column, LineSize);
 
@@ -1121,7 +1125,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		DoMenuSettingsBar(&Column, apTabNames, NUMBER_OF_HELP_TABS, s_aPageTabs, s_CurHelpCustomTab, LineSize);
 		Column.HSplitTop(MarginSmall, nullptr, &Column);
 
-		const float m_BiggestTab = LineSize * 6.0f + LineSize + (LineSize + 2.0f) * 2.0f;
+		const float m_BiggestTab = LineSize * 8.0f + LineSize + (LineSize + 2.0f) * 2.0f + MarginSmall;
 		const float m_CurrentY = Column.y;
 
 		if(s_CurHelpCustomTab == HELP_TAB_MAIN)
@@ -1147,6 +1151,20 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcSaveAlphaInOtherTeamInSpec, RCLocalize("Fix cl_show_others_alpha in spec", "RClient"), &g_Config.m_RcSaveAlphaInOtherTeamInSpec, &Column, LineSize);
 			static int s_WeaponSlotsHelpId = 0;
 			DoButton_CheckBoxAutoVMarginAndSet(&s_WeaponSlotsHelpId, RCLocalize("Weapon slots", "RClient"), &g_Config.m_RcWeaponSlots, &Column, LineSize);
+
+			Column.HSplitTop(LineSize, &Button, &Column);
+			static CButtonContainer s_ReaderButtonHudEditor, s_ClearButtonHudEditor, s_OpenHudEditor;
+			int SOpenRcHudEditor = GameClient()->m_RcHudEditor.IsActive();
+			if(DoButton_Menu(&s_OpenHudEditor, "Open Hud Editor", SOpenRcHudEditor, &Button))
+			{
+				if(Client()->State() != IClient::STATE_OFFLINE)
+				{
+					GameClient()->m_Menus.SetActive(false);
+					GameClient()->m_RcHudEditor.SetActive(true);
+				}
+			}
+			Column.HSplitTop(MarginSmall, &Button, &Column);
+			DoLine_KeyReader(Column, s_ReaderButtonHudEditor, s_ClearButtonHudEditor, RCLocalize("Bind Hud Editor", "RClient"), "rc_toggle_hud_editor");
 		}
 
 		if(s_CurHelpCustomTab == HELP_TAB_SORT)

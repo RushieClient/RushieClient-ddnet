@@ -87,6 +87,7 @@ CRClient::CRClient()
 
 void CRClient::OnReset()
 {
+	m_DummyConnectedPrevState = true;
 }
 
 void CRClient::OnInit()

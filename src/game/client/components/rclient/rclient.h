@@ -45,7 +45,7 @@ class CRClient : public CComponent
 
 	//Dummy clan
 	void DummyConnectedClan(bool IsDummyConnected);
-	bool m_DummyConnectedPrevState = false;
+	bool m_DummyConnectedPrevState = true;
 
 	//Tracker
 	static void ConTrackerAdd(IConsole::IResult *pResult, void *pUserData);
