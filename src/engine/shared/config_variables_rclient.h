@@ -225,3 +225,7 @@ MACRO_CONFIG_INT(RcHudLastTextPosX, rc_hud_last_text_pos_x, 0, -600, 600, CFGFLA
 MACRO_CONFIG_INT(RcHudLastTextPosY, rc_hud_last_text_pos_y, 0, -600, 600, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Player state Y offset in HUD units from top")
 MACRO_CONFIG_INT(RcChatPosX, rc_chat_pos_x, 0, -600, 600, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Chat X position in HUD units from left")
 MACRO_CONFIG_INT(RcChatPosY, rc_chat_pos_y, 0, -600, 600, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Chat Y offset in HUD units from bottom")
+
+// Hook Coll
+MACRO_CONFIG_INT(RcContinueHookLine, rc_continue_hook_line, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Continue hookline after hit")
+MACRO_CONFIG_COL(RcHookLineContinueColor, rc_hook_line_continue_color, 4278190080, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_COLALPHA, "Specifies the color of the hookline tip")

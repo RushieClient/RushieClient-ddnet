@@ -297,6 +297,7 @@ void CPlayers::RenderHookCollLine(
 	int HookTick;
 	bool HookEnteredTelehook = false;
 	std::optional<IGraphics::CLineItem> HookTipLineSegment;
+	std::optional<IGraphics::CLineItem> HookContinueLineSegment;
 	for(HookTick = 0; HookTick < MaxHookTicks; ++HookTick)
 	{
 		int Tele;
@@ -372,6 +373,9 @@ void CPlayers::RenderHookCollLine(
 			if(Hit != TILE_NOHOOK)
 				HookCollColor = color_cast<ColorRGBA>(ColorHSLA(g_Config.m_ClHookCollColorHookableColl));
 			vLineSegments.emplace_back(LineStartPos, HitPos);
+			vec2 EndPos = BasePos + normalize(QuantizedDirection) * HookLength;
+			if(distance(BasePos, EndPos) > distance(BasePos, HitPos))
+				HookContinueLineSegment = IGraphics::CLineItem(HitPos, EndPos);
 			break;
 		}
 
@@ -434,6 +438,7 @@ void CPlayers::RenderHookCollLine(
 	if(Alpha <= 0.0f)
 		return;
 	ColorRGBA HookCollTipColor = color_cast<ColorRGBA>(ColorHSLA(g_Config.m_ClHookCollTipColor, true));
+	ColorRGBA HookCollContinueColor = color_cast<ColorRGBA>(ColorHSLA(g_Config.m_RcHookLineContinueColor, true));
 
 	Graphics()->TextureClear();
 	if(HookCollSize > 0)
@@ -471,6 +476,13 @@ void CPlayers::RenderHookCollLine(
 			Graphics()->SetColor(HookCollTipColor.WithMultipliedAlpha(Alpha));
 			Graphics()->QuadsDrawFreeform(vLineQuadSegments.data(), vLineQuadSegments.size());
 		}
+		if(HookContinueLineSegment.has_value() && HookCollContinueColor.a > 0.0f && g_Config.m_RcContinueHookLine /*RClient*/)
+		{
+			vLineQuadSegments.clear();
+			ConvertLineSegments(HookContinueLineSegment.value());
+			Graphics()->SetColor(HookCollContinueColor.WithMultipliedAlpha(Alpha));
+			Graphics()->QuadsDrawFreeform(vLineQuadSegments.data(), vLineQuadSegments.size());
+		}
 		Graphics()->QuadsEnd();
 	}
 	else
@@ -482,6 +494,11 @@ void CPlayers::RenderHookCollLine(
 		{
 			Graphics()->SetColor(HookCollTipColor.WithMultipliedAlpha(Alpha));
 			Graphics()->LinesDraw(&HookTipLineSegment.value(), 1);
+		}
+		if(HookContinueLineSegment.has_value() && HookCollContinueColor.a > 0.0f && !g_Config.m_RcContinueHookLine /*RClient*/)
+		{
+			Graphics()->SetColor(HookCollContinueColor.WithMultipliedAlpha(Alpha));
+			Graphics()->LinesDraw(&HookContinueLineSegment.value(), 1);
 		}
 		Graphics()->LinesEnd();
 	}

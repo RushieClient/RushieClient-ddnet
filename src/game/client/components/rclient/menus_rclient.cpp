@@ -1125,7 +1125,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		DoMenuSettingsBar(&Column, apTabNames, NUMBER_OF_HELP_TABS, s_aPageTabs, s_CurHelpCustomTab, LineSize);
 		Column.HSplitTop(MarginSmall, nullptr, &Column);
 
-		const float m_BiggestTab = LineSize * 8.0f + LineSize + (LineSize + 2.0f) * 2.0f + MarginSmall;
+		const float m_BiggestTab = LineSize * 9.0f + LineSize + (LineSize + 2.0f) * 2.0f + MarginSmall;
 		const float m_CurrentY = Column.y;
 
 		if(s_CurHelpCustomTab == HELP_TAB_MAIN)
@@ -1151,7 +1151,6 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcSaveAlphaInOtherTeamInSpec, RCLocalize("Fix cl_show_others_alpha in spec", "RClient"), &g_Config.m_RcSaveAlphaInOtherTeamInSpec, &Column, LineSize);
 			static int s_WeaponSlotsHelpId = 0;
 			DoButton_CheckBoxAutoVMarginAndSet(&s_WeaponSlotsHelpId, RCLocalize("Weapon slots", "RClient"), &g_Config.m_RcWeaponSlots, &Column, LineSize);
-
 			Column.HSplitTop(LineSize, &Button, &Column);
 			static CButtonContainer s_ReaderButtonHudEditor, s_ClearButtonHudEditor, s_OpenHudEditor;
 			int SOpenRcHudEditor = GameClient()->m_RcHudEditor.IsActive();
@@ -1165,6 +1164,8 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 			}
 			Column.HSplitTop(MarginSmall, &Button, &Column);
 			DoLine_KeyReader(Column, s_ReaderButtonHudEditor, s_ClearButtonHudEditor, RCLocalize("Bind Hud Editor", "RClient"), "rc_toggle_hud_editor");
+			static CButtonContainer s_HookLineContinueColor;
+			DoButton_ColorPickerAutoVMargin(&s_HookLineContinueColor, RCLocalize("Continue hook line after hit", "RClient"), &g_Config.m_RcHookLineContinueColor, color_cast<ColorRGBA>(ColorHSLA(DefaultConfig::RcHookLineContinueColor)), &Column, LineSize, true, &g_Config.m_RcContinueHookLine);
 		}
 
 		if(s_CurHelpCustomTab == HELP_TAB_SORT)
