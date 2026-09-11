@@ -1513,9 +1513,8 @@ void CMenus::RenderServerbrowserFriends(CUIRect View)
 			if(!pEntry->m_NumClients)
 				continue;
 
-			for(int ClientIndex = 0; ClientIndex < pEntry->m_NumClients; ++ClientIndex)
+			for(const CServerInfo::CClient &CurrentClient : pEntry->m_vClients)
 			{
-				const CServerInfo::CClient &CurrentClient = pEntry->m_vClients[ClientIndex];
 				for(const CWarEntry &War : GameClient()->m_WarList.m_vWarEntries)
 				{
 					const bool NameHit = War.m_aName[0] != '\0' && str_comp(War.m_aName, CurrentClient.m_aName) == 0;
