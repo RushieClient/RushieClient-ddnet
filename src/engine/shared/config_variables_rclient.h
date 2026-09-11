@@ -207,6 +207,8 @@ MACRO_CONFIG_INT(RcWeaponSlots, rc_weapon_slots, 0, 0, 1, CFGFLAG_CLIENT | CFGFL
 // Hud Editor
 MACRO_CONFIG_INT(RcHudTimerPosX, rc_hud_timer_pos_x, 0, -600, 600, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Game timer X offset in HUD units from center")
 MACRO_CONFIG_INT(RcHudTimerPosY, rc_hud_timer_pos_y, 0, -600, 600, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Game timer Y position in HUD units from top")
+MACRO_CONFIG_INT(RcHudSpectatorCountPosX, rc_hud_spectator_count_pos_x, 0, -600, 600, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Game timer X offset in HUD units from center")
+MACRO_CONFIG_INT(RcHudSpectatorCountPosY, rc_hud_spectator_count_pos_y, 0, -600, 600, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Game timer Y position in HUD units from top")
 MACRO_CONFIG_INT(RcHudDummyActionsPosX, rc_hud_dummy_actions_pos_x, 0, -600, 600, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Game timer X offset in HUD units from center")
 MACRO_CONFIG_INT(RcHudDummyActionsPosY, rc_hud_dummy_actions_pos_y, 0, -600, 600, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Game timer Y position in HUD units from top")
 MACRO_CONFIG_INT(RcHudPlayerMovementPosX, rc_hud_player_movement_pos_x, 0, -600, 600, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Game timer X offset in HUD units from center")

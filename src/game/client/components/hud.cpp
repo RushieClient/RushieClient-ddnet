@@ -1530,6 +1530,9 @@ void CHud::RenderSpectatorCount()
 		StartY = StartY - 29.0f - (g_Config.m_RcShowhudAdvancedDummyActions ? 13.0f * 2 : 0.0f) - 4; // dummy actions height and padding
 	}
 
+	StartX += g_Config.m_RcHudSpectatorCountPosX;
+	StartY += g_Config.m_RcHudSpectatorCountPosY;
+
 	Graphics()->DrawRect(StartX, StartY, BoxWidth, BoxHeight, ColorRGBA(0.0f, 0.0f, 0.0f, 0.4f), IGraphics::CORNER_L, 5.0f);
 
 	float y = StartY + BoxHeight / 3;

@@ -12,12 +12,13 @@ class CHudEditor : public CComponent
 	vec2 m_HudTimerPos;
 	vec2 m_DumActionsPos;
 	vec2 m_PlPosPos;
+	vec2 m_SpecCountPos;
 
 	std::optional<vec2> m_LastMousePos;
 	void SetUiMousePos(vec2 Pos);
 	void LockMouse();
 
-	int m_DragElement = 0; // 1-chat 2-hudtimer 3-dumactions 4-plpos
+	int m_DragElement = 0; // 1-chat 2-hudtimer 3-dumactions 4-plpos 5-SpecCount
 	vec2 m_DragPos;
 	bool m_MouseWasPressed = false;
 	int64_t m_TimeLatestPressedNeed = 0;
@@ -27,6 +28,7 @@ class CHudEditor : public CComponent
 	CButtonContainer m_ResetButtonHudTimer;
 	CButtonContainer m_ResetButtonDumActions;
 	CButtonContainer m_ResetButtonPlPos;
+	CButtonContainer m_ResetButtonSpecCount;
 
 	bool m_Active = false;
 	void SetActive(bool Active);

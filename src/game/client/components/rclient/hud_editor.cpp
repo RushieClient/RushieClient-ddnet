@@ -17,6 +17,7 @@ namespace EditorSettingsOpened
 		HUDTIMER = 1 << 1,
 		HUDDUMACTIONS = 1 << 2,
 		HUDPLPOS = 1 << 3,
+		HUDSPECCOUNT = 1 << 4,
 	};
 }
 
@@ -69,7 +70,7 @@ void CHudEditor::OnRender()
 	Ui()->DoLabel(pScreen, "Hold 0.25s to move. Click for settings", 16.0f, TEXTALIGN_MC);
 
 	vec2 BoxSize = vec2(60.0f, 14.0f);
-	CUIRect ChatBox, HudTimerBox, DumActionsBox, PlPosBox;
+	CUIRect ChatBox, HudTimerBox, DumActionsBox, PlPosBox, SpecCountBox;
 
 	const float RealAspect = Graphics()->ScreenAspectReal();
 	const float ChatAspect = (g_Config.m_RcCustomAspectDisable & RcAspectDisable::CHAT)
@@ -220,6 +221,56 @@ void CHudEditor::OnRender()
 			Ui()->DoLabel(&PosLabel, aBuf, 12.0f, TEXTALIGN_MC);
 		}
 	}
+	
+	// SpecCount
+	{
+		const float MWidth = 300.0f * Graphics()->ScreenAspectReal();
+		const float BoxHeight = 14.f;
+		const float BoxWidth = 13.f;
+
+		float StartX = MWidth - BoxWidth;
+		float StartY = 285.0f - BoxHeight - 4; // 4 units distance to the next display;
+		if(g_Config.m_ClShowhudPlayerPosition || g_Config.m_ClShowhudPlayerSpeed || g_Config.m_ClShowhudPlayerAngle)
+		{
+			StartY -= 4;
+		}
+		StartY -= GameClient()->m_Hud.GetMovementInformationBoxHeight();;
+
+		if(g_Config.m_ClShowhudScore)
+		{
+			StartY -= 56;
+		}
+
+		if(g_Config.m_ClShowhudDummyActions && !(GameClient()->m_Snap.m_pGameInfoObj->m_GameStateFlags & GAMESTATEFLAG_GAMEOVER) && Client()->DummyConnected())
+		{
+			StartY = StartY - 29.0f - (g_Config.m_RcShowhudAdvancedDummyActions ? 13.0f * 2 : 0.0f) - 4; // dummy actions height and padding
+		}
+	
+		StartX = (StartX + g_Config.m_RcHudSpectatorCountPosX) * 2.0f;
+		StartY = (StartY + g_Config.m_RcHudSpectatorCountPosY) * 2.0f;
+		
+		SpecCountBox = {StartX - (BoxSize.x) / 2, StartY + BoxHeight / 2.0f, BoxSize.x, BoxSize.y};
+		SpecCountBox.DrawOutline(ColorRGBA(1.0f, 1.0f, 1.0f, 0.5f));
+		SpecCountBox.Draw(ColorRGBA(1.0f, 1.0f, 1.0f, 0.25f), IGraphics::CORNER_NONE, 0.0f);
+		Ui()->DoLabel(&SpecCountBox, "SpecCount", 12.0f, TEXTALIGN_MC);
+		if(m_OpenedSettings & EditorSettingsOpened::HUDSPECCOUNT)
+		{
+			CUIRect ResetButton = {SpecCountBox.x, SpecCountBox.y + SpecCountBox.h + SmallMargin, SpecCountBox.w, 12.0f};
+			if(GameClient()->m_Menus.DoButton_Menu(&m_ResetButtonPlPos, "Reset", 0, &ResetButton))
+			{
+				g_Config.m_RcHudSpectatorCountPosX = 0;
+				g_Config.m_RcHudSpectatorCountPosY = 0;
+			}
+			CUIRect PosLabel = {SpecCountBox.x, SpecCountBox.y + (SpecCountBox.h + SmallMargin) * 2, SpecCountBox.w, 12.0f};
+			char aBuf[32];
+			str_format(aBuf, sizeof(aBuf), "x: %.0f, y: %.0f", PosLabel.x, PosLabel.y);
+			Ui()->DoLabel(&PosLabel, aBuf, 12.0f, TEXTALIGN_MC);
+			PosLabel.y = SpecCountBox.y + (SpecCountBox.h + SmallMargin) * 3;
+			str_format(aBuf, sizeof(aBuf), "cx: %i, cy: %i", g_Config.m_RcHudSpectatorCountPosX, g_Config.m_RcHudSpectatorCountPosY);
+			Ui()->DoLabel(&PosLabel, aBuf, 12.0f, TEXTALIGN_MC);
+		}
+	}
+
 
 	// Drag
 	const bool Pressed = Ui()->MouseButton(0);
@@ -245,6 +296,11 @@ void CHudEditor::OnRender()
 			m_DragElement = 4;
 			m_DragPos = vec2(g_Config.m_RcHudPlayerMovementPosX, g_Config.m_RcHudPlayerMovementPosY);
 		}
+		else if(SpecCountBox.Inside(Ui()->MousePos()))
+		{
+			m_DragElement = 5;
+			m_DragPos = vec2(g_Config.m_RcHudSpectatorCountPosX, g_Config.m_RcHudSpectatorCountPosY);
+		}
 	}
 	if(m_DragElement != 0 && Pressed && !m_MouseWasPressed)
 		m_TimeLatestPressedNeed = time_get() + time_freq() * 0.25f;
@@ -258,6 +314,7 @@ void CHudEditor::OnRender()
 			case 2: m_OpenedSettings ^= EditorSettingsOpened::HUDTIMER; break;
 			case 3: m_OpenedSettings ^= EditorSettingsOpened::HUDDUMACTIONS; break;
 			case 4: m_OpenedSettings ^= EditorSettingsOpened::HUDPLPOS; break;
+			case 5: m_OpenedSettings ^= EditorSettingsOpened::HUDSPECCOUNT; break;
 			default:;
 			}
 		}
@@ -269,7 +326,8 @@ void CHudEditor::OnRender()
 		if(!(HudTimerBox.Inside(Ui()->MousePos()) ||
 			ChatBox.Inside(Ui()->MousePos()) ||
 			PlPosBox.Inside(Ui()->MousePos()) ||
-			DumActionsBox.Inside(Ui()->MousePos())
+			DumActionsBox.Inside(Ui()->MousePos()) ||
+			SpecCountBox.Inside(Ui()->MousePos())
 		))
 		{
 			m_DragElement = 0;
@@ -299,6 +357,12 @@ void CHudEditor::OnRender()
 		m_DragPos += ConfDelta;
 		g_Config.m_RcHudPlayerMovementPosX = round_to_int(m_DragPos.x);
 		g_Config.m_RcHudPlayerMovementPosY = round_to_int(m_DragPos.y);
+	}
+	else if(m_DragElement == 5)
+	{
+		m_DragPos += ConfDelta;
+		g_Config.m_RcHudSpectatorCountPosX = round_to_int(m_DragPos.x);
+		g_Config.m_RcHudSpectatorCountPosY = round_to_int(m_DragPos.y);
 	}
 
 	m_MouseWasPressed = Pressed;
