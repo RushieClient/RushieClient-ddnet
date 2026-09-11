@@ -121,11 +121,7 @@ void CHudEditor::ComputeElementBox(int Idx)
 	{
 		const float FontSize = g_Config.m_ClChatFontSize / 10.0f;
 		Pos.x = (5.0f + g_Config.m_RcChatPosX) * 2.0f;
-		Pos.y = (MHeight
-		    - (20.0f * FontSize / 6.0f + (g_Config.m_TcStatusBar ? g_Config.m_TcStatusBarHeight : 0.0f))
-		    + g_Config.m_RcChatPosY
-		    - FontSize * (8.0f / 6.0f))
-		    * 2.0f;
+		Pos.y = (MHeight - (20.0f * FontSize / 6.0f + (g_Config.m_TcStatusBar ? g_Config.m_TcStatusBarHeight : 0.0f)) + g_Config.m_RcChatPosY - FontSize * (8.0f / 6.0f)) * 2.0f;
 		break;
 	}
 	case ELEM_HUDTIMER:

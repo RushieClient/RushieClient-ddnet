@@ -314,7 +314,7 @@ void CRClient::ConfigSaveCallback(IConfigManager *pConfigManager, void *pUserDat
 		str_format(aBuf, sizeof(aBuf), "bind %s \"%s\"", g_Config.m_RcDeepFlyOnRMB ? "mouse2" : "mouse1", Text.c_str());
 		pConfigManager->WriteLine(aBuf, ConfigDomain::RCLIENT);
 	}
-	for(const std::string& i : pSelf->m_CensorWordsList)
+	for(const std::string &i : pSelf->m_CensorWordsList)
 	{
 		str_format(aBuf, sizeof(aBuf), "rc_message_filter_add_word %s", i.c_str());
 		pConfigManager->WriteLine(aBuf, ConfigDomain::RCLIENTCENSORLIST);

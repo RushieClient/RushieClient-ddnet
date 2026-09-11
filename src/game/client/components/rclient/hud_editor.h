@@ -57,6 +57,7 @@ class CHudEditor : public CComponent
 	static constexpr float MOVEMENT_INFORMATION_LINE_HEIGHT = 8.0f;
 	inline float GetMovementInformationBoxHeight();
 	inline int GetDigitsIndex(int Value, int Max);
+
 public:
 	CHudEditor();
 	int Sizeof() const override { return sizeof(*this); }

@@ -153,10 +153,10 @@ void CEdgeHelper::RenderEdgeHelperEdgeInfo(CUIRect *pBase)
 	LeftZone.Margin(SEdgeHelperProperties::ms_ItemSpacing, &LeftZone);
 	RightZone.Margin(SEdgeHelperProperties::ms_ItemSpacing, &RightZone);
 	LeftZone.Draw(m_PosX >= 44 ? color_cast<ColorRGBA>(ColorHSLA(g_Config.m_RcEdgeInfoColorKill)) : m_PosX >= 28 ? color_cast<ColorRGBA>(ColorHSLA(g_Config.m_RcEdgeInfoColorSafe)) :
-															 color_cast<ColorRGBA>(ColorHSLA(g_Config.m_RcEdgeInfoColorFreeze)),
+														       color_cast<ColorRGBA>(ColorHSLA(g_Config.m_RcEdgeInfoColorFreeze)),
 		IGraphics::CORNER_ALL, SEdgeHelperProperties::ms_Rounding);
 	RightZone.Draw(m_PosX <= 53 ? color_cast<ColorRGBA>(ColorHSLA(g_Config.m_RcEdgeInfoColorKill)) : m_PosX <= 69 ? color_cast<ColorRGBA>(ColorHSLA(g_Config.m_RcEdgeInfoColorSafe)) :
-															  color_cast<ColorRGBA>(ColorHSLA(g_Config.m_RcEdgeInfoColorFreeze)),
+															color_cast<ColorRGBA>(ColorHSLA(g_Config.m_RcEdgeInfoColorFreeze)),
 		IGraphics::CORNER_ALL, SEdgeHelperProperties::ms_Rounding);
 	CenterZone.VSplitLeft(SEdgeHelperProperties::ms_WallWidth + ActionSpacing, &LeftZone, &CenterZone);
 	CenterZone.VSplitRight(SEdgeHelperProperties::ms_WallWidth + ActionSpacing, &CenterZone, &RightZone);
