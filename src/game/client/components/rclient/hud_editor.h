@@ -18,6 +18,10 @@ class CHudEditor : public CComponent
 		ELEM_PLPOS,
 		ELEM_SPECCOUNT,
 		ELEM_PLAYERSTATE,
+		ELEM_FROZENHUD,
+		ELEM_FROZENTEXT,
+		ELEM_FPSTEXT,
+		ELEM_LASTTEXT,
 		ELEM_COUNT,
 	};
 
@@ -51,6 +55,10 @@ class CHudEditor : public CComponent
 
 	bool m_Active = false;
 	void SetActive(bool Active);
+
+	static constexpr float MOVEMENT_INFORMATION_LINE_HEIGHT = 8.0f;
+	inline float GetMovementInformationBoxHeight();
+	inline int GetDigitsIndex(int Value, int Max);
 public:
 	CHudEditor();
 	int Sizeof() const override { return sizeof(*this); }

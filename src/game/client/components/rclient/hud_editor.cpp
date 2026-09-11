@@ -24,7 +24,11 @@ CHudEditor::CHudEditor()
 	m_aElements[ELEM_PLPOS] = {"Pl Pos", &g_Config.m_RcHudPlayerMovementPosX, &g_Config.m_RcHudPlayerMovementPosY};
 	m_aElements[ELEM_SPECCOUNT] = {"SpecCount", &g_Config.m_RcHudSpectatorCountPosX, &g_Config.m_RcHudSpectatorCountPosY};
 	m_aElements[ELEM_PLAYERSTATE] = {"PlayerState", &g_Config.m_RcHudPlayerStatePosX, &g_Config.m_RcHudPlayerStatePosY};
-	OnReset();
+	m_aElements[ELEM_FROZENHUD] = {"FrozenHud", &g_Config.m_RcHudFrozenHudPosX, &g_Config.m_RcHudFrozenHudPosY};
+	m_aElements[ELEM_FROZENTEXT] = {"FrozenText", &g_Config.m_RcHudFrozenTextPosX, &g_Config.m_RcHudFrozenTextPosY};
+	m_aElements[ELEM_FPSTEXT] = {"FpsText", &g_Config.m_RcHudFpsTextPosX, &g_Config.m_RcHudFpsTextPosY};
+	m_aElements[ELEM_LASTTEXT] = {"LastText", &g_Config.m_RcHudLastTextPosX, &g_Config.m_RcHudLastTextPosY};
+	CHudEditor::OnReset();
 }
 
 void CHudEditor::OnConsoleInit()
@@ -41,10 +45,74 @@ void CHudEditor::OnReset()
 	m_OpenedSettings = 0;
 }
 
+inline int CHudEditor::GetDigitsIndex(int Value, int Max)
+{
+	if(Value < 0)
+	{
+		Value *= -1;
+	}
+	int DigitsIndex = std::log10((Value ? Value : 1));
+	if(DigitsIndex > Max)
+	{
+		DigitsIndex = Max;
+	}
+	if(DigitsIndex < 0)
+	{
+		DigitsIndex = 0;
+	}
+	return DigitsIndex;
+}
+
+inline float CHudEditor::GetMovementInformationBoxHeight()
+{
+	// if(GameClient()->m_Snap.m_SpecInfo.m_Active && (GameClient()->m_Snap.m_SpecInfo.m_SpectatorId == SPEC_FREEVIEW || GameClient()->m_aClients[GameClient()->m_Snap.m_SpecInfo.m_SpectatorId].m_SpecCharPresent))
+	// 	return g_Config.m_ClShowhudPlayerPosition ? 3.0f * MOVEMENT_INFORMATION_LINE_HEIGHT + 2.0f : 0.0f;
+	// float BoxHeight = 3.0f * MOVEMENT_INFORMATION_LINE_HEIGHT * (g_Config.m_ClShowhudPlayerPosition + g_Config.m_ClShowhudPlayerSpeed) + 2.0f * MOVEMENT_INFORMATION_LINE_HEIGHT * g_Config.m_ClShowhudPlayerAngle;
+	// if(g_Config.m_ClShowhudPlayerPosition || g_Config.m_ClShowhudPlayerSpeed || g_Config.m_ClShowhudPlayerAngle)
+	// {
+	// 	BoxHeight += 2.0f;
+	// }
+	// return BoxHeight;
+	float BoxHeight = 0.0f;
+	if(GameClient()->m_Snap.m_SpecInfo.m_Active && (GameClient()->m_Snap.m_SpecInfo.m_SpectatorId == SPEC_FREEVIEW || GameClient()->m_aClients[GameClient()->m_Snap.m_SpecInfo.m_SpectatorId].m_SpecCharPresent))
+	{
+		if(!GameClient()->m_RClient.m_vPlayersInTracker.empty())
+			BoxHeight += GameClient()->m_RClient.m_vPlayersInTracker.size() * MOVEMENT_INFORMATION_LINE_HEIGHT * 3.0f;
+		if(g_Config.m_ClShowhudPlayerPosition)
+			BoxHeight += MOVEMENT_INFORMATION_LINE_HEIGHT * 3.0f;
+		if(g_Config.m_ClShowhudPlayerPosition && g_Config.m_TcShowhudDummyPosition && Client()->DummyConnected())
+			BoxHeight += MOVEMENT_INFORMATION_LINE_HEIGHT * 2.0f;
+	}
+	else
+	{
+		if(!GameClient()->m_RClient.m_vPlayersInTracker.empty())
+			BoxHeight += GameClient()->m_RClient.m_vPlayersInTracker.size() * MOVEMENT_INFORMATION_LINE_HEIGHT * 3.0f;
+		if(g_Config.m_ClShowhudPlayerPosition)
+			BoxHeight += MOVEMENT_INFORMATION_LINE_HEIGHT * 3.0f;
+		if(g_Config.m_ClShowhudPlayerPosition && g_Config.m_TcShowhudDummyPosition && Client()->DummyConnected())
+			BoxHeight += MOVEMENT_INFORMATION_LINE_HEIGHT * 2.0f;
+		if(g_Config.m_ClShowhudPlayerSpeed)
+			BoxHeight += MOVEMENT_INFORMATION_LINE_HEIGHT * 3.0f;
+		if(g_Config.m_ClShowhudPlayerSpeed && g_Config.m_TcShowhudDummySpeed && Client()->DummyConnected())
+			BoxHeight += MOVEMENT_INFORMATION_LINE_HEIGHT * 2.0f;
+		if(g_Config.m_ClShowhudPlayerAngle)
+			BoxHeight += MOVEMENT_INFORMATION_LINE_HEIGHT * (g_Config.m_RcShowhudSmallerHud ? 1.0f : 2.0f);
+		if(g_Config.m_ClShowhudPlayerAngle && g_Config.m_TcShowhudDummyAngle && Client()->DummyConnected())
+			BoxHeight += MOVEMENT_INFORMATION_LINE_HEIGHT;
+		if(g_Config.m_RcShowhudPlayerCheckpoint)
+			BoxHeight += MOVEMENT_INFORMATION_LINE_HEIGHT * (g_Config.m_RcShowhudSmallerHud ? 1.0f : 2.0f);
+	}
+	if(BoxHeight > 0.0f)
+		BoxHeight += 2.0f;
+	return BoxHeight;
+}
+
 void CHudEditor::ComputeElementBox(int Idx)
 {
 	CUIRect *pScreen = GameClient()->m_RClient.GetRealScreen();
 	const float RealAspect = Graphics()->ScreenAspectReal();
+	float MWidth = 300.0f * RealAspect;
+	float MHeight = 300.0f;
 	vec2 Pos;
 
 	switch(Idx)
@@ -56,7 +124,7 @@ void CHudEditor::ComputeElementBox(int Idx)
 		m_aElements[Idx].m_DragScaleX = RealAspect / ChatAspect;
 		const float FontSize = g_Config.m_ClChatFontSize / 10.0f;
 		Pos.x = (5.0f + g_Config.m_RcChatPosX) * 2.0f * m_aElements[Idx].m_DragScaleX;
-		Pos.y = (300.0f
+		Pos.y = (MHeight
 		    - (20.0f * FontSize / 6.0f + (g_Config.m_TcStatusBar ? g_Config.m_TcStatusBarHeight : 0.0f))
 		    + g_Config.m_RcChatPosY
 		    - FontSize * (8.0f / 6.0f))
@@ -64,21 +132,21 @@ void CHudEditor::ComputeElementBox(int Idx)
 		break;
 	}
 	case ELEM_HUDTIMER:
-		Pos.x = (300.0f * RealAspect / 2.0f + g_Config.m_RcHudTimerPosX) * 2.0f - BOX_WIDTH / 2.0f;
+		Pos.x = (MWidth / 2.0f + g_Config.m_RcHudTimerPosX) * 2.0f - BOX_WIDTH / 2.0f;
 		Pos.y = (2.0f + g_Config.m_RcHudTimerPosY) * 2.0f + BOX_HEIGHT / 2.0f;
 		break;
 	case ELEM_DUMACTIONS:
 	{
 		const float BoxHeight = 13.0f * 2 + 3.0f + (g_Config.m_RcShowhudAdvancedDummyActions ? 13.0f * 2 : 0.0f); // 13.0f - icon, 3.0f - spacing(once)
 		const float BoxWidth = 16.0f;
-		Pos.x = (300.0f * RealAspect - BoxWidth + g_Config.m_RcHudDummyActionsPosX) * 2 + (BoxWidth - BOX_WIDTH) / 2;
+		Pos.x = (MWidth - BoxWidth + g_Config.m_RcHudDummyActionsPosX) * 2 + (BoxWidth - BOX_WIDTH) / 2;
 		Pos.y = (285.0f - BoxHeight - 4 + g_Config.m_RcHudDummyActionsPosY) * 2;
 
 		if(g_Config.m_ClShowhudPlayerPosition || g_Config.m_ClShowhudPlayerSpeed || g_Config.m_ClShowhudPlayerAngle)
 		{
 			Pos.y -= 4 * 2;
 		}
-		Pos.y -= GameClient()->m_Hud.GetMovementInformationBoxHeight() * 2;
+		Pos.y -= GetMovementInformationBoxHeight() * 2;
 
 		if(g_Config.m_ClShowhudScore)
 		{
@@ -94,9 +162,9 @@ void CHudEditor::ComputeElementBox(int Idx)
 	}
 	case ELEM_PLPOS:
 	{
-		const float BoxHeight = GameClient()->m_Hud.GetMovementInformationBoxHeight();
+		const float BoxHeight = GetMovementInformationBoxHeight();
 		const float BoxWidth = 62.0f;
-		Pos.x = (300.0f * RealAspect - BoxWidth + g_Config.m_RcHudPlayerMovementPosX) * 2 + (BoxWidth * 2 - BOX_WIDTH) / 2;
+		Pos.x = (MWidth - BoxWidth + g_Config.m_RcHudPlayerMovementPosX) * 2 + (BoxWidth * 2 - BOX_WIDTH) / 2;
 		Pos.y = (285.0f - BoxHeight - 4.0f + g_Config.m_RcHudPlayerMovementPosY) * 2;
 		if(g_Config.m_ClShowhudScore)
 		{
@@ -107,7 +175,6 @@ void CHudEditor::ComputeElementBox(int Idx)
 	}
 	case ELEM_SPECCOUNT:
 	{
-		const float MWidth = 300.0f * Graphics()->ScreenAspectReal();
 		const float BoxHeight = 14.f;
 		const float BoxWidth = 13.f;
 
@@ -117,7 +184,7 @@ void CHudEditor::ComputeElementBox(int Idx)
 		{
 			StartY -= 4;
 		}
-		StartY -= GameClient()->m_Hud.GetMovementInformationBoxHeight();
+		StartY -= GetMovementInformationBoxHeight();
 
 		if(g_Config.m_ClShowhudScore)
 		{
@@ -139,6 +206,43 @@ void CHudEditor::ComputeElementBox(int Idx)
 		const bool HasAmmo = GameClient()->m_GameInfo.m_HudAmmo && g_Config.m_ClShowhudHealthAmmo;
 		Pos.x = (5.0f + g_Config.m_RcHudPlayerStatePosX) * 2.0f;
 		Pos.y = (5.0f + 12.0f + (HasHealth ? 24.0f : 0.0f) + (HasAmmo ? 12.0f : 0.0f) + g_Config.m_RcHudPlayerStatePosY) * 2.0f;
+		break;
+	}
+	case ELEM_FROZENHUD:
+	{
+		float StartPos = (MWidth / 2.0f + 38.0f * (MWidth / MHeight) / 1.78f + g_Config.m_RcHudFrozenHudPosX) * 2.0f;
+		Pos.x = StartPos;
+		Pos.y = g_Config.m_RcHudFrozenHudPosY * 2.0f;
+		break;
+	}
+	case ELEM_FROZENTEXT:
+	{
+		Pos.x = (MWidth / 2.0f + g_Config.m_RcHudFrozenTextPosX) * 2.0f - BOX_WIDTH / 2.0f;
+		Pos.y = (12.0f + g_Config.m_RcHudFrozenTextPosY) * 2.0f + BOX_HEIGHT / 2.0f - SMALL_MARGIN;
+		break;
+	}
+	case ELEM_FPSTEXT:
+	{
+		const int FramesPerSecond = round_to_int(1.0f / Client()->FrameTimeAverage());
+		static float s_TextWidth0 = TextRender()->TextWidth(12.f, "0", -1, -1.0f);
+		static float s_TextWidth00 = TextRender()->TextWidth(12.f, "00", -1, -1.0f);
+		static float s_TextWidth000 = TextRender()->TextWidth(12.f, "000", -1, -1.0f);
+		static float s_TextWidth0000 = TextRender()->TextWidth(12.f, "0000", -1, -1.0f);
+		static float s_TextWidth00000 = TextRender()->TextWidth(12.f, "00000", -1, -1.0f);
+		static const float s_aTextWidth[5] = {s_TextWidth0, s_TextWidth00, s_TextWidth000, s_TextWidth0000, s_TextWidth00000};
+		int DigitIndex = GetDigitsIndex(FramesPerSecond, 4);
+
+		Pos.x = (MWidth - 10 - s_aTextWidth[DigitIndex] + g_Config.m_RcHudFpsTextPosX) * 2.0f;
+		Pos.y = (5 + g_Config.m_RcHudFpsTextPosY) * 2.0f + BOX_HEIGHT;
+		break;
+	}
+	case ELEM_LASTTEXT:
+	{
+		float FontSize = g_Config.m_TcNotifyWhenLastSize;
+		float XPos = std::clamp((g_Config.m_TcNotifyWhenLastX / 100.0f) * MWidth, 1.0f, MWidth - FontSize) + g_Config.m_RcHudLastTextPosX;
+		float YPos = std::clamp((g_Config.m_TcNotifyWhenLastY / 100.0f) * MHeight, 1.0f, MHeight - FontSize) + g_Config.m_RcHudLastTextPosY;
+		Pos.x = XPos * 2.0f;
+		Pos.y = YPos * 2.0f;
 		break;
 	}
 	default:

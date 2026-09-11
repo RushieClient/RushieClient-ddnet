@@ -567,7 +567,7 @@ void CHud::RenderTextInfo()
 		int DigitIndex = GetDigitsIndex(FramesPerSecond, 4);
 
 		CTextCursor Cursor;
-		Cursor.SetPosition(vec2(m_Width - 10 - s_aTextWidth[DigitIndex], 5));
+		Cursor.SetPosition(vec2(m_Width - 10 - s_aTextWidth[DigitIndex] + g_Config.m_RcHudFpsTextPosX, 5 + g_Config.m_RcHudFpsTextPosY));
 		Cursor.m_FontSize = 12.0f;
 		auto OldFlags = TextRender()->GetRenderFlags();
 		TextRender()->SetRenderFlags(OldFlags | TEXT_RENDER_FLAG_ONE_TIME_USE);
@@ -585,7 +585,7 @@ void CHud::RenderTextInfo()
 	{
 		char aBuf[64];
 		str_format(aBuf, sizeof(aBuf), "%d", Client()->GetPredictionTime());
-		TextRender()->Text(m_Width - 10 - TextRender()->TextWidth(12, aBuf, -1, -1.0f), Showfps ? 20 : 5, 12, aBuf, -1.0f);
+		TextRender()->Text(m_Width - 10 - TextRender()->TextWidth(12, aBuf, -1, -1.0f) + g_Config.m_RcHudFpsTextPosX, (Showfps ? 20 : 5) + g_Config.m_RcHudFpsTextPosY, 12, aBuf, -1.0f);
 	}
 
 	if(g_Config.m_TcMiniDebug)
@@ -672,8 +672,8 @@ void CHud::RenderTextInfo()
 			{
 				TextRender()->TextColor(color_cast<ColorRGBA>(ColorHSLA(g_Config.m_TcNotifyWhenLastColor)));
 				float FontSize = g_Config.m_TcNotifyWhenLastSize;
-				float XPos = std::clamp((g_Config.m_TcNotifyWhenLastX / 100.0f) * m_Width, 1.0f, m_Width - FontSize);
-				float YPos = std::clamp((g_Config.m_TcNotifyWhenLastY / 100.0f) * m_Height, 1.0f, m_Height - FontSize);
+				float XPos = std::clamp((g_Config.m_TcNotifyWhenLastX / 100.0f) * m_Width, 1.0f, m_Width - FontSize) + g_Config.m_RcHudLastTextPosX;
+				float YPos = std::clamp((g_Config.m_TcNotifyWhenLastY / 100.0f) * m_Height, 1.0f, m_Height - FontSize) + g_Config.m_RcHudLastTextPosY;
 
 				TextRender()->Text(XPos, YPos, FontSize, g_Config.m_TcNotifyWhenLastText, -1.0f);
 				TextRender()->TextColor(TextRender()->DefaultTextColor());
@@ -686,7 +686,7 @@ void CHud::RenderTextInfo()
 		else if(g_Config.m_TcShowFrozenText == 2)
 			str_format(aBuf, sizeof(aBuf), "%d / %d", NumFrozen, NumInTeam);
 		if(g_Config.m_TcShowFrozenText > 0)
-			TextRender()->Text(m_Width / 2.0f - TextRender()->TextWidth(10.0f, aBuf) / 2.0f, 12.0f, 10.0f, aBuf);
+			TextRender()->Text(m_Width / 2.0f - TextRender()->TextWidth(10.0f, aBuf) / 2.0f + g_Config.m_RcHudFrozenTextPosX, 12.0f + g_Config.m_RcHudFrozenTextPosY, 10.0f, aBuf);
 
 		// str_format(aBuf, sizeof(aBuf), "%d", GameClient()->m_aClients[GameClient()->m_Snap.m_LocalClientId].m_PrevPredicted.m_FreezeEnd);
 		// str_format(aBuf, sizeof(aBuf), "%d", g_Config.m_ClWhatsMyPing);
@@ -710,13 +710,13 @@ void CHud::RenderTextInfo()
 			if(!g_Config.m_ClShowfps && !g_Config.m_ClShowpred)
 				MaxTees = (int)(9.5f * (m_Width / m_Height) * 13.0f / TeeSize);
 			int MaxRows = g_Config.m_TcFrozenMaxRows;
-			float StartPos = m_Width / 2.0f + 38.0f * (m_Width / m_Height) / 1.78f;
+			float StartPos = m_Width / 2.0f + 38.0f * (m_Width / m_Height) / 1.78f + g_Config.m_RcHudFrozenHudPosX;
 
 			int TotalRows = std::min(MaxRows, (NumInTeam + MaxTees - 1) / MaxTees);
 			Graphics()->TextureClear();
 			Graphics()->QuadsBegin();
 			Graphics()->SetColor(0.0f, 0.0f, 0.0f, 0.4f);
-			Graphics()->DrawRectExt(StartPos - TeeSize / 2.0f, 0.0f, TeeSize * std::min(NumInTeam, MaxTees), TeeSize + 3.0f + (TotalRows - 1) * TeeSize, 5.0f, IGraphics::CORNER_B);
+			Graphics()->DrawRectExt(StartPos - TeeSize / 2.0f, 0.0f + g_Config.m_RcHudFrozenHudPosY, TeeSize * std::min(NumInTeam, MaxTees), TeeSize + 3.0f + (TotalRows - 1) * TeeSize, 5.0f, !g_Config.m_RcHudFrozenHudPosY ? IGraphics::CORNER_B : IGraphics::CORNER_ALL);
 			Graphics()->QuadsEnd();
 
 			bool Overflow = NumInTeam > MaxTees * MaxRows;
@@ -760,7 +760,7 @@ void CHud::RenderTextInfo()
 						const CAnimState *pIdleState = CAnimState::GetIdle();
 						vec2 OffsetToMid;
 						CRenderTools::GetRenderTeeOffsetToRenderedTee(pIdleState, &TeeInfo, OffsetToMid);
-						vec2 TeeRenderPos(StartPos + ProgressiveOffset, TeeSize * (0.7f) + CurrentRow * TeeSize);
+						vec2 TeeRenderPos(StartPos + ProgressiveOffset, TeeSize * (0.7f) + CurrentRow * TeeSize  + g_Config.m_RcHudFrozenHudPosY);
 						float Alpha = 1.0f;
 						CNetObj_Character CurChar = GameClient()->m_aClients[i].m_RenderCur;
 						if(g_Config.m_TcShowFrozenHudSkins && Frozen)
@@ -1535,7 +1535,7 @@ void CHud::RenderSpectatorCount()
 	StartX += g_Config.m_RcHudSpectatorCountPosX;
 	StartY += g_Config.m_RcHudSpectatorCountPosY;
 
-	Graphics()->DrawRect(StartX, StartY, BoxWidth, BoxHeight, ColorRGBA(0.0f, 0.0f, 0.0f, 0.4f), !g_Config.m_RcHudSpectatorCountPosX ? IGraphics::CORNER_L : IGraphics::CORNER_NONE, 5.0f);
+	Graphics()->DrawRect(StartX, StartY, BoxWidth, BoxHeight, ColorRGBA(0.0f, 0.0f, 0.0f, 0.4f), !g_Config.m_RcHudSpectatorCountPosX ? IGraphics::CORNER_L : IGraphics::CORNER_ALL, 5.0f);
 
 	float y = StartY + BoxHeight / 3;
 	float x = StartX + 2;
@@ -1626,7 +1626,7 @@ inline int CHud::GetDigitsIndex(int Value, int Max)
 	return DigitsIndex;
 }
 
-float CHud::GetMovementInformationBoxHeight()
+inline float CHud::GetMovementInformationBoxHeight()
 {
 	// if(GameClient()->m_Snap.m_SpecInfo.m_Active && (GameClient()->m_Snap.m_SpecInfo.m_SpectatorId == SPEC_FREEVIEW || GameClient()->m_aClients[GameClient()->m_Snap.m_SpecInfo.m_SpectatorId].m_SpecCharPresent))
 	// 	return g_Config.m_ClShowhudPlayerPosition ? 3.0f * MOVEMENT_INFORMATION_LINE_HEIGHT + 2.0f : 0.0f;
