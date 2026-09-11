@@ -12,7 +12,7 @@ class CHudEditor : public CComponent
 	enum
 	{
 		ELEM_NONE = -1,
-		ELEM_CHAT = 0,
+		ELEM_CHAT,
 		ELEM_HUDTIMER,
 		ELEM_DUMACTIONS,
 		ELEM_PLPOS,
