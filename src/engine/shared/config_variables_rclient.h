@@ -213,5 +213,7 @@ MACRO_CONFIG_INT(RcHudDummyActionsPosX, rc_hud_dummy_actions_pos_x, 0, -600, 600
 MACRO_CONFIG_INT(RcHudDummyActionsPosY, rc_hud_dummy_actions_pos_y, 0, -600, 600, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Game timer Y position in HUD units from top")
 MACRO_CONFIG_INT(RcHudPlayerMovementPosX, rc_hud_player_movement_pos_x, 0, -600, 600, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Game timer X offset in HUD units from center")
 MACRO_CONFIG_INT(RcHudPlayerMovementPosY, rc_hud_player_movement_pos_y, 0, -600, 600, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Game timer Y position in HUD units from top")
+MACRO_CONFIG_INT(RcHudPlayerStatePosX, rc_hud_player_state_pos_x, 0, -600, 600, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Player state X offset in HUD units from left")
+MACRO_CONFIG_INT(RcHudPlayerStatePosY, rc_hud_player_state_pos_y, 0, -600, 600, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Player state Y offset in HUD units from top")
 MACRO_CONFIG_INT(RcChatPosX, rc_chat_pos_x, 0, -600, 600, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Chat X position in HUD units from left")
 MACRO_CONFIG_INT(RcChatPosY, rc_chat_pos_y, 0, -600, 600, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Chat Y offset in HUD units from bottom")

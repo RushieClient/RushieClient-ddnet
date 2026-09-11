@@ -1058,6 +1058,8 @@ void CHud::PreparePlayerStateQuads()
 
 void CHud::RenderPlayerState(const int ClientId)
 {
+	const float OffsetX = g_Config.m_RcHudPlayerStatePosX;
+	const float OffsetY = g_Config.m_RcHudPlayerStatePosY;
 	Graphics()->SetColor(1.f, 1.f, 1.f, 1.f);
 
 	// pCharacter contains the predicted character for local players or the last snap for players who are spectated
@@ -1111,22 +1113,22 @@ void CHud::RenderPlayerState(const int ClientId)
 		if(JumpsOffsetY > 0)
 		{
 			Graphics()->TextureSet(GameClient()->m_HudSkin.m_SpriteHudAirjump);
-			Graphics()->RenderQuadContainerEx(m_HudQuadContainerIndex, m_AirjumpOffset, AvailableJumpsToDisplay, 0, JumpsOffsetY);
+			Graphics()->RenderQuadContainerEx(m_HudQuadContainerIndex, m_AirjumpOffset, AvailableJumpsToDisplay, OffsetX, JumpsOffsetY + OffsetY);
 			Graphics()->TextureSet(GameClient()->m_HudSkin.m_SpriteHudAirjumpEmpty);
-			Graphics()->RenderQuadContainerEx(m_HudQuadContainerIndex, m_AirjumpEmptyOffset + AvailableJumpsToDisplay, TotalJumpsToDisplay - AvailableJumpsToDisplay, 0, JumpsOffsetY);
+			Graphics()->RenderQuadContainerEx(m_HudQuadContainerIndex, m_AirjumpEmptyOffset + AvailableJumpsToDisplay, TotalJumpsToDisplay - AvailableJumpsToDisplay, OffsetX, JumpsOffsetY + OffsetY);
 		}
 		else
 		{
 			Graphics()->TextureSet(GameClient()->m_HudSkin.m_SpriteHudAirjump);
-			Graphics()->RenderQuadContainer(m_HudQuadContainerIndex, m_AirjumpOffset, AvailableJumpsToDisplay);
+			Graphics()->RenderQuadContainerEx(m_HudQuadContainerIndex, m_AirjumpOffset, AvailableJumpsToDisplay, OffsetX, OffsetY);
 			Graphics()->TextureSet(GameClient()->m_HudSkin.m_SpriteHudAirjumpEmpty);
-			Graphics()->RenderQuadContainer(m_HudQuadContainerIndex, m_AirjumpEmptyOffset + AvailableJumpsToDisplay, TotalJumpsToDisplay - AvailableJumpsToDisplay);
+			Graphics()->RenderQuadContainerEx(m_HudQuadContainerIndex, m_AirjumpEmptyOffset + AvailableJumpsToDisplay, TotalJumpsToDisplay - AvailableJumpsToDisplay, OffsetX, OffsetY);
 		}
 	}
 
-	float x = 5 + 12;
+	float x = 5 + 12 + OffsetX;
 	float y = (5 + 12 + (GameClient()->m_GameInfo.m_HudHealthArmor && g_Config.m_ClShowhudHealthAmmo ? 24 : 0) +
-		   (GameClient()->m_GameInfo.m_HudAmmo && g_Config.m_ClShowhudHealthAmmo ? 12 : 0));
+		   (GameClient()->m_GameInfo.m_HudAmmo && g_Config.m_ClShowhudHealthAmmo ? 12 : 0)) + OffsetY;
 
 	// render weapons
 	{
@@ -1163,7 +1165,7 @@ void CHud::RenderPlayerState(const int ClientId)
 	}
 
 	// render capabilities
-	x = 5;
+	x = 5 + OffsetX;
 	y += 12;
 	if(TotalJumpsToDisplay > 0)
 	{
@@ -1213,7 +1215,7 @@ void CHud::RenderPlayerState(const int ClientId)
 	}
 
 	// render prohibited capabilities
-	x = 5;
+	x = 5 + OffsetX;
 	if(HasCapabilities)
 	{
 		y += 12;
@@ -1276,7 +1278,7 @@ void CHud::RenderPlayerState(const int ClientId)
 	}
 
 	// render dummy actions and freeze state
-	x = 5;
+	x = 5 + OffsetX;
 	if(HasProhibitedCapabilities)
 	{
 		y += 12;
@@ -1533,7 +1535,7 @@ void CHud::RenderSpectatorCount()
 	StartX += g_Config.m_RcHudSpectatorCountPosX;
 	StartY += g_Config.m_RcHudSpectatorCountPosY;
 
-	Graphics()->DrawRect(StartX, StartY, BoxWidth, BoxHeight, ColorRGBA(0.0f, 0.0f, 0.0f, 0.4f), IGraphics::CORNER_L, 5.0f);
+	Graphics()->DrawRect(StartX, StartY, BoxWidth, BoxHeight, ColorRGBA(0.0f, 0.0f, 0.0f, 0.4f), !g_Config.m_RcHudSpectatorCountPosX ? IGraphics::CORNER_L : IGraphics::CORNER_NONE, 5.0f);
 
 	float y = StartY + BoxHeight / 3;
 	float x = StartX + 2;
