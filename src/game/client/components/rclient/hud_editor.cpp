@@ -119,11 +119,8 @@ void CHudEditor::ComputeElementBox(int Idx)
 	{
 	case ELEM_CHAT:
 	{
-		const float ChatAspect = (g_Config.m_RcCustomAspectDisable & RcAspectDisable::CHAT)
-		    ? RealAspect : Graphics()->ScreenAspect();
-		m_aElements[Idx].m_DragScaleX = RealAspect / ChatAspect;
 		const float FontSize = g_Config.m_ClChatFontSize / 10.0f;
-		Pos.x = (5.0f + g_Config.m_RcChatPosX) * 2.0f * m_aElements[Idx].m_DragScaleX;
+		Pos.x = (5.0f + g_Config.m_RcChatPosX) * 2.0f;
 		Pos.y = (MHeight
 		    - (20.0f * FontSize / 6.0f + (g_Config.m_TcStatusBar ? g_Config.m_TcStatusBarHeight : 0.0f))
 		    + g_Config.m_RcChatPosY
@@ -355,7 +352,7 @@ void CHudEditor::OnRender()
 	else if(m_DragElement != ELEM_NONE)
 	{
 		const SElement &Element = m_aElements[m_DragElement];
-		m_DragPos += vec2(ConfDelta.x * Element.m_DragScaleX, ConfDelta.y);
+		m_DragPos += ConfDelta;
 		*Element.m_pConfigX = round_to_int(m_DragPos.x);
 		*Element.m_pConfigY = round_to_int(m_DragPos.y);
 	}

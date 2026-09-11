@@ -33,7 +33,6 @@ class CHudEditor : public CComponent
 		const char *m_pName;
 		int *m_pConfigX = nullptr;
 		int *m_pConfigY = nullptr;
-		float m_DragScaleX = 1.0f; // extra horizontal drag scale, updated by ComputeElementBox()
 	};
 
 	SElement m_aElements[ELEM_COUNT];
@@ -54,7 +53,6 @@ class CHudEditor : public CComponent
 	int m_OpenedSettings = 0;
 
 	bool m_Active = false;
-	void SetActive(bool Active);
 
 	static constexpr float MOVEMENT_INFORMATION_LINE_HEIGHT = 8.0f;
 	inline float GetMovementInformationBoxHeight();
@@ -68,6 +66,7 @@ public:
 	bool OnInput(const IInput::CEvent &Event) override;
 	bool OnCursorMove(float x, float y, IInput::ECursorType CursorType) override;
 
+	void SetActive(bool Active);
 	bool IsActive() const { return m_Active; }
 };
 
