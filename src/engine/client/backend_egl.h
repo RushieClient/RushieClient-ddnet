@@ -126,6 +126,7 @@ public:
 	int WindowActive() override { return 1; }
 	int WindowOpen() override { return 1; }
 	void SetWindowGrab(bool Grab) override {}
+	void SetWindowScreenCaptureProtect(int Type) override {}
 	bool ResizeWindow(int w, int h, int RefreshRate) override { return false; }
 	void GetViewportSize(int &w, int &h) override
 	{
