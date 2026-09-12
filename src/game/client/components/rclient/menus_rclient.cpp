@@ -1137,6 +1137,9 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 				{0, 1, 2},
 				g_Config.m_RcAutoLockTeam);
 			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcAntiUnSpec, RCLocalize("Anti UnSpec in player", "RClient"), &g_Config.m_RcAntiUnSpec, &Column, LineSize);
+			Column.HSplitTop(LineSize, &Button, &Column);
+			Button.VSplitLeft(Margin, nullptr, &Button);
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcAntiUnSpecSetPlayerCamera, RCLocalize("Set camera to player when try unspec", "RClient"), &g_Config.m_RcAntiUnSpecSetPlayerCamera, &Button, LineSize);
 			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcShowRechargeBars, RCLocalize("Show Recharge bars (by +KZ/Kaizo Client)", "RClient"), &g_Config.m_RcShowRechargeBars, &Column, LineSize);
 			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcClearConfigsInUnknownFile, RCLocalize("Clear ddnet config from unknown configs on exit", "RClient"), &g_Config.m_RcClearConfigsInUnknownFile, &Column, LineSize);
 			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcShowOpenSecondClientButton, RCLocalize("Show open second client button", "RClient"), &g_Config.m_RcShowOpenSecondClientButton, &Column, LineSize);

@@ -1876,6 +1876,8 @@ bool CRClient::AntiUnSpec()
 			else
 			{
 				GameClient()->Echo("Are u sure want unspec? Press again to unspec");
+				if(g_Config.m_RcAntiUnSpecSetPlayerCamera)
+					GameClient()->m_Camera.SetView(ivec2(LocalPlayerPos.x / 32.0f, LocalPlayerPos.y / 32.0f));
 				m_ConfirmUnSpec = true;
 				return true;
 			}
