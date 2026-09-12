@@ -1,8 +1,6 @@
 #include "edgehelper.h"
 
 #include <engine/font_icons.h>
-#include <game/localization.h>
-
 #include <engine/graphics.h>
 #include <engine/shared/config.h>
 
@@ -14,6 +12,7 @@
 #include <game/client/components/rclient/rclient_include.h>
 #include <game/client/gameclient.h>
 #include <game/client/ui.h>
+#include <game/localization.h>
 
 namespace SEdgeHelperProperties
 {

@@ -3,8 +3,6 @@
 #ifndef GAME_CLIENT_COMPONENTS_CHAT_H
 #define GAME_CLIENT_COMPONENTS_CHAT_H
 
-#include <game/client/ui.h>
-
 #include <base/str.h>
 
 #include <engine/console.h>
@@ -17,6 +15,7 @@
 #include <game/client/component.h>
 #include <game/client/lineinput.h>
 #include <game/client/render.h>
+#include <game/client/ui.h>
 
 #include <vector>
 

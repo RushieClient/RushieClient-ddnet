@@ -2,6 +2,7 @@
 #define GAME_CLIENT_COMPONENTS_RCLIENT_HUD_EDITOR_H
 
 #include <engine/console.h>
+
 #include <game/client/component.h>
 #include <game/client/ui.h>
 

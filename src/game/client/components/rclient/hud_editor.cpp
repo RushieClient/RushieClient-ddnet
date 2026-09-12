@@ -1,11 +1,12 @@
 #include "hud_editor.h"
 
-#include <base/time.h>
-#include <engine/shared/config.h>
 #include "rclient_include.h"
+
+#include <base/time.h>
 
 #include <engine/console.h>
 #include <engine/graphics.h>
+#include <engine/shared/config.h>
 
 #include <game/client/gameclient.h>
 

@@ -1,12 +1,11 @@
 #ifndef GAME_CLIENT_COMPONENTS_RCLIENT_ADMINPANEL_H
 #define GAME_CLIENT_COMPONENTS_RCLIENT_ADMINPANEL_H
 
-#include <game/client/lineinput.h>
-#include <game/client/ui.h>
-
 #include <engine/console.h>
 
 #include <game/client/component.h>
+#include <game/client/lineinput.h>
+#include <game/client/ui.h>
 class CAdminPanel : public CComponent
 {
 	bool m_Active = false;

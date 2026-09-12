@@ -1,7 +1,6 @@
 #include "updater.h"
 
 #include <base/dbg.h>
-
 #include <base/fs.h>
 #include <base/log.h>
 #include <base/str.h>

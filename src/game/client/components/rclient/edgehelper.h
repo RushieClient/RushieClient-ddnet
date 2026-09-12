@@ -1,11 +1,10 @@
 #ifndef GAME_CLIENT_COMPONENTS_RCLIENT_EDGEHELPER_H
 #define GAME_CLIENT_COMPONENTS_RCLIENT_EDGEHELPER_H
 
-#include <game/client/ui_rect.h>
-
 #include <engine/console.h>
 
 #include <game/client/component.h>
+#include <game/client/ui_rect.h>
 class CEdgeHelper : public CComponent
 {
 	bool m_Active = false;

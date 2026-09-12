@@ -1,13 +1,15 @@
-#include <engine/font_icons.h>
-#include <game/client/components/menus.h>
-#include <game/client/gameclient.h>
-#include <game/client/ui_listbox.h>
-#include <game/localization.h>
 #include "rclient_include.h"
 
 #include <base/math.h>
 #include <base/time.h>
 #include <base/types.h>
+
+#include <engine/font_icons.h>
+
+#include <game/client/components/menus.h>
+#include <game/client/gameclient.h>
+#include <game/client/ui_listbox.h>
+#include <game/localization.h>
 
 #include <algorithm>
 #include <vector>

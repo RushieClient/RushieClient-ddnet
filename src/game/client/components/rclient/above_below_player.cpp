@@ -1,8 +1,10 @@
 #include "above_below_player.h"
 
-#include <engine/shared/config.h>
-#include <game/client/gameclient.h>
 #include "rclient_include.h"
+
+#include <engine/shared/config.h>
+
+#include <game/client/gameclient.h>
 
 CAboveBelowPlayer::CAboveBelowPlayer()
 {

@@ -1,19 +1,20 @@
 #include "rclient.h"
 
+#include "rclient_include.h"
+
 #include <base/io.h>
 #include <base/log.h>
 #include <base/process.h>
 #include <base/str.h>
+#include <base/time.h>
+
 #include <engine/shared/config.h>
+#include <engine/shared/json.h>
 #include <engine/shared/linereader.h>
+
 #include <game/client/gameclient.h>
 #include <game/localization.h>
 #include <game/version.h>
-#include "rclient_include.h"
-
-#include <base/time.h>
-
-#include <engine/shared/json.h>
 
 static constexpr const char *RCLIENT_INFO_URL = "https://server.rushie.qzz.io/version";
 

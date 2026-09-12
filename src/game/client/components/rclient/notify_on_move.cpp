@@ -1,8 +1,10 @@
 #include "notify_on_move.h"
 
-#include <engine/shared/config.h>
-#include <game/client/gameclient.h>
 #include "rclient_include.h"
+
+#include <engine/shared/config.h>
+
+#include <game/client/gameclient.h>
 
 CNotifyOnMove::CNotifyOnMove()
 {

@@ -3,8 +3,6 @@
 
 #include "chat.h"
 
-#include <engine/font_icons.h>
-
 #include <base/color.h>
 #include <base/io.h>
 #include <base/log.h>
@@ -13,6 +11,7 @@
 
 #include <engine/editor.h>
 #include <engine/external/regex.h>
+#include <engine/font_icons.h>
 #include <engine/graphics.h>
 #include <engine/keys.h>
 #include <engine/shared/config.h>
