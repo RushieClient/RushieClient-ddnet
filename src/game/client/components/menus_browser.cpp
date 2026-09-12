@@ -1780,7 +1780,7 @@ void CMenus::RenderServerbrowserFriends(CUIRect View)
 			// entries
 			if(s_vWarExtended[WarTypeIndex])
 			{
-				for(size_t WarIndex = 0; WarIndex < vItems.size(); ++WarIndex)
+				for(const auto &WarPlayer : vItems)
 				{
 					// space
 					{
@@ -1790,7 +1790,6 @@ void CMenus::RenderServerbrowserFriends(CUIRect View)
 					}
 
 					CUIRect Rect;
-					const auto &WarPlayer = vItems[WarIndex];
 					List.HSplitTop(11.0f + 10.0f + 2 * 2.0f + 1.0f + (WarPlayer.ServerInfo() == nullptr ? 0.0f : 10.0f), &Rect, &List);
 					s_ScrollRegion.AddRect(Rect);
 					if(s_ScrollRegion.RectClipped(Rect))

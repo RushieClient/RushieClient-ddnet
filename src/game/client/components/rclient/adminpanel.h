@@ -1,8 +1,8 @@
 #ifndef GAME_CLIENT_COMPONENTS_RCLIENT_ADMINPANEL_H
 #define GAME_CLIENT_COMPONENTS_RCLIENT_ADMINPANEL_H
 
-#include "game/client/lineinput.h"
-#include "game/client/ui.h"
+#include <game/client/lineinput.h>
+#include <game/client/ui.h>
 
 #include <engine/console.h>
 

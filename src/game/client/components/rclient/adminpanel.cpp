@@ -1,6 +1,6 @@
 #include "adminpanel.h"
 
-#include "engine/font_icons.h"
+#include <engine/font_icons.h>
 #include "rclient_include.h"
 
 #include <engine/console.h>

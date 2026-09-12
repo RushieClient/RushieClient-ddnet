@@ -1,6 +1,6 @@
 #ifndef GAME_CLIENT_COMPONENTS_RCLIENT_NOTIFY_ON_MOVE_H
 #define GAME_CLIENT_COMPONENTS_RCLIENT_NOTIFY_ON_MOVE_H
-#include "game/client/component.h"
+#include <game/client/component.h>
 
 #include <base/vmath.h>
 

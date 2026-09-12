@@ -42,9 +42,7 @@ class CSteam : public ISteam
 	}
 
 public:
-	CSteam()
-	{
-	}
+	CSteam() = default;
 	~CSteam() override
 	{
 		if(m_Initialized)

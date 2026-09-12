@@ -1,8 +1,7 @@
 #include "swaptimer.h"
 
-#include "engine/shared/config.h"
-#include "game/client/gameclient.h"
-#include "rclient_include.h"
+#include <engine/shared/config.h>
+#include <game/client/gameclient.h>
 
 CSwapTimer::CSwapTimer()
 {

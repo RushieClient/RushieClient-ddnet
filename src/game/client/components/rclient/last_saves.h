@@ -1,6 +1,6 @@
 #ifndef GAME_CLIENT_COMPONENTS_RCLIENT_LAST_SAVES_H
 #define GAME_CLIENT_COMPONENTS_RCLIENT_LAST_SAVES_H
-#include "game/client/component.h"
+#include <game/client/component.h>
 
 class CLastSaves : public CComponent
 {

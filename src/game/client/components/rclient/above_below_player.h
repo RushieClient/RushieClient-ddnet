@@ -1,6 +1,6 @@
 #ifndef GAME_CLIENT_COMPONENTS_RCLIENT_ABOVE_BELOW_PLAYER_H
 #define GAME_CLIENT_COMPONENTS_RCLIENT_ABOVE_BELOW_PLAYER_H
-#include "game/client/component.h"
+#include <game/client/component.h>
 
 class CAboveBelowPlayer : public CComponent
 {

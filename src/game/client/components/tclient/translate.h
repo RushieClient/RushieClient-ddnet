@@ -1,7 +1,7 @@
 #ifndef GAME_CLIENT_COMPONENTS_TCLIENT_TRANSLATE_H
 #define GAME_CLIENT_COMPONENTS_TCLIENT_TRANSLATE_H
 
-#include "game/client/components/rclient/rclient.h"
+#include <game/client/components/rclient/rclient.h>
 
 #include <game/client/component.h>
 #include <game/client/components/chat.h>

@@ -3,7 +3,7 @@
 
 #include "chat.h"
 
-#include "engine/font_icons.h"
+#include <engine/font_icons.h>
 
 #include <base/color.h>
 #include <base/io.h>
@@ -1818,9 +1818,9 @@ void CChat::SendChat(int Team, const char *pLine, bool LineTranslated)
 			const char *OnlyCommand = GameClient()->m_RClient.FixLayoutLine(pLine) + 1;
 			if(!m_vServerCommands.empty())
 			{
-				for(auto &m_vServerCommand : m_vServerCommands)
+				for(auto &ServerCommand : m_vServerCommands)
 				{
-					if(str_startswith_nocase(OnlyCommand, m_vServerCommand.m_aName))
+					if(str_startswith_nocase(OnlyCommand, ServerCommand.m_aName))
 					{
 						HaveCommand = true;
 						break;

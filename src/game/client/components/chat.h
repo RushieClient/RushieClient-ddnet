@@ -3,7 +3,7 @@
 #ifndef GAME_CLIENT_COMPONENTS_CHAT_H
 #define GAME_CLIENT_COMPONENTS_CHAT_H
 
-#include "game/client/ui.h"
+#include <game/client/ui.h>
 
 #include <base/str.h>
 

@@ -1,7 +1,7 @@
 #ifndef GAME_CLIENT_COMPONENTS_RCLIENT_RCLIENT_H
 #define GAME_CLIENT_COMPONENTS_RCLIENT_RCLIENT_H
 
-#include "engine/http.h"
+#include <engine/http.h>
 
 #include <engine/shared/console.h>
 

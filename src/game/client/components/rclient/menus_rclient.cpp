@@ -1,8 +1,8 @@
-#include "engine/font_icons.h"
-#include "game/client/components/menus.h"
-#include "game/client/gameclient.h"
-#include "game/client/ui_listbox.h"
-#include "game/localization.h"
+#include <engine/font_icons.h>
+#include <game/client/components/menus.h>
+#include <game/client/gameclient.h>
+#include <game/client/ui_listbox.h>
+#include <game/localization.h>
 #include "rclient_include.h"
 
 #include <base/math.h>
@@ -1379,7 +1379,7 @@ void CMenus::RenderSettingsRClientChatBinds(CUIRect MainView)
 	CUIRect ResetBindsChat;
 	MainView.HSplitTop(FontSize * 1.25f, &ResetBindsChat, &MainView);
 	static CButtonContainer s_ResetBindsChat;
-	if(GameClient()->m_Menus.DoButton_Menu(&s_ResetBindsChat, RCLocalize("Reset RClient chatbinds", "RClient"), 0, &ResetBindsChat, BUTTONFLAG_LEFT, 0, IGraphics::CORNER_ALL, 5.0f, 0.0f, ColorRGBA(1.0f, 0.0f, 0.0f, 0.75f)))
+	if(GameClient()->m_Menus.DoButton_Menu(&s_ResetBindsChat, RCLocalize("Reset RClient chatbinds", "RClient"), 0, &ResetBindsChat, BUTTONFLAG_LEFT, nullptr, IGraphics::CORNER_ALL, 5.0f, 0.0f, ColorRGBA(1.0f, 0.0f, 0.0f, 0.75f)))
 	{
 		GameClient()->m_RClient.ResetRClientChatBinds();
 	}

@@ -1,7 +1,7 @@
 #include "hud_editor.h"
 
-#include "base/time.h"
-#include "engine/shared/config.h"
+#include <base/time.h>
+#include <engine/shared/config.h>
 #include "rclient_include.h"
 
 #include <engine/console.h>

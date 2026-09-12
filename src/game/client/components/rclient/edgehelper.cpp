@@ -1,7 +1,7 @@
 #include "edgehelper.h"
 
-#include "engine/font_icons.h"
-#include "game/localization.h"
+#include <engine/font_icons.h>
+#include <game/localization.h>
 
 #include <engine/graphics.h>
 #include <engine/shared/config.h>

@@ -1,6 +1,6 @@
 #ifndef GAME_CLIENT_COMPONENTS_RCLIENT_SWAPTIMER_H
 #define GAME_CLIENT_COMPONENTS_RCLIENT_SWAPTIMER_H
-#include "game/client/component.h"
+#include <game/client/component.h>
 
 class CSwapTimer : public CComponent
 {
