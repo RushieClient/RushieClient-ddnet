@@ -1818,9 +1818,9 @@ void CChat::SendChat(int Team, const char *pLine, bool LineTranslated)
 			const char *OnlyCommand = GameClient()->m_RClient.FixLayoutLine(pLine) + 1;
 			if(!m_vServerCommands.empty())
 			{
-				for(size_t i = 0; i < m_vServerCommands.size(); i++)
+				for(auto & m_vServerCommand : m_vServerCommands)
 				{
-					if(str_startswith_nocase(OnlyCommand, m_vServerCommands[i].m_aName))
+					if(str_startswith_nocase(OnlyCommand, m_vServerCommand.m_aName))
 					{
 						HaveCommand = true;
 						break;
@@ -2072,12 +2072,12 @@ CUi::EPopupMenuFunctionResult CChat::CChatPopupContext::Render(void *pContext, C
 	if(pUi->DoButton_PopupMenu(&pPopupContext->m_CopyFull, Localize("Copy Full"), &Container, FontSize, TEXTALIGN_MC, 0.0f, false, true, CopyFullButtonColor))
 	{
 		char aBuf[MAX_CHAT_LENGTH];
-		char m_aTimeStamp[80];
-		str_timestamp_ex(pPopupContext->m_Time, m_aTimeStamp, sizeof(m_aTimeStamp), TimestampFormat::SPACE);
+		char TimeStamp[80];
+		str_timestamp_ex(pPopupContext->m_Time, TimeStamp, sizeof(TimeStamp), TimestampFormat::SPACE);
 		if(IsServer)
-			str_format(aBuf, sizeof(aBuf), "%s | %s: %s%s", m_aTimeStamp, pPopupContext->m_From, pPopupContext->m_aName, pPopupContext->m_aText);
+			str_format(aBuf, sizeof(aBuf), "%s | %s: %s%s", TimeStamp, pPopupContext->m_From, pPopupContext->m_aName, pPopupContext->m_aText);
 		else
-			str_format(aBuf, sizeof(aBuf), "%s | %s: %s: %s", m_aTimeStamp, pPopupContext->m_From, pPopupContext->m_aName, pPopupContext->m_aText);
+			str_format(aBuf, sizeof(aBuf), "%s | %s: %s: %s", TimeStamp, pPopupContext->m_From, pPopupContext->m_aName, pPopupContext->m_aText);
 		pChat->Input()->SetClipboardText(aBuf);
 	}
 

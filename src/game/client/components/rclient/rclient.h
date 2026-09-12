@@ -236,9 +236,9 @@ public:
 	bool m_ConfirmUnSpec = false;
 
 	// Sorting players
-	const CNetObj_PlayerInfo *GetSortedPlayersScoreboard(int Config, int ClientId);
-	const CNetObj_PlayerInfo *GetSortedPlayersSpectator(int Config, int ClientId);
-	const CNetObj_PlayerInfo **GetSortedPlayersSpectatorArray(int Config);
+	const CNetObj_PlayerInfo *GetSortedPlayersScoreboard(int SwitchNum, int ClientId);
+	const CNetObj_PlayerInfo *GetSortedPlayersSpectator(int SwitchNum, int ClientId);
+	const CNetObj_PlayerInfo **GetSortedPlayersSpectatorArray(int SwitchNum);
 
 	// Saves Reader
 	int GetSavesAmount(const char *MapName);

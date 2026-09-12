@@ -176,8 +176,8 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		DoMenuSettingsBar(&Column, apTabNames, NUMBER_OF_DUMMY_TABS, s_aPageTabs, s_CurDummyCustomTab, LineSize);
 		Column.HSplitTop(MarginSmall, nullptr, &Column);
 
-		const float m_BiggestTab = LineSize * 4.0f;
-		const float m_CurrentY = Column.y;
+		const float MBiggestTab = LineSize * 4.0f;
+		const float MCurrentY = Column.y;
 		if(s_CurDummyCustomTab == DUMMY_TAB_POS)
 		{
 			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_TcShowhudDummyPosition, RCLocalize("Show dummy position", "RClient"), &g_Config.m_TcShowhudDummyPosition, &Column, LineSize);
@@ -210,7 +210,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 				Ui()->DoEditBox(&s_LineInput, &Button, EditBoxFontSize);
 			}
 		}
-		Column.HSplitTop(m_BiggestTab - Column.y + m_CurrentY, nullptr, &Column);
+		Column.HSplitTop(MBiggestTab - Column.y + MCurrentY, nullptr, &Column);
 	}
 
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
@@ -239,8 +239,8 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		DoMenuSettingsBar(&Column, apTabNames, NUMBER_OF_SCOREBOARD_TABS, s_aPageTabs, s_CurScoreboardCustomTab, LineSize);
 		Column.HSplitTop(MarginSmall, nullptr, &Column);
 
-		const float m_BiggestTab = LineSize * 3.0f;
-		const float m_CurrentY = Column.y;
+		const float MBiggestTab = LineSize * 3.0f;
+		const float MCurrentY = Column.y;
 		if(s_CurScoreboardCustomTab == SCOREBOARD_TAB_POPUP)
 		{
 			static CButtonContainer s_ReaderButtonScoreboardMouse, s_ClearButtonScoreboardmouse;
@@ -255,7 +255,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 			static int s_HeartSizeScoreboardId = 0;
 			Ui()->DoScrollbarOption(&s_HeartSizeScoreboardId, &g_Config.m_RcSizeOfHeart, &Button, RCLocalize("Heart size", "RClient"), 0, 200, &CUi::ms_LinearScrollbarScale, 0);
 		}
-		Column.HSplitTop(m_BiggestTab - Column.y + m_CurrentY, nullptr, &Column);
+		Column.HSplitTop(MBiggestTab - Column.y + MCurrentY, nullptr, &Column);
 	}
 
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
@@ -293,8 +293,8 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 			Ui()->DoLabel(&Label, RCLocalize("idea from BestClient", "RClient"), Margin, TEXTALIGN_MC);
 		}
 
-		const float m_BiggestTab = LineSize * 4.0f + 2.0f * 2.0f;
-		const float m_CurrentY = Column.y;
+		const float MBiggestTab = LineSize * 4.0f + 2.0f * 2.0f;
+		const float MCurrentY = Column.y;
 		if(s_CurPlayersCustomTab == PLAYERS_TAB_EFFECTS)
 		{
 			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcHideFrozenFlakesEffect, RCLocalize("Hide frozen flakes", "RClient"), &g_Config.m_RcHideFrozenFlakesEffect, &Column, LineSize);
@@ -344,7 +344,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 			static CButtonContainer s_HitboxColor;
 			DoButton_ColorPickerAutoVMargin(&s_HitboxColor, RCLocalize("Hitbox color", "RClient"), &g_Config.m_RcShowHitboxColor, color_cast<ColorRGBA>(ColorHSLA(DefaultConfig::RcShowHitboxColor)), &Column, LineSize, true);
 		}
-		Column.HSplitTop(m_BiggestTab - Column.y + m_CurrentY, nullptr, &Column);
+		Column.HSplitTop(MBiggestTab - Column.y + MCurrentY, nullptr, &Column);
 	}
 
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
@@ -439,9 +439,9 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	Ui()->DoLabel(&Button, "→", LineSize, TEXTALIGN_MC);
 	Boxes.VSplitLeft(BoxSize, &Button, &Boxes);
 	static CButtonContainer s_ApplyBtnAspect;
-	const float AspectConfirmTimeoutSec = 10.0f;
 	if(DoButton_Menu(&s_ApplyBtnAspect, RCLocalize("Apply", "RClient"), 0, &Button))
 	{
+		const float AspectConfirmTimeoutSec = 10.0f;
 		s_AspectConfirmPopupContext.m_pUi = Ui();
 		s_AspectConfirmPopupContext.m_pGameClient = GameClient();
 		s_AspectConfirmPopupContext.m_OldAspectX = g_Config.m_RcCustomAspectX;
@@ -455,10 +455,10 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		const float PopupW = 300.0f;
 		const float PopupH = 120.0f;
 
-		SPopupMenuProperties m_Props;
-		m_Props.m_CloseAtClickOutside = false;
-		m_Props.m_CloseAtEscape = false;
-		Ui()->DoPopupMenu(&s_AspectConfirmPopupContext, pScreen->w / 2.0f - PopupW / 2.0f, pScreen->h / 2.0f - PopupH / 2.0f, PopupW, PopupH, &s_AspectConfirmPopupContext, CMenusRClientConfirmAspect::Render, m_Props);
+		SPopupMenuProperties MProps;
+		MProps.m_CloseAtClickOutside = false;
+		MProps.m_CloseAtEscape = false;
+		Ui()->DoPopupMenu(&s_AspectConfirmPopupContext, pScreen->w / 2.0f - PopupW / 2.0f, pScreen->h / 2.0f - PopupH / 2.0f, PopupW, PopupH, &s_AspectConfirmPopupContext, CMenusRClientConfirmAspect::Render, MProps);
 	}
 
 	Column.HSplitTop(LineSize, &Button, &Column);
@@ -593,9 +593,9 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		DoMenuSettingsBar(&Column, apTabNames, NUMBER_OF_CHAT_TABS, s_aPageTabs, s_CurChatCustomTab, LineSize);
 		Column.HSplitTop(MarginSmall, nullptr, &Column);
 
-		// const float m_BiggestTab = LineSize * 7.0f + (LineSize + 2.0f) + (LineSize + MarginExtraSmall) * 2.0f;
-		const float m_BiggestTab = LineSize * 4.0f + (LineSize + MarginSmall) * 4 + (LineSize + MarginExtraSmall) * 2.0f;
-		const float m_CurrentY = Column.y;
+		// const float MBiggestTab = LineSize * 7.0f + (LineSize + 2.0f) + (LineSize + MarginExtraSmall) * 2.0f;
+		const float MBiggestTab = LineSize * 4.0f + (LineSize + MarginSmall) * 4 + (LineSize + MarginExtraSmall) * 2.0f;
+		const float MCurrentY = Column.y;
 		if(s_CurChatCustomTab == CHAT_TAB_MAIN)
 		{
 			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcChatShowMouse, RCLocalize("Show mouse when open chat", "RClient"), &g_Config.m_RcChatShowMouse, &Column, LineSize);
@@ -797,7 +797,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 				Column.HSplitTop(MarginSmall, nullptr, &Column);
 			}
 		}
-		Column.HSplitTop(m_BiggestTab - Column.y + m_CurrentY, nullptr, &Column);
+		Column.HSplitTop(MBiggestTab - Column.y + MCurrentY, nullptr, &Column);
 	}
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
 	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;
@@ -827,8 +827,8 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		DoMenuSettingsBar(&Column, apTabNames, NUMBER_OF_NAMEPLATES_TABS, s_aPageTabs, s_CurNameplatesCustomTab, LineSize);
 		Column.HSplitTop(MarginSmall, nullptr, &Column);
 
-		const float m_BiggestTab = LineSize * 5.0f + LineSize + (LineSize + 2.0f);
-		const float m_CurrentY = Column.y;
+		const float MBiggestTab = LineSize * 5.0f + LineSize + (LineSize + 2.0f);
+		const float MCurrentY = Column.y;
 		if(s_CurNameplatesCustomTab == NAMEPLATE_TAB_HOOK)
 		{
 			static std::vector<CButtonContainer> s_vButtonContainersHookDetection = {{}, {}, {}, {}, {}};
@@ -872,7 +872,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcNamePlatesWeaponsNinja, RCLocalize("Show ninja", "RClient"), &g_Config.m_RcNamePlatesWeaponsNinja, &Column, LineSize);
 			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcNamePlatesWeaponsLaser, RCLocalize("Show laser", "RClient"), &g_Config.m_RcNamePlatesWeaponsLaser, &Column, LineSize);
 		}
-		Column.HSplitTop(m_BiggestTab - Column.y + m_CurrentY, nullptr, &Column);
+		Column.HSplitTop(MBiggestTab - Column.y + MCurrentY, nullptr, &Column);
 	}
 
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
@@ -908,8 +908,8 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 			Ui()->DoLabel(&Label, RCLocalize("idea from BestClient", "RClient"), Margin, TEXTALIGN_MC);
 		}
 
-		const float m_BiggestTab = LineSize * 4.0f + LineSize * 2.0f + (LineSize + 2.0f);
-		const float m_CurrentY = Column.y;
+		const float MBiggestTab = LineSize * 4.0f + LineSize * 2.0f + (LineSize + 2.0f);
+		const float MCurrentY = Column.y;
 
 		if(s_CurAfkCustomTab == AFK_TAB_NONACTIVE)
 		{
@@ -946,7 +946,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 			}
 		}
 
-		Column.HSplitTop(m_BiggestTab - Column.y + m_CurrentY, nullptr, &Column);
+		Column.HSplitTop(MBiggestTab - Column.y + MCurrentY, nullptr, &Column);
 	}
 
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
@@ -1125,8 +1125,8 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		DoMenuSettingsBar(&Column, apTabNames, NUMBER_OF_HELP_TABS, s_aPageTabs, s_CurHelpCustomTab, LineSize);
 		Column.HSplitTop(MarginSmall, nullptr, &Column);
 
-		const float m_BiggestTab = LineSize * 9.0f + LineSize + (LineSize + 2.0f) * 2.0f + MarginSmall;
-		const float m_CurrentY = Column.y;
+		const float MBiggestTab = LineSize * 9.0f + LineSize + (LineSize + 2.0f) * 2.0f + MarginSmall;
+		const float MCurrentY = Column.y;
 
 		if(s_CurHelpCustomTab == HELP_TAB_MAIN)
 		{
@@ -1188,7 +1188,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 				g_Config.m_RcSpectatorSortId);
 		}
 
-		Column.HSplitTop(m_BiggestTab - Column.y + m_CurrentY, nullptr, &Column);
+		Column.HSplitTop(MBiggestTab - Column.y + MCurrentY, nullptr, &Column);
 	}
 
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
@@ -1413,16 +1413,16 @@ void CMenus::RenderSettingsRClientInfo(CUIRect MainView)
 
 	LeftView.HSplitTop(LineSize * 2.0f, &Button, &LeftView);
 	Button.VSplitMid(&ButtonLeft, &ButtonRight, MarginSmall);
-	if(DoButtonLineSize_Menu(&s_DiscordButton, RCLocalize("Discord", "RClient"), 0, &ButtonLeft, LineSize, false, 0, IGraphics::CORNER_ALL, 5.0f, 0.0f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f)))
+	if(DoButtonLineSize_Menu(&s_DiscordButton, RCLocalize("Discord", "RClient"), 0, &ButtonLeft, LineSize, false, nullptr, IGraphics::CORNER_ALL, 5.0f, 0.0f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f)))
 		Client()->ViewLink("https://discord.gg/xxVrBecVx9");
-	if(DoButtonLineSize_Menu(&s_WebsiteButton, RCLocalize("Website", "RClient"), 0, &ButtonRight, LineSize, false, 0, IGraphics::CORNER_ALL, 5.0f, 0.0f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f)))
+	if(DoButtonLineSize_Menu(&s_WebsiteButton, RCLocalize("Website", "RClient"), 0, &ButtonRight, LineSize, false, nullptr, IGraphics::CORNER_ALL, 5.0f, 0.0f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f)))
 		Client()->ViewLink("https://rushie-client.ru/");
 
 	LeftView.HSplitTop(MarginSmall, nullptr, &LeftView);
 	LeftView.HSplitTop(LineSize * 2.0f, &Button, &LeftView);
 	Button.VSplitMid(&ButtonLeft, &ButtonRight, MarginSmall);
 
-	if(DoButtonLineSize_Menu(&s_GithubButton, RCLocalize("Github", "RClient"), 0, &ButtonLeft, LineSize, false, 0, IGraphics::CORNER_ALL, 5.0f, 0.0f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f)))
+	if(DoButtonLineSize_Menu(&s_GithubButton, RCLocalize("Github", "RClient"), 0, &ButtonLeft, LineSize, false, nullptr, IGraphics::CORNER_ALL, 5.0f, 0.0f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f)))
 		Client()->ViewLink("https://github.com/RushieClient/RushieClient-ddnet");
 
 	LeftView = LowerLeftView;
@@ -1438,7 +1438,7 @@ void CMenus::RenderSettingsRClientInfo(CUIRect MainView)
 	Button.VSplitMid(&TClientConfig, &ProfilesFile, MarginSmall);
 
 	static CButtonContainer s_Config;
-	if(DoButtonLineSize_Menu(&s_Config, RCLocalize("RClient Settings", "RClient"), 0, &TClientConfig, LineSize, false, 0, IGraphics::CORNER_ALL, 5.0f, 0.0f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f)))
+	if(DoButtonLineSize_Menu(&s_Config, RCLocalize("RClient Settings", "RClient"), 0, &TClientConfig, LineSize, false, nullptr, IGraphics::CORNER_ALL, 5.0f, 0.0f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f)))
 	{
 		Storage()->GetCompletePath(IStorage::TYPE_SAVE, s_aConfigDomains[ConfigDomain::RCLIENT].m_aConfigPath, aBuf, sizeof(aBuf));
 		Client()->ViewFile(aBuf);

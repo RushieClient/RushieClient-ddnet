@@ -93,15 +93,15 @@ void CEdgeHelper::RenderEdgeHelper()
 {
 	CUIRect Base, EdgeInfo, JumpInfo;
 
-	float m_Height = 300.0f;
-	float m_Width = m_Height * (g_Config.m_RcCustomAspectDisable & RcAspectDisable::EDGEINFO ? Graphics()->ScreenAspectReal() : Graphics()->ScreenAspect());
+	float MHeight = 300.0f;
+	float MWidth = MHeight * (g_Config.m_RcCustomAspectDisable & RcAspectDisable::EDGEINFO ? Graphics()->ScreenAspectReal() : Graphics()->ScreenAspect());
 
-	Base.h = m_Height / (g_Config.m_RcEdgeInfoJump && g_Config.m_RcEdgeInfoCords ? 6 : 12);
-	Base.w = m_Width / 5;
-	Base.x = (m_Width - Base.w) * (g_Config.m_RcEdgeInfoPosX / 100.0f);
-	Base.y = (m_Height - Base.h) * (g_Config.m_RcEdgeInfoPosY / 100.0f);
+	Base.h = MHeight / (g_Config.m_RcEdgeInfoJump && g_Config.m_RcEdgeInfoCords ? 6 : 12);
+	Base.w = MWidth / 5;
+	Base.x = (MWidth - Base.w) * (g_Config.m_RcEdgeInfoPosX / 100.0f);
+	Base.y = (MHeight - Base.h) * (g_Config.m_RcEdgeInfoPosY / 100.0f);
 
-	Graphics()->MapScreenToSize(m_Width, m_Height);
+	Graphics()->MapScreenToSize(MWidth, MHeight);
 
 	Base.Draw(SEdgeHelperProperties::WindowColorDark(), IGraphics::CORNER_ALL, SEdgeHelperProperties::ms_Rounding);
 	Base.Margin(SEdgeHelperProperties::ms_Padding, &Base);
@@ -136,9 +136,9 @@ float CEdgeHelper::GetPositionEdgeHelper(int ClientId, int Conn)
 	}
 
 	ValuePos = std::round(ValuePos * 100.0f) / 100.0f;
-	float temp = std::round(ValuePos * 100.0f); // temp = 3263.0f
-	int result = static_cast<int>(temp) % 100; // result = 3263 % 100 = 63
-	return result;
+	float Temp = std::round(ValuePos * 100.0f); // temp = 3263.0f
+	int Result = static_cast<int>(Temp) % 100; // result = 3263 % 100 = 63
+	return Result;
 }
 
 void CEdgeHelper::RenderEdgeHelperEdgeInfo(CUIRect *pBase)
@@ -204,7 +204,7 @@ void CEdgeHelper::RenderEdgeHelperJumpInfo(CUIRect *pBase)
 {
 	CUIRect LeftZone, RightZone, CenterZone;
 	pBase->HSplitTop(SEdgeHelperProperties::ms_ItemSpacing, nullptr, pBase);
-	float ActionSpacing = (pBase->w - (2 * SEdgeHelperProperties::ms_ArrowsSize + 3 * SEdgeHelperProperties::ms_ArrowsSize)) / 4;
+	float ActionSpacing = (pBase->w - (2 * SEdgeHelperProperties::ms_ArrowsSize + 3 * SEdgeHelperProperties::ms_ArrowsSize)) / 4; // NOLINT(clang-analyzer-core.UndefinedBinaryOperatorResult)
 	pBase->VSplitLeft(SEdgeHelperProperties::ms_ArrowsSize + ActionSpacing, &LeftZone, &CenterZone);
 	CenterZone.VSplitRight(SEdgeHelperProperties::ms_ArrowsSize + ActionSpacing, &CenterZone, &RightZone);
 	LeftZone.VSplitRight(ActionSpacing, &LeftZone, nullptr);
@@ -229,43 +229,43 @@ void CEdgeHelper::RenderEdgeHelperJumpInfo(CUIRect *pBase)
 	LeftZone.VSplitLeft(3, nullptr, &LeftZone);
 	RightZone.VSplitLeft(ActionSpacing - 3, nullptr, &RightZone);
 	RightZone.VSplitRight(3, &RightZone, nullptr);
-	std::sort(m_Values.begin(), m_Values.end());
+	std::ranges::sort(m_Values);
 
-	int lower = -1;
-	int upper = -1;
+	int Lower = -1;
+	int Upper = -1;
 
 	for(int v : m_Values)
 	{
 		if(v <= m_PosX)
-			lower = v;
+			Lower = v;
 		if(v >= m_PosX)
 		{
-			upper = v;
+			Upper = v;
 			break;
 		}
 	}
 
 	char aBuf[64];
 	str_format(aBuf, sizeof(aBuf), "%02i", m_PosX);
-	if(m_PosX == lower)
+	if(m_PosX == Lower)
 		TextRender()->TextColor(SEdgeHelperProperties::ActionActiveButtonColor());
 	Ui()->DoLabel(&CenterZone, aBuf, 12, TEXTALIGN_MC);
 	TextRender()->TextColor(TextRender()->DefaultTextColor());
 
-	if(lower == -1)
+	if(Lower == -1)
 		str_copy(aBuf, "- |");
 	else
-		str_format(aBuf, sizeof(aBuf), "%i |", lower);
-	if(m_PosX == lower || m_PosX == upper)
+		str_format(aBuf, sizeof(aBuf), "%i |", Lower);
+	if(m_PosX == Lower || m_PosX == Upper)
 		TextRender()->TextColor(SEdgeHelperProperties::ActionActiveButtonColor());
 	Ui()->DoLabel(&LeftZone, aBuf, 12, TEXTALIGN_MC);
 	TextRender()->TextColor(TextRender()->DefaultTextColor());
 
-	if(upper == -1)
+	if(Upper == -1)
 		str_copy(aBuf, "| -");
 	else
-		str_format(aBuf, sizeof(aBuf), "| %i", upper);
-	if(m_PosX == upper)
+		str_format(aBuf, sizeof(aBuf), "| %i", Upper);
+	if(m_PosX == Upper)
 		TextRender()->TextColor(SEdgeHelperProperties::ActionActiveButtonColor());
 	Ui()->DoLabel(&RightZone, aBuf, 12, TEXTALIGN_MC);
 	TextRender()->TextColor(TextRender()->DefaultTextColor());

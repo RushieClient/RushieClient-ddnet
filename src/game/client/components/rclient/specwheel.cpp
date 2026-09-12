@@ -338,19 +338,19 @@ void CSpecWheel::ExecuteBind(int Bind)
 	str_escape(&pDst, GameClient()->m_aClients[GameClient()->m_Snap.m_SpecInfo.m_SpectatorId].m_aName, aEscapedName + sizeof(aEscapedName));
 
 	std::string Command{m_vSpecBinds[Bind].m_aCommand};
-	std::string old_str{"%plnick%"};
-	size_t startnick{Command.find(old_str)};
-	while(startnick != std::string::npos)
+	std::string OldStr{"%plnick%"};
+	size_t StartNick{Command.find(OldStr)};
+	while(StartNick != std::string::npos)
 	{
-		Command.replace(startnick, old_str.length(), aEscapedName);
-		startnick = Command.find(old_str, startnick + str_length(aEscapedName));
+		Command.replace(StartNick, OldStr.length(), aEscapedName);
+		StartNick = Command.find(OldStr, StartNick + str_length(aEscapedName));
 	}
-	old_str = "%plid%";
-	size_t startid{Command.find(old_str)};
-	while(startid != std::string::npos)
+	OldStr = "%plid%";
+	size_t StartId{Command.find(OldStr)};
+	while(StartId != std::string::npos)
 	{
-		Command.replace(startid, old_str.length(), std::to_string(GameClient()->m_Snap.m_SpecInfo.m_SpectatorId));
-		startid = Command.find(old_str, startid + std::to_string(GameClient()->m_Snap.m_SpecInfo.m_SpectatorId).length());
+		Command.replace(StartId, OldStr.length(), std::to_string(GameClient()->m_Snap.m_SpecInfo.m_SpectatorId));
+		StartId = Command.find(OldStr, StartId + std::to_string(GameClient()->m_Snap.m_SpecInfo.m_SpectatorId).length());
 	}
 	Console()->ExecuteLine(Command.c_str(), IConsole::CLIENT_ID_UNSPECIFIED);
 }

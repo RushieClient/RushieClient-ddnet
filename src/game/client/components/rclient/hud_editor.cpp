@@ -337,8 +337,8 @@ void CHudEditor::OnRender()
 	else if(m_TimeLatestPressedNeed > time_get())
 	{
 		bool InsideAny = false;
-		for(int i = 0; i < ELEM_COUNT; i++)
-			InsideAny = InsideAny || m_aBoxes[i].Inside(Ui()->MousePos());
+		for(const CUIRect &Box : m_aBoxes)
+			InsideAny = InsideAny || Box.Inside(Ui()->MousePos());
 		if(!InsideAny)
 		{
 			m_DragElement = ELEM_NONE;

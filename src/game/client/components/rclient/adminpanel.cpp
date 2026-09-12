@@ -1,7 +1,6 @@
 #include "adminpanel.h"
 
 #include "engine/font_icons.h"
-#include "game/localization.h"
 #include "rclient_include.h"
 
 #include <engine/console.h>
@@ -539,8 +538,8 @@ void CAdminPanel::RenderPlayerPanelPopUpTimers(CUIRect *pBase)
 
 	static const struct
 	{
-		const char *pTime;
-		int Minutes;
+		const char *m_Time;
+		int m_Minutes;
 	} s_aElems[] = {
 		{"1m", 1}, {"5m", 5}, {"10m", 10}, {"15m", 15}, {"30m", 30}, {"45m", 45},
 		{"1h", 60}, {"3h", 180}, {"12h", 720}, {"1d", 1440}, {"3d", 4320}, {"5d", 7200},
@@ -565,16 +564,16 @@ void CAdminPanel::RenderPlayerPanelPopUpTimers(CUIRect *pBase)
 
 		Container.VSplitLeft(SAdminPanelProperties::ms_RconTimersWidth, &Button, &Container);
 		if(Hovered(&Button))
-			Button.Draw(m_PlayerPopup.m_MinutesTimers == s_aElems[i].Minutes ? SAdminPanelProperties::ActionBanAltButtonColor() : SAdminPanelProperties::GeneralActiveButtonColor(), IGraphics::CORNER_ALL, SAdminPanelProperties::ms_Rounding);
+			Button.Draw(m_PlayerPopup.m_MinutesTimers == s_aElems[i].m_Minutes ? SAdminPanelProperties::ActionBanAltButtonColor() : SAdminPanelProperties::GeneralActiveButtonColor(), IGraphics::CORNER_ALL, SAdminPanelProperties::ms_Rounding);
 		else
-			Button.Draw(m_PlayerPopup.m_MinutesTimers == s_aElems[i].Minutes ? SAdminPanelProperties::GeneralActiveButtonColor() : SAdminPanelProperties::GeneralButtonColor(), IGraphics::CORNER_ALL, SAdminPanelProperties::ms_Rounding);
-		Ui()->DoLabel(&Button, s_aElems[i].pTime, SAdminPanelProperties::ms_FontSize, TEXTALIGN_MC);
+			Button.Draw(m_PlayerPopup.m_MinutesTimers == s_aElems[i].m_Minutes ? SAdminPanelProperties::GeneralActiveButtonColor() : SAdminPanelProperties::GeneralButtonColor(), IGraphics::CORNER_ALL, SAdminPanelProperties::ms_Rounding);
+		Ui()->DoLabel(&Button, s_aElems[i].m_Time, SAdminPanelProperties::ms_FontSize, TEXTALIGN_MC);
 		if(DoButtonLogic(&Button))
 		{
-			if(m_PlayerPopup.m_MinutesTimers == s_aElems[i].Minutes)
+			if(m_PlayerPopup.m_MinutesTimers == s_aElems[i].m_Minutes)
 				m_PlayerPopup.m_MinutesTimers = 0;
 			else
-				m_PlayerPopup.m_MinutesTimers = s_aElems[i].Minutes;
+				m_PlayerPopup.m_MinutesTimers = s_aElems[i].m_Minutes;
 		}
 		Container.VSplitLeft(ItemSpacingW, nullptr, &Container);
 	}
@@ -585,19 +584,19 @@ void CAdminPanel::RenderPlayerPanelPopUpReadyButtons(CUIRect *pBase)
 	CUIRect Label, Button, Column;
 	static const struct
 	{
-		const char *Reason;
-		int Minutes;
+		const char *m_Reason;
+		int m_Minutes;
 	} s_aReadyMute[] = {
 		{"Insult", 15}, {"Spam", 5}, {"Advertising", 15}};
 	static const struct
 	{
-		const char *Reason;
-		int Minutes;
+		const char *m_Reason;
+		int m_Minutes;
 	} s_aReadyBan[] = {
 		{"Block", 60}, {"Bot Client", 2660}, {"Behaviour Inappropriate", 120}, {"Advertising bot client", 2660}};
 	static const struct
 	{
-		const char *Reason;
+		const char *m_Reason;
 	} s_aReadyKick[] = {
 		{"Block"}, {"Spam"}};
 
@@ -617,24 +616,24 @@ void CAdminPanel::RenderPlayerPanelPopUpReadyButtons(CUIRect *pBase)
 	ReadyButtonsArea.VSplitLeft(SAdminPanelProperties::ms_ReadyButtonsWidth, &Column, &ReadyButtonsArea);
 	Column.HSplitTop(SAdminPanelProperties::ms_ButtonHeight, &Label, &Column);
 	Ui()->DoLabel(&Label, ("Kick"), SAdminPanelProperties::ms_FontSize, TEXTALIGN_MC);
-	for(unsigned i = 0; i < std::size(s_aReadyKick); i++)
+	for(auto i : s_aReadyKick)
 	{
 		Column.HSplitTop(SAdminPanelProperties::ms_ItemSpacing, nullptr, &Column);
 		Column.HSplitTop(SAdminPanelProperties::ms_RconActionHeight, &Button, &Column);
 
 		if(Hovered(&Button))
 		{
-			Button.Draw(m_PlayerPopup.m_ChosenActionButton == 2 && !str_comp(m_PlayerPopup.m_InputReason, s_aReadyKick[i].Reason) ? SAdminPanelProperties::ActionKickAltButtonColor() : SAdminPanelProperties::ActionKickButtonColor(), IGraphics::CORNER_ALL, SAdminPanelProperties::ms_Rounding);
-			DoLabelLabeledButtonDown(&Button, "", s_aReadyKick[i].Reason, SAdminPanelProperties::ms_IconFontSize, SAdminPanelProperties::ms_FontSize, 18.0f, 0.0f);
+			Button.Draw(m_PlayerPopup.m_ChosenActionButton == 2 && !str_comp(m_PlayerPopup.m_InputReason, i.m_Reason) ? SAdminPanelProperties::ActionKickAltButtonColor() : SAdminPanelProperties::ActionKickButtonColor(), IGraphics::CORNER_ALL, SAdminPanelProperties::ms_Rounding);
+			DoLabelLabeledButtonDown(&Button, "", i.m_Reason, SAdminPanelProperties::ms_IconFontSize, SAdminPanelProperties::ms_FontSize, 18.0f, 0.0f);
 		}
 		else
 		{
-			Button.Draw(m_PlayerPopup.m_ChosenActionButton == 2 && !str_comp(m_PlayerPopup.m_InputReason, s_aReadyKick[i].Reason) ? SAdminPanelProperties::ActionKickButtonColor() : SAdminPanelProperties::ActionKickAltButtonColor(), IGraphics::CORNER_ALL, SAdminPanelProperties::ms_Rounding);
-			DoLabelLabeledButtonDown(&Button, "", s_aReadyKick[i].Reason, SAdminPanelProperties::ms_IconFontSize, SAdminPanelProperties::ms_FontSize, 18.0f, 0.0f);
+			Button.Draw(m_PlayerPopup.m_ChosenActionButton == 2 && !str_comp(m_PlayerPopup.m_InputReason, i.m_Reason) ? SAdminPanelProperties::ActionKickButtonColor() : SAdminPanelProperties::ActionKickAltButtonColor(), IGraphics::CORNER_ALL, SAdminPanelProperties::ms_Rounding);
+			DoLabelLabeledButtonDown(&Button, "", i.m_Reason, SAdminPanelProperties::ms_IconFontSize, SAdminPanelProperties::ms_FontSize, 18.0f, 0.0f);
 		}
 		if(DoButtonLogic(&Button))
 		{
-			if(m_PlayerPopup.m_ChosenActionButton == 2 && !str_comp(m_PlayerPopup.m_InputReason, s_aReadyKick[i].Reason))
+			if(m_PlayerPopup.m_ChosenActionButton == 2 && !str_comp(m_PlayerPopup.m_InputReason, i.m_Reason))
 			{
 				m_PlayerPopup.m_ChosenActionButton = 0;
 				m_PlayerPopup.m_InputReason[0] = '\0';
@@ -643,7 +642,7 @@ void CAdminPanel::RenderPlayerPanelPopUpReadyButtons(CUIRect *pBase)
 			else
 			{
 				m_PlayerPopup.m_ChosenActionButton = 2;
-				str_copy(m_PlayerPopup.m_InputReason, s_aReadyKick[i].Reason, sizeof(m_PlayerPopup.m_InputReason));
+				str_copy(m_PlayerPopup.m_InputReason, i.m_Reason, sizeof(m_PlayerPopup.m_InputReason));
 				m_PlayerPopup.m_MinutesTimers = 0;
 			}
 		}
@@ -653,24 +652,24 @@ void CAdminPanel::RenderPlayerPanelPopUpReadyButtons(CUIRect *pBase)
 	ReadyButtonsArea.VSplitLeft(SAdminPanelProperties::ms_ReadyButtonsWidth, &Column, &ReadyButtonsArea);
 	Column.HSplitTop(SAdminPanelProperties::ms_ButtonHeight, &Label, &Column);
 	Ui()->DoLabel(&Label, ("Mute"), SAdminPanelProperties::ms_FontSize, TEXTALIGN_MC);
-	for(unsigned i = 0; i < std::size(s_aReadyMute); i++)
+	for(auto i : s_aReadyMute)
 	{
 		Column.HSplitTop(SAdminPanelProperties::ms_ItemSpacing, nullptr, &Column);
 		Column.HSplitTop(SAdminPanelProperties::ms_RconActionHeight, &Button, &Column);
-		str_format(aBuf, sizeof(aBuf), "Minutes: %i", s_aReadyMute[i].Minutes);
+		str_format(aBuf, sizeof(aBuf), "Minutes: %i", i.m_Minutes);
 		if(Hovered(&Button))
 		{
-			Button.Draw(m_PlayerPopup.m_ChosenActionButton == 3 && !str_comp(m_PlayerPopup.m_InputReason, s_aReadyMute[i].Reason) ? SAdminPanelProperties::ActionMuteAltButtonColor() : SAdminPanelProperties::ActionMuteButtonColor(), IGraphics::CORNER_ALL, SAdminPanelProperties::ms_Rounding);
-			DoLabelLabeledButtonDown(&Button, aBuf, s_aReadyMute[i].Reason, SAdminPanelProperties::ms_IconFontSize, SAdminPanelProperties::ms_FontSize, 18.0f, 0.0f);
+			Button.Draw(m_PlayerPopup.m_ChosenActionButton == 3 && !str_comp(m_PlayerPopup.m_InputReason, i.m_Reason) ? SAdminPanelProperties::ActionMuteAltButtonColor() : SAdminPanelProperties::ActionMuteButtonColor(), IGraphics::CORNER_ALL, SAdminPanelProperties::ms_Rounding);
+			DoLabelLabeledButtonDown(&Button, aBuf, i.m_Reason, SAdminPanelProperties::ms_IconFontSize, SAdminPanelProperties::ms_FontSize, 18.0f, 0.0f);
 		}
 		else
 		{
-			Button.Draw(m_PlayerPopup.m_ChosenActionButton == 3 && !str_comp(m_PlayerPopup.m_InputReason, s_aReadyMute[i].Reason) ? SAdminPanelProperties::ActionMuteButtonColor() : SAdminPanelProperties::ActionMuteAltButtonColor(), IGraphics::CORNER_ALL, SAdminPanelProperties::ms_Rounding);
-			DoLabelLabeledButtonDown(&Button, aBuf, s_aReadyMute[i].Reason, SAdminPanelProperties::ms_IconFontSize, SAdminPanelProperties::ms_FontSize, 18.0f, 0.0f);
+			Button.Draw(m_PlayerPopup.m_ChosenActionButton == 3 && !str_comp(m_PlayerPopup.m_InputReason, i.m_Reason) ? SAdminPanelProperties::ActionMuteButtonColor() : SAdminPanelProperties::ActionMuteAltButtonColor(), IGraphics::CORNER_ALL, SAdminPanelProperties::ms_Rounding);
+			DoLabelLabeledButtonDown(&Button, aBuf, i.m_Reason, SAdminPanelProperties::ms_IconFontSize, SAdminPanelProperties::ms_FontSize, 18.0f, 0.0f);
 		}
 		if(DoButtonLogic(&Button))
 		{
-			if(m_PlayerPopup.m_ChosenActionButton == 3 && !str_comp(m_PlayerPopup.m_InputReason, s_aReadyMute[i].Reason))
+			if(m_PlayerPopup.m_ChosenActionButton == 3 && !str_comp(m_PlayerPopup.m_InputReason, i.m_Reason))
 			{
 				m_PlayerPopup.m_ChosenActionButton = 0;
 				m_PlayerPopup.m_InputReason[0] = '\0';
@@ -679,8 +678,8 @@ void CAdminPanel::RenderPlayerPanelPopUpReadyButtons(CUIRect *pBase)
 			else
 			{
 				m_PlayerPopup.m_ChosenActionButton = 3;
-				str_copy(m_PlayerPopup.m_InputReason, s_aReadyMute[i].Reason, sizeof(m_PlayerPopup.m_InputReason));
-				m_PlayerPopup.m_MinutesTimers = s_aReadyMute[i].Minutes;
+				str_copy(m_PlayerPopup.m_InputReason, i.m_Reason, sizeof(m_PlayerPopup.m_InputReason));
+				m_PlayerPopup.m_MinutesTimers = i.m_Minutes;
 			}
 		}
 	}
@@ -691,9 +690,9 @@ void CAdminPanel::RenderPlayerPanelPopUpReadyButtons(CUIRect *pBase)
 	Ui()->DoLabel(&Label, ("Ban"), SAdminPanelProperties::ms_FontSize, TEXTALIGN_MC);
 	Column.VSplitMid(&LeftView, &RightView, SAdminPanelProperties::ms_ItemSpacing);
 	int IsLeft = 1;
-	for(unsigned i = 0; i < std::size(s_aReadyBan); i++)
+	for(auto i : s_aReadyBan)
 	{
-		str_format(aBuf, sizeof(aBuf), "Minutes: %i", s_aReadyBan[i].Minutes);
+		str_format(aBuf, sizeof(aBuf), "Minutes: %i", i.m_Minutes);
 
 		if(IsLeft == 1)
 		{
@@ -708,17 +707,17 @@ void CAdminPanel::RenderPlayerPanelPopUpReadyButtons(CUIRect *pBase)
 
 		if(Hovered(&Button))
 		{
-			Button.Draw(m_PlayerPopup.m_ChosenActionButton == 4 && !str_comp(m_PlayerPopup.m_InputReason, s_aReadyBan[i].Reason) ? SAdminPanelProperties::ActionBanAltButtonColor() : SAdminPanelProperties::ActionBanButtonColor(), IGraphics::CORNER_ALL, SAdminPanelProperties::ms_Rounding);
-			DoLabelLabeledButtonDown(&Button, aBuf, s_aReadyBan[i].Reason, SAdminPanelProperties::ms_IconFontSize, SAdminPanelProperties::ms_FontSize, 18.0f, 0.0f);
+			Button.Draw(m_PlayerPopup.m_ChosenActionButton == 4 && !str_comp(m_PlayerPopup.m_InputReason, i.m_Reason) ? SAdminPanelProperties::ActionBanAltButtonColor() : SAdminPanelProperties::ActionBanButtonColor(), IGraphics::CORNER_ALL, SAdminPanelProperties::ms_Rounding);
+			DoLabelLabeledButtonDown(&Button, aBuf, i.m_Reason, SAdminPanelProperties::ms_IconFontSize, SAdminPanelProperties::ms_FontSize, 18.0f, 0.0f);
 		}
 		else
 		{
-			Button.Draw(m_PlayerPopup.m_ChosenActionButton == 4 && !str_comp(m_PlayerPopup.m_InputReason, s_aReadyBan[i].Reason) ? SAdminPanelProperties::ActionBanButtonColor() : SAdminPanelProperties::ActionBanAltButtonColor(), IGraphics::CORNER_ALL, SAdminPanelProperties::ms_Rounding);
-			DoLabelLabeledButtonDown(&Button, aBuf, s_aReadyBan[i].Reason, SAdminPanelProperties::ms_IconFontSize, SAdminPanelProperties::ms_FontSize, 18.0f, 0.0f);
+			Button.Draw(m_PlayerPopup.m_ChosenActionButton == 4 && !str_comp(m_PlayerPopup.m_InputReason, i.m_Reason) ? SAdminPanelProperties::ActionBanButtonColor() : SAdminPanelProperties::ActionBanAltButtonColor(), IGraphics::CORNER_ALL, SAdminPanelProperties::ms_Rounding);
+			DoLabelLabeledButtonDown(&Button, aBuf, i.m_Reason, SAdminPanelProperties::ms_IconFontSize, SAdminPanelProperties::ms_FontSize, 18.0f, 0.0f);
 		}
 		if(DoButtonLogic(&Button))
 		{
-			if(m_PlayerPopup.m_ChosenActionButton == 4 && !str_comp(m_PlayerPopup.m_InputReason, s_aReadyBan[i].Reason))
+			if(m_PlayerPopup.m_ChosenActionButton == 4 && !str_comp(m_PlayerPopup.m_InputReason, i.m_Reason))
 			{
 				m_PlayerPopup.m_ChosenActionButton = 0;
 				m_PlayerPopup.m_InputReason[0] = '\0';
@@ -727,8 +726,8 @@ void CAdminPanel::RenderPlayerPanelPopUpReadyButtons(CUIRect *pBase)
 			else
 			{
 				m_PlayerPopup.m_ChosenActionButton = 4;
-				str_copy(m_PlayerPopup.m_InputReason, s_aReadyBan[i].Reason, sizeof(m_PlayerPopup.m_InputReason));
-				m_PlayerPopup.m_MinutesTimers = s_aReadyBan[i].Minutes;
+				str_copy(m_PlayerPopup.m_InputReason, i.m_Reason, sizeof(m_PlayerPopup.m_InputReason));
+				m_PlayerPopup.m_MinutesTimers = i.m_Minutes;
 			}
 		}
 

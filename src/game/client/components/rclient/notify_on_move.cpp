@@ -146,14 +146,14 @@ void CNotifyOnMove::OnRender()
 				float T = m_SpecNotifyAnim;
 				float Phase = (T < 0.5f) ? (2.0f * T * T) : (1.0f - std::pow(-2.0f * T + 2.0f, 2) / 2.0f);
 
-				int m_Height = 300.0f;
-				int m_Width = m_Height * (g_Config.m_RcCustomAspectDisable & RcAspectDisable::NOTIFYINSPEC ? Graphics()->ScreenAspectReal() : Graphics()->ScreenAspect());
-				Graphics()->MapScreenToSize((float)m_Width, (float)m_Height);
+				float MHeight = 300.0f;
+				float MWidth = MHeight * (g_Config.m_RcCustomAspectDisable & RcAspectDisable::NOTIFYINSPEC ? Graphics()->ScreenAspectReal() : Graphics()->ScreenAspect());
+				Graphics()->MapScreenToSize(MWidth, MHeight);
 				CUIRect NotifyBox;
 				NotifyBox.w = 60.0f;
 				NotifyBox.h = 12.0f;
-				NotifyBox.x = (m_Width - NotifyBox.w) / 100.0f * g_Config.m_RcTextOnMoveInSpecPosX;
-				NotifyBox.y = (m_Height - NotifyBox.h) / 100.0f * g_Config.m_RcTextOnMoveInSpecPosY;
+				NotifyBox.x = (MWidth - NotifyBox.w) / 100.0f * g_Config.m_RcTextOnMoveInSpecPosX;
+				NotifyBox.y = (MHeight - NotifyBox.h) / 100.0f * g_Config.m_RcTextOnMoveInSpecPosY;
 				NotifyBox.Draw(ColorRGBA(0.0f, 0.0f, 0.0f, 0.6f * Phase), IGraphics::CORNER_ALL, 5.0f);
 				NotifyBox.Margin(1.0f, &NotifyBox);
 				TextRender()->TextColor(ColorRGBA(1.0f, 0.0f, 0.0f, Phase));

@@ -34,17 +34,17 @@ void CAboveBelowPlayer::OnRender()
 		return;
 	}
 
-	vec2 m_LocalPos;
-	int m_LinesNum = 0;
+	vec2 MLocalPos;
+	int MLinesNum = 0;
 
 	if(GameClient()->m_aClients[LocalClientId].m_SpecCharPresent)
 	{
-		m_LocalPos = GameClient()->m_aClients[LocalClientId].m_SpecChar / 32.0f;
+		MLocalPos = GameClient()->m_aClients[LocalClientId].m_SpecChar / 32.0f;
 	}
 	else
 	{
 		const CNetObj_Character *pLocalChar = &GameClient()->m_Snap.m_aCharacters[LocalClientId].m_Cur;
-		m_LocalPos = vec2(pLocalChar->m_X, pLocalChar->m_Y) / 32.0f;
+		MLocalPos = vec2(pLocalChar->m_X, pLocalChar->m_Y) / 32.0f;
 	}
 
 	for(int i = 0; i < MAX_CLIENTS; i++)
@@ -59,26 +59,26 @@ void CAboveBelowPlayer::OnRender()
 			continue;
 
 		const CNetObj_Character *pCurChar = &GameClient()->m_Snap.m_aCharacters[i].m_Cur;
-		vec2 m_PlayerPos = vec2(pCurChar->m_X, pCurChar->m_Y) / 32.0f;
-		if(m_PlayerPos.x == m_LocalPos.x)
+		vec2 MPlayerPos = vec2(pCurChar->m_X, pCurChar->m_Y) / 32.0f;
+		if(MPlayerPos.x == MLocalPos.x)
 		{
-			if(m_PlayerPos.y == m_LocalPos.y && g_Config.m_RcNotifyWhenSamePosPlayer)
+			if(MPlayerPos.y == MLocalPos.y && g_Config.m_RcNotifyWhenSamePosPlayer)
 				m_PlayerSame = true;
-			if(m_PlayerPos.y < m_LocalPos.y && g_Config.m_RcNotifyWhenBelowPosPlayer)
+			if(MPlayerPos.y < MLocalPos.y && g_Config.m_RcNotifyWhenBelowPosPlayer)
 				m_PlayerBelow = true;
-			if(m_PlayerPos.y > m_LocalPos.y && g_Config.m_RcNotifyWhenAbovePosPlayer)
+			if(MPlayerPos.y > MLocalPos.y && g_Config.m_RcNotifyWhenAbovePosPlayer)
 				m_PlayerAbove = true;
 		}
 	}
 
-	m_LinesNum = (m_PlayerAbove ? 1 : m_AboveAnim > m_HideAnim ? 1 :
+	MLinesNum = (m_PlayerAbove ? 1 : m_AboveAnim > m_HideAnim ? 1 :
 								     0) +
 		     (m_PlayerSame ? 1 : m_SameAnim > m_HideAnim ? 1 :
 								   0) +
 		     (m_PlayerBelow ? 1 : m_BelowAnim > m_HideAnim ? 1 :
 								     0);
 
-	if(!m_LinesNum)
+	if(!MLinesNum)
 		return;
 
 	Ui()->m_RcForceRealAspect = g_Config.m_RcCustomAspectDisable & RcAspectDisable::NOTIFYINSPEC;
@@ -87,7 +87,7 @@ void CAboveBelowPlayer::OnRender()
 	const float LineSize = 20.0f;
 	const float FontSize = 14.0f;
 	const float Margin = 5.0f;
-	float LineHeight = 20 * m_LinesNum + 5 * (m_LinesNum - 1);
+	float LineHeight = 20 * MLinesNum + 5 * (MLinesNum - 1);
 	// Line screen/4 - w, 20px - h, Marign - 5px
 	CUIRect Line, CurLine;
 	Line.w = pScreen->w / 6.0f;

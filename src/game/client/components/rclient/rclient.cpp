@@ -408,7 +408,7 @@ static TVersion ToTCVersion(char *pStr)
 			return gs_InvalidTCVersion;
 
 		aVersion[i] = str_toint(p);
-		p = strtok(NULL, ".");
+		p = strtok(nullptr, ".");
 	}
 
 	if(p)
@@ -456,7 +456,7 @@ void CRClient::ResetRClientInfoTask()
 	if(m_pRClientInfoTask)
 	{
 		m_pRClientInfoTask->Abort();
-		m_pRClientInfoTask = NULL;
+		m_pRClientInfoTask = nullptr;
 	}
 }
 
@@ -847,13 +847,7 @@ void CRClient::TrackerClientIdRemove(int ClientId)
 }
 bool CRClient::TrackerIsTracked(int ClientId)
 {
-	for(SPlayerList &i : m_vPlayersInTracker)
-	{
-		if(ClientId == i.m_ClientId)
-		{
-			return true;
-		}
-	}
+	return std::ranges::any_of(m_vPlayersInTracker, [ClientId](const SPlayerList &i) { return ClientId == i.m_ClientId; });
 	return false;
 }
 void CRClient::TrackerClientIdAdd(int ClientId)
@@ -1088,7 +1082,7 @@ void CRClient::ConAddCensorWord(IConsole::IResult *pResult, void *pUserData)
 	CRClient *pSelf = static_cast<CRClient *>(pUserData);
 	char aBuf[256];
 	str_utf8_tolower(pResult->GetString(0), aBuf, sizeof(aBuf));
-	pSelf->m_CensorWordsList.push_back(aBuf);
+	pSelf->m_CensorWordsList.emplace_back(aBuf);
 	pSelf->m_FilteredMessagesCache.clear();
 }
 
@@ -1138,9 +1132,8 @@ const char *CRClient::FilterMessage(const char *Message, bool IsChat, int Client
 	std::string Text{Message};
 	if(g_Config.m_RcMessageFilterMode == 1)
 	{
-		for(size_t i = 0; i < m_CensorWordsList.size(); i++)
+		for(const std::string &ToDelete : m_CensorWordsList)
 		{
-			std::string ToDelete{m_CensorWordsList[i]};
 			const char *pFound = str_utf8_find_nocase(Text.c_str(), ToDelete.c_str());
 			while(pFound)
 			{
@@ -1195,31 +1188,30 @@ const char *CRClient::FilterMessage(const char *Message, bool IsChat, int Client
 	}
 	if(g_Config.m_RcMessageFilterMode == 2)
 	{
-		for(size_t i = 0; i < m_CensorWordsList.size(); i++)
+		for(const std::string &ToDelete : m_CensorWordsList)
 		{
-			std::string ToDelete{m_CensorWordsList[i]};
 			const char *pFound = str_utf8_find_nocase(Text.c_str(), ToDelete.c_str());
 			while(pFound)
 			{
 				CensorFoundInMessage = true;
 				size_t Start = pFound - Text.c_str();
-				size_t word_start = Text.find_last_of(' ', Start);
-				if(word_start == std::string::npos)
-					word_start = 0;
+				size_t WordStart = Text.find_last_of(' ', Start);
+				if(WordStart == std::string::npos)
+					WordStart = 0;
 				else
-					word_start++;
-				size_t word_end = Text.find_first_of(' ', Start + ToDelete.length());
-				if(word_end == std::string::npos)
-					word_end = Text.length();
+					WordStart++;
+				size_t WordEnd = Text.find_first_of(' ', Start + ToDelete.length());
+				if(WordEnd == std::string::npos)
+					WordEnd = Text.length();
 				if(g_Config.m_RcMessageFilterMultiplyChangeWordOnFullMatch)
 				{
 					size_t CharCount = 0;
 					size_t BytesCount = 0;
-					str_utf8_stats(Text.c_str() + word_start, word_end - word_start, word_end - word_start, &BytesCount, &CharCount);
+					str_utf8_stats(Text.c_str() + WordStart, WordEnd - WordStart, WordEnd - WordStart, &BytesCount, &CharCount);
 					if(strlen(g_Config.m_RcMessageFilterWordOnFullMatch) < 2)
 					{
-						Text.replace(word_start, word_end - word_start, CharCount + 1, g_Config.m_RcMessageFilterWordOnFullMatch[0]);
-						pFound = str_utf8_find_nocase(Text.c_str() + word_start + (CharCount + 1), ToDelete.c_str());
+						Text.replace(WordStart, WordEnd - WordStart, CharCount + 1, g_Config.m_RcMessageFilterWordOnFullMatch[0]);
+						pFound = str_utf8_find_nocase(Text.c_str() + WordStart + (CharCount + 1), ToDelete.c_str());
 					}
 					else
 					{
@@ -1227,14 +1219,14 @@ const char *CRClient::FilterMessage(const char *Message, bool IsChat, int Client
 						ToChange.reserve((CharCount + 1) * strlen(g_Config.m_RcMessageFilterWordOnFullMatch));
 						for(size_t j = 0; j < CharCount + 1; j++)
 							ToChange += g_Config.m_RcMessageFilterWordOnFullMatch;
-						Text.replace(word_start, word_end - word_start, ToChange);
-						pFound = str_utf8_find_nocase(Text.c_str() + word_start + ToChange.size(), ToDelete.c_str());
+						Text.replace(WordStart, WordEnd - WordStart, ToChange);
+						pFound = str_utf8_find_nocase(Text.c_str() + WordStart + ToChange.size(), ToDelete.c_str());
 					}
 				}
 				else
 				{
-					Text.replace(word_start, word_end - word_start, g_Config.m_RcMessageFilterWordOnFullMatch);
-					pFound = str_utf8_find_nocase(Text.c_str() + word_start + strlen(g_Config.m_RcMessageFilterWordOnFullMatch), ToDelete.c_str());
+					Text.replace(WordStart, WordEnd - WordStart, g_Config.m_RcMessageFilterWordOnFullMatch);
+					pFound = str_utf8_find_nocase(Text.c_str() + WordStart + strlen(g_Config.m_RcMessageFilterWordOnFullMatch), ToDelete.c_str());
 				}
 			}
 		}
@@ -1260,33 +1252,32 @@ const char *CRClient::FilterMessage(const char *Message, bool IsChat, int Client
 	}
 	if(g_Config.m_RcMessageFilterMode == 3)
 	{
-		for(size_t i = 0; i < m_CensorWordsList.size(); i++)
+		for(const std::string &ToDelete : m_CensorWordsList)
 		{
-			std::string ToDelete{m_CensorWordsList[i]};
 			const char *pFound = str_utf8_find_nocase(Text.c_str(), ToDelete.c_str());
 			while(pFound)
 			{
 				CensorFoundInMessage = true;
 				size_t Start = pFound - Text.c_str();
-				size_t word_start = Text.find_last_of(' ', Start);
-				if(word_start == std::string::npos)
-					word_start = 0;
+				size_t WordStart = Text.find_last_of(' ', Start);
+				if(WordStart == std::string::npos)
+					WordStart = 0;
 				else
-					word_start++;
-				size_t word_end = Text.find_first_of(' ', Start + ToDelete.length());
-				if(word_end == std::string::npos)
-					word_end = Text.length();
-				if(!str_utf8_comp_nocase(Text.c_str() + word_start, ToDelete.c_str()))
+					WordStart++;
+				size_t WordEnd = Text.find_first_of(' ', Start + ToDelete.length());
+				if(WordEnd == std::string::npos)
+					WordEnd = Text.length();
+				if(!str_utf8_comp_nocase(Text.c_str() + WordStart, ToDelete.c_str()))
 				{
 					if(g_Config.m_RcMessageFilterMultiplyChangeWordOnFullMatch)
 					{
 						size_t CharCount = 0;
 						size_t BytesCount = 0;
-						str_utf8_stats(Text.c_str() + word_start, word_end - word_start, word_end - word_start, &BytesCount, &CharCount);
+						str_utf8_stats(Text.c_str() + WordStart, WordEnd - WordStart, WordEnd - WordStart, &BytesCount, &CharCount);
 						if(strlen(g_Config.m_RcMessageFilterWordOnFullMatch) < 2)
 						{
-							Text.replace(word_start, word_end - word_start, CharCount + 1, g_Config.m_RcMessageFilterWordOnFullMatch[0]);
-							pFound = str_utf8_find_nocase(Text.c_str() + word_start + (CharCount + 1), ToDelete.c_str());
+							Text.replace(WordStart, WordEnd - WordStart, CharCount + 1, g_Config.m_RcMessageFilterWordOnFullMatch[0]);
+							pFound = str_utf8_find_nocase(Text.c_str() + WordStart + (CharCount + 1), ToDelete.c_str());
 						}
 						else
 						{
@@ -1294,14 +1285,14 @@ const char *CRClient::FilterMessage(const char *Message, bool IsChat, int Client
 							ToChange.reserve((CharCount + 1) * strlen(g_Config.m_RcMessageFilterWordOnFullMatch));
 							for(size_t j = 0; j < CharCount + 1; j++)
 								ToChange += g_Config.m_RcMessageFilterWordOnFullMatch;
-							Text.replace(word_start, word_end - word_start, ToChange);
-							pFound = str_utf8_find_nocase(Text.c_str() + word_start + ToChange.size(), ToDelete.c_str());
+							Text.replace(WordStart, WordEnd - WordStart, ToChange);
+							pFound = str_utf8_find_nocase(Text.c_str() + WordStart + ToChange.size(), ToDelete.c_str());
 						}
 					}
 					else
 					{
-						Text.replace(word_start, word_end - word_start, g_Config.m_RcMessageFilterWordOnFullMatch);
-						pFound = str_utf8_find_nocase(Text.c_str() + word_start + strlen(g_Config.m_RcMessageFilterWordOnFullMatch), ToDelete.c_str());
+						Text.replace(WordStart, WordEnd - WordStart, g_Config.m_RcMessageFilterWordOnFullMatch);
+						pFound = str_utf8_find_nocase(Text.c_str() + WordStart + strlen(g_Config.m_RcMessageFilterWordOnFullMatch), ToDelete.c_str());
 					}
 				}
 				else
@@ -1464,7 +1455,7 @@ void CRClient::ResetRclientDDstatsFindHours()
 	if(m_pRClientDDstatsTaskFindHours)
 	{
 		m_pRClientDDstatsTaskFindHours->Abort();
-		m_pRClientDDstatsTaskFindHours = NULL;
+		m_pRClientDDstatsTaskFindHours = nullptr;
 	}
 }
 
@@ -1560,7 +1551,7 @@ void CRClient::ResetRclientDDstatsFindTime()
 	if(m_pRClientDDstatsTaskFindTime)
 	{
 		m_pRClientDDstatsTaskFindTime->Abort();
-		m_pRClientDDstatsTaskFindTime = NULL;
+		m_pRClientDDstatsTaskFindTime = nullptr;
 	}
 }
 
@@ -1760,11 +1751,11 @@ void CRClient::AddNewLanguage(ChatThings::STranslateLangs Lang)
 
 ChatThings::STranslateLangs CRClient::GetLanguageName(const char *pCode)
 {
-	for(ChatThings::STranslateLangs item : ChatThings::g_LangsList)
+	for(ChatThings::STranslateLangs LangItem : ChatThings::g_LangsList)
 	{
-		if(!str_utf8_comp_nocase(pCode, item.m_LangCode))
+		if(!str_utf8_comp_nocase(pCode, LangItem.m_LangCode))
 		{
-			return item;
+			return LangItem;
 		}
 	}
 	return ChatThings::g_EmptyLang;
@@ -2259,7 +2250,7 @@ void CRClient::ResetRclientBCFetchList()
 	if(m_pRClientBCFetchListTask)
 	{
 		m_pRClientBCFetchListTask->Abort();
-		m_pRClientBCFetchListTask = NULL;
+		m_pRClientBCFetchListTask = nullptr;
 	}
 }
 
@@ -2343,17 +2334,13 @@ bool CRClient::IsOtherTeamAlpha(int ClientId) const
 // Highlight Players
 bool CRClient::IsNeedHighlightPlayer(const char *PlayerName)
 {
-	for(std::string &NickTest : m_HighLightPlayersList)
-	{
-		if(!str_utf8_comp_nocase(NickTest.c_str(), PlayerName))
-			return true;
-	}
+	return std::ranges::any_of(m_HighLightPlayersList, [PlayerName](const std::string &NickTest) { return !str_utf8_comp_nocase(NickTest.c_str(), PlayerName); });
 	return false;
 }
 
 void CRClient::AddHighlightPlayer(const char *PlayerName)
 {
-	m_HighLightPlayersList.push_back(PlayerName);
+	m_HighLightPlayersList.emplace_back(PlayerName);
 }
 
 void CRClient::RemoveHighlightPlayer(const char *PlayerName)
@@ -2418,7 +2405,7 @@ void CRClient::ResetDuckDuckGoVqdTask()
 	if(m_pRClientVqdTask)
 	{
 		m_pRClientVqdTask->Abort();
-		m_pRClientVqdTask = NULL;
+		m_pRClientVqdTask = nullptr;
 	}
 }
 
