@@ -72,11 +72,11 @@ void CAboveBelowPlayer::OnRender()
 	}
 
 	MLinesNum = (m_PlayerAbove ? 1 : m_AboveAnim > m_HideAnim ? 1 :
-								     0) +
-		     (m_PlayerSame ? 1 : m_SameAnim > m_HideAnim ? 1 :
-								   0) +
-		     (m_PlayerBelow ? 1 : m_BelowAnim > m_HideAnim ? 1 :
-								     0);
+								    0) +
+		    (m_PlayerSame ? 1 : m_SameAnim > m_HideAnim ? 1 :
+								  0) +
+		    (m_PlayerBelow ? 1 : m_BelowAnim > m_HideAnim ? 1 :
+								    0);
 
 	if(!MLinesNum)
 		return;

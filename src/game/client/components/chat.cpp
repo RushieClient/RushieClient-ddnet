@@ -1818,7 +1818,7 @@ void CChat::SendChat(int Team, const char *pLine, bool LineTranslated)
 			const char *OnlyCommand = GameClient()->m_RClient.FixLayoutLine(pLine) + 1;
 			if(!m_vServerCommands.empty())
 			{
-				for(auto & m_vServerCommand : m_vServerCommands)
+				for(auto &m_vServerCommand : m_vServerCommands)
 				{
 					if(str_startswith_nocase(OnlyCommand, m_vServerCommand.m_aName))
 					{
