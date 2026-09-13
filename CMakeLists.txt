@@ -1854,10 +1854,7 @@ set(EXPECTED_DATA
   rclient/rcactions.png
   rclient/rchammer.png
   rclient/rchook.png
-  rclient/rclient_big_logo.png
   rclient/rclient_icon.png
-  rclient/rclient_icon_red.png
-  rclient/rclient_icon_white.png
   rclient/rcweapons.png
   rclient/spec_afk.png
   shader/pipeline.frag
