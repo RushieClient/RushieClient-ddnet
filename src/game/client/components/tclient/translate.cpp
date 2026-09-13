@@ -721,8 +721,8 @@ public:
 			g_Config.m_TcTranslateEndpoint[0] != '\0' ? g_Config.m_TcTranslateEndpoint : "https://duckduckgo.com",
 			pVqd,
 			CTranslateBackendDDG::EncodeTarget(SendTranslate ? g_Config.m_RcTranslateSendTarget : g_Config.m_TcTranslateTarget));
-		m_pHttpRequest->HeaderString("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:132.0) Gecko/20100101 Firefox/132.0");
 		CreateHttpRequest(Http, aBuf);
+		m_pHttpRequest->HeaderString("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:132.0) Gecko/20100101 Firefox/132.0");
 		m_pHttpRequest->PostTextPlain(pText);
 	}
 };
