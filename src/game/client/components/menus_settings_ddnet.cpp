@@ -323,14 +323,14 @@ void CMenus::RenderSettingsDDNet(CUIRect MainView)
 	// Updater
 #if defined(CONF_AUTOUPDATE)
 	{
-		const bool NeedUpdate = GameClient()->m_TClient.NeedUpdate();
+		const bool NeedUpdate = GameClient()->m_RClient.NeedUpdate();
 		IUpdater::EUpdaterState State = Updater()->GetCurrentState();
 
 		// Update Button
 		char aBuf[256];
 		if(NeedUpdate && State <= IUpdater::CLEAN)
 		{
-			str_format(aBuf, sizeof(aBuf), Localize("TClient %s is available:"), GameClient()->m_TClient.m_aVersionStr);
+			str_format(aBuf, sizeof(aBuf), Localize("RClient %s is available:"), GameClient()->m_RClient.m_aVersionStr);
 			UpdaterRect.VSplitLeft(TextRender()->TextWidth(14.0f, aBuf, -1, -1.0f) + 10.0f, &UpdaterRect, &Button);
 			Button.VSplitLeft(100.0f, &Button, nullptr);
 			static CButtonContainer s_ButtonUpdate;
@@ -343,7 +343,7 @@ void CMenus::RenderSettingsDDNet(CUIRect MainView)
 			str_copy(aBuf, Localize("Updating…"));
 		else if(State == IUpdater::NEED_RESTART)
 		{
-			str_copy(aBuf, Localize("TClient Client updated!"));
+			str_copy(aBuf, Localize("RClient Client updated!"));
 			m_NeedRestartUpdate = true;
 		}
 		else
