@@ -1,3 +1,10 @@
+##### authors #####
+
+# 2026-09-13 Marxie
+##### /authors #####
+
+##### translated strings #####
+
 [RClient]
 Settings
 == 设置
@@ -80,7 +87,7 @@ Always show quick actions in popup
 
 [RClient]
 Freeze inputs when popup opened
-== 弹窗打开时禁止游戏操作
+== 允许当弹窗打开时卡键
 
 [RClient]
 Show friend's heart in scoreboard
@@ -107,10 +114,6 @@ Hitbox
 == 碰撞箱
 
 [RClient]
-idea from BestClient
-== 想法来自 BestClient
-
-[RClient]
 Hide frozen flakes
 == 隐藏冻结雪花
 
@@ -120,7 +123,7 @@ Always show sparkles
 
 [RClient]
 Show step effects
-== 显示脚步效果
+== 显示脚步特效
 
 [RClient]
 Off
@@ -180,7 +183,7 @@ Size of hitbox
 
 [RClient]
 Quality of hitbox
-== 碰撞箱透明度
+== 碰撞箱边数
 
 [RClient]
 Hitbox color
@@ -256,47 +259,47 @@ Apply
 
 [RClient]
 Disable for almost all UI
-== 禁用几乎所有UI
+== 禁止作用在几乎所有 UI
 
 [RClient]
 Disable for Wheels
-== 禁用轮盘
+== 禁止作用在轮盘
 
 [RClient]
 Disable for Menus
-== 禁用菜单
+== 禁止作用在菜单
 
 [RClient]
 Disable for Scoreboard
-== 禁用计分板
+== 禁止作用在计分板
 
 [RClient]
 Disable for Console
-== 禁用控制台
+== 禁止作用在控制台
 
 [RClient]
 Disable for Above/Below Player
-== 禁用 顶部/底部 的玩家
+== 禁止作用在 顶部/底部 的玩家
 
 [RClient]
 Disable for Hud
-== 禁用 Hud
+== 禁止作用在 Hud
 
 [RClient]
 Disable for Chat
-== 禁用聊天
+== 禁止作用在聊天
 
 [RClient]
 Disable for Edge info
-== 禁用边缘跳信息
+== 禁止作用在边缘跳信息
 
 [RClient]
 Disable for Info messages
-== 禁用信息消息
+== 禁止作用在信息消息
 
 [RClient]
 Disable for Notify in spec
-== 旁观时禁用通知
+== 禁止作用在挂机提醒通知
 
 [RClient]
 Above/Below Player
@@ -371,10 +374,6 @@ Show mouse when open chat
 == 在打开聊天时显示鼠标
 
 [RClient]
-Fix language commands
-== 修复语言指令
-
-[RClient]
 Enable chat scroll
 == 启动聊天滚动
 
@@ -384,7 +383,7 @@ Show scroll bar
 
 [RClient]
 Enable highlight players in chat
-== 在聊天中启用提及玩家
+== 启用战争列表玩家颜色
 
 [RClient]
 Chat Filter Mode
@@ -408,7 +407,7 @@ Multiply Partial Match
 
 [RClient]
 Partial Word Replacement
-== 部分文本替换
+== 替换部分文本
 
 [RClient]
 Multiply Full Match
@@ -424,7 +423,7 @@ Filter Chat
 
 [RClient]
 Filter Nameplates
-== 昵称栏过滤器
+== 名称栏过滤器
 
 [RClient]
 Filter Scoreboard
@@ -476,7 +475,7 @@ Google backends
 
 [RClient]
 Nameplates
-== 昵称栏
+== 名称栏
 
 [RClient]
 Hook
@@ -504,7 +503,7 @@ Hook size
 
 [RClient]
 Hook shift on invis
-== 冻结时偏移钩锁图标
+== 固定钩锁图标
 
 [RClient]
 Fire Detection
@@ -524,14 +523,14 @@ Fire size
 
 [RClient]
 Fire shift on invis
-== 冻结时偏移开火图标
+== 固定开火图标
 
 [RClient]
 Use preinput for fire
 == 使用预输入开火
 
 * - Can be fake info in some cases. Better when preinput enabled
-== * - 正常在某些情况会是虚假的信息，若启用预输入效果更好
+== * - 在某些情况会是虚假的信息，若启用预输入效果更好
 
 [RClient]
 Weapons in nameplates
@@ -619,7 +618,7 @@ Detect other clients
 
 [RClient]
 Show client type in nameplates
-== 在昵称栏显示客户端类型
+== 在名称栏显示客户端类型
 
 [RClient]
 Only you
@@ -651,7 +650,7 @@ Toggle deepfly
 
 [RClient]
 Deepfly on rmb
-== deepfly 作为右键
+== deepfly 作用在右键
 
 [RClient]
 Toggle 45 degrees
@@ -763,7 +762,7 @@ Any
 
 [RClient]
 Anti UnSpec in player
-== 和玩家接触时阻止退出 Spec
+== 和玩家有接触时阻止退出 Spec
 
 [RClient]
 Show Recharge bars (by +KZ/Kaizo Client)
@@ -819,7 +818,7 @@ Keep this settings?
 
 [RClient]
 Name:
-== 昵称:
+== 名称:
 
 [RClient]
 Command:
@@ -855,7 +854,7 @@ Use middle mouse select without copy
 
 [RClient]
 Use %plnick% for replacing with nickname
-== 使用 %plnick% 以替代昵称
+== 使用 %plnick% 以替代名称
 
 [RClient]
 Use %plid% for replacing with client id
@@ -863,7 +862,7 @@ Use %plid% for replacing with client id
 
 [RClient]
 Use bracket yourself "%plnick%"
-== 使用括号括住以代表自己 "%plnick%"
+== 使用引号括住以代表自己 "%plnick%"
 
 [RClient]
 Example: echo "\\"%plnick%\\" %plid%"
@@ -950,6 +949,30 @@ Find Finish:
 == 寻找终点:
 
 [RClient]
+Weapon slots
+== 智能切换武器
+
+[RClient]
+Gun fire volume
+== 开火音量
+
+[RClient]
+Fix cl_show_others_alpha in spec
+== 修复在旁观中的 cl_show_others_alpha (其他队伍透明度)
+
+[RClient]
+Confirm
+== 确认
+
+[RClient]
+Deny
+== 取消
+
+[RClient]
+idea from BestClient
+== 
+
+[RClient]
 by qxdFox/Entity Client
 == 
 
@@ -959,6 +982,10 @@ Discord RPC
 
 [RClient]
 Steam
+== 
+
+[RClient]
+Fix language commands
 == 
 
 [RClient]
@@ -1024,7 +1051,11 @@ Echo small sens
 == 
 
 [RClient]
-Weapon slots
+Left jump
+== 
+
+[RClient]
+Right jump
 == 
 
 [RClient]
@@ -1044,6 +1075,10 @@ Hud
 == 
 
 [RClient]
+Set camera to player when try unspec
+== 
+
+[RClient]
 File
 == 
 
@@ -1052,11 +1087,11 @@ File
 == 
 
 [RClient]
-Gun fire volume
+Bind Hud Editor
 == 
 
 [RClient]
-Fix cl_show_others_alpha in spec
+Continue hook line after hit
 == 
 
 [RClient]
@@ -1121,14 +1156,6 @@ Integration
 
 [RClient]
 Enable Discord Integration
-== 
-
-[RClient]
-Confirm
-== 
-
-[RClient]
-Deny
 == 
 
 [RClient]

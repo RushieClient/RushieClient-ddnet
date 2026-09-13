@@ -1050,6 +1050,22 @@ Weapon slots
 == Слоты оружий
 
 [RClient]
+Send in menu info when inactive
+== Отправлять "в меню" когда свернут
+
+[RClient]
+Set camera to player when try unspec
+== Ставить камеру на игрока когда антианспек
+
+[RClient]
+Bind Hud Editor
+== Бинд худ едитора
+
+[RClient]
+Continue hook line after hit
+== Продолжать хуклайн после удара
+
+[RClient]
 Rcon
 == 
 
@@ -1108,15 +1124,19 @@ duckduckgo (works on upd))
 == 
 
 [RClient]
-Send in menu info when inactive
-== 
-
-[RClient]
 Wake up
 == 
 
 [RClient]
 by +KZ/Kaizo Client
+== 
+
+[RClient]
+Left jump
+== 
+
+[RClient]
+Right jump
 == 
 
 [RClient]
