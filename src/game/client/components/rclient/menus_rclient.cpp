@@ -212,7 +212,8 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 				Ui()->DoEditBox(&s_LineInput, &Button, EditBoxFontSize);
 			}
 		}
-		Column.HSplitTop(MBiggestTab - Column.y + MCurrentY, nullptr, &Column);
+		if(MBiggestTab > Column.y - MCurrentY)
+			Column.HSplitTop(MBiggestTab - (Column.y - MCurrentY), nullptr, &Column);
 	}
 
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
@@ -257,7 +258,8 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 			static int s_HeartSizeScoreboardId = 0;
 			Ui()->DoScrollbarOption(&s_HeartSizeScoreboardId, &g_Config.m_RcSizeOfHeart, &Button, RCLocalize("Heart size", "RClient"), 0, 200, &CUi::ms_LinearScrollbarScale, 0);
 		}
-		Column.HSplitTop(MBiggestTab - Column.y + MCurrentY, nullptr, &Column);
+		if(MBiggestTab > Column.y - MCurrentY)
+			Column.HSplitTop(MBiggestTab - (Column.y - MCurrentY), nullptr, &Column);
 	}
 
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
@@ -346,7 +348,8 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 			static CButtonContainer s_HitboxColor;
 			DoButton_ColorPickerAutoVMargin(&s_HitboxColor, RCLocalize("Hitbox color", "RClient"), &g_Config.m_RcShowHitboxColor, color_cast<ColorRGBA>(ColorHSLA(DefaultConfig::RcShowHitboxColor)), &Column, LineSize, true);
 		}
-		Column.HSplitTop(MBiggestTab - Column.y + MCurrentY, nullptr, &Column);
+		if(MBiggestTab > Column.y - MCurrentY)
+			Column.HSplitTop(MBiggestTab - (Column.y - MCurrentY), nullptr, &Column);
 	}
 
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
@@ -799,7 +802,8 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 				Column.HSplitTop(MarginSmall, nullptr, &Column);
 			}
 		}
-		Column.HSplitTop(MBiggestTab - Column.y + MCurrentY, nullptr, &Column);
+		if(MBiggestTab > Column.y - MCurrentY)
+			Column.HSplitTop(MBiggestTab - (Column.y - MCurrentY), nullptr, &Column);
 	}
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
 	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;
@@ -874,7 +878,8 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcNamePlatesWeaponsNinja, RCLocalize("Show ninja", "RClient"), &g_Config.m_RcNamePlatesWeaponsNinja, &Column, LineSize);
 			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcNamePlatesWeaponsLaser, RCLocalize("Show laser", "RClient"), &g_Config.m_RcNamePlatesWeaponsLaser, &Column, LineSize);
 		}
-		Column.HSplitTop(MBiggestTab - Column.y + MCurrentY, nullptr, &Column);
+		if(MBiggestTab > Column.y - MCurrentY)
+			Column.HSplitTop(MBiggestTab - (Column.y - MCurrentY), nullptr, &Column);
 	}
 
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
@@ -947,8 +952,8 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 				DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcTextOnMoveInSpecRemoveOnInput, RCLocalize("Remove text on any input", "RClient"), &g_Config.m_RcTextOnMoveInSpecRemoveOnInput, &Column, LineSize);
 			}
 		}
-
-		Column.HSplitTop(MBiggestTab - Column.y + MCurrentY, nullptr, &Column);
+		if(MBiggestTab > Column.y - MCurrentY)
+			Column.HSplitTop(MBiggestTab - (Column.y - MCurrentY), nullptr, &Column);
 	}
 
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
@@ -1127,7 +1132,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		DoMenuSettingsBar(&Column, apTabNames, NUMBER_OF_HELP_TABS, s_aPageTabs, s_CurHelpCustomTab, LineSize);
 		Column.HSplitTop(MarginSmall, nullptr, &Column);
 
-		const float MBiggestTab = LineSize * 9.0f + LineSize + (LineSize + 2.0f) * 2.0f + MarginSmall;
+		const float MBiggestTab = LineSize * 10.0f + LineSize + (LineSize + 2.0f) * 2.0f + MarginSmall;
 		const float MCurrentY = Column.y;
 
 		if(s_CurHelpCustomTab == HELP_TAB_MAIN)
@@ -1189,8 +1194,8 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 				{0, 1, 2},
 				g_Config.m_RcSpectatorSortId);
 		}
-
-		Column.HSplitTop(MBiggestTab - Column.y + MCurrentY, nullptr, &Column);
+		if(MBiggestTab > Column.y - MCurrentY)
+			Column.HSplitTop(MBiggestTab - (Column.y - MCurrentY), nullptr, &Column);
 	}
 
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
