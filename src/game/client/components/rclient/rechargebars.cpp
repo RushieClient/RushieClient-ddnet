@@ -16,6 +16,9 @@ void CRechargeBars::RenderRechargeBar(const int ClientId)
 	if(!pWorldChar)
 		return;
 
+	if(pCharacterPred->m_ActiveWeapon < WEAPON_HAMMER || pCharacterPred->m_ActiveWeapon >= NUM_WEAPONS)
+		return;
+
 	const CTuningParams *pTuning = pWorldChar->GetTuning(pWorldChar->GetOverriddenTuneZone());
 	const float FireDelay = pTuning->GetWeaponFireDelay(pCharacterPred->m_ActiveWeapon);
 	const int RechargeTime = std::round(FireDelay * Client()->GameTickSpeed());
