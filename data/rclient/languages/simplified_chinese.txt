@@ -1091,7 +1091,11 @@ Bind Hud Editor
 == 
 
 [RClient]
-Continue hook line after hit
+Continue hook line after hit block
+== 
+
+[RClient]
+Continue hook line after hit player
 == 
 
 [RClient]

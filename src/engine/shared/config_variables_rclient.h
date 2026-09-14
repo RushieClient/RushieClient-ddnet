@@ -230,3 +230,5 @@ MACRO_CONFIG_INT(RcChatPosY, rc_chat_pos_y, 0, -600, 600, CFGFLAG_CLIENT | CFGFL
 // Hook Coll
 MACRO_CONFIG_INT(RcContinueHookLine, rc_continue_hook_line, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Continue hookline after hit")
 MACRO_CONFIG_COL(RcHookLineContinueColor, rc_hook_line_continue_color, 4278190080, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_COLALPHA, "Specifies the color of the hookline tip")
+MACRO_CONFIG_INT(RcContinuePlayerHookLine, rc_continue_player_hook_line, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Continue hookline after hit")
+MACRO_CONFIG_COL(RcHookLinePlayerContinueColor, rc_hook_line_player_continue_color, 4278190080, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_COLALPHA, "Specifies the color of the hookline tip")

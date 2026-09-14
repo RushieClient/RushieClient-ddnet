@@ -267,6 +267,8 @@ void CPlayers::RenderHookCollLine(
 
 	ColorRGBA HookCollColor = color_cast<ColorRGBA>(ColorHSLA(g_Config.m_ClHookCollColorNoColl));
 	std::vector<IGraphics::CLineItem> vLineSegments;
+	std::optional<IGraphics::CLineItem> HookContinueLineSegment;
+	std::optional<IGraphics::CLineItem> HookContinuePlayerLineSegment;
 
 	const int MaxHookTicks = 5 * Client()->GameTickSpeed(); // calculating above 5 seconds is very expensive and unlikely to happen
 
@@ -276,28 +278,33 @@ void CPlayers::RenderHookCollLine(
 		// stop hookline at player circle so it looks better
 		vec2 aIntersections[2];
 		int NumIntersections = intersect_line_circle(StartPos, EndPos, HookablePlayerPosition, CCharacterCore::PhysicalSize() * 1.45f / 2.0f, aIntersections);
+		vec2 StopPos;
 		if(NumIntersections == 2)
 		{
 			if(distance(Position, aIntersections[0]) < distance(Position, aIntersections[1]))
-				vLineSegments.emplace_back(StartPos, aIntersections[0]);
+				StopPos = aIntersections[0];
 			else
-				vLineSegments.emplace_back(StartPos, aIntersections[1]);
+				StopPos = aIntersections[1];
 		}
 		else if(NumIntersections == 1)
 		{
-			vLineSegments.emplace_back(StartPos, aIntersections[0]);
+			StopPos = aIntersections[0];
 		}
 		else
 		{
-			vLineSegments.emplace_back(StartPos, HitPos);
+			StopPos = HitPos;
 		}
+		vLineSegments.emplace_back(StartPos, StopPos);
+
+		vec2 FullEndPos = BasePos + normalize(QuantizedDirection) * HookLength;
+		if(distance(BasePos, FullEndPos) > distance(BasePos, StopPos))
+			HookContinuePlayerLineSegment = IGraphics::CLineItem(StopPos, FullEndPos);
 	};
 
 	// simulate the hook into the future
 	int HookTick;
 	bool HookEnteredTelehook = false;
 	std::optional<IGraphics::CLineItem> HookTipLineSegment;
-	std::optional<IGraphics::CLineItem> HookContinueLineSegment;
 	for(HookTick = 0; HookTick < MaxHookTicks; ++HookTick)
 	{
 		int Tele;
@@ -439,6 +446,7 @@ void CPlayers::RenderHookCollLine(
 		return;
 	ColorRGBA HookCollTipColor = color_cast<ColorRGBA>(ColorHSLA(g_Config.m_ClHookCollTipColor, true));
 	ColorRGBA HookCollContinueColor = color_cast<ColorRGBA>(ColorHSLA(g_Config.m_RcHookLineContinueColor, true));
+	ColorRGBA HookCollContinuePlayerColor = color_cast<ColorRGBA>(ColorHSLA(g_Config.m_RcHookLinePlayerContinueColor, true));
 
 	Graphics()->TextureClear();
 	if(HookCollSize > 0)
@@ -483,6 +491,13 @@ void CPlayers::RenderHookCollLine(
 			Graphics()->SetColor(HookCollContinueColor.WithMultipliedAlpha(Alpha));
 			Graphics()->QuadsDrawFreeform(vLineQuadSegments.data(), vLineQuadSegments.size());
 		}
+		if(HookContinuePlayerLineSegment.has_value() && HookCollContinuePlayerColor.a > 0.0f && g_Config.m_RcContinuePlayerHookLine /*RClient*/)
+		{
+			vLineQuadSegments.clear();
+			ConvertLineSegments(HookContinuePlayerLineSegment.value());
+			Graphics()->SetColor(HookCollContinuePlayerColor.WithMultipliedAlpha(Alpha));
+			Graphics()->QuadsDrawFreeform(vLineQuadSegments.data(), vLineQuadSegments.size());
+		}
 		Graphics()->QuadsEnd();
 	}
 	else
@@ -499,6 +514,11 @@ void CPlayers::RenderHookCollLine(
 		{
 			Graphics()->SetColor(HookCollContinueColor.WithMultipliedAlpha(Alpha));
 			Graphics()->LinesDraw(&HookContinueLineSegment.value(), 1);
+		}
+		if(HookContinuePlayerLineSegment.has_value() && HookCollContinuePlayerColor.a > 0.0f && !g_Config.m_RcContinuePlayerHookLine /*RClient*/)
+		{
+			Graphics()->SetColor(HookCollContinuePlayerColor.WithMultipliedAlpha(Alpha));
+			Graphics()->LinesDraw(&HookContinuePlayerLineSegment.value(), 1);
 		}
 		Graphics()->LinesEnd();
 	}

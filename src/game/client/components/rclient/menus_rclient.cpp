@@ -1174,8 +1174,9 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 			}
 			Column.HSplitTop(MarginSmall, &Button, &Column);
 			DoLine_KeyReader(Column, s_ReaderButtonHudEditor, s_ClearButtonHudEditor, RCLocalize("Bind Hud Editor", "RClient"), "rc_toggle_hud_editor");
-			static CButtonContainer s_HookLineContinueColor;
-			DoButton_ColorPickerAutoVMargin(&s_HookLineContinueColor, RCLocalize("Continue hook line after hit", "RClient"), &g_Config.m_RcHookLineContinueColor, color_cast<ColorRGBA>(ColorHSLA(DefaultConfig::RcHookLineContinueColor)), &Column, LineSize, true, &g_Config.m_RcContinueHookLine);
+			static CButtonContainer s_HookLineContinueColor, s_HookLineContinuePlayerColor;
+			DoButton_ColorPickerAutoVMargin(&s_HookLineContinueColor, RCLocalize("Continue hook line after hit block", "RClient"), &g_Config.m_RcHookLineContinueColor, color_cast<ColorRGBA>(ColorHSLA(DefaultConfig::RcHookLineContinueColor)), &Column, LineSize, true, &g_Config.m_RcContinueHookLine);
+			DoButton_ColorPickerAutoVMargin(&s_HookLineContinuePlayerColor, RCLocalize("Continue hook line after hit player", "RClient"), &g_Config.m_RcHookLinePlayerContinueColor, color_cast<ColorRGBA>(ColorHSLA(DefaultConfig::RcHookLinePlayerContinueColor)), &Column, LineSize, true, &g_Config.m_RcContinuePlayerHookLine);
 		}
 
 		if(s_CurHelpCustomTab == HELP_TAB_SORT)

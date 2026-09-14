@@ -1062,10 +1062,6 @@ Bind Hud Editor
 == Бинд худ едитора
 
 [RClient]
-Continue hook line after hit
-== Продолжать хуклайн после удара
-
-[RClient]
 Rcon
 == 
 
@@ -1146,6 +1142,14 @@ Monitor(win7-11)
 [RClient]
 Exclude(win10-11)
 == 
+
+[RClient]
+Continue hook line after hit block
+== Продолжать хуклайн после блока
+
+[RClient]
+Continue hook line after hit player
+== Продолжать хуклайн после игрока
 
 [RClient]
 name-team-score
