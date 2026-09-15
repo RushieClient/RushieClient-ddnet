@@ -1026,8 +1026,8 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	}
 	DoLine_KeyReader(Column, s_ReaderButtonFindTeleport, s_ClearButtonFindTeleport, RCLocalize("Find Teleport", "RClient"), "rc_goto_tele_cursor");
 	DoLine_KeyReader(Column, s_ReaderButtonFindFinish, s_ClearButtonFindFinish, RCLocalize("Find Finish", "RClient"), "rc_goto_finish_cursor");
-	DoLine_KeyReader(Column, s_ReaderButtonLJump, s_ClearButtonLJump, RCLocalize("Left jump", "RClient"), "\"+left;+jump\"");
-	DoLine_KeyReader(Column, s_ReaderButtonRJump, s_ClearButtonRJump, RCLocalize("Right jump", "RClient"), "\"+right;+jump\"");
+	DoLine_KeyReader(Column, s_ReaderButtonLJump, s_ClearButtonLJump, RCLocalize("Left jump", "RClient"), "+left;+jump");
+	DoLine_KeyReader(Column, s_ReaderButtonRJump, s_ClearButtonRJump, RCLocalize("Right jump", "RClient"), "+right;+jump");
 	static int s_WeaponSlotsBindsId = 0;
 	DoButton_CheckBoxAutoVMarginAndSet(&s_WeaponSlotsBindsId, RCLocalize("Weapon slots", "RClient"), &g_Config.m_RcWeaponSlots, &Column, LineSize);
 
