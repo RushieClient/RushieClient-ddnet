@@ -97,7 +97,7 @@ void CRClient::OnInit()
 	SetForcedAspectRatio();
 	if(m_LatestLangsList.empty())
 		ResetLanguages();
-	if(!str_comp(g_Config.m_TcTranslateBackend, "duckduckgo"))
+	if(!str_comp_nocase(g_Config.m_TcTranslateBackend, "duckduckgo"))
 		FetchDuckDuckGoVqd();
 }
 
@@ -193,7 +193,7 @@ void CRClient::OnRender()
 		FinishDuckDuckGoVqd();
 		ResetDuckDuckGoVqdTask();
 	}
-	if(!str_comp(g_Config.m_TcTranslateBackend, "duckduckgo"))
+	if(!str_comp_nocase(g_Config.m_TcTranslateBackend, "duckduckgo"))
 	{
 		const uint64_t CurrentTime = time_get();
 		if(CurrentTime > m_LastDDGFetchTime)
@@ -2365,8 +2365,8 @@ void CRClient::ResetHighlightPlayer()
 void CRClient::ConchainCheckBackend(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData)
 {
 	pfnCallback(pResult, pCallbackUserData);
-	if(!str_comp(g_Config.m_TcTranslateBackend, "duckduckgo"))
-		((CRClient *)pUserData)->FetchDuckDuckGoVqd();
+	if(!str_comp_nocase(g_Config.m_TcTranslateBackend, "duckduckgo"))
+		((CRClient *)pUserData)->m_LastDDGFetchTime = 0;
 }
 
 void CRClient::FetchDuckDuckGoVqd()
