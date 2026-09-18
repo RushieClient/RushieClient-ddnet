@@ -4,6 +4,12 @@ on:
   push:
     branches-ignore:
       - gh-readonly-queue/**
+  pull_request:
+  merge_group:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/master' && !startsWith(github.ref, 'refs/tags/') }}
 
 jobs:
   build-cmake:
@@ -13,175 +19,221 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, macOS-latest, windows-latest]
+        name: [macOS-latest, windows-latest, ubuntu-22.04]
         include:
-        - os: ubuntu-22.04
-          cmake-args: -G Ninja -DCMAKE_BUILD_TYPE=Release -DDISCORD=ON -DDISCORD_DYNAMIC=ON -DWEBSOCKETS=OFF -DPREFER_BUNDLED_LIBS=ON -DAUTOUPDATE=ON
-          cmake-init-env: CXXFLAGS= 
-          package-file: "*-linux_x86_64.tar.xz"
-        - os: macOS-latest
-          # Universal PCH builds split architectures and reject the shared ARM compiler flags.
-          cmake-args: -G Ninja -DCMAKE_BUILD_TYPE=Release -DDISCORD=ON -DWEBSOCKETS=OFF -DPREFER_BUNDLED_LIBS=ON -DPRECOMPILE_HEADERS=OFF -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64" -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib -DCMAKE_FIND_FRAMEWORK=LAST
-          cmake-init-env: CXXFLAGS= 
-          package-file: "*-macos.dmg"
-        - os: windows-latest
-          cmake-args: -A x64 -DDISCORD=ON -DTOOLS=OFF -DAUTOUPDATE=ON -DVULKAN=ON
-          cmake-init-env: CXXFLAGS= LDFLAGS=
-          package-file: "*-win64.zip"
-        # - os: windows-latest
-        #   cmake-args: -A Win32 -DDISCORD=ON
-        #   cmake-init-env: CXXFLAGS= LDFLAGS=
-        #   package-file: "*-win32.zip"
+          - name: ubuntu-22.04
+            os: ubuntu-22.04
+            cmake-path: /usr/bin/
+            cmake-args: -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DDISCORD=ON -DDISCORD_DYNAMIC=ON -DWEBSOCKETS=OFF -DPREFER_BUNDLED_LIBS=ON -DAUTOUPDATE=ON
+            cmake-args-release: -DIPO=ON
+            cmake-init-env: CXXFLAGS= 
+            package-file: "*-linux_x86_64.tar.xz"
+          - name: macOS-latest
+            os: macOS-latest
+            cmake-args: -G Ninja -DCMAKE_BUILD_TYPE=Release -DDISCORD=ON -DWEBSOCKETS=OFF -DPREFER_BUNDLED_LIBS=ON -DPRECOMPILE_HEADERS=OFF -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64" -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib -DCMAKE_FIND_FRAMEWORK=LAST
+            cmake-args-release: -DIPO=ON
+            cmake-init-env: CXXFLAGS= 
+            package-file: "*-macos.dmg"
+          - name: windows-latest
+            os: windows-latest
+            cmake-args: -A x64 -DDISCORD=ON -DTOOLS=OFF -DAUTOUPDATE=ON -DVULKAN=ON
+            cmake-init-env: CXXFLAGS=/WX LDFLAGS=/WX
+            package-file: "*-win64.zip"
+            executable-suffix: .exe
+
     steps:
-    - uses: actions/checkout@v4
-      with:
-        submodules: true
+      - uses: actions/checkout@v5
+        with:
+          submodules: recursive
 
-    - name: Prepare Linux
-      if: contains(matrix.os, 'ubuntu')
-      run: |
-        sudo apt-get update -y
-        # mount: /var/lib/grub/esp: special device /dev/disk/by-id/scsi-... does not exist.
-        # sudo apt-get upgrade -y
-        sudo apt-get install pkg-config cmake ninja-build libfreetype6-dev libnotify-dev libsdl2-dev libsqlite3-dev libvulkan-dev glslang-tools spirv-tools libavcodec-dev libavformat-dev libavutil-dev libswresample-dev libswscale-dev libx264-dev libpng-dev valgrind gcovr libglew-dev -y
+      - name: Prepare Linux
+        if: contains(matrix.os, 'ubuntu')
+        run: |
+          sudo apt-get update -y
+          # mount: /var/lib/grub/esp: special device /dev/disk/by-id/scsi-... does not exist.
+          # sudo apt-get upgrade -y
+          packages=(
+            # tidy-alphabetical-start
+            gcovr
+            libavcodec-dev
+            libavformat-dev
+            libavutil-dev
+            libfreetype6-dev
+            libglew-dev
+            libnotify-dev
+            libpng-dev
+            libsdl2-dev
+            libsqlite3-dev
+            libswresample-dev
+            libswscale-dev
+            libx264-dev
+            ninja-build
+            pkg-config
+            valgrind
+            # tidy-alphabetical-end
+          )
+          sudo apt-get install -y "${packages[@]}"
 
-    - name: Prepare macOS
-      if: contains(matrix.os, 'macOS')
-      run: |
-        brew update || true
-        brew install pkg-config ninja molten-vk vulkan-headers glslang spirv-tools glew googletest libpng molten-vk opusfile wavpack x264 || true
-        brew upgrade freetype
-        pip3 install --break-system-packages dmgbuild
-        echo /Library/Frameworks/Python.framework/Versions/3.12/bin >> $GITHUB_PATH
-        sudo rm -rf /Library/Developer/CommandLineTools
+      - name: Prepare macOS
+        if: contains(matrix.os, 'macOS')
+        run: |
+          brew update
+          brew install ffmpeg molten-vk ninja pkg-config sdl2
+          brew upgrade freetype
+          pip3 install --break-system-packages dmgbuild pyobjc-framework-Quartz
+          echo /Library/Frameworks/Python.framework/Versions/3.12/bin >> $GITHUB_PATH
+          sudo rm -rf /Library/Developer/CommandLineTools
 
-    - name: Add rust macOS
-      if: contains(matrix.os, 'macOS')
-      run: |
-        rustup default stable
-        rustup update
-        rustup target add x86_64-apple-darwin aarch64-apple-darwin
+      - name: Install Vulkan SDK
+        uses: humbletim/install-vulkan-sdk@v1.2
+        with:
+          version: 1.3.296.0
+          cache: true
 
-    - name: Add rust for Windows 32
-      if: contains(matrix.cmake-args, '-A Win32')
-      run: |
-        rustup default stable
-        rustup target add i686-pc-windows-msvc
+      - name: Cache Rust dependencies
+        uses: Swatinem/rust-cache@v2.9.2
+        with:
+          cache-bin: false # WORKAROUND(https://github.com/Swatinem/rust-cache/issues/341)
+          workspaces: |
+            src/mastersrv
+            src/masterping
+            ./
 
-    - name: Cache Rust dependencies
-      uses: Swatinem/rust-cache@v2
+      - name: Build in release mode
+        run: |
+          mkdir release
+          cd release
+          ${{ matrix.cmake-path }}cmake -E env ${{ matrix.cmake-init-env }} ${{ matrix.cmake-path }}cmake ${{ matrix.cmake-args }} ${{ matrix.cmake-args-release }} -DCMAKE_BUILD_TYPE=Release -Werror=dev -DDOWNLOAD_GTEST=ON -DCMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE=. ..
+          ${{ matrix.workaround-issue10203-run-after-configure }}
+          ${{ matrix.cmake-path }}cmake --build . --config Release --target everything
 
-    - name: Install Vulkan SDK
-      uses: humbletim/install-vulkan-sdk@v1.2
-      with:
-        version: 1.3.296.0
-        cache: true
+      - name: Package
+        run: |
+          cd release
+          ${{ matrix.cmake-path }}cmake --build . --config Release --target package_default
+          mkdir artifacts
+          mv ${{ matrix.package-file }} artifacts
 
-    - name: Build in release mode
-      env:
-        VERSION: ${{ secrets.VERSION }}
-      shell: bash
-      run: |
-        VERSION_FILE="$GITHUB_WORKSPACE/versioninfo.h"
-        printf '%s' "$VERSION" | base64 -d > "$VERSION_FILE"
-        if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
-            export MSYS_ARG_CONV_EXCL="/FI"
-            POST_FLAGS="-DCMAKE_CXX_FLAGS=\"/FI$VERSION_FILE\""
-            ENVFLAGS=""
-        else
-            ENVFLAGS="CXXFLAGS=-include$VERSION_FILE"
-            POST_FLAGS=""
-        fi
-
-        if [[ "${{ matrix.os }}" == "macOS-latest" ]]; then
-            POST_FLAGS+=" -DPNG_LIBRARY=${GITHUB_WORKSPACE}/ddnet-libs/png/mac/libfat/libpng16.16.dylib"
-            POST_FLAGS+=" -DPNG_INCLUDEDIR=${GITHUB_WORKSPACE}/ddnet-libs/png/include"
-        fi
-        mkdir release
-        cd release
-        ${{ matrix.cmake-path }}cmake -E env ${{ matrix.cmake-init-env }} $ENVFLAGS ${{ matrix.cmake-path }}cmake ${{ matrix.cmake-args }} $POST_FLAGS -DCMAKE_BUILD_TYPE=Release -DDOWNLOAD_GTEST=ON -DCMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE=. ..
-        ${{ matrix.cmake-path }}cmake --build . --config Release --target everything ${{ matrix.build-args }}
-
-    - name: Print DDNet.exe SHA256
-      if: contains(matrix.os, 'windows')
-      shell: pwsh
-      run: |
-        $hash = (Get-FileHash .\release\DDNet.exe -Algorithm SHA256).Hash
-        Write-Output "DDNet.exe SHA256: $hash"
-        "DDNet.exe SHA256: ``$hash``" >> $env:GITHUB_STEP_SUMMARY
-
-    - name: Package
-      run: |
-        cd release
-        ${{ matrix.cmake-path }}cmake --build . --config Release --target package_default ${{ matrix.build-args }}
-        mkdir artifacts
-        mv ${{ matrix.package-file }} artifacts
-
-    - name: Upload Artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: ddnet-${{ matrix.os }}
-        path: release/artifacts
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v6
+        with:
+          name: ddnet-${{ matrix.name }}
+          path: release/artifacts
 
   build-android:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     env:
       CARGO_HTTP_MULTIPLEXING: false
     steps:
-    - uses: actions/checkout@v4
-      with:
-        submodules: true
+      - uses: actions/checkout@v5
+        with:
+          submodules: recursive
 
-    - name: Prepare
-      run: |
-        sudo apt-get update -y
-        sudo apt-get install cmake ninja-build openjdk-21-jdk p7zip-full curl glslang-tools openssl
-        cargo install cargo-ndk
-        rustup target add armv7-linux-androideabi
-        rustup target add i686-linux-android
-        rustup target add aarch64-linux-android
-        rustup target add x86_64-linux-android
-        mkdir ~/Android
-        cd ~/Android
-        mkdir Sdk
-        cd Sdk
-        mkdir ndk
-        cd ndk
-        wget --quiet https://dl.google.com/android/repository/android-ndk-r26d-linux.zip
-        unzip android-ndk-r26d-linux.zip
-        rm android-ndk-r26d-linux.zip
-        cd ~/Android/Sdk
-        mkdir build-tools
-        cd build-tools
-        wget --quiet https://dl.google.com/android/repository/build-tools_r30.0.3-linux.zip
-        unzip build-tools_r30.0.3-linux.zip
-        rm build-tools_r30.0.3-linux.zip
-        mv android-11 30.0.3
-        cd ~/Android/Sdk
-        mkdir cmdline-tools
-        cd cmdline-tools
-        wget --quiet https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
-        unzip commandlinetools-linux-11076708_latest.zip
-        rm commandlinetools-linux-11076708_latest.zip
-        mv cmdline-tools latest
-        yes | latest/bin/sdkmanager --licenses
+      - name: Validate Gradle Wrapper
+        uses: gradle/actions/wrapper-validation@v5
 
-    - name: Build
-      env:
-        TW_KEY_NAME: /home/runner/DDNet.jks
-        TW_KEY_ALIAS: DDNet-Key
-        VERSION: ${{ secrets.VERSION }}
-      run: |
-        printf '%s' "$VERSION" | base64 -d > "$GITHUB_WORKSPACE/versioninfo.h"
-        export TW_KEY_PW="$(openssl rand -base64 32)"
-        keytool -genkey -v -keystore "$TW_KEY_NAME" -keyalg RSA -keysize 2048 -validity 10000 -alias "$TW_KEY_ALIAS" -storepass "$TW_KEY_PW" -dname "CN=DDNet CI, OU=DDNet, O=DDNet"
-        mkdir build-android
-        scripts/android/cmake_android.sh all DDNet org.ddnet.client Release build-android
-        mkdir artifacts
-        mv build-android/DDNet.apk artifacts
+      - name: Prepare Linux
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install ninja-build openjdk-21-jdk openssl
+          curl -LO https://github.com/Kitware/CMake/releases/download/v3.22.1/cmake-3.22.1-Linux-x86_64.tar.gz
+          mkdir -p /home/runner/cmake
+          tar --strip-components 1 -C /home/runner/cmake -xf cmake-3.22.1-Linux-x86_64.tar.gz
+          rustup default 1.92.0
+          cargo install cargo-ndk
+          rustup target add armv7-linux-androideabi
+          rustup target add i686-linux-android
+          rustup target add aarch64-linux-android
+          rustup target add x86_64-linux-android
+          scripts/android/download_android_sdk.sh /home/runner
 
-    - name: Upload Artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: ddnet-android
-        path: artifacts
+      - name: Install Vulkan SDK
+        uses: humbletim/install-vulkan-sdk@v1.2
+        with:
+          version: 1.3.296.0
+          cache: true
+
+      - name: Cache Rust dependencies
+        uses: Swatinem/rust-cache@v2.9.2
+        with:
+          cache-bin: false # WORKAROUND(https://github.com/Swatinem/rust-cache/issues/341)
+          workspaces: |
+            src/mastersrv
+            src/masterping
+            ./
+
+      - name: Build Android app
+        env:
+          TW_KEY_NAME: /home/runner/DDNet.jks
+          TW_KEY_ALIAS: DDNet-Key
+        run: |
+          export TW_KEY_PW="$(openssl rand -base64 32)"
+          keytool -genkey -v -keystore "$TW_KEY_NAME" -keyalg RSA -keysize 2048 -validity 10000 -alias "$TW_KEY_ALIAS" -storepass "$TW_KEY_PW" -dname "CN=DDNet CI, OU=DDNet, O=DDNet"
+          export ANDROID_HOME="/home/runner/Android/Sdk"
+          unset ANDROID_SDK_ROOT
+          export PATH=/home/runner/cmake/bin:$PATH
+          scripts/android/cmake_android.sh all DDNet org.ddnet.client Release build-android
+          mkdir artifacts
+          mv build-android/DDNet.apk artifacts
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v6
+        with:
+          name: ddnet-android
+          path: artifacts
+
+  build-ios:
+    runs-on: macos-26
+    env:
+      CARGO_HTTP_MULTIPLEXING: false
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: recursive
+
+      - name: Prepare macOS
+        run: |
+          sudo xcode-select -s "/Applications/Xcode_26.2.app/Contents/Developer"
+          xcodebuild -version
+          rustup target add aarch64-apple-ios
+          rustup target add aarch64-apple-ios-sim
+
+      - name: Cache Rust dependencies
+        uses: Swatinem/rust-cache@v2.9.2
+        with:
+          cache-bin: false # WORKAROUND(https://github.com/Swatinem/rust-cache/issues/341)
+          workspaces: ./
+
+      - name: Build iOS simulator app in debug mode
+        run: scripts/ios/cmake_ios.sh sim-arm64 DDNet org.ddnet.client Debug build-ios-sim
+
+      - name: Smoke test iOS simulator app in debug mode
+        timeout-minutes: 15
+        run: |
+          UDID=$(xcrun simctl list devices available -j | python3 -c 'import json,sys; print(next(device["udid"] for devices in json.load(sys.stdin)["devices"].values() for device in devices if "iPhone" in device["name"]))')
+          xcrun simctl bootstatus "$UDID" -b
+          xcrun simctl install "$UDID" build-ios-sim/Debug-iphonesimulator/DDNet.app
+          xcrun simctl launch --console-pty "$UDID" org.ddnet.client quit > simulator-console.log 2>&1
+          cat simulator-console.log
+          grep -q "config: saved to settings_ddnet.cfg" simulator-console.log
+
+      - name: Build iOS device app in release mode
+        run: scripts/ios/cmake_ios.sh device DDNet org.ddnet.client Release build-ios-device
+
+      - name: Package
+        run: |
+          mkdir artifacts
+          # Zip the app bundles, as the artifact upload does not keep the executable bit.
+          cd build-ios-sim/Debug-iphonesimulator
+          zip -qry ../../artifacts/DDNet-simulator.zip DDNet.app
+          cd ../..
+          # The app is unsigned, so it has to be signed before it can be installed.
+          mkdir Payload
+          mv build-ios-device/Release-iphoneos/DDNet.app Payload
+          zip -qry artifacts/DDNet.ipa Payload
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v6
+        with:
+          name: ddnet-ios
+          path: artifacts
