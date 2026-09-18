@@ -30,13 +30,13 @@ jobs:
             package-file: "*-linux_x86_64.tar.xz"
           - name: macOS-latest
             os: macOS-latest
-            cmake-args: -G Ninja -DCMAKE_BUILD_TYPE=Release -DDISCORD=ON -DWEBSOCKETS=OFF -DPREFER_BUNDLED_LIBS=ON -DPRECOMPILE_HEADERS=OFF -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64" -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib -DCMAKE_FIND_FRAMEWORK=LAST
+            cmake-args: -G Ninja -DCMAKE_BUILD_TYPE=Release -DDISCORD=ON -DWEBSOCKETS=OFF -DPREFER_BUNDLED_LIBS=ON -DPRECOMPILE_HEADERS=OFF -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib -DCMAKE_FIND_FRAMEWORK=LAST
             cmake-args-release: -DIPO=ON
             cmake-init-env: CXXFLAGS= 
             package-file: "*-macos.dmg"
           - name: windows-latest
             os: windows-latest
-            cmake-args: -A x64 -DDISCORD=ON -DTOOLS=OFF -DAUTOUPDATE=ON -DVULKAN=ON
+            cmake-args: -A x64 -DDISCORD=ON -DAUTOUPDATE=ON -DVULKAN=ON
             cmake-init-env: CXXFLAGS=/WX LDFLAGS=/WX
             package-file: "*-win64.zip"
             executable-suffix: .exe
@@ -97,7 +97,7 @@ jobs:
         run: |
           rustup default stable
           rustup update
-          rustup target add x86_64-apple-darwin aarch64-apple-darwin
+          rustup target add aarch64-apple-darwin
 
       - name: Install Vulkan SDK
         uses: humbletim/install-vulkan-sdk@v1.2
