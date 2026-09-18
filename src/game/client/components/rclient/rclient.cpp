@@ -1,5 +1,6 @@
 #include "rclient.h"
 
+#include "base/dbg.h"
 #include "rclient_include.h"
 
 #include <base/io.h>
@@ -224,7 +225,7 @@ void CRClient::OnConsoleInit()
 	Console()->Register("rc_message_filter_add_word", "s[word]", CFGFLAG_CLIENT, ConAddCensorWord, this, "Add word to censor list");
 	Console()->Register("rc_message_filter_remove_word", "s[word]", CFGFLAG_CLIENT, ConRemoveCensorWord, this, "Remove word from censor list");
 	Console()->Register("rc_message_filter_print_words", "", CFGFLAG_CLIENT, ConPrintCensorList, this, "Print censor list");
-	Console()->Register("rc_find_hours", "s[player]", CFGFLAG_CLIENT, ConPlayerFindHours, this, "Find hours");
+	Console()->Register("rc_find_hours", "s[player] ?s[w]", CFGFLAG_CLIENT, ConPlayerFindHours, this, "Find hours");
 	Console()->Register("rc_find_time", "s[player] s[map] ?s[map1] ?s[map2] ?s[map3] ?s[map4] ?s[map5]", CFGFLAG_CLIENT, ConPlayerFindTime, this, "Find hours");
 	Console()->Register("rc_force_aspect", "", CFGFLAG_CLIENT, ConForceAspect, this, "Force aspect ratio(useless)");
 	Console()->Register("rc_translate_add_language", "s[langcode]", CFGFLAG_CLIENT, ConAddLanguage, this, "Add new language for translate (use ISO 639-1)");
@@ -237,6 +238,8 @@ void CRClient::OnConsoleInit()
 	Console()->Register("+rc_spec_go_down", "", CFGFLAG_CLIENT, ConSpecGoDown, this, "Go down in spec freeview");
 	Console()->Register("rc_launch_second_client", "", CFGFLAG_CLIENT, ConLaunchSecondClient, this, "Launch second client");
 	Console()->Register("rc_test_function", "s[map]", CFGFLAG_CLIENT, ConRClientTestFunction, this, "Just for test, lazy to remove");
+	Console()->Register("rc_spec_cmd", "s[cmd]", CFGFLAG_CLIENT, ConSpecCommandFunc, this, "Use %plnick% %plid% for binds");
+	Console()->Register("rc_crash_client", "?s[yes]", CFGFLAG_CLIENT, ConCrashClientFunc, this, "Use %plnick% %plid% for binds");
 	Console()->Chain("rc_message_filter_mode", ConchainResetCensorListCache, this);
 	Console()->Chain("rc_message_filter_multiply_change_word_on_full_match", ConchainResetCensorListCache, this);
 	Console()->Chain("rc_message_filter_word_on_full_match", ConchainResetCensorListCache, this);
@@ -1401,7 +1404,7 @@ void CRClient::FetchRclientDDstatsFindHours(const char *PlayerNickname, const ch
 	char aUrl[256];
 	char Nickname[256];
 	EscapeUrl(Nickname, sizeof(Nickname), PlayerNickname);
-	if(!str_find_nocase("w", WriteInChat))
+	if(!str_comp_nocase("w", WriteInChat))
 		m_FindHoursWriteInChat = true;
 	else
 		m_FindHoursWriteInChat = false;
@@ -2258,8 +2261,47 @@ void CRClient::ResetRclientBCFetchList()
 // Test function
 void CRClient::ConRClientTestFunction(IConsole::IResult *pResult, void *pUserData)
 {
-	CRClient *pThis = static_cast<CRClient *>(pUserData);
-	pThis->FetchDuckDuckGoVqd();
+	dbg_msg("RClient", "Thats a debug bruh");
+}
+
+// Crash Client
+void CRClient::ConCrashClientFunc(IConsole::IResult *pResult, void *pUserData)
+{
+	if(!str_comp_nocase(pResult->GetString(0), "yes") || !str_comp_nocase(pResult->GetString(0), "y"))
+	{
+		exit(6767);
+	}
+	else
+	{
+		dbg_msg("RClient", "Need to confirm (yes or y)");
+	}
+}
+
+// Spec Command
+void CRClient::ConSpecCommandFunc(IConsole::IResult *pResult, void *pUserData)
+{
+	CRClient *pSelf = static_cast<CRClient *>(pUserData);
+	if(pSelf->GameClient()->m_Snap.m_SpecInfo.m_SpectatorId < 0)
+		return;
+	char aEscapedName[MAX_NAME_LENGTH * 2] = "";
+	char *pDst = aEscapedName;
+	str_escape(&pDst, pSelf->GameClient()->m_aClients[pSelf->GameClient()->m_Snap.m_SpecInfo.m_SpectatorId].m_aName, aEscapedName + sizeof(aEscapedName));
+	std::string Command{pResult->GetString(0)};
+	std::string OldStr{"%plnick%"};
+	size_t StartNick{Command.find(OldStr)};
+	while(StartNick != std::string::npos)
+	{
+		Command.replace(StartNick, OldStr.length(), aEscapedName);
+		StartNick = Command.find(OldStr, StartNick + str_length(aEscapedName));
+	}
+	OldStr = "%plid%";
+	size_t StartId{Command.find(OldStr)};
+	while(StartId != std::string::npos)
+	{
+		Command.replace(StartId, OldStr.length(), std::to_string(pSelf->GameClient()->m_Snap.m_SpecInfo.m_SpectatorId));
+		StartId = Command.find(OldStr, StartId + std::to_string(pSelf->GameClient()->m_Snap.m_SpecInfo.m_SpectatorId).length());
+	}
+	pSelf->Console()->ExecuteLine(Command.c_str(), IConsole::CLIENT_ID_UNSPECIFIED);
 }
 
 // Saves reader

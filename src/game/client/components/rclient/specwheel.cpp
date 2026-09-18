@@ -117,7 +117,7 @@ void CSpecWheel::OnConsoleInit()
 {
 	IConfigManager *pConfigManager = Kernel()->RequestInterface<IConfigManager>();
 	if(pConfigManager)
-		pConfigManager->RegisterCallback(ConfigSaveCallback, this, ConfigDomain::TCLIENT);
+		pConfigManager->RegisterCallback(ConfigSaveCallback, this, ConfigDomain::RCLIENT);
 
 	Console()->Register("+specwheel", "", CFGFLAG_CLIENT, ConOpenSpecwheel, this, "Open specwheel selector");
 	Console()->Register("+specwheel_execute_hover", "", CFGFLAG_CLIENT, ConSpecwheelExecuteHover, this, "Execute hovered specwheel bind");

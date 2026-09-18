@@ -590,7 +590,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		DoMenuSettingsBar(&Column, apTabNames, NUMBER_OF_HELP_TABS, s_aPageTabs, s_CurHelpCustomTab, LineSize);
 		Column.HSplitTop(MarginSmall, nullptr, &Column);
 
-		const float MBiggestTab = LineSize * 10.0f + LineSize + (LineSize + 2.0f) * 2.0f + MarginSmall;
+		const float MBiggestTab = LineSize * 11.0f + LineSize + (LineSize + 2.0f) * 2.0f + MarginSmall;
 		const float MCurrentY = Column.y;
 
 		if(s_CurHelpCustomTab == HELP_TAB_MAIN)

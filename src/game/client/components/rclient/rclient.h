@@ -126,6 +126,12 @@ class CRClient : public CComponent
 	static void ConchainCheckBackend(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
 	uint64_t m_LastDDGFetchTime = 0;
 
+	// Spec Command
+	static void ConSpecCommandFunc(IConsole::IResult *pResult, void *pUserData);
+
+	// Crash Client
+	static void ConCrashClientFunc(IConsole::IResult *pResult, void *pUserData);
+
 public:
 	CRClient();
 	int Sizeof() const override { return sizeof(*this); }
