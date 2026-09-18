@@ -568,6 +568,98 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
 	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;
 
+		Column.HSplitTop(MarginBetweenSections, nullptr, &Column);
+	s_SectionBoxes.push_back(Column);
+	Column.HSplitTop(HeadlineHeight, &Label, &Column);
+	Ui()->DoLabel(&Label, RCLocalize("Helpful Functions", "RClient"), HeadlineFontSize, TEXTALIGN_MC);
+	Column.HSplitTop(MarginSmall, nullptr, &Column);
+
+	{
+		enum
+		{
+			HELP_TAB_MAIN = 0,
+			HELP_TAB_SORT,
+			NUMBER_OF_HELP_TABS
+		};
+
+		static int s_CurHelpCustomTab = 0;
+		static CButtonContainer s_aPageTabs[NUMBER_OF_HELP_TABS] = {};
+		const char *apTabNames[NUMBER_OF_HELP_TABS] = {
+			RCLocalize("Main", "RClient"),
+			RCLocalize("Sort", "RClient")};
+		DoMenuSettingsBar(&Column, apTabNames, NUMBER_OF_HELP_TABS, s_aPageTabs, s_CurHelpCustomTab, LineSize);
+		Column.HSplitTop(MarginSmall, nullptr, &Column);
+
+		const float MBiggestTab = LineSize * 10.0f + LineSize + (LineSize + 2.0f) * 2.0f + MarginSmall;
+		const float MCurrentY = Column.y;
+
+		if(s_CurHelpCustomTab == HELP_TAB_MAIN)
+		{
+			static std::vector<CButtonContainer> s_vButtonContainersAutoLock = {{}, {}, {}};
+			DoLine_RadioMenu(Column, RCLocalize("Auto Lock Team", "RClient"),
+				s_vButtonContainersAutoLock,
+				{RCLocalize("Off", "RClient"), RCLocalize("Empty", "RClient"), RCLocalize("Any", "RClient")},
+				{0, 1, 2},
+				g_Config.m_RcAutoLockTeam);
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcAntiUnSpec, RCLocalize("Anti UnSpec in player", "RClient"), &g_Config.m_RcAntiUnSpec, &Column, LineSize);
+			Column.HSplitTop(LineSize, &Button, &Column);
+			Button.VSplitLeft(Margin, nullptr, &Button);
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcAntiUnSpecSetPlayerCamera, RCLocalize("Set camera to player when try unspec", "RClient"), &g_Config.m_RcAntiUnSpecSetPlayerCamera, &Button, LineSize);
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcShowRechargeBars, RCLocalize("Show Recharge bars (by +KZ/Kaizo Client)", "RClient"), &g_Config.m_RcShowRechargeBars, &Column, LineSize);
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcClearConfigsInUnknownFile, RCLocalize("Clear ddnet config from unknown configs on exit", "RClient"), &g_Config.m_RcClearConfigsInUnknownFile, &Column, LineSize);
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcShowOpenSecondClientButton, RCLocalize("Show open second client button", "RClient"), &g_Config.m_RcShowOpenSecondClientButton, &Column, LineSize);
+			static std::vector<CButtonContainer> s_vButtonContainersSaveCount = {{}, {}, {}};
+			DoLine_RadioMenu(Column, RCLocalize("Show Save Count", "RClient"),
+				s_vButtonContainersSaveCount,
+				{RCLocalize("Off", "RClient"), RCLocalize("File", "RClient"), RCLocalize("/load", "RClient")},
+				{0, 1, 2},
+				g_Config.m_RcShowSavesCount);
+			Column.HSplitTop(LineSize, &Button, &Column);
+			Ui()->DoScrollbarOption(&g_Config.m_RcSndGunFireVolume, &g_Config.m_RcSndGunFireVolume, &Button, RCLocalize("Gun fire volume", "RClient"), 0, 100, &CUi::ms_LinearScrollbarScale, 0);
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcSaveAlphaInOtherTeamInSpec, RCLocalize("Fix cl_show_others_alpha in spec", "RClient"), &g_Config.m_RcSaveAlphaInOtherTeamInSpec, &Column, LineSize);
+			static int s_WeaponSlotsHelpId = 0;
+			DoButton_CheckBoxAutoVMarginAndSet(&s_WeaponSlotsHelpId, RCLocalize("Weapon slots", "RClient"), &g_Config.m_RcWeaponSlots, &Column, LineSize);
+			Column.HSplitTop(LineSize, &Button, &Column);
+			static CButtonContainer s_ReaderButtonHudEditor, s_ClearButtonHudEditor, s_OpenHudEditor;
+			int SOpenRcHudEditor = GameClient()->m_RcHudEditor.IsActive();
+			if(DoButton_Menu(&s_OpenHudEditor, "Open Hud Editor", SOpenRcHudEditor, &Button))
+			{
+				if(Client()->State() != IClient::STATE_OFFLINE)
+				{
+					GameClient()->m_Menus.SetActive(false);
+					GameClient()->m_RcHudEditor.SetActive(true);
+				}
+			}
+			Column.HSplitTop(MarginSmall, &Button, &Column);
+			DoLine_KeyReader(Column, s_ReaderButtonHudEditor, s_ClearButtonHudEditor, RCLocalize("Bind Hud Editor", "RClient"), "rc_toggle_hud_editor");
+			static CButtonContainer s_HookLineContinueColor, s_HookLineContinuePlayerColor;
+			DoButton_ColorPickerAutoVMargin(&s_HookLineContinueColor, RCLocalize("Continue hook line after hit block", "RClient"), &g_Config.m_RcHookLineContinueColor, color_cast<ColorRGBA>(ColorHSLA(DefaultConfig::RcHookLineContinueColor)), &Column, LineSize, true, &g_Config.m_RcContinueHookLine);
+			DoButton_ColorPickerAutoVMargin(&s_HookLineContinuePlayerColor, RCLocalize("Continue hook line after hit player", "RClient"), &g_Config.m_RcHookLinePlayerContinueColor, color_cast<ColorRGBA>(ColorHSLA(DefaultConfig::RcHookLinePlayerContinueColor)), &Column, LineSize, true, &g_Config.m_RcContinuePlayerHookLine);
+		}
+
+		if(s_CurHelpCustomTab == HELP_TAB_SORT)
+		{
+			static std::vector<CButtonContainer> s_vButtonContainersSortScoreboard = {{}, {}, {}, {}, {}};
+			DoLine_RadioMenu_WLabelSize(Column, RCLocalize("Sort Scoreboard", "RClient"), Column.w / 4,
+				s_vButtonContainersSortScoreboard,
+				{RCLocalize("name-team-score", "RClient"), RCLocalize("id-team-score", "RClient"), RCLocalize("id-score", "RClient"), RCLocalize("id-team", "RClient"), RCLocalize("id", "RClient")},
+				{0, 1, 2, 3, 4},
+				g_Config.m_RcScoreboardSortId);
+
+			static std::vector<CButtonContainer> s_vButtonContainersSortSpectator = {{}, {}, {}};
+			DoLine_RadioMenu_WLabelSize(Column, RCLocalize("Sort Spectator", "RClient"), Column.w / 4,
+				s_vButtonContainersSortSpectator,
+				{RCLocalize("name-team", "RClient"), RCLocalize("id-team", "RClient"), RCLocalize("id", "RClient")},
+				{0, 1, 2},
+				g_Config.m_RcSpectatorSortId);
+		}
+		if(MBiggestTab > Column.y - MCurrentY)
+			Column.HSplitTop(MBiggestTab - (Column.y - MCurrentY), nullptr, &Column);
+	}
+
+	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
+	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;
+
 	// ***** RightView ***** //
 	LeftView = Column;
 	Column = RightView;
@@ -1106,98 +1198,6 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcEnableSwapTimerOnLeftSide, RCLocalize("Swap timer on left side", "RClient"), &g_Config.m_RcEnableSwapTimerOnLeftSide, &Column, LineSize);
 	Column.HSplitTop(LineSize, &Button, &Column);
 	Ui()->DoScrollbarOption(&g_Config.m_RcEnableSwapTimerPosY, &g_Config.m_RcEnableSwapTimerPosY, &Button, RCLocalize("Swap timer pos y", "RClient"), 0, 200, &CUi::ms_LinearScrollbarScale, 0);
-
-	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
-	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;
-
-	Column.HSplitTop(MarginBetweenSections, nullptr, &Column);
-	s_SectionBoxes.push_back(Column);
-	Column.HSplitTop(HeadlineHeight, &Label, &Column);
-	Ui()->DoLabel(&Label, RCLocalize("Helpful Functions", "RClient"), HeadlineFontSize, TEXTALIGN_MC);
-	Column.HSplitTop(MarginSmall, nullptr, &Column);
-
-	{
-		enum
-		{
-			HELP_TAB_MAIN = 0,
-			HELP_TAB_SORT,
-			NUMBER_OF_HELP_TABS
-		};
-
-		static int s_CurHelpCustomTab = 0;
-		static CButtonContainer s_aPageTabs[NUMBER_OF_HELP_TABS] = {};
-		const char *apTabNames[NUMBER_OF_HELP_TABS] = {
-			RCLocalize("Main", "RClient"),
-			RCLocalize("Sort", "RClient")};
-		DoMenuSettingsBar(&Column, apTabNames, NUMBER_OF_HELP_TABS, s_aPageTabs, s_CurHelpCustomTab, LineSize);
-		Column.HSplitTop(MarginSmall, nullptr, &Column);
-
-		const float MBiggestTab = LineSize * 10.0f + LineSize + (LineSize + 2.0f) * 2.0f + MarginSmall;
-		const float MCurrentY = Column.y;
-
-		if(s_CurHelpCustomTab == HELP_TAB_MAIN)
-		{
-			static std::vector<CButtonContainer> s_vButtonContainersAutoLock = {{}, {}, {}};
-			DoLine_RadioMenu(Column, RCLocalize("Auto Lock Team", "RClient"),
-				s_vButtonContainersAutoLock,
-				{RCLocalize("Off", "RClient"), RCLocalize("Empty", "RClient"), RCLocalize("Any", "RClient")},
-				{0, 1, 2},
-				g_Config.m_RcAutoLockTeam);
-			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcAntiUnSpec, RCLocalize("Anti UnSpec in player", "RClient"), &g_Config.m_RcAntiUnSpec, &Column, LineSize);
-			Column.HSplitTop(LineSize, &Button, &Column);
-			Button.VSplitLeft(Margin, nullptr, &Button);
-			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcAntiUnSpecSetPlayerCamera, RCLocalize("Set camera to player when try unspec", "RClient"), &g_Config.m_RcAntiUnSpecSetPlayerCamera, &Button, LineSize);
-			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcShowRechargeBars, RCLocalize("Show Recharge bars (by +KZ/Kaizo Client)", "RClient"), &g_Config.m_RcShowRechargeBars, &Column, LineSize);
-			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcClearConfigsInUnknownFile, RCLocalize("Clear ddnet config from unknown configs on exit", "RClient"), &g_Config.m_RcClearConfigsInUnknownFile, &Column, LineSize);
-			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcShowOpenSecondClientButton, RCLocalize("Show open second client button", "RClient"), &g_Config.m_RcShowOpenSecondClientButton, &Column, LineSize);
-			static std::vector<CButtonContainer> s_vButtonContainersSaveCount = {{}, {}, {}};
-			DoLine_RadioMenu(Column, RCLocalize("Show Save Count", "RClient"),
-				s_vButtonContainersSaveCount,
-				{RCLocalize("Off", "RClient"), RCLocalize("File", "RClient"), RCLocalize("/load", "RClient")},
-				{0, 1, 2},
-				g_Config.m_RcShowSavesCount);
-			Column.HSplitTop(LineSize, &Button, &Column);
-			Ui()->DoScrollbarOption(&g_Config.m_RcSndGunFireVolume, &g_Config.m_RcSndGunFireVolume, &Button, RCLocalize("Gun fire volume", "RClient"), 0, 100, &CUi::ms_LinearScrollbarScale, 0);
-			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcSaveAlphaInOtherTeamInSpec, RCLocalize("Fix cl_show_others_alpha in spec", "RClient"), &g_Config.m_RcSaveAlphaInOtherTeamInSpec, &Column, LineSize);
-			static int s_WeaponSlotsHelpId = 0;
-			DoButton_CheckBoxAutoVMarginAndSet(&s_WeaponSlotsHelpId, RCLocalize("Weapon slots", "RClient"), &g_Config.m_RcWeaponSlots, &Column, LineSize);
-			Column.HSplitTop(LineSize, &Button, &Column);
-			static CButtonContainer s_ReaderButtonHudEditor, s_ClearButtonHudEditor, s_OpenHudEditor;
-			int SOpenRcHudEditor = GameClient()->m_RcHudEditor.IsActive();
-			if(DoButton_Menu(&s_OpenHudEditor, "Open Hud Editor", SOpenRcHudEditor, &Button))
-			{
-				if(Client()->State() != IClient::STATE_OFFLINE)
-				{
-					GameClient()->m_Menus.SetActive(false);
-					GameClient()->m_RcHudEditor.SetActive(true);
-				}
-			}
-			Column.HSplitTop(MarginSmall, &Button, &Column);
-			DoLine_KeyReader(Column, s_ReaderButtonHudEditor, s_ClearButtonHudEditor, RCLocalize("Bind Hud Editor", "RClient"), "rc_toggle_hud_editor");
-			static CButtonContainer s_HookLineContinueColor, s_HookLineContinuePlayerColor;
-			DoButton_ColorPickerAutoVMargin(&s_HookLineContinueColor, RCLocalize("Continue hook line after hit block", "RClient"), &g_Config.m_RcHookLineContinueColor, color_cast<ColorRGBA>(ColorHSLA(DefaultConfig::RcHookLineContinueColor)), &Column, LineSize, true, &g_Config.m_RcContinueHookLine);
-			DoButton_ColorPickerAutoVMargin(&s_HookLineContinuePlayerColor, RCLocalize("Continue hook line after hit player", "RClient"), &g_Config.m_RcHookLinePlayerContinueColor, color_cast<ColorRGBA>(ColorHSLA(DefaultConfig::RcHookLinePlayerContinueColor)), &Column, LineSize, true, &g_Config.m_RcContinuePlayerHookLine);
-		}
-
-		if(s_CurHelpCustomTab == HELP_TAB_SORT)
-		{
-			static std::vector<CButtonContainer> s_vButtonContainersSortScoreboard = {{}, {}, {}, {}, {}};
-			DoLine_RadioMenu_WLabelSize(Column, RCLocalize("Sort Scoreboard", "RClient"), Column.w / 4,
-				s_vButtonContainersSortScoreboard,
-				{RCLocalize("name-team-score", "RClient"), RCLocalize("id-team-score", "RClient"), RCLocalize("id-score", "RClient"), RCLocalize("id-team", "RClient"), RCLocalize("id", "RClient")},
-				{0, 1, 2, 3, 4},
-				g_Config.m_RcScoreboardSortId);
-
-			static std::vector<CButtonContainer> s_vButtonContainersSortSpectator = {{}, {}, {}};
-			DoLine_RadioMenu_WLabelSize(Column, RCLocalize("Sort Spectator", "RClient"), Column.w / 4,
-				s_vButtonContainersSortSpectator,
-				{RCLocalize("name-team", "RClient"), RCLocalize("id-team", "RClient"), RCLocalize("id", "RClient")},
-				{0, 1, 2},
-				g_Config.m_RcSpectatorSortId);
-		}
-		if(MBiggestTab > Column.y - MCurrentY)
-			Column.HSplitTop(MBiggestTab - (Column.y - MCurrentY), nullptr, &Column);
-	}
 
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
 	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;
