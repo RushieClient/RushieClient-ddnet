@@ -132,6 +132,9 @@ class CRClient : public CComponent
 	// Crash Client
 	static void ConCrashClientFunc(IConsole::IResult *pResult, void *pUserData);
 
+	// Send no translate
+	static void ConRcSayNoTranslate(IConsole::IResult *pResult, void *pUserData);
+
 public:
 	CRClient();
 	int Sizeof() const override { return sizeof(*this); }

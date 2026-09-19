@@ -966,7 +966,26 @@ void CTranslate::TranslateSend(const char *Line, int WorkId, int JobIntVariable)
 
 	const char *pTextToTranslate = Line;
 	const char *pColon = str_find(Line, ": ");
-	if(pColon && pColon != Line)
+	if(str_find_nocase(Line, "/w ") == Line || str_find_nocase(Line, "/whisper ") == Line)
+	{
+		std::string Text = Line;
+		size_t NameStart = Text.find_first_of(' ', 1) + 1;
+		size_t NameEnd = Text.find_first_of(' ', NameStart);
+		if(Text[NameStart] == '"')
+		{
+			size_t QuoteEnd = Text.find('"', NameStart + 1);
+			NameEnd = QuoteEnd == std::string::npos ? std::string::npos : Text.find_first_of(' ', QuoteEnd);
+		}
+		if(NameEnd == std::string::npos)
+			NameEnd = Text.length();
+		size_t PrefixLen = NameEnd < Text.length() ? NameEnd + 1 : NameEnd;
+		if(PrefixLen > 0 && PrefixLen < sizeof(Job.m_TextPrefix))
+		{
+			str_copy(Job.m_TextPrefix, Line, PrefixLen + 1);
+			pTextToTranslate = Line + PrefixLen;
+		}
+	}
+	else if(pColon && pColon != Line)
 	{
 		size_t PrefixLen = pColon - Line + 2;
 		if(PrefixLen < sizeof(Job.m_TextPrefix))

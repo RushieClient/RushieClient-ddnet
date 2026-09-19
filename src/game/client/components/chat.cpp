@@ -1809,38 +1809,44 @@ void CChat::SendChat(int Team, const char *pLine, bool LineTranslated)
 	// send chat message
 	CNetMsg_Cl_Say Msg;
 	Msg.m_Team = Team;
-	if((str_startswith(pLine, ".") || str_startswith(pLine, "/")) || !g_Config.m_RcTranslateSend || LineTranslated)
+	if((str_startswith(pLine, ".") || str_startswith(pLine, "/")) && g_Config.m_RcCommandsFixLayout)
 	{
-		if((str_startswith(pLine, ".") || str_startswith(pLine, "/")) && g_Config.m_RcCommandsFixLayout)
+		bool HaveCommand = false;
+		const char *OnlyCommand = GameClient()->m_RClient.FixLayoutLine(pLine) + 1;
+		if(!m_vServerCommands.empty())
 		{
-			bool HaveCommand = false;
-			const char *OnlyCommand = GameClient()->m_RClient.FixLayoutLine(pLine) + 1;
-			if(!m_vServerCommands.empty())
+			for(auto &ServerCommand : m_vServerCommands)
 			{
-				for(auto &ServerCommand : m_vServerCommands)
+				if(str_startswith_nocase(OnlyCommand, ServerCommand.m_aName))
 				{
-					if(str_startswith_nocase(OnlyCommand, ServerCommand.m_aName))
-					{
-						HaveCommand = true;
-						break;
-					}
+					HaveCommand = true;
+					break;
 				}
 			}
-			if(HaveCommand)
-			{
-				char aBuf[256];
-				str_format(aBuf, sizeof(aBuf), "/%s", OnlyCommand);
-				Msg.m_pMessage = aBuf;
-			}
-			else
-				Msg.m_pMessage = pLine;
+		}
+		if(HaveCommand)
+		{
+			char aBuf[256];
+			str_format(aBuf, sizeof(aBuf), "/%s", OnlyCommand);
+			Msg.m_pMessage = aBuf;
 		}
 		else
 			Msg.m_pMessage = pLine;
+	}
+	else
+		Msg.m_pMessage = pLine;
 
-		if((!str_comp(Msg.m_pMessage, "/spec") || !str_comp(Msg.m_pMessage, "/pause")) && GameClient()->m_RClient.AntiUnSpec())
-			return;
+	if((!str_comp(Msg.m_pMessage, "/spec") || !str_comp(Msg.m_pMessage, "/pause")) && GameClient()->m_RClient.AntiUnSpec())
+		return;
 
+	if((str_startswith(pLine, "/w ") || str_startswith(pLine,"/whisper ")) && !LineTranslated && g_Config.m_RcTranslateSend)
+	{
+		GameClient()->m_Translate.TranslateSend(pLine, 0, Team);
+		return;
+	}
+
+	if(str_startswith(pLine, ".") || str_startswith(pLine, "/") || !g_Config.m_RcTranslateSend || LineTranslated)
+	{
 		Client()->SendPackMsgActive(&Msg, MSGFLAG_VITAL);
 	}
 	else

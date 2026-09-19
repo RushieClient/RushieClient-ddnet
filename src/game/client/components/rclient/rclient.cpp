@@ -240,6 +240,7 @@ void CRClient::OnConsoleInit()
 	Console()->Register("rc_test_function", "s[map]", CFGFLAG_CLIENT, ConRClientTestFunction, this, "Just for test, lazy to remove");
 	Console()->Register("rc_spec_cmd", "s[cmd]", CFGFLAG_CLIENT, ConSpecCommandFunc, this, "Use %plnick% %plid% for binds");
 	Console()->Register("rc_crash_client", "?s[yes]", CFGFLAG_CLIENT, ConCrashClientFunc, this, "Use %plnick% %plid% for binds");
+	Console()->Register("rc_say_notranslate", "r[message]", CFGFLAG_CLIENT, ConRcSayNoTranslate, this, "Say in chat");
 	Console()->Chain("rc_message_filter_mode", ConchainResetCensorListCache, this);
 	Console()->Chain("rc_message_filter_multiply_change_word_on_full_match", ConchainResetCensorListCache, this);
 	Console()->Chain("rc_message_filter_word_on_full_match", ConchainResetCensorListCache, this);
@@ -2485,4 +2486,10 @@ CUIRect *CRClient::GetRealScreen()
 	m_RealScreen.h = 600.0f;
 	m_RealScreen.w = Graphics()->ScreenAspectReal() * m_RealScreen.h;
 	return &m_RealScreen;
+}
+
+// Send without translate
+void CRClient::ConRcSayNoTranslate(IConsole::IResult *pResult, void *pUserData)
+{
+	((CRClient *)pUserData)->GameClient()->m_Chat.SendChat(0, pResult->GetString(0), true);
 }
