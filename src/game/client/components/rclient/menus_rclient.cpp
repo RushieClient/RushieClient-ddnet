@@ -568,7 +568,8 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
 	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;
 
-		Column.HSplitTop(MarginBetweenSections, nullptr, &Column);
+	// ***** Helping Function ***** //
+	Column.HSplitTop(MarginBetweenSections, nullptr, &Column);
 	s_SectionBoxes.push_back(Column);
 	Column.HSplitTop(HeadlineHeight, &Label, &Column);
 	Ui()->DoLabel(&Label, RCLocalize("Helpful Functions", "RClient"), HeadlineFontSize, TEXTALIGN_MC);

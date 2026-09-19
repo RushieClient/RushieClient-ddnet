@@ -1839,7 +1839,7 @@ void CChat::SendChat(int Team, const char *pLine, bool LineTranslated)
 	if((!str_comp(Msg.m_pMessage, "/spec") || !str_comp(Msg.m_pMessage, "/pause")) && GameClient()->m_RClient.AntiUnSpec())
 		return;
 
-	if((str_startswith(pLine, "/w ") || str_startswith(pLine,"/whisper ")) && !LineTranslated && g_Config.m_RcTranslateSend)
+	if((str_startswith(pLine, "/w ") || str_startswith(pLine, "/whisper ")) && !LineTranslated && g_Config.m_RcTranslateSend)
 	{
 		GameClient()->m_Translate.TranslateSend(pLine, 0, Team);
 		return;
