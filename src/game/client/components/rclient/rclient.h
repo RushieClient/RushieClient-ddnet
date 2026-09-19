@@ -274,6 +274,13 @@ public:
 	// Ui
 	CUIRect *GetRealScreen();
 	CUIRect m_RealScreen;
+
+	// Crash Client
+	bool CrashClientConfirm = false;
+	void RcCrashClient();
+
+	// Menus
+	void OnMenuSetActive(bool Active);
 };
 
 #endif // GAME_CLIENT_COMPONENTS_RCLIENT_RCLIENT_H

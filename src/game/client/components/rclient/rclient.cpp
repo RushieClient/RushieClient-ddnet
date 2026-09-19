@@ -2493,3 +2493,16 @@ void CRClient::ConRcSayNoTranslate(IConsole::IResult *pResult, void *pUserData)
 {
 	((CRClient *)pUserData)->GameClient()->m_Chat.SendChat(0, pResult->GetString(0), true);
 }
+
+void CRClient::RcCrashClient()
+{
+	if(CrashClientConfirm)
+		exit(6767);
+	CrashClientConfirm = true;
+}
+
+void CRClient::OnMenuSetActive(bool Active)
+{
+	if(!Active)
+		CrashClientConfirm = false;
+}

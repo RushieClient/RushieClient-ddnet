@@ -2339,6 +2339,7 @@ void CMenus::SetActive(bool Active)
 		Ui()->SetActiveItem(nullptr);
 	}
 	m_MenuActive = Active;
+	GameClient()->m_RClient.OnMenuSetActive(m_MenuActive);
 	if(!m_MenuActive)
 	{
 		if(m_NeedSendinfo)

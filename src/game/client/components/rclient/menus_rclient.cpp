@@ -1538,6 +1538,13 @@ void CMenus::RenderSettingsRClientInfo(CUIRect MainView)
 	// Ui()->DoLabel(&Label, RCLocalize("Integration", "RClient"), HeadlineFontSize, TEXTALIGN_ML);
 	// RightView.HSplitTop(MarginSmall, nullptr, &RightView);
 	// DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_TcDiscordRPC, RCLocalize("Enable Discord Integration", "RClient"), &g_Config.m_TcDiscordRPC, &RightView, LineSize);
+
+	RightView.HSplitBottom(LineSize, &RightView, &Button);
+	static CButtonContainer s_CrashButton;
+	if(DoButton_Menu(&s_CrashButton, RCLocalize("Crash Client"), 0, &Button, BUTTONFLAG_LEFT, nullptr, IGraphics::CORNER_ALL, 5.0f, 0.0f, GameClient()->m_RClient.CrashClientConfirm ? ColorRGBA(1.0f, 0.0f, 0.0f, 1.0f) : ColorRGBA(1.0f, 0.0f, 0.0f, 0.1f)))
+	{
+		GameClient()->m_RClient.RcCrashClient();
+	}
 }
 
 CUi::EPopupMenuFunctionResult CMenusRClientConfirmAspect::Render(void *pContext, CUIRect View, bool Active)
