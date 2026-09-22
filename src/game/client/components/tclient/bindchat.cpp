@@ -79,6 +79,9 @@ decltype(CBindChat::BIND_DEFAULTS_RCLIENT) CBindChat::BIND_DEFAULTS_RCLIENT = {
 							 {RCLocalizable("Find Teleport:", "RClient"), {"!findtele", "rc_goto_tele_cursor"}},
 							 {RCLocalizable("Find Finish:", "RClient"), {"!findfinish", "rc_goto_finish_cursor"}},
 						 }},
+	{RCLocalizable("Utilities", "RClient"), {
+		{RCLocalizable("Send your pos", "RClient"), {"!sendpos", "rc_send_my_pos"}},
+	}},
 };
 
 CBindChat::CBindChat()

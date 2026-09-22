@@ -135,6 +135,9 @@ class CRClient : public CComponent
 	// Send no translate
 	static void ConRcSayNoTranslate(IConsole::IResult *pResult, void *pUserData);
 
+	// Send Pos
+	static void ConRcSendMyPos(IConsole::IResult *pResult, void *pUserData);
+
 public:
 	CRClient();
 	int Sizeof() const override { return sizeof(*this); }
@@ -281,6 +284,9 @@ public:
 
 	// Menus
 	void OnMenuSetActive(bool Active);
+
+	// Send Pos
+	void RcSendMyPos();
 };
 
 #endif // GAME_CLIENT_COMPONENTS_RCLIENT_RCLIENT_H

@@ -241,6 +241,7 @@ void CRClient::OnConsoleInit()
 	Console()->Register("rc_spec_cmd", "s[cmd]", CFGFLAG_CLIENT, ConSpecCommandFunc, this, "Use %plnick% %plid% for binds");
 	Console()->Register("rc_crash_client", "?s[yes]", CFGFLAG_CLIENT, ConCrashClientFunc, this, "Use %plnick% %plid% for binds");
 	Console()->Register("rc_say_notranslate", "r[message]", CFGFLAG_CLIENT, ConRcSayNoTranslate, this, "Say in chat");
+	Console()->Register("rc_send_my_pos", "", CFGFLAG_CLIENT, ConRcSendMyPos, this, "Sends your pos in chat");
 	Console()->Chain("rc_message_filter_mode", ConchainResetCensorListCache, this);
 	Console()->Chain("rc_message_filter_multiply_change_word_on_full_match", ConchainResetCensorListCache, this);
 	Console()->Chain("rc_message_filter_word_on_full_match", ConchainResetCensorListCache, this);
@@ -2505,4 +2506,25 @@ void CRClient::OnMenuSetActive(bool Active)
 {
 	if(!Active)
 		m_CrashClientConfirm = false;
+}
+
+void CRClient::ConRcSendMyPos(IConsole::IResult *pResult, void *pUserData)
+{
+	CRClient *pSelf = static_cast<CRClient *>(pUserData);
+	pSelf->RcSendMyPos();
+}
+
+void CRClient::RcSendMyPos()
+{
+	const int ClientId = GameClient()->m_Snap.m_LocalClientId;
+	char aBuf[128];
+	if(ClientId >= 0)
+	{
+		str_format(aBuf, sizeof(aBuf), "My pos - X:%.2f Y:%.2f", GameClient()->m_Snap.m_aCharacters[ClientId].m_Cur.m_X / 32.0f, GameClient()->m_Snap.m_aCharacters[ClientId].m_Cur.m_Y / 32.0f);
+		GameClient()->m_Chat.SendChat(0, aBuf, true);
+	}
+	else
+	{
+		GameClient()->m_Chat.SendChat(0, "Im in spec", true);
+	}
 }
