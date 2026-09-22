@@ -232,3 +232,6 @@ MACRO_CONFIG_INT(RcContinueHookLine, rc_continue_hook_line, 0, 0, 1, CFGFLAG_CLI
 MACRO_CONFIG_COL(RcHookLineContinueColor, rc_hook_line_continue_color, 4278190080, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_COLALPHA, "Specifies the color of the hookline tip")
 MACRO_CONFIG_INT(RcContinuePlayerHookLine, rc_continue_player_hook_line, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Continue hookline after hit")
 MACRO_CONFIG_COL(RcHookLinePlayerContinueColor, rc_hook_line_player_continue_color, 4278190080, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_COLALPHA, "Specifies the color of the hookline tip")
+
+// SendPos
+MACRO_CONFIG_INT(RcSendSpecPlPos, rc_send_spec_pl_pos, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Send player in spec pos")

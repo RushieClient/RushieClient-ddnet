@@ -636,6 +636,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 			static CButtonContainer s_HookLineContinueColor, s_HookLineContinuePlayerColor;
 			DoButton_ColorPickerAutoVMargin(&s_HookLineContinueColor, RCLocalize("Continue hook line after hit block", "RClient"), &g_Config.m_RcHookLineContinueColor, color_cast<ColorRGBA>(ColorHSLA(DefaultConfig::RcHookLineContinueColor)), &Column, LineSize, true, &g_Config.m_RcContinueHookLine);
 			DoButton_ColorPickerAutoVMargin(&s_HookLineContinuePlayerColor, RCLocalize("Continue hook line after hit player", "RClient"), &g_Config.m_RcHookLinePlayerContinueColor, color_cast<ColorRGBA>(ColorHSLA(DefaultConfig::RcHookLinePlayerContinueColor)), &Column, LineSize, true, &g_Config.m_RcContinuePlayerHookLine);
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcSendSpecPlPos, RCLocalize("Can send spec target pos in !sendpos", "RClient"), &g_Config.m_RcSendSpecPlPos, &Button, LineSize);
 		}
 
 		if(s_CurHelpCustomTab == HELP_TAB_SORT)
