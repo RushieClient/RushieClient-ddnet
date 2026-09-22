@@ -276,7 +276,7 @@ public:
 	CUIRect m_RealScreen;
 
 	// Crash Client
-	bool CrashClientConfirm = false;
+	bool m_CrashClientConfirm = false;
 	void RcCrashClient();
 
 	// Menus

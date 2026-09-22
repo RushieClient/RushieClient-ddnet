@@ -1,6 +1,6 @@
 #include "rclient.h"
 
-#include "base/dbg.h"
+#include <base/dbg.h>
 #include "rclient_include.h"
 
 #include <base/io.h>
@@ -2496,13 +2496,13 @@ void CRClient::ConRcSayNoTranslate(IConsole::IResult *pResult, void *pUserData)
 
 void CRClient::RcCrashClient()
 {
-	if(CrashClientConfirm)
+	if(m_CrashClientConfirm)
 		exit(6767);
-	CrashClientConfirm = true;
+	m_CrashClientConfirm = true;
 }
 
 void CRClient::OnMenuSetActive(bool Active)
 {
 	if(!Active)
-		CrashClientConfirm = false;
+		m_CrashClientConfirm = false;
 }

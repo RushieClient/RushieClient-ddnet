@@ -1541,7 +1541,7 @@ void CMenus::RenderSettingsRClientInfo(CUIRect MainView)
 
 	RightView.HSplitBottom(LineSize, &RightView, &Button);
 	static CButtonContainer s_CrashButton;
-	if(DoButton_Menu(&s_CrashButton, RCLocalize("Crash Client"), 0, &Button, BUTTONFLAG_LEFT, nullptr, IGraphics::CORNER_ALL, 5.0f, 0.0f, GameClient()->m_RClient.CrashClientConfirm ? ColorRGBA(1.0f, 0.0f, 0.0f, 1.0f) : ColorRGBA(1.0f, 0.0f, 0.0f, 0.1f)))
+	if(DoButton_Menu(&s_CrashButton, RCLocalize("Crash Client"), 0, &Button, BUTTONFLAG_LEFT, nullptr, IGraphics::CORNER_ALL, 5.0f, 0.0f, GameClient()->m_RClient.m_CrashClientConfirm ? ColorRGBA(1.0f, 0.0f, 0.0f, 1.0f) : ColorRGBA(1.0f, 0.0f, 0.0f, 0.1f)))
 	{
 		GameClient()->m_RClient.RcCrashClient();
 	}
