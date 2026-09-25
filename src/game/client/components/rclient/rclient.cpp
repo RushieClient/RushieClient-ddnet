@@ -98,8 +98,6 @@ void CRClient::OnInit()
 	SetForcedAspectRatio();
 	if(m_LatestLangsList.empty())
 		ResetLanguages();
-	if(!str_comp_nocase(g_Config.m_TcTranslateBackend, "duckduckgo"))
-		FetchDuckDuckGoVqd();
 }
 
 void CRClient::OnRender()
