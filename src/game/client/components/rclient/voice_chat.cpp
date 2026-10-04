@@ -10,52 +10,55 @@
 
 #include <engine/shared/config.h>
 
+#include <algorithm>
+#include <charconv>
+#include <exception>
+#include <stdexcept>
+#include <utility>
+
 CRCVoiceChat::CRCVoiceChat()
 #ifdef CONF_LIVEKIT
 	: m_Delegate(this)
-{
-#else
-{
-	CRCVoiceChat::OnReset();
 #endif
+{
 }
 
 CRCVoiceChat::~CRCVoiceChat()
 {
-#ifdef CONF_LIVEKIT
-	if(m_Thread.joinable())
-		m_Thread.join();
-	m_pRoom.reset();
-#endif
+	OnShutdown();
 }
 
 void CRCVoiceChat::OnInit()
 {
 #ifdef CONF_LIVEKIT
-	livekit::initialize(livekit::LogLevel::Debug);
-	dbg_msg("voicechat", "livekit initialized");
+	if(m_Initialized)
+		return;
+	try
+	{
+		livekit::initialize(livekit::LogLevel::Info);
+		m_Initialized = true;
+	}
+	catch(const std::exception &Ex)
+	{
+		dbg_msg("voicechat", "initialization failed: %s", Ex.what());
+	}
 #endif
 }
 
 void CRCVoiceChat::OnReset()
 {
 #ifdef CONF_LIVEKIT
-	if(m_Thread.joinable())
-		m_Thread.join();
-	m_pMicTrack.reset();
-	m_pMicSource.reset();
-	m_pRoom.reset();
-	m_Connected = false;
-	m_vParticipants.clear();
-	{
-		std::lock_guard<std::mutex> Lock(m_EventLock);
-		m_vEvents.clear();
-	}
+	ResetConnection();
 	m_ManualDisconnect = false;
-	{
-		std::lock_guard<std::mutex> Lock(m_LevelLock);
-		m_mLevels.clear();
-	}
+	m_NextAutoConnect = 0.0f;
+#endif
+}
+
+void CRCVoiceChat::OnRelease()
+{
+#ifdef CONF_LIVEKIT
+	m_PttHeld = false;
+	ApplyMicState();
 #endif
 }
 
@@ -63,6 +66,13 @@ void CRCVoiceChat::OnRender()
 {
 #ifdef CONF_LIVEKIT
 	ProcessEvents();
+	if(m_PttHeld && (Client()->State() != IClient::STATE_ONLINE || GameClient()->m_Menus.IsActive() ||
+				GameClient()->m_Chat.IsActive() || GameClient()->m_GameConsole.IsActive()))
+		OnRelease();
+	ApplyMicState();
+	if(!m_Connected && !m_Connecting && m_Thread.joinable())
+		ResetConnection();
+	UpdateTalking();
 
 	const bool OnServer = Client()->ServerAddress().type != NETTYPE_INVALID;
 	if(OnServer && Client()->State() == IClient::STATE_ONLINE && g_Config.m_RcVoiceAutoConnect &&
@@ -71,39 +81,6 @@ void CRCVoiceChat::OnRender()
 		m_NextAutoConnect = Client()->GlobalTime() + 10.0f;
 		dbg_msg("voicechat", "auto connect (room '%s')", RoomNameFromAddress().c_str());
 		Connect();
-	}
-
-	const float Now = Client()->GlobalTime();
-	const float Dt = Now - m_LastLevelTick;
-	m_LastLevelTick = Now;
-	{
-		std::lock_guard<std::mutex> Lock(m_LevelLock);
-		for(auto &Entry : m_mLevels)
-			Entry.second *= std::exp(-8.0f * Dt);
-
-		for(auto &P : m_vParticipants)
-		{
-			auto It = m_mLevels.find(P.m_Identity);
-			P.m_Talking = It != m_mLevels.end() && It->second > 0.0f;
-		}
-	}
-
-	if(m_Connected && Client()->GlobalTime() >= m_NextClientIdRefresh)
-	{
-		m_NextClientIdRefresh = Client()->GlobalTime() + 2.0f;
-		for(auto &P : m_vParticipants)
-		{
-			int Id = -1;
-			if(auto pRemote = m_pRoom->remoteParticipant(P.m_Identity).lock())
-			{
-				const char *pMeta = pRemote->metadata().c_str();
-				char *pEnd = nullptr;
-				const long Parsed = strtol(pMeta, &pEnd, 10);
-				if(pEnd != pMeta && *pEnd == '\0' && Parsed >= 0 && Parsed < MAX_CLIENTS)
-					Id = (int)Parsed;
-			}
-			m_mClientIds[P.m_Identity] = Id;
-		}
 	}
 
 	if(!g_Config.m_RcVoiceHud)
@@ -121,7 +98,16 @@ void CRCVoiceChat::OnRender()
 	Panel.HSplitTop(16.0f, &Row, &Panel);
 	const char *pStatus = "Voice: off";
 	if(Connected())
-		pStatus = Muted() ? "Voice: muted" : (Transmitting() ? "Voice: talking" : "Voice: ready (PTT)");
+	{
+		if(m_Reconnecting)
+			pStatus = "Voice: reconnecting...";
+		else if(m_Connecting)
+			pStatus = "Voice: preparing mic...";
+		else if(!m_MicReady)
+			pStatus = "Voice: mic unavailable";
+		else
+			pStatus = Muted() ? "Voice: muted" : (Transmitting() ? "Voice: talking" : "Voice: ready (PTT)");
+	}
 	else if(Connecting())
 		pStatus = "Voice: connecting...";
 	Ui()->DoLabel(&Row, pStatus, 10.0f, TEXTALIGN_ML);
@@ -157,9 +143,13 @@ void CRCVoiceChat::OnConsoleInit()
 void CRCVoiceChat::OnShutdown()
 {
 #ifdef CONF_LIVEKIT
-
+	ResetConnection();
+	if(m_Initialized)
+	{
+		livekit::shutdown();
+		m_Initialized = false;
+	}
 #endif
-	OnReset();
 }
 
 bool CRCVoiceChat::Connected() const
@@ -192,26 +182,37 @@ std::vector<CRCVoiceChat::SParticipant> CRCVoiceChat::Participants() const
 void CRCVoiceChat::Connect()
 {
 #ifdef CONF_LIVEKIT
-	if(m_Connecting || m_Connected)
-	{
-		dbg_msg("voicechat", "already connecting/connected");
+	if(!m_Initialized || m_Connecting || m_Connected)
 		return;
-	}
 	if(g_Config.m_RcVoiceUrl[0] == '\0' || g_Config.m_RcVoiceToken[0] == '\0')
 	{
 		dbg_msg("voicechat", "set rc_voice_url and rc_voice_token first");
 		return;
 	}
-
 	const int LocalClientId = GameClient()->m_Snap.m_LocalClientId;
+	if(Client()->State() != IClient::STATE_ONLINE || Client()->ServerAddress().type == NETTYPE_INVALID ||
+		LocalClientId < 0 || LocalClientId >= MAX_CLIENTS)
+	{
+		dbg_msg("voicechat", "not in game yet");
+		return;
+	}
 
-	if(LocalClientId < 0) { dbg_msg("voicechat", "not in game yet"); return; }
-
+	ResetConnection();
+	m_ManualDisconnect = false;
+	m_Cancelled = false;
 	m_Connecting = true;
-	if(m_Thread.joinable())
-		m_Thread.join();
-	m_Thread = std::thread(&CRCVoiceChat::ConnectThread, this,
-		std::string(g_Config.m_RcVoiceUrl), std::string(g_Config.m_RcVoiceToken), LocalClientId);
+	try
+	{
+		// Configuration is copied on the game thread, including device IDs.
+		m_Thread = std::thread(&CRCVoiceChat::ConnectThread, this,
+			std::string(g_Config.m_RcVoiceUrl), std::string(g_Config.m_RcVoiceToken), LocalClientId,
+			std::string(g_Config.m_RcVoiceMicDevice), std::string(g_Config.m_RcVoicePlayoutDevice));
+	}
+	catch(const std::exception &Ex)
+	{
+		m_Connecting = false;
+		dbg_msg("voicechat", "could not start connection: %s", Ex.what());
+	}
 #else
 	dbg_msg("voicechat", "voice chat is not available in this build");
 #endif
@@ -220,18 +221,8 @@ void CRCVoiceChat::Connect()
 void CRCVoiceChat::Disconnect()
 {
 #ifdef CONF_LIVEKIT
-	if(m_Connecting)
-	{
-		dbg_msg("voicechat", "still connecting, wait");
-		return;
-	}
-	if(!m_Connected)
-	{
-		dbg_msg("voicechat", "not connected");
-		return;
-	}
 	m_ManualDisconnect = true;
-	m_pRoom->disconnect();
+	ResetConnection();
 #else
 	dbg_msg("voicechat", "voice chat is not available in this build");
 #endif
@@ -247,119 +238,39 @@ void CRCVoiceChat::ConDisconnect(IConsole::IResult *pResult, void *pUserData)
 	((CRCVoiceChat *)pUserData)->Disconnect();
 }
 
-bool CRCVoiceChat::Muted() const
-{
-#ifdef CONF_LIVEKIT
-	return m_FullMuted;
-#else
-	return false;
-#endif
-}
-
-bool CRCVoiceChat::Transmitting() const
-{
-#ifdef CONF_LIVEKIT
-	return m_Connected && m_PttHeld && !m_FullMuted;
-#else
-	return false;
-#endif
-}
-
-#ifdef CONF_LIVEKIT
-
-void CRCVoiceChat::ConnectThread(std::string Url, std::string Token, int LocalClientId)
-{
-	m_pMicTrack.reset();
-	m_pMicSource.reset();
-	m_pPlatformAudio.reset();
-
-	m_pRoom = std::make_unique<livekit::Room>();
-	m_pRoom->setDelegate(&m_Delegate);
-
-	livekit::RoomOptions Options;
-	Options.connect_timeout = std::chrono::milliseconds(10000);
-
-	if(!m_pRoom->connect(Url, Token, Options))
-	{
-		m_Connecting = false;
-		dbg_msg("voicechat", "connect failed");
-		return;
-	}
-
-	m_Connected = true;
-	m_Connecting = false;
-	dbg_msg("voicechat", "joined room '%s'", m_pRoom->roomInfo().name.c_str());
-
-	{
-		SEvent Ev;
-		Ev.m_Type = EEventType::Snapshot;
-		for(const auto &pWeak : m_pRoom->remoteParticipants())
-		{
-			if(auto pParticipant = pWeak.lock())
-			{
-				Ev.m_vIdentities.push_back(pParticipant->identity());
-				Ev.m_vNames.push_back(pParticipant->name());
-			}
-		}
-		PushEvent(std::move(Ev));
-	}
-
-	try
-	{
-		m_pPlatformAudio = std::make_unique<livekit::PlatformAudio>();
-
-		if(g_Config.m_RcVoiceMicDevice[0] != '\0')
-			m_pPlatformAudio->setRecordingDevice(g_Config.m_RcVoiceMicDevice);
-		if(g_Config.m_RcVoicePlayoutDevice[0] != '\0')
-			m_pPlatformAudio->setPlayoutDevice(g_Config.m_RcVoicePlayoutDevice);
-
-		livekit::PlatformAudioOptions MicOptions;
-		m_pMicSource = m_pPlatformAudio->createAudioSource(MicOptions);
-		m_pMicTrack = livekit::LocalAudioTrack::createLocalAudioTrack("mic", m_pMicSource);
-
-		if(auto pLocal = m_pRoom->localParticipant().lock())
-		{
-			pLocal->publishTrack(m_pMicTrack, livekit::TrackPublishOptions{});
-			if(LocalClientId >= 0)
-				pLocal->setMetadata(std::to_string(LocalClientId));
-		}
-
-		ApplyMicState();
-	}
-	catch(const std::exception &Ex)
-	{
-		dbg_msg("voicechat", "mic setup failed: %s", Ex.what());
-		return;
-	}
-
-	dbg_msg("voicechat", "mic published");
-}
-
 void CRCVoiceChat::ConPtt(IConsole::IResult *pResult, void *pUserData)
 {
+#ifdef CONF_LIVEKIT
 	CRCVoiceChat *pSelf = (CRCVoiceChat *)pUserData;
-	pSelf->m_PttHeld = pResult->GetInteger(0) != 0;
+	pSelf->m_PttHeld = pResult->GetInteger(0) != 0 && pSelf->Client()->State() == IClient::STATE_ONLINE &&
+			   !pSelf->GameClient()->m_Menus.IsActive() && !pSelf->GameClient()->m_Chat.IsActive() && !pSelf->GameClient()->m_GameConsole.IsActive();
 	pSelf->ApplyMicState();
+#endif
 }
 
 void CRCVoiceChat::ConMute(IConsole::IResult *pResult, void *pUserData)
 {
+#ifdef CONF_LIVEKIT
 	CRCVoiceChat *pSelf = (CRCVoiceChat *)pUserData;
 	pSelf->m_FullMuted = true;
 	pSelf->ApplyMicState();
 	dbg_msg("voicechat", "mic fully muted (PTT disabled)");
+#endif
 }
 
 void CRCVoiceChat::ConUnmute(IConsole::IResult *pResult, void *pUserData)
 {
+#ifdef CONF_LIVEKIT
 	CRCVoiceChat *pSelf = (CRCVoiceChat *)pUserData;
 	pSelf->m_FullMuted = false;
 	pSelf->ApplyMicState();
 	dbg_msg("voicechat", "mic enabled (transmit via PTT)");
+#endif
 }
 
 void CRCVoiceChat::ConStatus(IConsole::IResult *pResult, void *pUserData)
 {
+#ifdef CONF_LIVEKIT
 	CRCVoiceChat *pSelf = (CRCVoiceChat *)pUserData;
 	if(!pSelf->m_Connected)
 	{
@@ -374,18 +285,191 @@ void CRCVoiceChat::ConStatus(IConsole::IResult *pResult, void *pUserData)
 		dbg_msg("voicechat", "  %s (%s)%s", P.m_Name.c_str(), P.m_Identity.c_str(),
 			P.m_Talking ? " [talking]" : "");
 	dbg_msg("voicechat", "server room='%s'", pSelf->RoomNameFromAddress().c_str());
+#endif
+}
+
+bool CRCVoiceChat::Muted() const
+{
+#ifdef CONF_LIVEKIT
+	return m_FullMuted;
+#else
+	return false;
+#endif
+}
+
+bool CRCVoiceChat::Transmitting() const
+{
+#ifdef CONF_LIVEKIT
+	return m_Connected && !m_Reconnecting && m_MicReady && m_Transmitting && m_PttHeld && !m_FullMuted;
+#else
+	return false;
+#endif
+}
+
+#ifdef CONF_LIVEKIT
+
+void CRCVoiceChat::ConnectThread(std::string Url, std::string Token, int LocalClientId,
+	std::string MicDevice, std::string PlayoutDevice)
+{
+	try
+	{
+		m_pPlatformAudio = std::make_unique<livekit::PlatformAudio>();
+		if(!MicDevice.empty())
+			m_pPlatformAudio->setRecordingDevice(MicDevice);
+		if(!PlayoutDevice.empty())
+			m_pPlatformAudio->setPlayoutDevice(PlayoutDevice);
+		m_pRoom = std::make_unique<livekit::Room>();
+		m_pRoom->setDelegate(&m_Delegate);
+		livekit::RoomOptions Options;
+		Options.connect_timeout = std::chrono::seconds(10);
+		Options.join_retries = 0;
+		if(!m_pRoom->connect(Url, Token, Options))
+			throw std::runtime_error("room connection failed");
+		if(m_Cancelled)
+		{
+			m_Connecting = false;
+			return;
+		}
+		m_Connected = true;
+		dbg_msg("voicechat", "joined room '%s'", m_pRoom->roomInfo().name.c_str());
+
+		{
+			// Hold the queue lock while collecting identities: a leave callback
+			// must be queued after this snapshot if the peer is still in it.
+			std::lock_guard<std::mutex> Lock(m_EventLock);
+			SEvent Ev{EEventType::Snapshot};
+			for(const auto &Weak : m_pRoom->remoteParticipants())
+				if(auto pParticipant = Weak.lock())
+					Ev.m_vIdentities.push_back(pParticipant->identity());
+			m_vEvents.push_back(std::move(Ev));
+		}
+
+		try
+		{
+			auto pLocal = m_pRoom->localParticipant().lock();
+			if(!pLocal)
+				throw std::runtime_error("local participant is unavailable");
+			try
+			{
+				pLocal->setMetadata(std::to_string(LocalClientId));
+			}
+			catch(const std::exception &)
+			{
+				dbg_msg("voicechat", "could not update client id metadata (check canUpdateOwnMetadata)");
+			}
+			if(!m_Cancelled && m_Connected)
+			{
+				m_pMicSource = m_pPlatformAudio->createAudioSource(livekit::PlatformAudioOptions{});
+				auto pTrack = livekit::LocalAudioTrack::createLocalAudioTrack("mic", m_pMicSource);
+				pTrack->mute(); // Never publish an open microphone, even when PTT is held.
+				livekit::TrackPublishOptions PublishOptions;
+				PublishOptions.source = livekit::TrackSource::SOURCE_MICROPHONE;
+				pLocal->publishTrack(pTrack, PublishOptions);
+				{
+					std::lock_guard<std::mutex> Lock(m_MicLock);
+					m_pMicTrack = std::move(pTrack);
+					m_MicReady = true;
+				}
+				ApplyMicState();
+				dbg_msg("voicechat", "mic published");
+			}
+		}
+		catch(const std::exception &Ex)
+		{
+			// Keep the room available for listening, but do not report transmission.
+			dbg_msg("voicechat", "mic setup failed: %s", Ex.what());
+		}
+	}
+	catch(const std::exception &Ex)
+	{
+		m_Connected = false;
+		dbg_msg("voicechat", "connect failed: %s", Ex.what());
+	}
+	catch(...)
+	{
+		m_Connected = false;
+		dbg_msg("voicechat", "connect failed with an unknown error");
+	}
+	if(m_Cancelled)
+		m_Connected = false;
+	// Leave this true through microphone setup: Connect must not replace a live thread.
+	m_Connecting = false;
 }
 
 void CRCVoiceChat::ApplyMicState()
 {
-	if(!m_pMicTrack || !m_Connected)
+	std::lock_guard<std::mutex> Lock(m_MicLock);
+	if(!m_pMicTrack || !m_MicReady)
 		return;
-	if(m_PttHeld && !m_FullMuted)
-		m_pMicTrack->unmute();
-	else
-		m_pMicTrack->mute();
+	const bool Transmit = m_Connected && !m_Cancelled && !m_Reconnecting && m_PttHeld && !m_FullMuted;
+	if(Transmit == m_Transmitting)
+		return;
+	try
+	{
+		if(Transmit)
+			m_pMicTrack->unmute();
+		else
+			m_pMicTrack->mute();
+		m_Transmitting = Transmit;
+	}
+	catch(const std::exception &Ex)
+	{
+		m_Cancelled = true;
+		m_Connected = false;
+		m_Transmitting = false;
+		dbg_msg("voicechat", "mic state failed; closing voice connection: %s", Ex.what());
+	}
 }
 
+void CRCVoiceChat::ResetConnection()
+{
+	m_Cancelled = true;
+	m_PttHeld = false;
+	m_Connected = false;
+	if(m_Thread.joinable())
+		m_Thread.join();
+	{
+		std::lock_guard<std::mutex> Lock(m_MicLock);
+		if(m_pMicTrack)
+		{
+			try
+			{
+				m_pMicTrack->mute();
+			}
+			catch(const std::exception &)
+			{
+			}
+		}
+		m_pMicTrack.reset();
+		m_MicReady = false;
+		m_Transmitting = false;
+	}
+	m_pMicSource.reset();
+	m_pPlatformAudio.reset();
+	if(m_pRoom)
+		m_pRoom->setDelegate(nullptr);
+	m_pRoom.reset(); // Waits for SDK callbacks; clear their queue only afterwards.
+	{
+		std::lock_guard<std::mutex> Lock(m_AudioActivityLock);
+		m_mAudioActivity.clear();
+	}
+	m_Delegate.Reset();
+	m_Connected = false;
+	m_Connecting = false;
+	m_Reconnecting = false;
+	m_vParticipants.clear();
+	m_mClientIds.clear();
+	std::lock_guard<std::mutex> Lock(m_EventLock);
+	m_vEvents.clear();
+}
+
+int CRCVoiceChat::ParseClientId(const std::string &Metadata)
+{
+	int Id = -1;
+	const char *pEnd = Metadata.data() + Metadata.size();
+	const auto Result = std::from_chars(Metadata.data(), pEnd, Id);
+	return Result.ec == std::errc{} && Result.ptr == pEnd && Id >= 0 && Id < MAX_CLIENTS ? Id : -1;
+}
 
 void CRCVoiceChat::PushEvent(SEvent Event)
 {
@@ -400,48 +484,81 @@ void CRCVoiceChat::ProcessEvents()
 		std::lock_guard<std::mutex> Lock(m_EventLock);
 		vEvents.swap(m_vEvents);
 	}
-
-	for(SEvent &Ev : vEvents)
+	for(const SEvent &Ev : vEvents)
 	{
 		switch(Ev.m_Type)
 		{
 		case EEventType::ParticipantJoined:
-			if(std::find_if(m_vParticipants.begin(), m_vParticipants.end(),
-				   [&](const SParticipant &P) { return P.m_Identity == Ev.m_Identity; }) == m_vParticipants.end())
-			{
-				m_vParticipants.push_back({Ev.m_Identity, Ev.m_Name, false});
-				dbg_msg("voicechat", "join: '%s' (%s)", Ev.m_Name.c_str(), Ev.m_Identity.c_str());
-			}
-			break;
-
-		case EEventType::ParticipantLeft:
 		{
 			auto It = std::find_if(m_vParticipants.begin(), m_vParticipants.end(),
 				[&](const SParticipant &P) { return P.m_Identity == Ev.m_Identity; });
-			if(It != m_vParticipants.end())
-			{
-				dbg_msg("voicechat", "left: '%s' (%s)", It->m_Name.c_str(), It->m_Identity.c_str());
-				m_vParticipants.erase(It);
-			}
-			std::lock_guard<std::mutex> Lock(m_LevelLock);
-			m_mLevels.erase(Ev.m_Identity);
-			m_mClientIds.erase(Ev.m_Identity);
+			if(It == m_vParticipants.end())
+				m_vParticipants.push_back({Ev.m_Identity, Ev.m_Name, false});
+			else
+				It->m_Name = Ev.m_Name;
+			m_mClientIds[Ev.m_Identity] = ParseClientId(Ev.m_Metadata);
 			break;
 		}
-
-		case EEventType::ActiveSpeakers:
-			for(auto &P : m_vParticipants)
-				P.m_Talking = std::find(Ev.m_vIdentities.begin(), Ev.m_vIdentities.end(), P.m_Identity) != Ev.m_vIdentities.end();
+		case EEventType::ParticipantLeft:
+			m_vParticipants.erase(std::remove_if(m_vParticipants.begin(), m_vParticipants.end(),
+						      [&](const SParticipant &P) { return P.m_Identity == Ev.m_Identity; }),
+				m_vParticipants.end());
+			m_mClientIds.erase(Ev.m_Identity);
 			break;
-
 		case EEventType::Snapshot:
+			// The worker only supplies immutable identities. Rich participant
+			// data from SDK callbacks must not be overwritten by this fallback.
+			for(const auto &Identity : Ev.m_vIdentities)
+				if(std::none_of(m_vParticipants.begin(), m_vParticipants.end(),
+					   [&](const SParticipant &P) { return P.m_Identity == Identity; }))
+					m_vParticipants.push_back({Identity, {}, false});
+			break;
+		case EEventType::Disconnected:
 			m_vParticipants.clear();
-			for(size_t i = 0; i < Ev.m_vIdentities.size(); i++)
-				m_vParticipants.push_back({Ev.m_vIdentities[i],
-					i < Ev.m_vNames.size() ? Ev.m_vNames[i] : "", false});
+			m_mClientIds.clear();
 			break;
 		}
 	}
+}
+
+void CRCVoiceChat::RecordAudioActivity(const std::string &TrackId, const livekit::AudioFrame &Frame)
+{
+	// Any nonzero decoded sample counts, including very quiet sound.
+	if(std::none_of(Frame.data().begin(), Frame.data().end(), [](std::int16_t Sample) { return Sample != 0; }))
+		return;
+	std::lock_guard<std::mutex> Lock(m_AudioActivityLock);
+	auto It = m_mAudioActivity.find(TrackId);
+	if(It != m_mAudioActivity.end() && !It->second.m_Muted)
+		It->second.m_SoundUntil = std::chrono::steady_clock::now() + std::chrono::milliseconds(200);
+}
+
+void CRCVoiceChat::SetAudioMuted(const std::string &TrackId, bool Muted)
+{
+	std::lock_guard<std::mutex> Lock(m_AudioActivityLock);
+	auto It = m_mAudioActivity.find(TrackId);
+	if(It != m_mAudioActivity.end())
+	{
+		It->second.m_Muted = Muted;
+		It->second.m_SoundUntil = {};
+	}
+}
+
+void CRCVoiceChat::ClearAudioActivity(const std::string &Identity)
+{
+	std::lock_guard<std::mutex> Lock(m_AudioActivityLock);
+	std::erase_if(m_mAudioActivity, [&](const auto &Entry) { return Entry.second.m_Identity == Identity; });
+}
+
+void CRCVoiceChat::UpdateTalking()
+{
+	const auto Now = std::chrono::steady_clock::now();
+	const bool Receiving = m_Connected && !m_Reconnecting && !m_Cancelled;
+	std::lock_guard<std::mutex> Lock(m_AudioActivityLock);
+	for(auto &P : m_vParticipants)
+		P.m_Talking = Receiving && std::any_of(m_mAudioActivity.begin(), m_mAudioActivity.end(), [&](const auto &Entry) {
+			const auto &Activity = Entry.second;
+			return Activity.m_Identity == P.m_Identity && !Activity.m_Muted && Now < Activity.m_SoundUntil;
+		});
 }
 
 std::string CRCVoiceChat::RoomNameFromAddress() const
@@ -470,82 +587,47 @@ std::string CRCVoiceChat::RoomNameFromAddress() const
 	return Sanitized;
 }
 
-void CRCVoiceChat::UpdateSpeakingLevel(const std::string &Identity, const livekit::AudioFrame &Frame)
-{
-	double Sum = 0.0;
-	const auto &Data = Frame.data();
-	for(std::int16_t Sample : Data)
-		Sum += double(Sample) * Sample;
-	const float Level = Data.empty() ? 0.0f : (float)(std::sqrt(Sum / Data.size()) / 32768.0);
-
-	std::lock_guard<std::mutex> Lock(m_LevelLock);
-	float &Smoothed = m_mLevels[Identity];
-	if(Level > Smoothed)
-		Smoothed = Level;
-}
-
 #endif
 
 std::vector<CRCVoiceChat::SDevice> CRCVoiceChat::MicDevices()
 {
-#ifdef CONF_LIVEKIT
-	if(!m_pPlatformAudio)
-	{
-		try
-		{
-			m_pPlatformAudio = std::make_unique<livekit::PlatformAudio>();
-		}
-		catch(const std::exception &Ex)
-		{
-			dbg_msg("voicechat", "platform audio: %s", Ex.what());
-			return {};
-		}
-	}
 	std::vector<SDevice> vDevices;
+#ifdef CONF_LIVEKIT
+	if(!m_Initialized)
+		return vDevices;
 	try
 	{
-		for(const auto &Dev : m_pPlatformAudio->recordingDevices())
+		// Device enumeration must not replace the connection thread's manager.
+		livekit::PlatformAudio Audio;
+		for(const auto &Dev : Audio.recordingDevices())
 			vDevices.push_back({Dev.name, Dev.id});
 	}
 	catch(const std::exception &Ex)
 	{
 		dbg_msg("voicechat", "mic devices: %s", Ex.what());
 	}
-	return vDevices;
-#else
-	return {};
 #endif
+	return vDevices;
 }
 
 std::vector<CRCVoiceChat::SDevice> CRCVoiceChat::PlayoutDevices()
 {
-#ifdef CONF_LIVEKIT
-	if(!m_pPlatformAudio)
-	{
-		try
-		{
-			m_pPlatformAudio = std::make_unique<livekit::PlatformAudio>();
-		}
-		catch(const std::exception &Ex)
-		{
-			dbg_msg("voicechat", "platform audio: %s", Ex.what());
-			return {};
-		}
-	}
 	std::vector<SDevice> vDevices;
+#ifdef CONF_LIVEKIT
+	if(!m_Initialized)
+		return vDevices;
 	try
 	{
-		for(const auto &Dev : m_pPlatformAudio->playoutDevices())
+		livekit::PlatformAudio Audio;
+		for(const auto &Dev : Audio.playoutDevices())
 			vDevices.push_back({Dev.name, Dev.id});
 	}
 	catch(const std::exception &Ex)
 	{
 		dbg_msg("voicechat", "playout devices: %s", Ex.what());
 	}
-	return vDevices;
-#else
-	return {};
 #endif
+	return vDevices;
 }
 
 int CRCVoiceChat::ClientIdOf(const std::string &Identity) const
