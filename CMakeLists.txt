@@ -2919,6 +2919,8 @@ if(CLIENT)
     components/rclient/specwheel.h
     components/rclient/swaptimer.cpp
     components/rclient/swaptimer.h
+    components/rclient/voice_chat.cpp
+    components/rclient/voice_chat.h
     components/scoreboard.cpp
     components/scoreboard.h
     components/skins.cpp
@@ -3320,6 +3322,10 @@ if(CLIENT)
 
   if(VULKAN)
     target_compile_definitions(game-client PRIVATE CONF_BACKEND_VULKAN)
+  endif()
+
+  if(LIVEKIT)
+    target_compile_definitions(game-client PRIVATE CONF_LIVEKIT)
   endif()
 
   list(APPEND TARGETS_OWN game-client)

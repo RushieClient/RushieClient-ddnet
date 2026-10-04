@@ -1204,6 +1204,90 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
 	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;
 
+	// ***** Voice chat ***** //
+	Column.HSplitTop(MarginBetweenSections, nullptr, &Column);
+	s_SectionBoxes.push_back(Column);
+	Column.HSplitTop(HeadlineHeight, &Label, &Column);
+	Ui()->DoLabel(&Label, RCLocalize("Voice chat", "RClient"), HeadlineFontSize, TEXTALIGN_MC);
+	Column.HSplitTop(MarginSmall, nullptr, &Column);
+	{
+		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcVoiceAutoConnect, RCLocalize("Auto connect on server join", "RClient"), &g_Config.m_RcVoiceAutoConnect, &Column, LineSize);
+		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcVoiceHud, RCLocalize("Show voice HUD", "RClient"), &g_Config.m_RcVoiceHud, &Column, LineSize);
+		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcVoiceRoomMode, RCLocalize("Custom room (name@server)", "RClient"), &g_Config.m_RcVoiceRoomMode, &Column, LineSize);
+
+		{
+			CUIRect Box;
+			Column.HSplitTop(LineSize + MarginExtraSmall, &Box, &Column);
+			Box.VSplitMid(&Label, &Button);
+			Ui()->DoLabel(&Label, RCLocalize("Custom room name", "RClient"), FontSize, TEXTALIGN_ML);
+			static CLineInput s_RoomInput(g_Config.m_RcVoiceRoomName, sizeof(g_Config.m_RcVoiceRoomName));
+			Ui()->DoEditBox(&s_RoomInput, &Button, EditBoxFontSize);
+		}
+		{
+			CUIRect Box;
+			Column.HSplitTop(LineSize + MarginExtraSmall, &Box, &Column);
+			Box.VSplitMid(&Label, &Button);
+			Ui()->DoLabel(&Label, RCLocalize("Token endpoint URL", "RClient"), FontSize, TEXTALIGN_ML);
+			static CLineInput s_EndpointInput(g_Config.m_RcVoiceTokenUrl, sizeof(g_Config.m_RcVoiceTokenUrl));
+			Ui()->DoEditBox(&s_EndpointInput, &Button, EditBoxFontSize);
+		}
+		{
+			CUIRect Box;
+			Column.HSplitTop(LineSize + MarginExtraSmall, &Box, &Column);
+			Box.VSplitMid(&Label, &Button);
+			Ui()->DoLabel(&Label, RCLocalize("Server URL (manual)", "RClient"), FontSize, TEXTALIGN_ML);
+			static CLineInput s_UrlInput(g_Config.m_RcVoiceUrl, sizeof(g_Config.m_RcVoiceUrl));
+			Ui()->DoEditBox(&s_UrlInput, &Button, EditBoxFontSize);
+		}
+		{
+			CUIRect Box;
+			Column.HSplitTop(LineSize + MarginExtraSmall, &Box, &Column);
+			Box.VSplitMid(&Label, &Button);
+			Ui()->DoLabel(&Label, RCLocalize("Token (manual)", "RClient"), FontSize, TEXTALIGN_ML);
+			static CLineInput s_TokenInput(g_Config.m_RcVoiceToken, sizeof(g_Config.m_RcVoiceToken));
+			Ui()->DoEditBox(&s_TokenInput, &Button, EditBoxFontSize);
+		}
+
+		{
+			static std::vector<CRCVoiceChat::SDevice> s_vDevices;
+			static bool s_Loaded = false;
+			if(!s_Loaded)
+			{
+				s_vDevices = GameClient()->m_RcVoiceChat.MicDevices();
+				s_Loaded = true;
+			}
+			const char *pCurrent = g_Config.m_RcVoiceMicDevice;
+			for(size_t i = 0; i < s_vDevices.size() && i < 16; i++)
+			{
+				CUIRect Row;
+				Column.HSplitTop(LineSize, &Row, &Column);
+				static CButtonContainer s_aMicButtons[16];
+				char aLabel[256];
+				str_format(aLabel, sizeof(aLabel), "%s%s", s_vDevices[i].m_Id == pCurrent ? "* " : "", s_vDevices[i].m_Name.c_str());
+				if(DoButton_Menu(&s_aMicButtons[i], aLabel, s_vDevices[i].m_Id == pCurrent, &Row))
+				{
+					str_copy(g_Config.m_RcVoiceMicDevice, s_vDevices[i].m_Id.c_str());
+					s_Loaded = false;
+				}
+			}
+		}
+
+		Column.HSplitTop(MarginSmall, nullptr, &Column);
+		Column.HSplitTop(LineSize, &Button, &Column);
+		static CButtonContainer s_VoiceConnectBtn;
+		const bool Connected = GameClient()->m_RcVoiceChat.Connected();
+		if(DoButton_Menu(&s_VoiceConnectBtn, Connected ? RCLocalize("Disconnect voice", "RClient") : RCLocalize("Connect voice", "RClient"), 0, &Button))
+		{
+			if(Connected)
+				GameClient()->m_RcVoiceChat.Disconnect();
+			else
+				GameClient()->m_RcVoiceChat.Connect();
+		}
+	}
+
+	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
+	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;
+
 	// ***** END OF PAGE 1 SETTINGS ***** //
 	RightView = Column;
 

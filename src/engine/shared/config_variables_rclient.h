@@ -235,3 +235,14 @@ MACRO_CONFIG_COL(RcHookLinePlayerContinueColor, rc_hook_line_player_continue_col
 
 // SendPos
 MACRO_CONFIG_INT(RcSendSpecPlPos, rc_send_spec_pl_pos, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Send player in spec pos")
+
+// Voice chat
+MACRO_CONFIG_STR(RcVoiceTokenUrl, rc_voice_token_url, 256, "", CFGFLAG_CLIENT | CFGFLAG_SAVE, "LiveKit token endpoint URL (empty = manual url+token)")
+MACRO_CONFIG_STR(RcVoiceUrl, rc_voice_url, 256, "", CFGFLAG_CLIENT | CFGFLAG_SAVE, "LiveKit server websocket URL, manual mode (wss://...)")
+MACRO_CONFIG_STR(RcVoiceToken, rc_voice_token, 2048, "", CFGFLAG_CLIENT | CFGFLAG_SAVE, "LiveKit access token, manual mode")
+MACRO_CONFIG_INT(RcVoiceRoomMode, rc_voice_room_mode, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Voice room mode (0 - one room per server, 1 - custom room on server)")
+MACRO_CONFIG_STR(RcVoiceRoomName, rc_voice_room_name, 64, "", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Custom voice room name")
+MACRO_CONFIG_INT(RcVoiceAutoConnect, rc_voice_auto_connect, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Auto join voice chat on server connect")
+MACRO_CONFIG_STR(RcVoiceMicDevice, rc_voice_mic_device, 256, "", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Microphone device id (empty = system default)")
+MACRO_CONFIG_STR(RcVoicePlayoutDevice, rc_voice_playout_device, 256, "", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Speaker device id (empty = system default)")
+MACRO_CONFIG_INT(RcVoiceHud, rc_voice_hud, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show voice chat HUD")

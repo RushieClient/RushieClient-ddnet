@@ -79,6 +79,7 @@
 #include "components/rclient/rechargebars.h"
 #include "components/rclient/specwheel.h"
 #include "components/rclient/swaptimer.h"
+#include "components/rclient/voice_chat.h"
 
 //TClient
 #include "components/tclient/bg_draw.h"
@@ -251,6 +252,7 @@ public:
 	CRechargeBars m_RcRechargeBars;
 	CLastSaves m_RcLastSaves;
 	CHudEditor m_RcHudEditor;
+	CRCVoiceChat m_RcVoiceChat;
 
 	// TClient Components
 	CSkinProfiles m_SkinProfiles;

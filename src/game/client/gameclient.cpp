@@ -192,6 +192,7 @@ void CGameClient::OnConsoleInit()
 					      &m_Scoreboard,
 					      &m_Statboard,
 					      &m_RcAdminPanel, // RClient
+					      &m_RcVoiceChat, // RClient
 					      &m_Motd,
 					      &m_Menus,
 					      &m_Tooltips,
