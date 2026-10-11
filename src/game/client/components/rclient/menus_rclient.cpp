@@ -1211,66 +1211,177 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	Ui()->DoLabel(&Label, RCLocalize("Voice chat", "RClient"), HeadlineFontSize, TEXTALIGN_MC);
 	Column.HSplitTop(MarginSmall, nullptr, &Column);
 	{
-		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcVoiceAutoConnect, RCLocalize("Auto connect on server join", "RClient"), &g_Config.m_RcVoiceAutoConnect, &Column, LineSize);
-		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcVoiceHud, RCLocalize("Show voice HUD", "RClient"), &g_Config.m_RcVoiceHud, &Column, LineSize);
-		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcVoiceRoomMode, RCLocalize("Custom room (name@server)", "RClient"), &g_Config.m_RcVoiceRoomMode, &Column, LineSize);
+		enum
+		{
+			VOICE_TAB_MAIN = 0,
+			VOICE_TAB_AUDIO,
+			VOICE_TAB_CONNECTION,
+			NUMBER_OF_VOICE_TABS
+		};
+		static int s_CurVoiceTab = VOICE_TAB_MAIN;
+		static int s_aCurVoiceSubTabs[NUMBER_OF_VOICE_TABS] = {};
+		static CButtonContainer s_aVoiceTabs[NUMBER_OF_VOICE_TABS];
+		static CButtonContainer s_aaVoiceSubTabs[NUMBER_OF_VOICE_TABS][3];
+		const char *apTabNames[NUMBER_OF_VOICE_TABS] = {
+			RCLocalize("Main", "RClient"),
+			RCLocalize("Audio", "RClient"),
+			RCLocalize("Connection", "RClient")};
+		const char *aapSubTabNames[NUMBER_OF_VOICE_TABS][3] = {
+			{RCLocalize("General", "RClient"), RCLocalize("Devices", "RClient"), nullptr},
+			{RCLocalize("Volume", "RClient"), RCLocalize("Distance", "RClient"), RCLocalize("Stereo", "RClient")},
+			{RCLocalize("Room", "RClient"), RCLocalize("Access", "RClient"), nullptr}};
+		const int aSubTabCounts[NUMBER_OF_VOICE_TABS] = {2, 3, 2};
+		DoMenuSettingsBar(&Column, apTabNames, NUMBER_OF_VOICE_TABS, s_aVoiceTabs, s_CurVoiceTab, LineSize);
+		Column.HSplitTop(MarginSmall, nullptr, &Column);
+		DoMenuSettingsBar(&Column, aapSubTabNames[s_CurVoiceTab], aSubTabCounts[s_CurVoiceTab], s_aaVoiceSubTabs[s_CurVoiceTab], s_aCurVoiceSubTabs[s_CurVoiceTab], LineSize);
+		Column.HSplitTop(MarginSmall, nullptr, &Column);
 
+		const int SubTab = s_aCurVoiceSubTabs[s_CurVoiceTab];
+		const float MBiggestTab = LineSize * 4.0f + MarginExtraSmall * 3.0f;
+		const float MCurrentY = Column.y;
+		if(s_CurVoiceTab == VOICE_TAB_MAIN)
 		{
-			CUIRect Box;
-			Column.HSplitTop(LineSize + MarginExtraSmall, &Box, &Column);
-			Box.VSplitMid(&Label, &Button);
-			Ui()->DoLabel(&Label, RCLocalize("Custom room name", "RClient"), FontSize, TEXTALIGN_ML);
-			static CLineInput s_RoomInput(g_Config.m_RcVoiceRoomName, sizeof(g_Config.m_RcVoiceRoomName));
-			Ui()->DoEditBox(&s_RoomInput, &Button, EditBoxFontSize);
-		}
-		{
-			CUIRect Box;
-			Column.HSplitTop(LineSize + MarginExtraSmall, &Box, &Column);
-			Box.VSplitMid(&Label, &Button);
-			Ui()->DoLabel(&Label, RCLocalize("Token endpoint URL", "RClient"), FontSize, TEXTALIGN_ML);
-			static CLineInput s_EndpointInput(g_Config.m_RcVoiceTokenUrl, sizeof(g_Config.m_RcVoiceTokenUrl));
-			Ui()->DoEditBox(&s_EndpointInput, &Button, EditBoxFontSize);
-		}
-		{
-			CUIRect Box;
-			Column.HSplitTop(LineSize + MarginExtraSmall, &Box, &Column);
-			Box.VSplitMid(&Label, &Button);
-			Ui()->DoLabel(&Label, RCLocalize("Server URL (manual)", "RClient"), FontSize, TEXTALIGN_ML);
-			static CLineInput s_UrlInput(g_Config.m_RcVoiceUrl, sizeof(g_Config.m_RcVoiceUrl));
-			Ui()->DoEditBox(&s_UrlInput, &Button, EditBoxFontSize);
-		}
-		{
-			CUIRect Box;
-			Column.HSplitTop(LineSize + MarginExtraSmall, &Box, &Column);
-			Box.VSplitMid(&Label, &Button);
-			Ui()->DoLabel(&Label, RCLocalize("Token (manual)", "RClient"), FontSize, TEXTALIGN_ML);
-			static CLineInput s_TokenInput(g_Config.m_RcVoiceToken, sizeof(g_Config.m_RcVoiceToken));
-			Ui()->DoEditBox(&s_TokenInput, &Button, EditBoxFontSize);
-		}
-
-		{
-			static std::vector<CRCVoiceChat::SDevice> s_vDevices;
-			static bool s_Loaded = false;
-			if(!s_Loaded)
+			if(SubTab == 0)
 			{
-				s_vDevices = GameClient()->m_RcVoiceChat.MicDevices();
-				s_Loaded = true;
+				DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcVoiceAutoConnect, RCLocalize("Auto connect on server join", "RClient"), &g_Config.m_RcVoiceAutoConnect, &Column, LineSize);
+				DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcVoiceHud, RCLocalize("Show voice HUD", "RClient"), &g_Config.m_RcVoiceHud, &Column, LineSize);
+				DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcVoiceFilterUnpositioned, RCLocalize("Mute participants without an in-game position", "RClient"), &g_Config.m_RcVoiceFilterUnpositioned, &Column, LineSize);
 			}
-			const char *pCurrent = g_Config.m_RcVoiceMicDevice;
-			for(size_t i = 0; i < s_vDevices.size() && i < 16; i++)
+			else
 			{
-				CUIRect Row;
-				Column.HSplitTop(LineSize, &Row, &Column);
-				static CButtonContainer s_aMicButtons[16];
-				char aLabel[256];
-				str_format(aLabel, sizeof(aLabel), "%s%s", s_vDevices[i].m_Id == pCurrent ? "* " : "", s_vDevices[i].m_Name.c_str());
-				if(DoButton_Menu(&s_aMicButtons[i], aLabel, s_vDevices[i].m_Id == pCurrent, &Row))
+				static std::vector<CRCVoiceChat::SDevice> s_avDevices[2];
+				static CUi::SDropDownState s_aDeviceStates[2];
+				static CScrollRegion s_aDeviceScrollRegions[2];
+				static CButtonContainer s_RefreshDevices;
+				static bool s_Loaded = false;
+				Column.HSplitTop(LineSize, &Button, &Column);
+				if(DoButton_Menu(&s_RefreshDevices, RCLocalize("Refresh voice devices", "RClient"), 0, &Button))
 				{
-					str_copy(g_Config.m_RcVoiceMicDevice, s_vDevices[i].m_Id.c_str());
+					for(auto &State : s_aDeviceStates)
+					{
+						Ui()->ClosePopupMenu(&State.m_SelectionPopupContext);
+						State.m_SelectionPopupContext.Reset();
+					}
 					s_Loaded = false;
 				}
+				if(!s_Loaded)
+				{
+					s_avDevices[0] = GameClient()->m_RcVoiceChat.MicDevices();
+					s_avDevices[1] = GameClient()->m_RcVoiceChat.PlayoutDevices();
+					for(auto &vDevices : s_avDevices)
+						if(vDevices.empty())
+							vDevices.push_back({"System default", ""});
+					s_Loaded = true;
+				}
+				for(int Device = 0; Device < 2; ++Device)
+				{
+					auto &vDevices = s_avDevices[Device];
+					char *pCurrent = Device == 0 ? g_Config.m_RcVoiceMicDevice : g_Config.m_RcVoicePlayoutDevice;
+					std::vector<const char *> vpNames;
+					int Selected = -1;
+					for(size_t i = 0; i < vDevices.size(); ++i)
+					{
+						vpNames.push_back(vDevices[i].m_Id.empty() ? RCLocalize("System default", "RClient") : vDevices[i].m_Name.c_str());
+						if(vDevices[i].m_Id == pCurrent || (!vDevices[i].m_Id.empty() && str_startswith(pCurrent, "sdl:") && vDevices[i].m_Name == pCurrent + 4))
+							Selected = i;
+					}
+					if(Selected < 0)
+					{
+						Selected = vpNames.size();
+						vpNames.push_back(RCLocalize("Saved device unavailable (system default)", "RClient"));
+					}
+					Column.HSplitTop(LineSize, &Button, &Column);
+					Button.VSplitMid(&Label, &Button);
+					Ui()->DoLabel(&Label, Device == 0 ? RCLocalize("Voice microphone", "RClient") : RCLocalize("Voice output device", "RClient"), FontSize, TEXTALIGN_ML);
+					s_aDeviceStates[Device].m_SelectionPopupContext.m_pScrollRegion = &s_aDeviceScrollRegions[Device];
+					const int NewSelected = Ui()->DoDropDown(&Button, Selected, vpNames.data(), vpNames.size(), s_aDeviceStates[Device]);
+					if(NewSelected != Selected && NewSelected >= 0 && (size_t)NewSelected < vDevices.size())
+						str_copy(pCurrent, vDevices[NewSelected].m_Id.c_str(), sizeof(g_Config.m_RcVoiceMicDevice));
+				}
+				Column.HSplitTop(LineSize, &Label, &Column);
+				Ui()->DoLabel(&Label, RCLocalize("Device changes apply on next voice connection", "RClient"), EditBoxFontSize, TEXTALIGN_ML);
 			}
 		}
+		else if(s_CurVoiceTab == VOICE_TAB_AUDIO)
+		{
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcVoiceSpatial, RCLocalize("Positional voice audio", "RClient"), &g_Config.m_RcVoiceSpatial, &Column, LineSize);
+			Column.HSplitTop(MarginSmall, nullptr, &Column);
+			if(SubTab == 0)
+			{
+				Column.HSplitTop(LineSize, &Button, &Column);
+				Ui()->DoScrollbarOption(&g_Config.m_RcVoiceVolume, &g_Config.m_RcVoiceVolume, &Button, RCLocalize("Voice volume (%)", "RClient"), 0, 400, &CUi::ms_LinearScrollbarScale, 0);
+				Column.HSplitTop(LineSize, &Button, &Column);
+				Ui()->DoScrollbarOption(&g_Config.m_RcVoiceMicVolume, &g_Config.m_RcVoiceMicVolume, &Button, RCLocalize("Microphone volume (%)", "RClient"), 0, 300, &CUi::ms_LinearScrollbarScale, 0);
+			}
+			else if(SubTab == 1)
+			{
+				Column.HSplitTop(LineSize, &Button, &Column);
+				Ui()->DoScrollbarOption(&g_Config.m_RcVoiceMinVolume, &g_Config.m_RcVoiceMinVolume, &Button, RCLocalize("Minimum voice volume", "RClient"), 0, 100, &CUi::ms_LinearScrollbarScale, 0);
+				Column.HSplitTop(LineSize, &Button, &Column);
+				Ui()->DoScrollbarOption(&g_Config.m_RcVoiceMinRadius, &g_Config.m_RcVoiceMinRadius, &Button, RCLocalize("Minimum volume distance (tiles)", "RClient"), 1, 200, &CUi::ms_LinearScrollbarScale, 0);
+				Column.HSplitTop(LineSize, &Button, &Column);
+				Ui()->DoScrollbarOption(&g_Config.m_RcVoiceRadius, &g_Config.m_RcVoiceRadius, &Button, RCLocalize("Voice cutoff radius (tiles)", "RClient"), 1, 200, &CUi::ms_LinearScrollbarScale, 0);
+				g_Config.m_RcVoiceMinRadius = std::min(g_Config.m_RcVoiceMinRadius, g_Config.m_RcVoiceRadius);
+			}
+			else
+			{
+				Column.HSplitTop(LineSize, &Button, &Column);
+				Ui()->DoScrollbarOption(&g_Config.m_RcVoiceStereoWidth, &g_Config.m_RcVoiceStereoWidth, &Button, RCLocalize("Voice stereo width (%)", "RClient"), 0, 200, &CUi::ms_LinearScrollbarScale, 0);
+				Column.HSplitTop(LineSize, &Button, &Column);
+				Ui()->DoScrollbarOption(&g_Config.m_RcVoiceStereoRadius, &g_Config.m_RcVoiceStereoRadius, &Button, RCLocalize("Voice stereo radius (tiles)", "RClient"), 1, 200, &CUi::ms_LinearScrollbarScale, 0);
+			}
+		}
+		else if(s_CurVoiceTab == VOICE_TAB_CONNECTION)
+		{
+			if(SubTab == 0)
+			{
+				DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcVoiceRoomMode, RCLocalize("Custom room (name@server)", "RClient"), &g_Config.m_RcVoiceRoomMode, &Column, LineSize);
+
+				{
+					CUIRect Box;
+					Column.HSplitTop(LineSize + MarginExtraSmall, &Box, &Column);
+					Box.VSplitMid(&Label, &Button);
+					Ui()->DoLabel(&Label, RCLocalize("Custom room name", "RClient"), FontSize, TEXTALIGN_ML);
+					static CLineInput s_RoomInput(g_Config.m_RcVoiceRoomName, sizeof(g_Config.m_RcVoiceRoomName));
+					Ui()->DoEditBox(&s_RoomInput, &Button, EditBoxFontSize);
+				}
+				Column.HSplitTop(LineSize, &Label, &Column);
+				Ui()->DoLabel(&Label, RCLocalize("Room selection requires a token endpoint", "RClient"), EditBoxFontSize, TEXTALIGN_ML);
+				Column.HSplitTop(LineSize, &Label, &Column);
+				Ui()->DoLabel(&Label, RCLocalize("Room changes apply on next voice connection", "RClient"), EditBoxFontSize, TEXTALIGN_ML);
+			}
+			else
+			{
+				{
+					CUIRect Box;
+					Column.HSplitTop(LineSize + MarginExtraSmall, &Box, &Column);
+					Box.VSplitMid(&Label, &Button);
+					Ui()->DoLabel(&Label, RCLocalize("Token endpoint URL", "RClient"), FontSize, TEXTALIGN_ML);
+					static CLineInput s_EndpointInput(g_Config.m_RcVoiceTokenUrl, sizeof(g_Config.m_RcVoiceTokenUrl));
+					Ui()->DoEditBox(&s_EndpointInput, &Button, EditBoxFontSize);
+				}
+				{
+					CUIRect Box;
+					Column.HSplitTop(LineSize + MarginExtraSmall, &Box, &Column);
+					Box.VSplitMid(&Label, &Button);
+					Ui()->DoLabel(&Label, RCLocalize("Server URL (manual)", "RClient"), FontSize, TEXTALIGN_ML);
+					static CLineInput s_UrlInput(g_Config.m_RcVoiceUrl, sizeof(g_Config.m_RcVoiceUrl));
+					Ui()->DoEditBox(&s_UrlInput, &Button, EditBoxFontSize);
+				}
+				{
+					CUIRect Box;
+					Column.HSplitTop(LineSize + MarginExtraSmall, &Box, &Column);
+					Box.VSplitMid(&Label, &Button);
+					Ui()->DoLabel(&Label, RCLocalize("Token (manual)", "RClient"), FontSize, TEXTALIGN_ML);
+					static CLineInput s_TokenInput(g_Config.m_RcVoiceToken, sizeof(g_Config.m_RcVoiceToken));
+					Ui()->DoEditBox(&s_TokenInput, &Button, EditBoxFontSize);
+				}
+				Column.HSplitTop(LineSize, &Label, &Column);
+				Ui()->DoLabel(&Label, RCLocalize("Empty endpoint uses manual URL and token", "RClient"), EditBoxFontSize, TEXTALIGN_ML);
+			}
+		}
+		if(MBiggestTab > Column.y - MCurrentY)
+			Column.HSplitTop(MBiggestTab - (Column.y - MCurrentY), nullptr, &Column);
 
 		Column.HSplitTop(MarginSmall, nullptr, &Column);
 		Column.HSplitTop(LineSize, &Button, &Column);

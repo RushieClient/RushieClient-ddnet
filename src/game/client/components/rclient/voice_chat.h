@@ -1,6 +1,7 @@
 #ifndef GAME_CLIENT_COMPONENTS_RCLIENT_VOICE_CHAT_H
 #define GAME_CLIENT_COMPONENTS_RCLIENT_VOICE_CHAT_H
 
+#include <array>
 #include <atomic>
 #include <chrono>
 #include <memory>
@@ -8,6 +9,7 @@
 #include <string>
 #include <thread>
 #include <unordered_map>
+#include <unordered_set>
 #include <utility>
 #include <vector>
 
@@ -15,6 +17,10 @@
 #include <engine/console.h>
 #include <game/client/component.h>
 #ifdef CONF_LIVEKIT
+#include <engine/http.h>
+
+#include "external/miniaudio.h"
+
 #include <livekit/livekit.h>
 #endif
 
@@ -75,16 +81,55 @@ private:
 	std::unordered_map<std::string, int> m_mClientIds;
 	struct SAudioActivity
 	{
+		struct SSource
+		{
+			ma_data_source_base m_Base{};
+			SAudioActivity *m_pAudio = nullptr;
+		} m_Source;
 		std::string m_Identity;
 		bool m_Muted = false;
 		std::chrono::steady_clock::time_point m_SoundUntil{};
+		vec2 m_TargetGains{0.0f, 0.0f};
+		vec2 m_AppliedGains{0.0f, 0.0f};
+		ma_pcm_rb m_Buffer{}; // 60 ms of mono PCM at 48 kHz.
+		ma_sound m_Sound{};
+		ma_gainer m_Gainer{};
+		ma_channel_converter m_StereoConverter{};
+		ma_data_converter m_Converter{};
+		unsigned m_Initialized = 0;
+		float m_LastSample = 0.0f;
+		std::chrono::steady_clock::time_point m_BufferTime{};
+		int m_SourceRate = 0;
+		int m_SourceChannels = 0;
+		void Init(ma_engine *pEngine);
+		~SAudioActivity();
+		void Clear();
 	};
 	std::mutex m_AudioActivityLock;
-	std::unordered_map<std::string, SAudioActivity> m_mAudioActivity; // Keyed by track SID.
+	std::unordered_map<std::string, std::unique_ptr<SAudioActivity>> m_mAudioActivity; // Keyed by track SID; stable node addresses.
+	void AddAudioTrack(const std::string &TrackId, const std::string &Identity, bool Muted);
+	static void CheckAudio(ma_result Result, const char *pOperation);
+	static ma_result ReadTrack(ma_data_source *pSource, void *pOutput, ma_uint64 Frames, ma_uint64 *pRead);
+	static ma_result TrackFormat(ma_data_source *pSource, ma_format *pFormat, ma_uint32 *pChannels, ma_uint32 *pRate, ma_channel *pMap, size_t MapSize);
+	static ma_uint32 ReadBuffer(ma_pcm_rb &Buffer, void *pOutput, ma_uint32 Frames);
+	static ma_uint32 WriteBuffer(ma_pcm_rb &Buffer, const void *pInput, ma_uint32 Frames);
 	void RecordAudioActivity(const std::string &TrackId, const livekit::AudioFrame &Frame);
 	void SetAudioMuted(const std::string &TrackId, bool Muted);
 	void ClearAudioActivity(const std::string &Identity);
 	void UpdateTalking();
+	static vec2 VoiceGains(bool HasPosition, bool Spatial, bool Filter, vec2 Delta, int MinVolume, int MinRadius, int Radius, int Volume, int StereoWidth, int StereoRadius);
+	static void ApplyMicGain(std::int16_t *pSamples, float Gain);
+	vec2 VoiceListenerPosition() const;
+	void OpenVoiceDevice(ma_device &Device, const std::string &Id, bool Capture);
+	std::vector<SDevice> AudioDevices(bool Capture);
+	static std::string AudioDeviceId(ma_backend Backend, const ma_device_info &Device);
+	static void DeviceCallback(ma_device *pDevice, void *pOutput, const void *pInput, ma_uint32 Frames);
+	static void DeviceNotification(const ma_device_notification *pNotification);
+	void StartAudio(const std::string &MicDevice, const std::string &PlayoutDevice);
+	void AudioThread();
+	void DisableMicrophone(const char *pError);
+	void MixAudio(std::int16_t *pOutput);
+	void StopAudio();
 
 	class CDelegate : public livekit::RoomDelegate
 	{
@@ -177,14 +222,11 @@ private:
 			const std::string Identity = Event.participant->identity();
 			const std::string TrackId = Event.track->sid();
 			const std::string TrackName = Event.publication ? Event.publication->name() : Event.track->name();
-			{
-				std::lock_guard<std::mutex> Lock(m_pVoice->m_AudioActivityLock);
-				m_pVoice->m_mAudioActivity[TrackId] = {Identity, Event.publication ? Event.publication->muted() : Event.track->muted(), {}};
-			}
+			m_pVoice->AddAudioTrack(TrackId, Identity, Event.publication ? Event.publication->muted() : Event.track->muted());
 			Room.setOnAudioFrameCallback(Identity, TrackName,
 				[pVoice = m_pVoice, TrackId](const livekit::AudioFrame &Frame) {
 					pVoice->RecordAudioActivity(TrackId, Frame);
-				});
+				}, livekit::AudioStream::Options{2});
 		}
 
 		void onTrackUnsubscribed(livekit::Room &Room, const livekit::TrackUnsubscribedEvent &Event) override
@@ -195,6 +237,7 @@ private:
 			Room.clearOnAudioFrameCallback(Event.participant->identity(), TrackName);
 			std::lock_guard<std::mutex> Lock(m_pVoice->m_AudioActivityLock);
 			m_pVoice->m_mAudioActivity.erase(Event.track->sid());
+			++m_pVoice->m_OutputGeneration;
 		}
 
 		void onTrackMuted(livekit::Room &Room, const livekit::TrackMutedEvent &Event) override
@@ -216,18 +259,41 @@ private:
 	};
 
 	void ConnectThread(std::string Url, std::string Token, int LocalClientId,
-		std::string MicDevice, std::string PlayoutDevice);
+		std::string MicDevice, std::string PlayoutDevice, std::shared_ptr<IHttpRequest> pTokenRequest = nullptr, std::string RoomName = {});
 
 	// ResetConnection joins the setup thread before replacing SDK objects.
 	std::unique_ptr<livekit::Room> m_pRoom;
 	CDelegate m_Delegate;
 	std::thread m_Thread;
+	std::shared_ptr<IHttpRequest> m_pTokenRequest; // Created and aborted on the game thread.
 	std::atomic<bool> m_Connecting{false};
 	std::atomic<bool> m_Connected{false};
 	std::atomic<bool> m_Reconnecting{false};
 	std::atomic<bool> m_Cancelled{false};
-	std::unique_ptr<livekit::PlatformAudio> m_pPlatformAudio;
-	std::shared_ptr<livekit::PlatformAudioSource> m_pMicSource;
+	std::shared_ptr<livekit::AudioSource> m_pMicSource;
+	std::unique_ptr<livekit::AudioProcessingModule> m_pAudioProcessing;
+	std::thread m_AudioThread;
+	std::atomic<bool> m_StopAudio{true};
+	std::atomic<bool> m_MicFailed{false};
+	std::atomic<float> m_MicGain{1.0f};
+	ma_context m_AudioContext{};
+	ma_engine m_AudioEngine{};
+	ma_device m_OutputDevice{};
+	ma_device m_CaptureDevice{};
+	ma_pcm_rb m_OutputBuffer{};
+	ma_pcm_rb m_CaptureBuffer{};
+	bool m_EngineInitialized = false;
+	bool m_OutputInitialized = false;
+	bool m_CaptureInitialized = false;
+	bool m_BuffersInitialized = false;
+	int m_DeviceDelayMs = 0;
+	bool m_AudioInitialized = false;
+	std::mutex m_AudioContextLock;
+	std::unordered_set<std::string> m_DeviceWarnings;
+	std::mutex m_DeviceBufferLock; // Device callbacks try-lock; never wait on SDK or mixing.
+	std::atomic<bool> m_OutputFailed{false};
+	std::atomic<unsigned> m_OutputGeneration{0};
+	std::atomic<unsigned> m_MicGeneration{0};
 	std::mutex m_MicLock; // Protects the track and serializes mute/unmute.
 	std::shared_ptr<livekit::LocalAudioTrack> m_pMicTrack;
 	std::atomic<bool> m_MicReady{false};

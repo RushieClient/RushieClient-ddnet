@@ -1178,3 +1178,111 @@ name-team
 [RClient]
 RClient \\/
 == 
+
+[RClient]
+Positional voice audio
+== Позиционный голос
+
+[RClient]
+Mute participants without an in-game position
+== Не слышать участников без игровой позиции
+
+[RClient]
+Minimum voice volume
+== Минимальная громкость голоса
+
+[RClient]
+Minimum volume distance (tiles)
+== Расстояние минимальной громкости (тайлы)
+
+[RClient]
+Voice cutoff radius (tiles)
+== Радиус слышимости голоса (тайлы)
+
+[RClient]
+Voice volume (%)
+== Громкость голосов (%)
+
+[RClient]
+Microphone volume (%)
+== Громкость микрофона (%)
+
+[RClient]
+Voice stereo width (%)
+== Ширина стерео голоса (%)
+
+[RClient]
+Voice stereo radius (tiles)
+== Радиус стерео голоса (тайлы)
+
+[RClient]
+Refresh voice devices
+== Обновить список устройств
+
+[RClient]
+System default
+== Системное устройство
+
+[RClient]
+Saved device unavailable (system default)
+== Устройство недоступно (системное)
+
+[RClient]
+Voice microphone
+== Микрофон войсчата
+
+[RClient]
+Voice output device
+== Устройство воспроизведения
+
+[RClient]
+Device changes apply on next voice connection
+== Устройства применятся при следующем подключении войсчата
+
+[RClient]
+General
+== Общее
+
+[RClient]
+Audio
+== Звук
+
+[RClient]
+Connection
+== Подключение
+
+[RClient]
+Devices
+== Устройства
+
+[RClient]
+Volume
+== Громкость
+
+[RClient]
+Distance
+== Дистанция
+
+[RClient]
+Stereo
+== Стерео
+
+[RClient]
+Room
+== Комната
+
+[RClient]
+Access
+== Доступ
+
+[RClient]
+Room selection requires a token endpoint
+== Для выбора комнаты нужен сервер выдачи токенов
+
+[RClient]
+Room changes apply on next voice connection
+== Комната применится при следующем подключении
+
+[RClient]
+Empty endpoint uses manual URL and token
+== Пустой адрес выдачи токенов — ручные URL и токен
