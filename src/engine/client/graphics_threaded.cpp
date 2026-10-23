@@ -2208,7 +2208,7 @@ int CGraphics_Threaded::IssueInit()
 		Flags |= IGraphicsBackend::INITFLAG_VSYNC;
 	}
 
-	const int Result = m_pBackend->Init("TClient", &g_Config.m_GfxScreen, &g_Config.m_GfxScreenWidth, &g_Config.m_GfxScreenHeight, &g_Config.m_GfxScreenRefreshRate, &g_Config.m_GfxFsaaSamples, Flags, &m_DesktopSize.x, &m_DesktopSize.y, &m_ScreenWidth, &m_ScreenHeight, m_pStorage);
+	const int Result = m_pBackend->Init("RClient", &g_Config.m_GfxScreen, &g_Config.m_GfxScreenWidth, &g_Config.m_GfxScreenHeight, &g_Config.m_GfxScreenRefreshRate, &g_Config.m_GfxFsaaSamples, Flags, &m_DesktopSize.x, &m_DesktopSize.y, &m_ScreenWidth, &m_ScreenHeight, m_pStorage);
 	m_DrawableWidth = m_ScreenWidth;
 	m_DrawableHeight = m_ScreenHeight;
 	AddBackEndWarningIfExists();
