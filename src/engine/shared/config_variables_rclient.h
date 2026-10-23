@@ -72,6 +72,7 @@ MACRO_CONFIG_INT(RcEdgeInfoPosY, rc_edge_info_pos_y, 75, 0, 100, CFGFLAG_CLIENT 
 // Hud
 MACRO_CONFIG_INT(RcShowhudPlayerCheckpoint, rc_showhud_player_checkpoint, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show checkpoint in hud")
 MACRO_CONFIG_INT(RcShowhudSmallerHud, rc_showhud_smaller_hud, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "checkpoint and hud will be oneline")
+MACRO_CONFIG_INT(RcShowhudRampSpeedX, rc_showhud_ramp_speed_x, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show ramp speed x")
 MACRO_CONFIG_INT(RcShowhudAdvancedDummyActions, rc_showhud_advanced_dummy_actions, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show advanced ingame HUD (Dummy Actions)")
 MACRO_CONFIG_INT(RcShowhudVotingPercent, rc_showhud_voting_percent, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show percent in hud")
 

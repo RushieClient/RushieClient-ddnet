@@ -49,6 +49,13 @@ const float MarginExtraSmall = 2.5f;
 const float MarginBetweenSections = 30.0f;
 const float MarginBetweenViews = 30.0f;
 
+// Height consumed by each common menu row, so tab sizes can be written in terms of widgets.
+static float TabHeightCheckBox(int Count = 1) { return LineSize * Count; }
+static float TabHeightRadioMenu(int Count = 1) { return (LineSize + 2.0f) * Count; }
+static float TabHeightKeyReader(int Count = 1) { return (LineSize + MarginExtraSmall) * Count; }
+static float TabHeightEditBox(int Count = 1) { return (LineSize + MarginExtraSmall) * Count; }
+static float TabHeightLine(int Count = 1) { return LineSize * Count; }
+
 static void SetFlag(int32_t &Flags, int n, bool Value)
 {
 	if(Value)
@@ -178,7 +185,11 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		DoMenuSettingsBar(&Column, apTabNames, NUMBER_OF_DUMMY_TABS, s_aPageTabs, s_CurDummyCustomTab, LineSize);
 		Column.HSplitTop(MarginSmall, nullptr, &Column);
 
-		const float MBiggestTab = LineSize * 4.0f;
+		// Position: 4 checkboxes
+		// Clan Change: 2 margins + checkbox + 2 edit boxes + margin
+		const float MBiggestTab = std::max(
+			TabHeightCheckBox(4),
+			MarginSmall * 2.0f + TabHeightCheckBox() + TabHeightEditBox(2) + MarginExtraSmall);
 		const float MCurrentY = Column.y;
 		if(s_CurDummyCustomTab == DUMMY_TAB_POS)
 		{
@@ -242,7 +253,11 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		DoMenuSettingsBar(&Column, apTabNames, NUMBER_OF_SCOREBOARD_TABS, s_aPageTabs, s_CurScoreboardCustomTab, LineSize);
 		Column.HSplitTop(MarginSmall, nullptr, &Column);
 
-		const float MBiggestTab = LineSize * 3.0f;
+		// Popup: key reader + 2 checkboxes
+		// Friends: checkbox + slider
+		const float MBiggestTab = std::max(
+			TabHeightKeyReader() + TabHeightCheckBox(2),
+			TabHeightCheckBox() + TabHeightLine());
 		const float MCurrentY = Column.y;
 		if(s_CurScoreboardCustomTab == SCOREBOARD_TAB_POPUP)
 		{
@@ -297,7 +312,14 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 			Ui()->DoLabel(&Label, RCLocalize("idea from BestClient", "RClient"), Margin, TEXTALIGN_MC);
 		}
 
-		const float MBiggestTab = LineSize * 4.0f + 2.0f * 2.0f;
+		// Effects: 2 checkboxes + 2 radio menus
+		// AFK: 4 checkboxes
+		// Hitbox: radio menu + 3 rows
+		const float MBiggestTab = std::max({
+			TabHeightCheckBox(2) + TabHeightRadioMenu(2),
+			TabHeightCheckBox(4),
+			TabHeightRadioMenu() + TabHeightLine(3),
+		});
 		const float MCurrentY = Column.y;
 		if(s_CurPlayersCustomTab == PLAYERS_TAB_EFFECTS)
 		{
@@ -591,7 +613,11 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		DoMenuSettingsBar(&Column, apTabNames, NUMBER_OF_HELP_TABS, s_aPageTabs, s_CurHelpCustomTab, LineSize);
 		Column.HSplitTop(MarginSmall, nullptr, &Column);
 
-		const float MBiggestTab = LineSize * 12.0f + LineSize + (LineSize + 2.0f) * 2.0f + MarginSmall;
+		// Main: 11 rows + 2 radio menus
+		// Sort: 2 radio menus
+		const float MBiggestTab = std::max(
+			TabHeightLine(11) + TabHeightRadioMenu(2),
+			TabHeightRadioMenu(2));
 		const float MCurrentY = Column.y;
 
 		if(s_CurHelpCustomTab == HELP_TAB_MAIN)
@@ -620,19 +646,6 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcSaveAlphaInOtherTeamInSpec, RCLocalize("Fix cl_show_others_alpha in spec", "RClient"), &g_Config.m_RcSaveAlphaInOtherTeamInSpec, &Column, LineSize);
 			static int s_WeaponSlotsHelpId = 0;
 			DoButton_CheckBoxAutoVMarginAndSet(&s_WeaponSlotsHelpId, RCLocalize("Weapon slots", "RClient"), &g_Config.m_RcWeaponSlots, &Column, LineSize);
-			Column.HSplitTop(LineSize, &Button, &Column);
-			static CButtonContainer s_ReaderButtonHudEditor, s_ClearButtonHudEditor, s_OpenHudEditor;
-			int SOpenRcHudEditor = GameClient()->m_RcHudEditor.IsActive();
-			if(DoButton_Menu(&s_OpenHudEditor, "Open Hud Editor", SOpenRcHudEditor, &Button))
-			{
-				if(Client()->State() != IClient::STATE_OFFLINE)
-				{
-					GameClient()->m_Menus.SetActive(false);
-					GameClient()->m_RcHudEditor.SetActive(true);
-				}
-			}
-			Column.HSplitTop(MarginSmall, &Button, &Column);
-			DoLine_KeyReader(Column, s_ReaderButtonHudEditor, s_ClearButtonHudEditor, RCLocalize("Bind Hud Editor", "RClient"), "rc_toggle_hud_editor");
 			static CButtonContainer s_HookLineContinueColor, s_HookLineContinuePlayerColor;
 			DoButton_ColorPickerAutoVMargin(&s_HookLineContinueColor, RCLocalize("Continue hook line after hit block", "RClient"), &g_Config.m_RcHookLineContinueColor, color_cast<ColorRGBA>(ColorHSLA(DefaultConfig::RcHookLineContinueColor)), &Column, LineSize, true, &g_Config.m_RcContinueHookLine);
 			DoButton_ColorPickerAutoVMargin(&s_HookLineContinuePlayerColor, RCLocalize("Continue hook line after hit player", "RClient"), &g_Config.m_RcHookLinePlayerContinueColor, color_cast<ColorRGBA>(ColorHSLA(DefaultConfig::RcHookLinePlayerContinueColor)), &Column, LineSize, true, &g_Config.m_RcContinuePlayerHookLine);
@@ -692,8 +705,14 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		DoMenuSettingsBar(&Column, apTabNames, NUMBER_OF_CHAT_TABS, s_aPageTabs, s_CurChatCustomTab, LineSize);
 		Column.HSplitTop(MarginSmall, nullptr, &Column);
 
-		// const float MBiggestTab = LineSize * 7.0f + (LineSize + 2.0f) + (LineSize + MarginExtraSmall) * 2.0f;
-		const float MBiggestTab = LineSize * 4.0f + (LineSize + MarginSmall) * 4 + (LineSize + MarginExtraSmall) * 2.0f;
+		// Main: 5 rows
+		// Filter: radio menu + 7 rows + 2 edit boxes (worst case)
+		// Translate: 8 rows + 4 margins + 2 edit boxes (worst case)
+		const float MBiggestTab = std::max({
+			TabHeightLine(5),
+			TabHeightRadioMenu() + TabHeightLine(7) + TabHeightEditBox(2),
+			TabHeightLine(8) + MarginSmall * 4.0f + TabHeightEditBox(2),
+		});
 		const float MCurrentY = Column.y;
 		if(s_CurChatCustomTab == CHAT_TAB_MAIN)
 		{
@@ -927,7 +946,14 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		DoMenuSettingsBar(&Column, apTabNames, NUMBER_OF_NAMEPLATES_TABS, s_aPageTabs, s_CurNameplatesCustomTab, LineSize);
 		Column.HSplitTop(MarginSmall, nullptr, &Column);
 
-		const float MBiggestTab = LineSize * 5.0f + LineSize + (LineSize + 2.0f);
+		// Hook: radio menu + 2 rows
+		// Fire: radio menu + 3 rows + note
+		// Weapons: radio menu + 6 rows
+		const float MBiggestTab = std::max({
+			TabHeightRadioMenu() + TabHeightLine(2),
+			TabHeightRadioMenu() + TabHeightLine(3) + LineSize / 2.0f,
+			TabHeightRadioMenu() + TabHeightLine(6),
+		});
 		const float MCurrentY = Column.y;
 		if(s_CurNameplatesCustomTab == NAMEPLATE_TAB_HOOK)
 		{
@@ -1009,7 +1035,11 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 			Ui()->DoLabel(&Label, RCLocalize("idea from BestClient", "RClient"), Margin, TEXTALIGN_MC);
 		}
 
-		const float MBiggestTab = LineSize * 4.0f + LineSize * 2.0f + (LineSize + 2.0f);
+		// NonActive: 2 checkboxes + radio menu
+		// Spec: 6 rows + radio menu
+		const float MBiggestTab = std::max(
+			TabHeightCheckBox(2) + TabHeightRadioMenu(),
+			TabHeightLine(6) + TabHeightRadioMenu());
 		const float MCurrentY = Column.y;
 
 		if(s_CurAfkCustomTab == AFK_TAB_NONACTIVE)
@@ -1181,10 +1211,25 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcShowhudPlayerCheckpoint, RCLocalize("Show checkpoint", "RClient"), &g_Config.m_RcShowhudPlayerCheckpoint, &Column, LineSize);
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcShowhudSmallerHud, RCLocalize("Smaller hud (angle,checkpoint)", "RClient"), &g_Config.m_RcShowhudSmallerHud, &Column, LineSize);
+	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcShowhudRampSpeedX, RCLocalize("Show ramp * VelX speed", "RClient"), &g_Config.m_RcShowhudRampSpeedX, &Column, LineSize);
 	Column.HSplitTop(LineSize, &Button, &Column);
 	static int s_HeartSizeHudId = 0;
 	Ui()->DoScrollbarOption(&s_HeartSizeHudId, &g_Config.m_RcSizeOfHeart, &Button, RCLocalize("Heart size", "RClient"), 0, 200, &CUi::ms_LinearScrollbarScale, 0);
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcShowhudVotingPercent, RCLocalize("Show percent in vote", "RClient"), &g_Config.m_RcShowhudVotingPercent, &Column, LineSize);
+	Column.HSplitTop(LineSize, &Button, &Column);
+	static CButtonContainer s_ReaderButtonHudEditor, s_ClearButtonHudEditor, s_OpenHudEditor;
+	int SOpenRcHudEditor = GameClient()->m_RcHudEditor.IsActive();
+	if(DoButton_Menu(&s_OpenHudEditor, "Open Hud Editor", SOpenRcHudEditor, &Button))
+	{
+		if(Client()->State() != IClient::STATE_OFFLINE)
+		{
+			GameClient()->m_Menus.SetActive(false);
+			GameClient()->m_RcHudEditor.SetActive(true);
+		}
+	}
+	Column.HSplitTop(MarginSmall, &Button, &Column);
+	DoLine_KeyReader(Column, s_ReaderButtonHudEditor, s_ClearButtonHudEditor, RCLocalize("Bind Hud Editor", "RClient"), "rc_toggle_hud_editor");
+
 
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
 	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;
@@ -1237,7 +1282,14 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		Column.HSplitTop(MarginSmall, nullptr, &Column);
 
 		const int SubTab = s_aCurVoiceSubTabs[s_CurVoiceTab];
-		const float MBiggestTab = LineSize * 4.0f + MarginExtraSmall * 3.0f;
+		// Main/Devices: 4 rows
+		// Audio/Distance: checkbox + margin + 3 sliders
+		// Connection/Access: 3 edit boxes + 1 row
+		const float MBiggestTab = std::max({
+			TabHeightLine(4),
+			TabHeightCheckBox() + MarginSmall + TabHeightLine(3),
+			TabHeightEditBox(3) + TabHeightLine(),
+		});
 		const float MCurrentY = Column.y;
 		if(s_CurVoiceTab == VOICE_TAB_MAIN)
 		{

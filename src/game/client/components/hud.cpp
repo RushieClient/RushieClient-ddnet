@@ -1657,6 +1657,8 @@ inline float CHud::GetMovementInformationBoxHeight()
 			BoxHeight += MOVEMENT_INFORMATION_LINE_HEIGHT * 2.0f;
 		if(g_Config.m_ClShowhudPlayerSpeed)
 			BoxHeight += MOVEMENT_INFORMATION_LINE_HEIGHT * 3.0f;
+		if(g_Config.m_ClShowhudPlayerSpeed && g_Config.m_RcShowhudRampSpeedX)
+			BoxHeight += MOVEMENT_INFORMATION_LINE_HEIGHT;
 		if(g_Config.m_ClShowhudPlayerSpeed && g_Config.m_TcShowhudDummySpeed && Client()->DummyConnected())
 			BoxHeight += MOVEMENT_INFORMATION_LINE_HEIGHT * 2.0f;
 		if(g_Config.m_ClShowhudPlayerAngle)
@@ -1824,10 +1826,10 @@ void CHud::RenderMovementInformation()
 		RenderMovementInformationTextContainer(m_aPlayerPositionContainers[1], TextRender()->DefaultTextColor(), RightX, y);
 		y += MOVEMENT_INFORMATION_LINE_HEIGHT;
 
+
+		char aBuf[64];
 		if(ShowDummyInfo && g_Config.m_TcShowhudDummyPosition)
 		{
-			char aBuf[64];
-
 			TextRender()->Text(LeftX, y, Fontsize, "DX:", -1.0f);
 			str_format(aBuf, sizeof(aBuf), "%.2f", std::round(DummyInfo.m_Pos.x * 100.0f) / 100.0f);
 
@@ -1871,10 +1873,20 @@ void CHud::RenderMovementInformation()
 
 		TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
 
+		char aBuf[32];
+		if(g_Config.m_RcShowhudRampSpeedX)
+		{
+			const float Velspeed = length(vec2(GameClient()->m_Snap.m_pLocalCharacter->m_VelX / 256.0f, GameClient()->m_Snap.m_pLocalCharacter->m_VelY / 256.0f)) * Client()->GameTickSpeed();
+			const float VelspeedX = GameClient()->m_Snap.m_pLocalCharacter->m_VelX / 256.0f * Client()->GameTickSpeed();
+			const float Ramp = VelocityRamp(Velspeed, GameClient()->m_aTuning[g_Config.m_ClDummy].m_VelrampStart, GameClient()->m_aTuning[g_Config.m_ClDummy].m_VelrampRange, GameClient()->m_aTuning[g_Config.m_ClDummy].m_VelrampCurvature);
+			TextRender()->Text(LeftX, y, Fontsize, "XRamp:", -1.0f);
+			str_format(aBuf, sizeof(aBuf), "%.0f", VelspeedX / 32 * Ramp);
+			TextRender()->Text(RightX - TextRender()->TextWidth(Fontsize, aBuf), y, Fontsize, aBuf, -1.0f);
+			y += MOVEMENT_INFORMATION_LINE_HEIGHT;
+		}
+
 		if(ShowDummyInfo && g_Config.m_TcShowhudDummySpeed)
 		{
-			char aBuf[32];
-
 			TextRender()->Text(LeftX, y, Fontsize, "DX:", -1.0f);
 			str_format(aBuf, sizeof(aBuf), "%.2f", std::round(DummyInfo.m_Speed.x * 100.0f) / 100.0f);
 			TextRender()->Text(RightX - TextRender()->TextWidth(Fontsize, aBuf), y, Fontsize, aBuf, -1.0f);
