@@ -1874,10 +1874,11 @@ void CHud::RenderMovementInformation()
 		TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
 
 		char aBuf[32];
-		if(g_Config.m_RcShowhudRampSpeedX)
+		if(g_Config.m_RcShowhudRampSpeedX && GameClient()->m_Snap.m_pLocalCharacter)
 		{
-			const float Velspeed = length(vec2(GameClient()->m_Snap.m_pLocalCharacter->m_VelX / 256.0f, GameClient()->m_Snap.m_pLocalCharacter->m_VelY / 256.0f)) * Client()->GameTickSpeed();
-			const float VelspeedX = GameClient()->m_Snap.m_pLocalCharacter->m_VelX / 256.0f * Client()->GameTickSpeed();
+			const CNetObj_Character *pLocalCharacter = GameClient()->m_Snap.m_pLocalCharacter;
+			const float Velspeed = length(vec2(pLocalCharacter->m_VelX / 256.0f, pLocalCharacter->m_VelY / 256.0f)) * Client()->GameTickSpeed();
+			const float VelspeedX = pLocalCharacter->m_VelX / 256.0f * Client()->GameTickSpeed();
 			const float Ramp = VelocityRamp(Velspeed, GameClient()->m_aTuning[g_Config.m_ClDummy].m_VelrampStart, GameClient()->m_aTuning[g_Config.m_ClDummy].m_VelrampRange, GameClient()->m_aTuning[g_Config.m_ClDummy].m_VelrampCurvature);
 			TextRender()->Text(LeftX, y, Fontsize, "XRamp:", -1.0f);
 			str_format(aBuf, sizeof(aBuf), "%.0f", VelspeedX / 32 * Ramp);
