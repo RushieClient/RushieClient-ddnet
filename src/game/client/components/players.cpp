@@ -510,12 +510,12 @@ void CPlayers::RenderHookCollLine(
 			Graphics()->SetColor(HookCollTipColor.WithMultipliedAlpha(Alpha));
 			Graphics()->LinesDraw(&HookTipLineSegment.value(), 1);
 		}
-		if(HookContinueLineSegment.has_value() && HookCollContinueColor.a > 0.0f && !g_Config.m_RcContinueHookLine /*RClient*/)
+		if(HookContinueLineSegment.has_value() && HookCollContinueColor.a > 0.0f && g_Config.m_RcContinueHookLine /*RClient*/)
 		{
 			Graphics()->SetColor(HookCollContinueColor.WithMultipliedAlpha(Alpha));
 			Graphics()->LinesDraw(&HookContinueLineSegment.value(), 1);
 		}
-		if(HookContinuePlayerLineSegment.has_value() && HookCollContinuePlayerColor.a > 0.0f && !g_Config.m_RcContinuePlayerHookLine /*RClient*/)
+		if(HookContinuePlayerLineSegment.has_value() && HookCollContinuePlayerColor.a > 0.0f && g_Config.m_RcContinuePlayerHookLine /*RClient*/)
 		{
 			Graphics()->SetColor(HookCollContinuePlayerColor.WithMultipliedAlpha(Alpha));
 			Graphics()->LinesDraw(&HookContinuePlayerLineSegment.value(), 1);
