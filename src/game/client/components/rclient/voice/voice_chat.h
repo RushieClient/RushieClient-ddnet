@@ -14,12 +14,36 @@
 #include <vector>
 
 #include <base/dbg.h>
+#include <engine/config.h>
 #include <engine/console.h>
 #include <game/client/component.h>
 #ifdef CONF_LIVEKIT
 #include <engine/http.h>
 
-#include "external/miniaudio.h"
+// Before miniaudio.h: these change the layout of ma_engine, a member of
+// CRCVoiceChat, so every file including this header sees the same set.
+#define MA_NO_DECODING
+#define MA_NO_ENCODING
+#define MA_NO_FLAC
+#define MA_NO_GENERATION
+#define MA_NO_MP3
+#define MA_NO_RESOURCE_MANAGER
+#define MA_NO_WAV
+
+#define MA_ENABLE_ONLY_SPECIFIC_BACKENDS
+#define MA_ENABLE_ALSA
+#define MA_ENABLE_AUDIO4
+#define MA_ENABLE_COREAUDIO
+#define MA_ENABLE_DSOUND
+#define MA_ENABLE_JACK
+#define MA_ENABLE_NULL
+#define MA_ENABLE_OSS
+#define MA_ENABLE_PULSEAUDIO
+#define MA_ENABLE_SNDIO
+#define MA_ENABLE_WASAPI
+#define MA_ENABLE_WINMM
+
+#include "../external/miniaudio.h"
 
 #include <livekit/livekit.h>
 #endif
@@ -32,6 +56,7 @@ public:
 		std::string m_Identity;
 		std::string m_Name;
 		bool m_Talking = false;
+		int m_MuteReason = 0; // VoiceLogic::EMuteReason, MUTE_NONE means audible
 	};
 
 	struct SDevice
@@ -51,6 +76,31 @@ private:
 	static void ConMute(IConsole::IResult *pResult, void *pUserData);
 	static void ConUnmute(IConsole::IResult *pResult, void *pUserData);
 	static void ConStatus(IConsole::IResult *pResult, void *pUserData);
+	static void ConToggleMute(IConsole::IResult *pResult, void *pUserData);
+	static void ConMuteName(IConsole::IResult *pResult, void *pUserData);
+	static void ConUnmuteName(IConsole::IResult *pResult, void *pUserData);
+	static void ConMuteList(IConsole::IResult *pResult, void *pUserData);
+	static void ConPurge(IConsole::IResult *pResult, void *pUserData);
+
+	// Drops participants without client id and without an audio track.
+	int PurgeStaleParticipants();
+
+	// In-game name, falls back to the token name.
+	const char *DisplayNameOf(const SParticipant &Participant, int ClientId);
+	bool IsLocalIdentity(const std::string &Identity);
+
+	// Per-nick local mutes, saved in the RClient config domain.
+	void MuteName(const char *pName);
+	void UnmuteName(const char *pName);
+	static void ConfigSaveCallback(IConfigManager *pConfigManager, void *pUserData);
+
+	mutable std::mutex m_MuteLock;
+	std::vector<std::string> m_vMutedNames; // Insertion order, for the config file.
+	std::unordered_set<std::string> m_MutedNameSet; // Lower-cased keys.
+
+	void SetLastError(const char *pError);
+	mutable std::mutex m_ErrorLock;
+	char m_aLastError[256] = "";
 
 #ifdef CONF_LIVEKIT
 	enum class EEventType
@@ -73,11 +123,16 @@ private:
 	void PushEvent(SEvent Event);
 	void ProcessEvents();
 	void ResetConnection();
-	static int ParseClientId(const std::string &Metadata);
+	int LocalClientId() const;
+	void UpdateMetadata();
+	void ConnectInternal(bool Manual);
+
+	static constexpr int MAX_CONNECT_FAILURES = 3;
 
 	std::mutex m_EventLock;
 	std::vector<SEvent> m_vEvents;
 	std::vector<SParticipant> m_vParticipants;
+	std::string m_LocalIdentity; // filters our own leftover session
 	std::unordered_map<std::string, int> m_mClientIds;
 	struct SAudioActivity
 	{
@@ -87,7 +142,9 @@ private:
 			SAudioActivity *m_pAudio = nullptr;
 		} m_Source;
 		std::string m_Identity;
+		std::string m_Name; // Cached, refreshed by UpdateTalking.
 		bool m_Muted = false;
+		int m_MuteReason = 0; // VoiceLogic::EMuteReason
 		std::chrono::steady_clock::time_point m_SoundUntil{};
 		vec2 m_TargetGains{0.0f, 0.0f};
 		vec2 m_AppliedGains{0.0f, 0.0f};
@@ -117,8 +174,7 @@ private:
 	void SetAudioMuted(const std::string &TrackId, bool Muted);
 	void ClearAudioActivity(const std::string &Identity);
 	void UpdateTalking();
-	static vec2 VoiceGains(bool HasPosition, bool Spatial, bool Filter, vec2 Delta, int MinVolume, int MinRadius, int Radius, int Volume, int StereoWidth, int StereoRadius);
-	static void ApplyMicGain(std::int16_t *pSamples, float Gain);
+	static void ApplyMicGain(std::int16_t *pSamples, size_t Samples, float Gain);
 	vec2 VoiceListenerPosition() const;
 	void OpenVoiceDevice(ma_device &Device, const std::string &Id, bool Capture);
 	std::vector<SDevice> AudioDevices(bool Capture);
@@ -126,6 +182,8 @@ private:
 	static void DeviceCallback(ma_device *pDevice, void *pOutput, const void *pInput, ma_uint32 Frames);
 	static void DeviceNotification(const ma_device_notification *pNotification);
 	void StartAudio(const std::string &MicDevice, const std::string &PlayoutDevice);
+	void StartAudioProcessing();
+	void StartAudioThread();
 	void AudioThread();
 	void DisableMicrophone(const char *pError);
 	void MixAudio(std::int16_t *pOutput);
@@ -134,18 +192,6 @@ private:
 	class CDelegate : public livekit::RoomDelegate
 	{
 		CRCVoiceChat *m_pVoice;
-		bool m_SnapshotSent = false;
-
-		void CaptureParticipants(livekit::Room &Room)
-		{
-			if(m_SnapshotSent)
-				return;
-			m_SnapshotSent = true;
-			// Copy mutable name/metadata on the SDK event thread, not the game thread.
-			for(const auto &Weak : Room.remoteParticipants())
-				if(auto pParticipant = Weak.lock())
-					PushParticipant(*pParticipant);
-		}
 
 		void PushParticipant(const livekit::Participant &Participant)
 		{
@@ -160,13 +206,20 @@ private:
 		explicit CDelegate(CRCVoiceChat *pVoice) :
 			m_pVoice(pVoice) {}
 
-		void Reset() { m_SnapshotSent = false; }
+		void Reset() {}
+
+		// Only from our own threads: calling it inside a delegate callback
+		// re-enters the FFI client and crashes it.
+		void SnapshotParticipants(livekit::Room &Room)
+		{
+			for(const auto &Weak : Room.remoteParticipants())
+				if(auto pParticipant = Weak.lock())
+					PushParticipant(*pParticipant);
+		}
 
 		void onConnectionStateChanged(livekit::Room &Room, const livekit::ConnectionStateChangedEvent &Event) override
 		{
 			m_pVoice->m_Reconnecting = Event.state == livekit::ConnectionState::Reconnecting;
-			if(Event.state == livekit::ConnectionState::Connected)
-				CaptureParticipants(Room);
 		}
 
 		void onDisconnected(livekit::Room &Room, const livekit::DisconnectedEvent &Event) override
@@ -181,14 +234,12 @@ private:
 
 		void onParticipantConnected(livekit::Room &Room, const livekit::ParticipantConnectedEvent &Event) override
 		{
-			CaptureParticipants(Room);
 			if(Event.participant)
 				PushParticipant(*Event.participant);
 		}
 
 		void onParticipantDisconnected(livekit::Room &Room, const livekit::ParticipantDisconnectedEvent &Event) override
 		{
-			CaptureParticipants(Room);
 			if(Event.participant)
 			{
 				m_pVoice->ClearAudioActivity(Event.participant->identity());
@@ -198,27 +249,24 @@ private:
 
 		void onParticipantNameChanged(livekit::Room &Room, const livekit::ParticipantNameChangedEvent &Event) override
 		{
-			CaptureParticipants(Room);
-			auto pLocal = Room.localParticipant().lock();
-			if(Event.participant && (!pLocal || Event.participant != pLocal.get()))
+			if(Event.participant)
 				PushParticipant(*Event.participant);
 		}
 
 		void onParticipantMetadataChanged(livekit::Room &Room, const livekit::ParticipantMetadataChangedEvent &Event) override
 		{
-			CaptureParticipants(Room);
-			auto pLocal = Room.localParticipant().lock();
-			if(Event.participant && (!pLocal || Event.participant != pLocal.get()))
+			if(Event.participant)
 				PushParticipant(*Event.participant);
 		}
 
 		void onTrackSubscribed(livekit::Room &Room, const livekit::TrackSubscribedEvent &Event) override
 		{
-			CaptureParticipants(Room);
-			if(Event.participant)
-				PushParticipant(*Event.participant);
 			if(!Event.participant || !Event.track || Event.track->kind() != livekit::TrackKind::KIND_AUDIO)
+			{
+				if(Event.participant)
+					PushParticipant(*Event.participant);
 				return;
+			}
 			const std::string Identity = Event.participant->identity();
 			const std::string TrackId = Event.track->sid();
 			const std::string TrackName = Event.publication ? Event.publication->name() : Event.track->name();
@@ -254,7 +302,6 @@ private:
 
 		void onLocalTrackPublished(livekit::Room &Room, const livekit::LocalTrackPublishedEvent &Event) override
 		{
-			CaptureParticipants(Room);
 		}
 	};
 
@@ -265,8 +312,7 @@ private:
 	std::unique_ptr<livekit::Room> m_pRoom;
 	CDelegate m_Delegate;
 	std::thread m_Thread;
-	std::shared_ptr<IHttpRequest> m_pTokenRequest; // Created and aborted on the game thread.
-	std::atomic<bool> m_Connecting{false};
+	std::shared_ptr<IHttpRequest> m_pTokenRequest; // Created and aborted on the game thread.	std::atomic<bool> m_Connecting{false};
 	std::atomic<bool> m_Connected{false};
 	std::atomic<bool> m_Reconnecting{false};
 	std::atomic<bool> m_Cancelled{false};
@@ -306,6 +352,21 @@ private:
 	std::string RoomNameFromAddress() const;
 	bool m_ManualDisconnect = false;
 	float m_NextAutoConnect = 0.0f;
+
+	// Survives a map change, not a reconnect with a different client id.
+	int m_ConnectedClientId = -1;
+	std::string m_ConnectedRoom;
+	bool m_ResumeCheck = false;
+	float m_NextRoomCheck = 0.0f;
+
+	// In-game client id published as metadata, needed for the dummy.
+	int m_MetadataClientId = -1;
+	float m_LastMetadataSync = 0.0f;
+
+	int m_ConnectFailures = 0;
+	float m_LastTokenRequestTime = 0.0f;
+
+	float m_LimiterGain = 1.0f;
 #endif
 
 public:
@@ -314,6 +375,7 @@ public:
 	int Sizeof() const override { return sizeof(*this); }
 	void OnInit() override;
 	void OnReset() override;
+	void OnStateChange(int NewState, int OldState) override;
 	void OnRelease() override;
 	void OnRender() override;
 	void OnConsoleInit() override;
@@ -325,8 +387,15 @@ public:
 	void Connect();
 	void Disconnect();
 	bool Muted() const;
+	void SetMuted(bool Muted);
 	bool Transmitting() const;
 	int ClientIdOf(const std::string &Identity) const;
+
+	// Used by the scoreboard and the menu.
+	bool IsNameMuted(const char *pName) const;
+	void ToggleNameMute(const char *pName);
+	std::vector<std::string> MutedNames() const;
+	std::string LastError() const;
 };
 
 #endif // GAME_CLIENT_COMPONENTS_RCLIENT_VOICE_CHAT_H

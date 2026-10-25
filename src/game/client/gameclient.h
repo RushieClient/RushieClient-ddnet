@@ -79,7 +79,7 @@
 #include "components/rclient/rechargebars.h"
 #include "components/rclient/specwheel.h"
 #include "components/rclient/swaptimer.h"
-#include "components/rclient/voice_chat.h"
+#include "components/rclient/voice/voice_chat.h"
 
 //TClient
 #include "components/tclient/bg_draw.h"

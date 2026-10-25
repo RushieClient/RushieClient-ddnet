@@ -1266,13 +1266,15 @@ CUi::EPopupMenuFunctionResult CScoreboard::CScoreboardPopupContext::Render(void 
 
 	if(!pPopupContext->m_IsLocal || g_Config.m_RcScoreboardAlwaysShowQuickActions)
 	{
-		const int ActionsNum = 3;
-		const float ActionSize = 25.0f;
-		const float ActionSpacing = (View.w - (ActionsNum * ActionSize)) / 2;
+		const int ActionsNum = 4;
+		const float ActionSize = 22.0f;
+		const float RowHeight = 25.0f; // Must match QuickActionHeight in CRClient::GetScoreboardHeight.
+		const float ActionSpacing = (View.w - (ActionsNum * ActionSize)) / (ActionsNum - 1);
 		int ActionCorners = IGraphics::CORNER_ALL;
 
 		View.HSplitTop(ItemSpacing * 2, nullptr, &View);
-		View.HSplitTop(ActionSize, &Container, &View);
+		View.HSplitTop(RowHeight, &Container, &View);
+		Container.VMargin((RowHeight - ActionSize) / 2.0f, &Container);
 
 		Container.VSplitLeft(ActionSize, &Action, &Container);
 
@@ -1314,6 +1316,19 @@ CUi::EPopupMenuFunctionResult CScoreboard::CScoreboardPopupContext::Render(void 
 			Client.m_EmoticonIgnore ^= 1;
 		}
 		pScoreboard->GameClient()->m_Tooltips.DoToolTip(&pPopupContext->m_EmoticonAction, &Action, Client.m_EmoticonIgnore ? Localize("Unmute emoticons") : Localize("Mute emoticons"));
+
+		Container.VSplitLeft(ActionSpacing, nullptr, &Container);
+		Container.VSplitLeft(ActionSize, &Action, &Container);
+
+		const bool VoiceMuted = pScoreboard->GameClient()->m_RcVoiceChat.IsNameMuted(Client.m_aName);
+		const char *pVoiceActionIcon = VoiceMuted ? FontIcon::MICROPHONE_SLASH : FontIcon::MICROPHONE;
+		ColorRGBA VoiceActionColor = VoiceMuted ? ColorRGBA(1.0f, 0.42f, 0.42f, 0.8f * pUi->ButtonColorMul(&pPopupContext->m_VcMuteButton)) :
+								 ColorRGBA(1.0f, 1.0f, 1.0f, 0.5f * pUi->ButtonColorMul(&pPopupContext->m_VcMuteButton));
+		if(pUi->DoButton_FontIcon(&pPopupContext->m_VcMuteButton, pVoiceActionIcon, VoiceMuted, &Action, BUTTONFLAG_LEFT, ActionCorners, true, VoiceActionColor))
+		{
+			pScoreboard->GameClient()->m_RcVoiceChat.ToggleNameMute(Client.m_aName);
+		}
+		pScoreboard->GameClient()->m_Tooltips.DoToolTip(&pPopupContext->m_VcMuteButton, &Action, VoiceMuted ? Localize("Unmute voice") : Localize("Mute voice"));
 
 		View.HSplitTop(ItemSpacing * 2, nullptr, &View);
 		View.HSplitTop(ActionSize, &Container, &View);

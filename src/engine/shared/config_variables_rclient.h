@@ -256,4 +256,6 @@ MACRO_CONFIG_INT(RcVoiceMinRadius, rc_voice_min_radius, 50, 1, 200, CFGFLAG_CLIE
 MACRO_CONFIG_INT(RcVoiceRadius, rc_voice_radius, 50, 1, 200, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Voice cutoff radius (tiles)")
 MACRO_CONFIG_INT(RcVoiceSpatial, rc_voice_spatial, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Position voice audio using in-game characters")
 MACRO_CONFIG_INT(RcVoiceListenerMode, rc_voice_listener_mode, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Voice listener (0 - character, 1 - camera)")
-MACRO_CONFIG_INT(RcVoiceFilterUnpositioned, rc_voice_filter_unpositioned, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Mute voice participants without a valid in-game character position")
+MACRO_CONFIG_INT(RcVoiceFilterUnpositioned, rc_voice_filter_unpositioned, 1, 0, 2, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Mute voice participants without an in-game character position (0 - no, 1 - players only, 2 - players and spectators)")
+MACRO_CONFIG_INT(RcVoiceMuted, rc_voice_muted, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Fully mute the voice microphone (push to talk disabled too)")
+MACRO_CONFIG_INT(RcVoiceTeamOnly, rc_voice_team_only, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Only hear your own DDNet team in voice chat")

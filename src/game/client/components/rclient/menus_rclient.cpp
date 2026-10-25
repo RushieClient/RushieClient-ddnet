@@ -1282,11 +1282,14 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		Column.HSplitTop(MarginSmall, nullptr, &Column);
 
 		const int SubTab = s_aCurVoiceSubTabs[s_CurVoiceTab];
+		// Main/General: 2 checkboxes + 1 radio row
 		// Main/Devices: 4 rows
+		// Audio/Volume: 3 checkboxes + margin + 2 sliders
 		// Audio/Distance: checkbox + margin + 3 sliders
 		// Connection/Access: 3 edit boxes + 1 row
 		const float MBiggestTab = std::max({
-			TabHeightLine(4),
+			TabHeightRadioMenu() + TabHeightCheckBox(2),
+			TabHeightCheckBox(3) + MarginSmall + TabHeightLine(2),
 			TabHeightCheckBox() + MarginSmall + TabHeightLine(3),
 			TabHeightEditBox(3) + TabHeightLine(),
 		});
@@ -1297,7 +1300,12 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 			{
 				DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcVoiceAutoConnect, RCLocalize("Auto connect on server join", "RClient"), &g_Config.m_RcVoiceAutoConnect, &Column, LineSize);
 				DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcVoiceHud, RCLocalize("Show voice HUD", "RClient"), &g_Config.m_RcVoiceHud, &Column, LineSize);
-				DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcVoiceFilterUnpositioned, RCLocalize("Mute participants without an in-game position", "RClient"), &g_Config.m_RcVoiceFilterUnpositioned, &Column, LineSize);
+				static std::vector<CButtonContainer> s_vUnpositionedButtons = {{}, {}, {}};
+				DoLine_RadioMenu(Column, RCLocalize("Players without a position", "RClient"),
+					s_vUnpositionedButtons,
+					{RCLocalize("Off", "RClient"), RCLocalize("Players only", "RClient"), RCLocalize("Everyone", "RClient")},
+					{0, 1, 2},
+					g_Config.m_RcVoiceFilterUnpositioned);
 			}
 			else
 			{
@@ -1348,7 +1356,10 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 					s_aDeviceStates[Device].m_SelectionPopupContext.m_pScrollRegion = &s_aDeviceScrollRegions[Device];
 					const int NewSelected = Ui()->DoDropDown(&Button, Selected, vpNames.data(), vpNames.size(), s_aDeviceStates[Device]);
 					if(NewSelected != Selected && NewSelected >= 0 && (size_t)NewSelected < vDevices.size())
-						str_copy(pCurrent, vDevices[NewSelected].m_Id.c_str(), sizeof(g_Config.m_RcVoiceMicDevice));
+					{
+						const int CurrentSize = Device == 0 ? (int)sizeof(g_Config.m_RcVoiceMicDevice) : (int)sizeof(g_Config.m_RcVoicePlayoutDevice);
+						str_copy(pCurrent, vDevices[NewSelected].m_Id.c_str(), CurrentSize);
+					}
 				}
 				Column.HSplitTop(LineSize, &Label, &Column);
 				Ui()->DoLabel(&Label, RCLocalize("Device changes apply on next voice connection", "RClient"), EditBoxFontSize, TEXTALIGN_ML);
@@ -1364,6 +1375,8 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 				Ui()->DoScrollbarOption(&g_Config.m_RcVoiceVolume, &g_Config.m_RcVoiceVolume, &Button, RCLocalize("Voice volume (%)", "RClient"), 0, 400, &CUi::ms_LinearScrollbarScale, 0);
 				Column.HSplitTop(LineSize, &Button, &Column);
 				Ui()->DoScrollbarOption(&g_Config.m_RcVoiceMicVolume, &g_Config.m_RcVoiceMicVolume, &Button, RCLocalize("Microphone volume (%)", "RClient"), 0, 300, &CUi::ms_LinearScrollbarScale, 0);
+				DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcVoiceMuted, RCLocalize("Mute my microphone", "RClient"), &g_Config.m_RcVoiceMuted, &Column, LineSize);
+				DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcVoiceTeamOnly, RCLocalize("Only hear my team", "RClient"), &g_Config.m_RcVoiceTeamOnly, &Column, LineSize);
 			}
 			else if(SubTab == 1)
 			{
@@ -1438,13 +1451,49 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		Column.HSplitTop(MarginSmall, nullptr, &Column);
 		Column.HSplitTop(LineSize, &Button, &Column);
 		static CButtonContainer s_VoiceConnectBtn;
-		const bool Connected = GameClient()->m_RcVoiceChat.Connected();
-		if(DoButton_Menu(&s_VoiceConnectBtn, Connected ? RCLocalize("Disconnect voice", "RClient") : RCLocalize("Connect voice", "RClient"), 0, &Button))
+		CRCVoiceChat &VoiceChat = GameClient()->m_RcVoiceChat;
+		const bool VoiceConnected = VoiceChat.Connected();
+		const bool VoiceConnecting = VoiceChat.Connecting();
+		const bool VoiceActive = VoiceConnected || VoiceConnecting;
+		if(DoButton_Menu(&s_VoiceConnectBtn, VoiceConnected ? RCLocalize("Disconnect voice", "RClient") : (VoiceConnecting ? RCLocalize("Cancel connecting", "RClient") : RCLocalize("Connect voice", "RClient")), 0, &Button))
 		{
-			if(Connected)
-				GameClient()->m_RcVoiceChat.Disconnect();
+			if(VoiceActive)
+				VoiceChat.Disconnect();
 			else
-				GameClient()->m_RcVoiceChat.Connect();
+				VoiceChat.Connect();
+		}
+
+		const std::string VoiceError = VoiceChat.LastError();
+		if(!VoiceError.empty())
+		{
+			char aError[128];
+			str_copy(aError, VoiceError.c_str(), 120);
+			Column.HSplitTop(LineSize, &Label, &Column);
+			TextRender()->TextColor(1.0f, 0.55f, 0.55f, 1.0f);
+			Ui()->DoLabel(&Label, aError, EditBoxFontSize, TEXTALIGN_ML);
+			TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
+		}
+
+		const std::vector<std::string> vMutedVoices = VoiceChat.MutedNames();
+		if(!vMutedVoices.empty())
+		{
+			char aCount[64];
+			str_format(aCount, sizeof(aCount), "%s: %d", RCLocalize("Muted voices", "RClient"), (int)vMutedVoices.size());
+			Column.HSplitTop(LineSize, &Label, &Column);
+			Ui()->DoLabel(&Label, aCount, EditBoxFontSize, TEXTALIGN_ML);
+
+			static std::vector<CButtonContainer> s_vUnmuteButtons;
+			if(s_vUnmuteButtons.size() < vMutedVoices.size())
+				s_vUnmuteButtons.resize(vMutedVoices.size());
+			for(size_t i = 0; i < vMutedVoices.size(); ++i)
+			{
+				CUIRect Row, UnmuteButton;
+				Column.HSplitTop(LineSize, &Row, &Column);
+				Row.VSplitRight(LineSize, &Row, &UnmuteButton);
+				Ui()->DoLabel(&Row, vMutedVoices[i].c_str(), EditBoxFontSize, TEXTALIGN_ML);
+				if(Ui()->DoButton_FontIcon(&s_vUnmuteButtons[i], FontIcon::XMARK, 0, &UnmuteButton, BUTTONFLAG_LEFT))
+					VoiceChat.ToggleNameMute(vMutedVoices[i].c_str());
+			}
 		}
 	}
 

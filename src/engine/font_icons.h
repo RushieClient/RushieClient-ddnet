@@ -63,6 +63,8 @@ namespace FontIcon
 	inline const char *const LOCK = "\uF023";
 	inline const char *const MAGNIFYING_GLASS = "\uF002";
 	inline const char *const MAP = "\uF279";
+	inline const char *const MICROPHONE = "\uF130";
+	inline const char *const MICROPHONE_SLASH = "\uF131";
 	inline const char *const MINUS = "-";
 	inline const char *const MUSIC = "\uF001";
 	inline const char *const NETWORK_WIRED = "\uF6FF";
