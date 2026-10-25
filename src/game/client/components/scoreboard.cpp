@@ -48,6 +48,7 @@ void CScoreboard::SetUiMousePos(vec2 Pos)
 void CScoreboard::LockMouse()
 {
 	Ui()->ClosePopupMenus();
+	Ui()->SetMouseSlow(false);
 	m_MouseUnlocked = false;
 	SetUiMousePos(m_LastMousePos.value());
 	m_LastMousePos = Ui()->MousePos();
@@ -85,6 +86,7 @@ void CScoreboard::ConToggleScoreboardCursor(IConsole::IResult *pResult, void *pU
 	if(!pSelf->m_MouseUnlocked)
 	{
 		pSelf->Ui()->ClosePopupMenus();
+		pSelf->Ui()->SetMouseSlow(false);
 	}
 
 	vec2 OldMousePos = pSelf->Ui()->MousePos();
@@ -1010,6 +1012,8 @@ void CScoreboard::OnRender()
 	{
 		Ui()->StartCheck();
 		Ui()->Update();
+		// Scrollbars enable slow movement again while dragging with Shift held.
+		Ui()->SetMouseSlow(false);
 	}
 
 	// if the score board is active, then we should clear the motd message as well
@@ -1266,16 +1270,13 @@ CUi::EPopupMenuFunctionResult CScoreboard::CScoreboardPopupContext::Render(void 
 
 	if(!pPopupContext->m_IsLocal || g_Config.m_RcScoreboardAlwaysShowQuickActions)
 	{
-		const int ActionsNum = 4;
+		const int ActionsNum = 3;
 		const float ActionSize = 22.0f;
-		const float RowHeight = 25.0f; // Must match QuickActionHeight in CRClient::GetScoreboardHeight.
 		const float ActionSpacing = (View.w - (ActionsNum * ActionSize)) / (ActionsNum - 1);
 		int ActionCorners = IGraphics::CORNER_ALL;
 
 		View.HSplitTop(ItemSpacing * 2, nullptr, &View);
-		View.HSplitTop(RowHeight, &Container, &View);
-		Container.VMargin((RowHeight - ActionSize) / 2.0f, &Container);
-
+		View.HSplitTop(ActionSize, &Container, &View);
 		Container.VSplitLeft(ActionSize, &Action, &Container);
 
 		ColorRGBA FriendActionColor = Client.m_Friend ? ColorRGBA(0.95f, 0.3f, 0.3f, 0.85f * pUi->ButtonColorMul(&pPopupContext->m_FriendAction)) :
@@ -1316,19 +1317,6 @@ CUi::EPopupMenuFunctionResult CScoreboard::CScoreboardPopupContext::Render(void 
 			Client.m_EmoticonIgnore ^= 1;
 		}
 		pScoreboard->GameClient()->m_Tooltips.DoToolTip(&pPopupContext->m_EmoticonAction, &Action, Client.m_EmoticonIgnore ? Localize("Unmute emoticons") : Localize("Mute emoticons"));
-
-		Container.VSplitLeft(ActionSpacing, nullptr, &Container);
-		Container.VSplitLeft(ActionSize, &Action, &Container);
-
-		const bool VoiceMuted = pScoreboard->GameClient()->m_RcVoiceChat.IsNameMuted(Client.m_aName);
-		const char *pVoiceActionIcon = VoiceMuted ? FontIcon::MICROPHONE_SLASH : FontIcon::MICROPHONE;
-		ColorRGBA VoiceActionColor = VoiceMuted ? ColorRGBA(1.0f, 0.42f, 0.42f, 0.8f * pUi->ButtonColorMul(&pPopupContext->m_VcMuteButton)) :
-								 ColorRGBA(1.0f, 1.0f, 1.0f, 0.5f * pUi->ButtonColorMul(&pPopupContext->m_VcMuteButton));
-		if(pUi->DoButton_FontIcon(&pPopupContext->m_VcMuteButton, pVoiceActionIcon, VoiceMuted, &Action, BUTTONFLAG_LEFT, ActionCorners, true, VoiceActionColor))
-		{
-			pScoreboard->GameClient()->m_RcVoiceChat.ToggleNameMute(Client.m_aName);
-		}
-		pScoreboard->GameClient()->m_Tooltips.DoToolTip(&pPopupContext->m_VcMuteButton, &Action, VoiceMuted ? Localize("Unmute voice") : Localize("Mute voice"));
 
 		View.HSplitTop(ItemSpacing * 2, nullptr, &View);
 		View.HSplitTop(ActionSize, &Container, &View);
@@ -1508,6 +1496,26 @@ CUi::EPopupMenuFunctionResult CScoreboard::CScoreboardPopupContext::Render(void 
 		char aSwapBuf[256];
 		str_format(aSwapBuf, sizeof(aSwapBuf), "say /swap %s", Client.m_aName);
 		pScoreboard->Console()->ExecuteLine(aSwapBuf, IConsole::CLIENT_ID_UNSPECIFIED);
+	}
+
+	if(!pPopupContext->m_IsLocal)
+	{
+		auto &Voice = pScoreboard->GameClient()->m_RcVoiceChat;
+		const auto Settings = Voice.UserSettings(Client.m_aName);
+		View.HSplitTop(ItemSpacing * 2, nullptr, &View);
+		CUIRect VolumeButton;
+		View.HSplitTop(ButtonSize, &VolumeButton, &View);
+		View.HSplitTop(ItemSpacing * 2, nullptr, &View);
+		View.HSplitTop(ButtonSize, &Container, &View); // Must match VoiceControlsHeight in GetScoreboardHeight.
+		const int Volume = round_to_int(pUi->DoScrollbarH(&pPopupContext->m_VoiceVolumeSlider, &Container, Settings.m_Volume / 200.0f) * 200.0f);
+		if(Volume != Settings.m_Volume)
+			Voice.SetUserSettings(Client.m_aName, Volume, Settings.m_Muted);
+		char aVolumeLabel[64];
+		str_format(aVolumeLabel, sizeof(aVolumeLabel), "%s: %d%%", RCLocalize("Volume", "RClient"), Volume);
+		const ColorRGBA MuteColor = Settings.m_Muted ? ColorRGBA(1.0f, 0.35f, 0.35f, 0.6f) : ColorRGBA(0.35f, 0.85f, 0.35f, 0.6f);
+		if(pUi->DoButton_PopupMenu(&pPopupContext->m_VoiceMuteButton, aVolumeLabel, &VolumeButton, FontSize, TEXTALIGN_MC, 0.0f, false, true, MuteColor))
+			Voice.SetUserSettings(Client.m_aName, Volume, !Settings.m_Muted);
+		pScoreboard->GameClient()->m_Tooltips.DoToolTip(&pPopupContext->m_VoiceMuteButton, &VolumeButton, Settings.m_Muted ? RCLocalize("Unmute voice", "RClient") : RCLocalize("Mute voice", "RClient"));
 	}
 
 	View.HSplitTop(ItemSpacing * 4, nullptr, &View);

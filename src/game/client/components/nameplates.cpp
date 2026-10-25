@@ -703,6 +703,44 @@ public:
 };
 
 // ***** RClient Parts *****
+class CNamePlatePartVoice : public CNamePlatePartText
+{
+private:
+	float m_FontSize = -INFINITY;
+
+protected:
+	bool UpdateNeeded(CGameClient &This, const CNamePlateData &Data) override
+	{
+		m_Visible = false;
+		if(!g_Config.m_RcNamePlatesVoice || !Data.m_InGame || !Data.m_ShowName)
+			return false;
+		const auto State = This.m_RcVoiceChat.PlayerVoiceState(Data.m_ClientId);
+		if(State == CRCVoiceChat::EPlayerVoiceState::DISCONNECTED)
+			return false;
+		m_Visible = true;
+		if(State == CRCVoiceChat::EPlayerVoiceState::MUTED)
+			m_Color = ColorRGBA(1.0f, 0.3f, 0.3f, Data.m_Color.a);
+		else if(State == CRCVoiceChat::EPlayerVoiceState::SPEAKING)
+			m_Color = ColorRGBA(0.35f, 1.0f, 0.35f, Data.m_Color.a);
+		else
+			m_Color = ColorRGBA(1.0f, 1.0f, 1.0f, Data.m_Color.a);
+		return m_FontSize != Data.m_FontSize;
+	}
+	void UpdateText(CGameClient &This, const CNamePlateData &Data) override
+	{
+		m_FontSize = Data.m_FontSize;
+		CTextCursor Cursor;
+		Cursor.m_FontSize = m_FontSize;
+		This.TextRender()->SetFontPreset(EFontPreset::ICON_FONT);
+		This.TextRender()->CreateOrAppendTextContainer(m_TextContainerIndex, &Cursor, FontIcon::RC_HEADPHONES);
+		This.TextRender()->SetFontPreset(EFontPreset::DEFAULT_FONT);
+	}
+
+public:
+	CNamePlatePartVoice(CGameClient &This) :
+		CNamePlatePartText(This) {}
+};
+
 class CNamePlatePartHookDetection : public CNamePlatePartIcon
 {
 protected:
@@ -895,6 +933,7 @@ private:
 			return;
 		m_Inited = true;
 
+		AddPart<CNamePlatePartVoice>(This); // RClient
 		AddPart<CNamePlatePartCustomClients>(This); // RClient
 		AddPart<CNamePlatePartCountry>(This); // TClient
 		AddPart<CNamePlatePartPing>(This); // TClient

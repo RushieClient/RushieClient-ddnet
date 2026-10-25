@@ -6,7 +6,10 @@
 #include "base/str.h"
 #include <base/log.h>
 #include "engine/client.h"
+#include <engine/font_icons.h>
 #include "engine/textrender.h"
+#include <game/client/components/rclient/rclient_include.h>
+#include <game/client/animstate.h>
 #include "game/client/gameclient.h"
 #include "game/client/ui.h"
 #include "game/client/ui_rect.h"
@@ -26,6 +29,20 @@
 #ifdef CONF_LIVEKIT
 #include <engine/shared/json.h>
 #include <engine/shared/jsonwriter.h>
+
+static std::int64_t VoiceNowMs()
+{
+	return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
+}
+
+static vec2 VoicePlayerPosition(const CGameClient *pGame, int ClientId, float IntraTick)
+{
+	// Use the same snapshot timeline for every participant, independently of
+	// rendering and client-side visual prediction.
+	const auto &Character = pGame->m_Snap.m_aCharacters[ClientId];
+	return mix(vec2(Character.m_Prev.m_X, Character.m_Prev.m_Y),
+		vec2(Character.m_Cur.m_X, Character.m_Cur.m_Y), IntraTick);
+}
 #endif
 
 CRCVoiceChat::CRCVoiceChat()
@@ -50,6 +67,7 @@ void CRCVoiceChat::OnInit()
 		livekit::initialize(livekit::LogLevel::Info);
 		m_Initialized = true;
 		m_FullMuted = g_Config.m_RcVoiceMuted != 0;
+		m_Deafened = g_Config.m_RcVoiceDeafened != 0;
 		ma_context_config Config = ma_context_config_init();
 		ma_backend Backends[] = {ma_backend_wasapi, ma_backend_dsound, ma_backend_winmm,
 			ma_backend_coreaudio, ma_backend_pulseaudio, ma_backend_alsa, ma_backend_jack,
@@ -69,10 +87,12 @@ void CRCVoiceChat::OnInit()
 void CRCVoiceChat::OnReset()
 {
 #ifdef CONF_LIVEKIT
-	// Map change: keep the session, OnRender reconnects if the client id changed.
-	m_ResumeCheck = true;
-	m_DeviceWarnings.clear();
-	m_DeviceDelayMs = 0;
+	if(!m_Connecting)
+	{
+		std::unique_lock<std::mutex> Lock(m_AudioContextLock, std::try_to_lock);
+		if(Lock)
+			m_DeviceWarnings.clear();
+	}
 #endif
 }
 
@@ -85,8 +105,7 @@ void CRCVoiceChat::OnStateChange(int NewState, int OldState)
 		m_ManualDisconnect = false;
 		m_NextAutoConnect = 0.0f;
 		m_ConnectFailures = 0;
-		m_ConnectedRoom.clear();
-		m_ResumeCheck = false;
+		m_ConnectPending = false;
 	}
 #else
 	(void)NewState;
@@ -98,54 +117,90 @@ void CRCVoiceChat::OnRelease()
 {
 #ifdef CONF_LIVEKIT
 	m_PttHeld = false;
+	m_PttTail.Cancel();
 	ApplyMicState();
 #endif
 }
 
-void CRCVoiceChat::OnRender()
+void CRCVoiceChat::OnUpdate()
 {
 #ifdef CONF_LIVEKIT
 	ProcessEvents();
+	if(Deafened() != (g_Config.m_RcVoiceDeafened != 0))
+		SetDeafened(g_Config.m_RcVoiceDeafened != 0);
+	if(m_MicrophoneTesting)
+	{
+		m_MicGain = std::clamp(g_Config.m_RcVoiceMicVolume, 0, 300) / 100.0f;
+		if(Client()->GlobalTime() - m_MicrophoneTestLastVisible > 0.5f || !GameClient()->m_Menus.IsActive() ||
+			m_TestMicDevice != g_Config.m_RcVoiceMicDevice || m_TestPlayoutDevice != g_Config.m_RcVoicePlayoutDevice)
+			StopMicrophoneTest();
+	}
 
 	// Menu checkbox writes the config, console commands write the atomic.
 	if(Muted() != (g_Config.m_RcVoiceMuted != 0))
 	{
-		m_FullMuted = g_Config.m_RcVoiceMuted != 0;
-		ApplyMicState();
+		SetMuted(g_Config.m_RcVoiceMuted != 0);
 	}
 
-	if(m_PttHeld && (Client()->State() != IClient::STATE_ONLINE || GameClient()->m_Menus.IsActive() ||
-				GameClient()->m_Chat.IsActive() || GameClient()->m_GameConsole.IsActive()))
+	if(PttActive() && (Client()->State() != IClient::STATE_ONLINE || GameClient()->m_Menus.IsActive() ||
+				  GameClient()->m_Chat.IsActive() || GameClient()->m_GameConsole.IsActive()))
 		OnRelease();
+	// Keep mute/PTT handling responsive during setup, but do not access the
+	// room or launch the metadata worker until Room::connect() has returned.
+	if(m_Connecting)
+		return;
 	ApplyMicState();
-	if(!m_Connected && !m_Connecting && m_Thread.joinable())
+	// Setup completion and a later disconnect both need cleanup. The setup
+	// thread has already been joined by the time most disconnects arrive.
+	if(m_Thread.joinable())
+	{
+		m_Thread.join();
+		if(!m_Connected && (!m_MicrophoneTesting || m_Cancelled))
+			RequestReset();
+		else if(!m_MicrophoneTesting)
+		{
+			m_ConnectPending = false;
+			if(m_MetadataClientId < 0)
+				m_MetadataRetry.OnFailure(m_MetadataRequestedClientId, Client()->GlobalTime());
+		}
+	}
+	if(m_ResetPending || (!m_Connected && m_pRoom) || (m_MicrophoneTesting && m_Cancelled))
 		ResetConnection();
+	if(m_ResetPending)
+		return;
+
+	// A reconnect that never completes keeps the HUD on "reconnecting" forever.
+	// Give up after a while and let auto connect fetch a fresh token.
+	if(m_Connected && m_Reconnecting)
+	{
+		const float Now = Client()->GlobalTime();
+		const float Since = m_ReconnectingSince.load();
+		if(Since <= 0.0f)
+			m_ReconnectingSince = Now;
+		else if(Now - Since > 30.0f)
+		{
+			log_warn("voicechat", "reconnect stuck for %d seconds, dropping the session", (int)(Now - Since));
+			m_ReconnectingSince = 0.0f;
+			ResetConnection();
+			// The network is probably still down. Retrying in this same frame
+			// would only burn an attempt against a dead name server.
+			m_NextAutoConnect = Now + 5.0f;
+		}
+	}
+	else
+	{
+		m_ReconnectingSince = 0.0f;
+	}
+
 	UpdateTalking();
 	UpdateMetadata();
+	UpdatePing();
 
 	const bool OnServer = Client()->ServerAddress().type != NETTYPE_INVALID;
 	const bool InGame = OnServer && Client()->State() == IClient::STATE_ONLINE;
-	const int LocalId = LocalClientId();
-
-	// Reconnect only if the client id actually changed during a map change.
-	if(m_ResumeCheck)
-	{
-		if(!m_Connected && !m_Connecting)
-			m_ResumeCheck = false;
-		else if(InGame && LocalId >= 0)
-		{
-			m_ResumeCheck = false;
-			if(m_Connected && LocalId != m_ConnectedClientId)
-			{
-				log_trace("voicechat", "client id changed from %d to %d on reset, reconnecting", m_ConnectedClientId, LocalId);
-				ResetConnection();
-				ConnectInternal(true);
-			}
-		}
-	}
 
 	// Server can change without leaving STATE_ONLINE, check once per second.
-	if(InGame && m_Connected && g_Config.m_RcVoiceTokenUrl[0] != '\0' && Client()->GlobalTime() >= m_NextRoomCheck)
+	if(InGame && m_Connected && Client()->GlobalTime() >= m_NextRoomCheck)
 	{
 		m_NextRoomCheck = Client()->GlobalTime() + 1.0f;
 		const std::string Room = RoomNameFromAddress();
@@ -153,24 +208,343 @@ void CRCVoiceChat::OnRender()
 		{
 			log_trace("voicechat", "voice room changed from '%s' to '%s', reconnecting", m_ConnectedRoom.c_str(), Room.c_str());
 			ResetConnection();
-			ConnectInternal(true);
+			m_ConnectPending = true;
+			m_NextPendingConnect = 0.0f;
 		}
 	}
 
+	// Keep an explicit connect queued until cleanup and the cooldown finish,
+	// even when automatic connections are disabled.
+	if(m_ConnectPending && !m_Connected && !m_Connecting && !m_ResetPending && InGame &&
+		LocalClientId() >= 0 && Client()->GlobalTime() >= m_NextPendingConnect)
+	{
+		m_ConnectPending = false;
+		ConnectInternal(true);
+	}
+
 	// Backoff, then stop after MAX_CONNECT_FAILURES.
-	if(InGame && g_Config.m_RcVoiceAutoConnect && !m_Connected && !m_Connecting && !m_ManualDisconnect &&
+	if(InGame && g_Config.m_RcVoiceAutoConnect && !m_MicrophoneTesting && !m_Connected && !m_Connecting && !m_ResetPending && !m_ConnectPending && !m_ManualDisconnect &&
 		m_ConnectFailures < MAX_CONNECT_FAILURES && Client()->GlobalTime() >= m_NextAutoConnect)
 	{
 		m_NextAutoConnect = Client()->GlobalTime() + VoiceLogic::NextAutoConnectDelay(m_ConnectFailures);
-		log_trace("voicechat", "auto connect (room '%s', failures %d)", RoomNameFromAddress().c_str(), m_ConnectFailures);
+		log_trace("voicechat", "auto connect (room '%s', failures %d)", RoomNameFromAddress().c_str(), m_ConnectFailures.load());
 		ConnectInternal(false);
 	}
 
-	if(!g_Config.m_RcVoiceHud || Client()->State() != IClient::STATE_ONLINE)
+#endif
+}
+
+void CRCVoiceChat::OnRender()
+{
+#ifdef CONF_LIVEKIT
+	RenderParticipantsOverlay();
+	RenderStatusHud();
+	RenderDebugHud();
+#endif
+}
+
+#ifdef CONF_LIVEKIT
+void CRCVoiceChat::UpdatePing()
+{
+	const float Now = Client()->GlobalTime();
+	if(!m_Connected || m_Reconnecting || m_Cancelled || !m_pRoom)
+	{
+		m_PingMs = -1;
+		return;
+	}
+	if(m_LastPingUpdate >= 0.0f && Now - m_LastPingUpdate > 10.0f)
+		m_PingMs = -1;
+	if(m_StatsThread.joinable())
+	{
+		if(m_StatsBusy)
+			return;
+		m_StatsThread.join();
+		m_PingMs = m_StatsPingMs;
+		m_LastPingUpdate = Now;
+	}
+	if(g_Config.m_RcVoiceIndicator && g_Config.m_RcVoiceStatus && Now >= m_NextStatsRequest)
+	{
+		m_NextStatsRequest = Now + 1.0f;
+		m_StatsBusy = true;
+		try
+		{
+			m_StatsThread = std::thread(&CRCVoiceChat::PingThread, this);
+		}
+		catch(const std::exception &)
+		{
+			m_StatsBusy = false;
+			m_PingMs = -1;
+		}
+	}
+}
+
+void CRCVoiceChat::PingThread()
+{
+	int Ping = -1;
+	try
+	{
+		// Dispatch may take SDK locks or perform synchronous FFI work.
+		// Cleanup joins this worker before destroying the room.
+		auto Future = m_pRoom->getStats();
+		while(!m_Cancelled && !m_Reconnecting && Future.wait_for(std::chrono::milliseconds(50)) != std::future_status::ready)
+		{
+		}
+		if(!m_Cancelled && !m_Reconnecting && Future.wait_for(std::chrono::seconds(0)) == std::future_status::ready)
+		{
+			const auto Stats = Future.get();
+			for(const auto *pStats : {&Stats.publisher_stats, &Stats.subscriber_stats})
+			{
+				for(const auto &Entry : *pStats)
+				{
+					const auto *pTransport = std::get_if<livekit::RtcTransportStats>(&Entry.stats);
+					if(!pTransport || pTransport->transport.selected_candidate_pair_id.empty())
+						continue;
+					for(const auto &Candidate : *pStats)
+					{
+						const auto *pPair = std::get_if<livekit::RtcCandidatePairStats>(&Candidate.stats);
+						if(!pPair || pPair->rtc.id != pTransport->transport.selected_candidate_pair_id)
+							continue;
+						const double Rtt = pPair->candidate_pair.current_round_trip_time;
+						if(pPair->candidate_pair.responses_received > 0 && std::isfinite(Rtt) && Rtt >= 0.0 && Rtt < 60.0)
+							Ping = std::max(Ping, (int)std::lround(Rtt * 1000.0));
+					}
+				}
+			}
+		}
+	}
+	catch(const std::exception &)
+	{
+	}
+	m_StatsPingMs = Ping;
+	m_StatsBusy = false;
+}
+
+void CRCVoiceChat::RenderStatusHud()
+{
+	if(!g_Config.m_RcVoiceIndicator || Client()->State() != IClient::STATE_ONLINE || !g_Config.m_ClShowhud ||
+		GameClient()->m_Chat.IsActive() || m_MicrophoneTesting)
+		return;
+
+	// Match the chat input's coordinates. This component renders before chat.
+	const float Height = 300.0f;
+	const float Width = Height * (g_Config.m_RcCustomAspectDisable & RcAspectDisable::CHAT ? Graphics()->ScreenAspectReal() : Graphics()->ScreenAspect());
+	Graphics()->MapScreenToSize(Width, Height);
+	const float FontSize = GameClient()->m_Chat.FontSize();
+	const float Size = FontSize;
+	const float X = 5.0f + g_Config.m_RcChatPosX;
+	const float Y = Height - (20.0f * FontSize / 6.0f + (g_Config.m_TcStatusBar ? g_Config.m_TcStatusBarHeight : 0.0f)) + g_Config.m_RcChatPosY;
+	const bool Ready = m_Connected && !m_Reconnecting && !m_ResetPending && m_MicReady && !m_MicFailed;
+	const bool Muted = g_Config.m_RcVoiceMuted != 0;
+	ColorRGBA Color = Ready ? ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f) : ColorRGBA(0.6f, 0.6f, 0.6f, 1.0f);
+	if(Muted)
+		Color = ColorRGBA(1.0f, 0.3f, 0.3f, 1.0f);
+	else if(Transmitting())
+		Color = ColorRGBA(0.35f, 1.0f, 0.35f, 1.0f);
+	char aPing[32];
+	const char *pStatus;
+	if(m_ResetPending)
+		pStatus = RCLocalize("Disconnecting...", "RClient");
+	else if(m_Connecting)
+		pStatus = RCLocalize("Connecting...", "RClient");
+	else if(m_ConnectPending)
+		pStatus = RCLocalize("Connection queued...", "RClient");
+	else if(m_Reconnecting)
+		pStatus = RCLocalize("Reconnecting...", "RClient");
+	else if(!m_Connected)
+		pStatus = RCLocalize("Disconnected", "RClient");
+	else if(m_OutputFailed)
+		pStatus = RCLocalize("Audio output unavailable, retrying...", "RClient");
+	else if(m_MicFailed)
+		pStatus = RCLocalize("Microphone unavailable, retrying...", "RClient");
+	else
+	{
+		if(m_PingMs >= 0)
+			str_format(aPing, sizeof(aPing), "%d ms", m_PingMs);
+		else
+			str_copy(aPing, "-- ms");
+		pStatus = aPing;
+	}
+	const float Padding = 3.0f;
+	const float Gap = 3.0f;
+	const float StatusWidth = g_Config.m_RcVoiceStatus ? Gap + TextRender()->TextWidth(Size, pStatus) : 0.0f;
+	const CUIRect Background{X, Y - 2.0f, Padding * 2.0f + Size * 2.0f + Gap + StatusWidth, Size + 4.0f};
+	Background.Draw(ColorRGBA(0.0f, 0.0f, 0.0f, 0.4f), IGraphics::CORNER_ALL, 3.0f);
+	TextRender()->TextColor(Color);
+	TextRender()->SetFontPreset(EFontPreset::ICON_FONT);
+	TextRender()->Text(X + Padding, Y, Size, FontIcon::MICROPHONE, -1.0f);
+	TextRender()->TextColor(Deafened() ? ColorRGBA(1.0f, 0.3f, 0.3f, 1.0f) : ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f));
+	TextRender()->Text(X + Padding + Size + Gap, Y, Size, FontIcon::RC_HEADPHONES, -1.0f);
+	TextRender()->SetFontPreset(EFontPreset::DEFAULT_FONT);
+	TextRender()->TextColor(TextRender()->DefaultTextColor());
+	if(g_Config.m_RcVoiceStatus)
+		TextRender()->Text(X + Padding + (Size + Gap) * 2.0f, Y, Size, pStatus, -1.0f);
+}
+
+void CRCVoiceChat::RenderParticipantsOverlay()
+{
+	if(!g_Config.m_RcVoiceOverlay || !g_Config.m_ClShowhud || Client()->State() != IClient::STATE_ONLINE ||
+		!m_Connected || m_Reconnecting || m_ResetPending || m_MicrophoneTesting)
+		return;
+	struct SRow
+	{
+		std::string m_Name;
+		std::string m_Identity;
+		int m_ClientId;
+		bool m_Muted;
+		bool m_Speaking;
+		vec2 m_Direction;
+		VoiceLogic::SOverlaySortKey m_SortKey;
+	};
+	std::vector<SRow> vRows;
+	// Match the displayed characters, including prediction and smoothing.
+	// Audio attenuation keeps its independent snapshot-based timeline.
+	vec2 Listener = GameClient()->m_Camera.m_Center;
+	if(!g_Config.m_RcVoiceListenerMode)
+	{
+		const int ListenerId = GameClient()->m_Snap.m_SpecInfo.m_Active ? GameClient()->m_Snap.m_SpecInfo.m_SpectatorId : LocalClientId();
+		if(ListenerId >= 0 && ListenerId < MAX_CLIENTS && GameClient()->m_aClients[ListenerId].m_Active && GameClient()->m_Snap.m_aCharacters[ListenerId].m_Active)
+			Listener = GameClient()->m_aClients[ListenerId].m_RenderPos;
+	}
+	for(const auto &P : m_vParticipants)
+	{
+		const int Id = ClientIdOf(P.m_Identity);
+		const std::string Name = DisplayNameOf(P, Id);
+		const auto Settings = UserSettings(Name.c_str());
+		const bool Muted = Settings.m_Muted;
+		const bool Speaking = P.m_Speaking;
+		if(VoiceLogic::ShowOverlayParticipant(Speaking, Muted, g_Config.m_RcVoiceOverlayMode == 0, g_Config.m_RcVoiceOverlayMuted))
+		{
+			const bool HasPosition = Id >= 0 && Id < MAX_CLIENTS && GameClient()->m_aClients[Id].m_Active && GameClient()->m_Snap.m_aCharacters[Id].m_Active;
+			const vec2 Delta = HasPosition ? GameClient()->m_aClients[Id].m_RenderPos - Listener : vec2(0.0f, 0.0f);
+			vRows.push_back({Name, P.m_Identity, Id, Muted, Speaking, VoiceLogic::OverlayDirection(HasPosition, Delta),
+				{Speaking, std::chrono::duration_cast<std::chrono::nanoseconds>(P.m_SpeakingStartedAt.time_since_epoch()).count(),
+					std::chrono::duration_cast<std::chrono::nanoseconds>(P.m_LastSoundUntil.time_since_epoch()).count(), Id}});
+		}
+	}
+	std::sort(vRows.begin(), vRows.end(), [](const SRow &A, const SRow &B) {
+		if(A.m_SortKey < B.m_SortKey)
+			return true;
+		if(B.m_SortKey < A.m_SortKey)
+			return false;
+		return A.m_Identity < B.m_Identity;
+	});
+	const float Height = 300.0f;
+	Graphics()->MapScreenToSize(Height * Graphics()->ScreenAspect(), Height);
+	const float X = 5.0f;
+	float Y = 90.0f;
+	constexpr float Scale = 0.6f;
+	const float RowHeight = 16.0f * Scale;
+	const float FontSize = 7.0f * Scale;
+	const float Padding = 3.0f * Scale;
+	const float MaxNameWidth = 60.0f * Scale;
+	const float IconsWidth = (g_Config.m_RcVoiceOverlayDirection ? 12.0f * Scale : 0.0f) + (g_Config.m_RcVoiceOverlaySkin ? 18.0f * Scale : 0.0f);
+	const ColorRGBA BackgroundColor = color_cast<ColorRGBA>(ColorHSLA(g_Config.m_RcVoiceOverlayBackgroundColor, true));
+	constexpr size_t MaxRows = 8;
+	const size_t VisibleRows = std::min(vRows.size(), MaxRows);
+	std::array<float, MaxRows> aNameWidths{};
+	float PanelWidth = 0.0f;
+	for(size_t i = 0; i < VisibleRows; ++i)
+	{
+		aNameWidths[i] = std::min(TextRender()->TextWidth(FontSize, vRows[i].m_Name.c_str()) + 0.5f * Scale, MaxNameWidth);
+		PanelWidth = std::max(PanelWidth, Padding * 2.0f + IconsWidth + aNameWidths[i]);
+	}
+	char aMore[64] = "";
+	if(vRows.size() > MaxRows)
+	{
+		str_format(aMore, sizeof(aMore), RCLocalize("+%d more", "RClient"), (int)(vRows.size() - MaxRows));
+		PanelWidth = std::max(PanelWidth, Padding * 2.0f + TextRender()->TextWidth(FontSize, aMore));
+	}
+	if(g_Config.m_RcVoiceOverlaySharedBackground && VisibleRows > 0)
+	{
+		const float PanelHeight = (VisibleRows + (aMore[0] ? 1 : 0)) * RowHeight - Scale;
+		const CUIRect Panel{X, Y, PanelWidth, PanelHeight};
+		Panel.Draw(BackgroundColor, IGraphics::CORNER_ALL, 3.0f * Scale);
+	}
+	for(size_t i = 0; i < VisibleRows; ++i)
+	{
+		const auto &Row = vRows[i];
+		const float NameWidth = aNameWidths[i];
+		CUIRect Rect{X, Y, Padding * 2.0f + IconsWidth + NameWidth, RowHeight - Scale};
+		if(!g_Config.m_RcVoiceOverlaySharedBackground)
+			Rect.Draw(BackgroundColor, IGraphics::CORNER_ALL, 3.0f * Scale);
+		const ColorRGBA Color = Row.m_Muted ? ColorRGBA(1.0f, 0.3f, 0.3f, 1.0f) : (Row.m_Speaking ? ColorRGBA(0.35f, 1.0f, 0.35f, 1.0f) : TextRender()->DefaultTextColor());
+		float ContentX = X + Padding;
+		if(g_Config.m_RcVoiceOverlayDirection)
+		{
+			const vec2 Center(ContentX + 5.0f * Scale, Y + Rect.h / 2.0f);
+			Graphics()->TextureClear();
+			Graphics()->QuadsBegin();
+			Graphics()->SetColor(Color);
+			if(Row.m_Direction == vec2(0.0f, 0.0f))
+				Graphics()->DrawCircle(Center.x, Center.y, 2.5f * Scale, 16);
+			else
+			{
+				const vec2 Side(-Row.m_Direction.y, Row.m_Direction.x);
+				const vec2 Tip = Center + Row.m_Direction * (5.0f * Scale);
+				const vec2 Base = Center - Row.m_Direction * Scale;
+				const vec2 Back = Center - Row.m_Direction * (5.0f * Scale);
+				IGraphics::CFreeformItem Shaft(Back - Side * Scale, Back + Side * Scale, Base - Side * Scale, Base + Side * Scale);
+				Graphics()->QuadsDrawFreeform(&Shaft, 1);
+				IGraphics::CFreeformItem Head(Tip, Base - Side * (3.5f * Scale), Base + Side * (3.5f * Scale), Base);
+				Graphics()->QuadsDrawFreeform(&Head, 1);
+			}
+			Graphics()->QuadsEnd();
+			ContentX += 12.0f * Scale;
+		}
+		if(g_Config.m_RcVoiceOverlaySkin)
+		{
+			CTeeRenderInfo TeeInfo;
+			if(Row.m_ClientId >= 0 && Row.m_ClientId < MAX_CLIENTS && GameClient()->m_aClients[Row.m_ClientId].m_Active)
+				TeeInfo = GameClient()->m_aClients[Row.m_ClientId].m_RenderInfo;
+			else
+				TeeInfo.Apply(GameClient()->m_Skins.Find("default"));
+			TeeInfo.m_Size = 14.0f * Scale;
+			vec2 Offset;
+			CRenderTools::GetRenderTeeOffsetToRenderedTee(CAnimState::GetIdle(), &TeeInfo, Offset);
+			RenderTools()->RenderTee(CAnimState::GetIdle(), &TeeInfo, EMOTE_NORMAL, vec2(1.0f, 0.0f), vec2(ContentX + 7.0f * Scale, Y + Rect.h / 2.0f + Offset.y));
+			ContentX += 18.0f * Scale;
+		}
+		CUIRect Name{ContentX, Y, NameWidth, Rect.h};
+		TextRender()->TextColor(Color);
+		SLabelProperties Props;
+		Props.m_EllipsisAtEnd = true;
+		Props.m_EnableWidthCheck = false;
+		Props.m_MinimumFontSize = FontSize;
+		Props.m_MaxWidth = NameWidth;
+		Ui()->DoLabel(&Name, Row.m_Name.c_str(), FontSize, TEXTALIGN_ML, Props);
+		TextRender()->TextColor(TextRender()->DefaultTextColor());
+		Y += RowHeight;
+	}
+	if(aMore[0])
+	{
+		TextRender()->Text(X + Padding, Y + 2.0f * Scale, FontSize, aMore, -1.0f);
+	}
+}
+
+void CRCVoiceChat::RenderDebugHud()
+{
+	if(!g_Config.m_RcVoiceDebugHud || Client()->State() != IClient::STATE_ONLINE)
 		return;
 
 	Ui()->MapScreen();
 	const CUIRect Screen = *Ui()->Screen();
+
+	// Setup/cleanup own SDK objects and devices until their workers finish.
+	// Only read game-thread UI and atomic connection state on this path.
+	if(m_Connecting || m_ResetPending || m_ConnectPending)
+	{
+		CUIRect Pill{Screen.w - 250.0f, 20.0f, 230.0f, 22.0f};
+		Pill.Draw(ColorRGBA(0.0f, 0.0f, 0.0f, 0.45f), IGraphics::CORNER_ALL, 11.0f);
+		Pill.HMargin(4.0f, &Pill);
+		Pill.VMargin(10.0f, &Pill);
+		TextRender()->TextColor(1.0f, 1.0f, 1.0f, 0.85f);
+		const char *pStatus = m_ResetPending ? "Voice: disconnecting..." : (m_Connecting ? "Voice: connecting..." : "Voice: connection queued...");
+		Ui()->DoLabel(&Pill, RCLocalize(pStatus, "RClient"), 9.0f, TEXTALIGN_ML);
+		TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
+		return;
+	}
+
+	const int LocalId = LocalClientId();
 	const std::string Error = LastError();
 	const bool Session = m_Connected || m_Connecting || m_Reconnecting;
 
@@ -201,7 +575,8 @@ void CRCVoiceChat::OnRender()
 	const std::vector<SParticipant> vParticipants = Participants();
 
 	const float PanelWidth = 300.0f;
-	const int RowCount = 2 + (int)vParticipants.size() + (Error.empty() ? 0 : 1);
+	// Keep room for three rows so the panel does not jump when people join.
+	const int RowCount = std::max(3, 2 + (int)vParticipants.size() + (Error.empty() ? 0 : 1));
 	CUIRect Panel{Screen.w - PanelWidth - 20.0f, 20.0f, PanelWidth, 10.0f + 14.0f * RowCount};
 	Panel.Draw(ColorRGBA(0.0f, 0.0f, 0.0f, 0.55f), IGraphics::CORNER_ALL, 10.0f);
 	Panel.VMargin(8.0f, &Panel);
@@ -217,8 +592,6 @@ void CRCVoiceChat::OnRender()
 	const char *pStatus = "Voice: ready (PTT)";
 	if(m_Reconnecting)
 		pStatus = "Voice: reconnecting...";
-	else if(m_Connecting)
-		pStatus = "Voice: preparing mic...";
 	else if(!m_MicReady || m_MicFailed)
 		pStatus = "Voice: mic unavailable";
 	else if(Muted())
@@ -290,21 +663,23 @@ void CRCVoiceChat::OnRender()
 		str_copy(aMessage, Error.c_str(), 120);
 		DrawRow(aMessage, ColorRGBA(1.0f, 0.55f, 0.55f, 0.9f), 8.0f);
 	}
-#endif
 }
+#endif
 
 void CRCVoiceChat::OnConsoleInit()
 {
 	Console()->Register("rc_voice_connect", "", CFGFLAG_CLIENT, ConConnect, this, "Connect to voice chat");
-	Console()->Register("rc_voice_disconnect", "", CFGFLAG_CLIENT, ConDisconnect, this, "Disconnect from voice chat");
+	Console()->Register("rc_voice_disconnect", "", CFGFLAG_CLIENT, ConDisconnect, this, "Disconnect from voice chat or cancel a queued connection");
 	Console()->Register("+rc_voice_ptt", "", CFGFLAG_CLIENT, ConPtt, this, "Push to talk (hold)");
 	Console()->Register("rc_voice_mute", "", CFGFLAG_CLIENT, ConMute, this, "Fully mute mic (PTT disabled too)");
 	Console()->Register("rc_voice_unmute", "", CFGFLAG_CLIENT, ConUnmute, this, "Enable mic (transmit via PTT)");
 	Console()->Register("rc_voice_toggle_mute", "", CFGFLAG_CLIENT, ConToggleMute, this, "Toggle microphone mute");
+	Console()->Register("rc_voice_toggle_deafen", "", CFGFLAG_CLIENT, ConToggleDeafen, this, "Toggle all incoming voice without changing saved volume or mute settings");
 	Console()->Register("rc_voice_status", "", CFGFLAG_CLIENT, ConStatus, this, "Voice chat status");
 	Console()->Register("rc_voice_mute_name", "s[name]", CFGFLAG_CLIENT, ConMuteName, this, "Locally mute a player's voice");
 	Console()->Register("rc_voice_unmute_name", "s[name]", CFGFLAG_CLIENT, ConUnmuteName, this, "Remove a local voice mute");
 	Console()->Register("rc_voice_mute_list", "", CFGFLAG_CLIENT, ConMuteList, this, "List locally muted voices");
+	Console()->Register("rc_voice_user", "s[name] i[volume] i[muted]", CFGFLAG_CLIENT, ConUserSettings, this, "Save a user's voice volume (0-200%) and mute state (0/1)");
 	Console()->Register("rc_voice_purge", "", CFGFLAG_CLIENT, ConPurge, this, "Drop stale voice participants left by crashed sessions");
 
 	// Muted names are extra lines in settings_rclient.cfg.
@@ -317,7 +692,16 @@ void CRCVoiceChat::OnShutdown()
 {
 #ifdef CONF_LIVEKIT
 	m_ManualDisconnect = true;
-	ResetConnection();
+	m_ConnectPending = false;
+	// No worker may outlive the component or livekit::shutdown().
+	RequestReset();
+	if(m_Thread.joinable())
+		m_Thread.join();
+	if(m_ResetThread.joinable())
+		m_ResetThread.join();
+	else
+		ReleaseSession();
+	FinishReset();
 	if(m_AudioInitialized)
 		ma_context_uninit(&m_AudioContext);
 	m_AudioInitialized = false;
@@ -341,7 +725,7 @@ bool CRCVoiceChat::Connected() const
 bool CRCVoiceChat::Connecting() const
 {
 #ifdef CONF_LIVEKIT
-	return m_Connecting;
+	return m_Connecting || m_ConnectPending;
 #else
 	return false;
 #endif
@@ -356,6 +740,127 @@ std::vector<CRCVoiceChat::SParticipant> CRCVoiceChat::Participants() const
 #endif
 }
 
+CRCVoiceChat::EPlayerVoiceState CRCVoiceChat::PlayerVoiceState(int ClientId) const
+{
+#ifdef CONF_LIVEKIT
+	if(ClientId < 0 || ClientId >= MAX_CLIENTS || Client()->State() != IClient::STATE_ONLINE ||
+		!m_Connected || m_Reconnecting || m_ResetPending || m_Cancelled)
+		return EPlayerVoiceState::DISCONNECTED;
+	if(ClientId == LocalClientId())
+		return Transmitting() ? EPlayerVoiceState::SPEAKING : EPlayerVoiceState::CONNECTED;
+	bool Connected = false;
+	bool Speaking = false;
+	for(const auto &Participant : m_vParticipants)
+	{
+		if(ClientIdOf(Participant.m_Identity) != ClientId)
+			continue;
+		Connected = true;
+		if(UserSettings(DisplayNameOf(Participant, ClientId)).m_Muted)
+			return EPlayerVoiceState::MUTED;
+		Speaking |= Participant.m_Speaking;
+	}
+	if(Connected)
+		return Speaking ? EPlayerVoiceState::SPEAKING : EPlayerVoiceState::CONNECTED;
+#endif
+	return EPlayerVoiceState::DISCONNECTED;
+}
+
+void CRCVoiceChat::StartMicrophoneTest()
+{
+#ifdef CONF_LIVEKIT
+	if(m_MicrophoneTesting || m_Connected || m_Connecting || m_ResetPending || m_ConnectPending || m_Thread.joinable())
+	{
+		SetLastError("disconnect voice and wait for cleanup before testing the microphone");
+		return;
+	}
+	if(!m_AudioInitialized || !m_Initialized)
+	{
+		SetLastError("voice audio devices are unavailable");
+		return;
+	}
+	SetLastError("");
+	m_TestMicDevice = g_Config.m_RcVoiceMicDevice;
+	m_TestPlayoutDevice = g_Config.m_RcVoicePlayoutDevice;
+	m_MicGain = std::clamp(g_Config.m_RcVoiceMicVolume, 0, 300) / 100.0f;
+	m_MicrophoneTestListen = false;
+	m_MicrophoneTestLevel = 0.0f;
+	m_MicrophoneTestLastVisible = Client()->GlobalTime();
+	m_PttHeld = false;
+	m_PttTail.Cancel();
+	m_Cancelled = false;
+	m_MicrophoneTesting = true;
+	m_Connecting = true;
+	try
+	{
+		m_Thread = std::thread(&CRCVoiceChat::MicrophoneTestThread, this, m_TestMicDevice, m_TestPlayoutDevice);
+	}
+	catch(const std::exception &Ex)
+	{
+		m_Connecting = false;
+		m_MicrophoneTesting = false;
+		SetLastError(Ex.what());
+	}
+#else
+	SetLastError("microphone testing is unavailable in this build");
+#endif
+}
+
+void CRCVoiceChat::StopMicrophoneTest()
+{
+#ifdef CONF_LIVEKIT
+	if(m_MicrophoneTesting)
+	{
+		m_MicrophoneTestListen = false;
+		m_MicrophoneTestLevel = 0.0f;
+		ResetConnection();
+	}
+#endif
+}
+
+void CRCVoiceChat::KeepMicrophoneTestVisible()
+{
+#ifdef CONF_LIVEKIT
+	m_MicrophoneTestLastVisible = Client()->GlobalTime();
+#endif
+}
+
+bool CRCVoiceChat::MicrophoneTesting() const
+{
+#ifdef CONF_LIVEKIT
+	return m_MicrophoneTesting;
+#else
+	return false;
+#endif
+}
+
+bool CRCVoiceChat::MicrophoneTestListening() const
+{
+#ifdef CONF_LIVEKIT
+	return m_MicrophoneTestListen;
+#else
+	return false;
+#endif
+}
+
+void CRCVoiceChat::SetMicrophoneTestListening(bool Listen)
+{
+#ifdef CONF_LIVEKIT
+	if(!m_MicrophoneTesting || m_ResetPending || m_Cancelled)
+		return;
+	if(m_MicrophoneTestListen.exchange(Listen) != Listen)
+		++m_OutputGeneration;
+#endif
+}
+
+float CRCVoiceChat::MicrophoneTestLevel() const
+{
+#ifdef CONF_LIVEKIT
+	return m_MicrophoneTestLevel;
+#else
+	return 0.0f;
+#endif
+}
+
 void CRCVoiceChat::Connect()
 {
 	ConnectInternal(true);
@@ -365,18 +870,38 @@ void CRCVoiceChat::ConnectInternal(bool Manual)
 {
 #ifdef CONF_LIVEKIT
 	if(Manual)
+	{
 		m_ConnectFailures = 0;
+		m_ManualDisconnect = false;
+	}
 	if(!m_Initialized || !m_AudioInitialized)
 	{
 		SetLastError("voice chat is not initialized (LiveKit or audio devices unavailable)");
 		return;
 	}
-	if(m_Connecting || m_Connected)
+	if(m_MicrophoneTesting)
+	{
+		StopMicrophoneTest();
+		m_ConnectPending = true;
+		m_NextPendingConnect = 0.0f;
 		return;
-	if(g_Config.m_RcVoiceTokenUrl[0] == '\0' && (g_Config.m_RcVoiceUrl[0] == '\0' || g_Config.m_RcVoiceToken[0] == '\0'))
+	}
+	if(m_Connecting || m_ResetPending)
+	{
+		// Repeated connect commands do not schedule a second live session.
+		if(m_ResetPending)
+		{
+			m_ConnectPending = true;
+			m_NextPendingConnect = 0.0f;
+		}
+		return;
+	}
+	if(m_Connected)
+		return;
+	if(g_Config.m_RcVoiceTokenUrl[0] == '\0')
 	{
 		++m_ConnectFailures;
-		SetLastError("set rc_voice_token_url or manual rc_voice_url and rc_voice_token first");
+		SetLastError("set rc_voice_token_url to the voice server endpoint first");
 		return;
 	}
 	const int LocalId = LocalClientId();
@@ -388,16 +913,25 @@ void CRCVoiceChat::ConnectInternal(bool Manual)
 		return;
 	}
 
-	const bool UseEndpoint = g_Config.m_RcVoiceTokenUrl[0] != '\0';
 	const float Now = Client()->GlobalTime();
-	if(UseEndpoint && m_LastTokenRequestTime > 0.0f && Now - m_LastTokenRequestTime < 5.0f)
+	if(m_LastTokenRequestTime > 0.0f && Now - m_LastTokenRequestTime < 5.0f)
 	{
-		SetLastError("token endpoint rate limited, retrying in a few seconds");
+		m_ConnectPending = true;
+		m_NextPendingConnect = m_LastTokenRequestTime + 5.0f;
+		SetLastError("");
+		dbg_msg("voicechat", "connection queued for %.1f seconds (rc_voice_disconnect cancels)", m_NextPendingConnect - Now);
 		return;
 	}
 
 	SetLastError("");
 	ResetConnection();
+	if(m_ResetPending)
+	{
+		m_ConnectPending = true;
+		m_NextPendingConnect = 0.0f;
+		return;
+	}
+	m_ConnectPending = false;
 	m_ManualDisconnect = false;
 	m_MicGain = std::clamp(g_Config.m_RcVoiceMicVolume, 0, 300) / 100.0f;
 	m_Cancelled = false;
@@ -405,27 +939,25 @@ void CRCVoiceChat::ConnectInternal(bool Manual)
 	try
 	{
 		const std::string RoomName = RoomNameFromAddress();
-		if(UseEndpoint)
-		{
-			CJsonStringWriter Json;
-			Json.BeginObject();
-			Json.WriteAttribute("room_name");
-			Json.WriteStrValue(RoomName.c_str());
-			Json.WriteAttribute("participant_name");
-			Json.WriteStrValue(GameClient()->m_aClients[LocalId].m_aName);
-			Json.WriteAttribute("participant_metadata");
-			Json.WriteStrValue(std::to_string(LocalId).c_str());
-			Json.EndObject();
-			m_LastTokenRequestTime = Now;
-			m_pTokenRequest = HttpPostJson(g_Config.m_RcVoiceTokenUrl, Json.GetOutputString().c_str());
-			m_pTokenRequest->Timeout(CTimeout{4000, 10000, 500, 5});
-			m_pTokenRequest->MaxResponseSize(16 * 1024);
-			m_pTokenRequest->LogProgress(HTTPLOG::NONE);
-			m_pTokenRequest->FailOnErrorStatus(false);
-			GameClient()->Http()->Run(m_pTokenRequest);
-		}
+		CJsonStringWriter Json;
+		Json.BeginObject();
+		Json.WriteAttribute("room_name");
+		Json.WriteStrValue(RoomName.c_str());
+		Json.WriteAttribute("participant_name");
+		Json.WriteStrValue(GameClient()->m_aClients[LocalId].m_aName);
+		Json.WriteAttribute("participant_metadata");
+		Json.WriteStrValue(std::to_string(LocalId).c_str());
+		Json.EndObject();
+		m_LastTokenRequestTime = Now;
+		m_pTokenRequest = HttpPostJson(g_Config.m_RcVoiceTokenUrl, Json.GetOutputString().c_str());
+		m_pTokenRequest->Timeout(CTimeout{4000, 10000, 500, 5});
+		m_pTokenRequest->MaxResponseSize(16 * 1024);
+		m_pTokenRequest->LogProgress(HTTPLOG::NONE);
+		m_pTokenRequest->FailOnErrorStatus(false);
+		GameClient()->Http()->Run(m_pTokenRequest);
+		m_MetadataRequestedClientId = LocalId;
 		m_Thread = std::thread(&CRCVoiceChat::ConnectThread, this,
-			std::string(g_Config.m_RcVoiceUrl), std::string(g_Config.m_RcVoiceToken), LocalId,
+			LocalId,
 			std::string(g_Config.m_RcVoiceMicDevice), std::string(g_Config.m_RcVoicePlayoutDevice), m_pTokenRequest, RoomName);
 	}
 	catch(const std::exception &Ex)
@@ -451,6 +983,8 @@ void CRCVoiceChat::Disconnect()
 	m_ManualDisconnect = true;
 	m_ConnectFailures = 0;
 	m_NextAutoConnect = 0.0f;
+	m_ConnectPending = false;
+	SetLastError("");
 	ResetConnection();
 #else
 	dbg_msg("voicechat", "voice chat is not available in this build");
@@ -470,9 +1004,29 @@ void CRCVoiceChat::ConDisconnect(IConsole::IResult *pResult, void *pUserData)
 void CRCVoiceChat::ConPtt(IConsole::IResult *pResult, void *pUserData)
 {
 #ifdef CONF_LIVEKIT
-	CRCVoiceChat *pSelf = (CRCVoiceChat *)pUserData;
-	pSelf->m_PttHeld = pResult->GetInteger(0) != 0 && pSelf->Client()->State() == IClient::STATE_ONLINE &&
-			   !pSelf->GameClient()->m_Menus.IsActive() && !pSelf->GameClient()->m_Chat.IsActive() && !pSelf->GameClient()->m_GameConsole.IsActive();
+	auto *pSelf = static_cast<CRCVoiceChat *>(pUserData);
+	const bool Allowed = pSelf->Client()->State() == IClient::STATE_ONLINE &&
+			     !pSelf->GameClient()->m_Menus.IsActive() && !pSelf->GameClient()->m_Chat.IsActive() && !pSelf->GameClient()->m_GameConsole.IsActive();
+	if(!Allowed)
+	{
+		pSelf->OnRelease();
+		return;
+	}
+	if(pResult->GetInteger(0) != 0)
+	{
+		pSelf->m_PttTail.Cancel();
+		pSelf->m_PttHeld = true;
+	}
+	else
+	{
+		if(pSelf->m_PttHeld)
+		{
+			if(pSelf->Transmitting())
+				pSelf->m_PttTail.Start(VoiceNowMs(), g_Config.m_RcVoicePttReleaseDelay);
+			// Publish the tail before clearing held, so capture sees no gap.
+			pSelf->m_PttHeld = false;
+		}
+	}
 	pSelf->ApplyMicState();
 #endif
 }
@@ -498,7 +1052,14 @@ void CRCVoiceChat::ConToggleMute(IConsole::IResult *pResult, void *pUserData)
 	dbg_msg("voicechat", "mic %s", pSelf->Muted() ? "fully muted" : "enabled");
 }
 
-const char *CRCVoiceChat::DisplayNameOf(const SParticipant &Participant, int ClientId)
+void CRCVoiceChat::ConToggleDeafen(IConsole::IResult *pResult, void *pUserData)
+{
+	auto *pSelf = static_cast<CRCVoiceChat *>(pUserData);
+	pSelf->SetDeafened(!pSelf->Deafened());
+	dbg_msg("voicechat", "incoming voice %s", pSelf->Deafened() ? "muted" : "enabled");
+}
+
+const char *CRCVoiceChat::DisplayNameOf(const SParticipant &Participant, int ClientId) const
 {
 #ifdef CONF_LIVEKIT
 	// In-game name wins over the token name.
@@ -512,6 +1073,11 @@ const char *CRCVoiceChat::DisplayNameOf(const SParticipant &Participant, int Cli
 	(void)ClientId;
 #endif
 	return Participant.m_Name.empty() ? Participant.m_Identity.c_str() : Participant.m_Name.c_str();
+}
+
+std::string CRCVoiceChat::ParticipantName(const SParticipant &Participant) const
+{
+	return DisplayNameOf(Participant, ClientIdOf(Participant.m_Identity));
 }
 
 bool CRCVoiceChat::IsLocalIdentity(const std::string &Identity)
@@ -532,22 +1098,36 @@ void CRCVoiceChat::ConStatus(IConsole::IResult *pResult, void *pUserData)
 
 	dbg_msg("voicechat", "=== voice chat status ===");
 #ifdef CONF_LIVEKIT
+	if(pSelf->m_Connecting && !pSelf->m_ResetPending)
+	{
+		dbg_msg("voicechat", "session: connecting (audio and room setup in progress)");
+		return;
+	}
+	if(pSelf->m_ResetPending)
+	{
+		dbg_msg("voicechat", "session: disconnecting  connect_queued=%d", (int)pSelf->m_ConnectPending);
+		if(!Error.empty())
+			dbg_msg("voicechat", "last_error: %s", Error.c_str());
+		return;
+	}
 	const int LocalId = pSelf->LocalClientId();
 
 	// Session
 	const char *pState = "disconnected";
-	if(pSelf->m_Connected)
+	if(pSelf->m_ConnectPending)
+		pState = "connection queued";
+	else if(pSelf->m_Connected)
 		pState = pSelf->m_Reconnecting ? "reconnecting" : "connected";
-	else if(pSelf->m_Connecting)
-		pState = "connecting";
 	dbg_msg("voicechat", "session: %s  room='%s'  server_room='%s'", pState,
 		pSelf->m_ConnectedRoom.empty() ? "-" : pSelf->m_ConnectedRoom.c_str(),
 		pSelf->RoomNameFromAddress().empty() ? "-" : pSelf->RoomNameFromAddress().c_str());
-	dbg_msg("voicechat", "ids: local_client_id=%d metadata_client_id=%d connected_client_id=%d",
-		LocalId, pSelf->m_MetadataClientId, pSelf->m_ConnectedClientId);
-	dbg_msg("voicechat", "mode: %s  autoconnect=%d  failures=%d  manual_disconnect=%d",
-		g_Config.m_RcVoiceTokenUrl[0] != '\0' ? "token endpoint" : "manual url+token",
-		g_Config.m_RcVoiceAutoConnect, pSelf->m_ConnectFailures, (int)pSelf->m_ManualDisconnect);
+	dbg_msg("voicechat", "ids: local_client_id=%d metadata_client_id=%d",
+		LocalId, pSelf->m_MetadataClientId.load());
+	dbg_msg("voicechat", "mode: token endpoint  autoconnect=%d  failures=%d  manual_disconnect=%d",
+		g_Config.m_RcVoiceAutoConnect, pSelf->m_ConnectFailures.load(), (int)pSelf->m_ManualDisconnect);
+	if(pSelf->m_ConnectPending)
+		dbg_msg("voicechat", "queued connection: retry in %.1fs (rc_voice_disconnect cancels)",
+			std::max(0.0f, pSelf->m_NextPendingConnect - pSelf->Client()->GlobalTime()));
 
 	// Audio
 	dbg_msg("voicechat", "audio: engine=%d  output=%d  capture=%d  device_delay=%dms",
@@ -560,9 +1140,10 @@ void CRCVoiceChat::ConStatus(IConsole::IResult *pResult, void *pUserData)
 		(int)pSelf->m_FullMuted, (int)pSelf->m_PttHeld);
 
 	// Filter settings
-	dbg_msg("voicechat", "filters: spatial=%d listener=%s unpositioned=%d team_only=%d volume=%d%%",
-		g_Config.m_RcVoiceSpatial, g_Config.m_RcVoiceListenerMode ? "camera" : "character",
-		g_Config.m_RcVoiceFilterUnpositioned, g_Config.m_RcVoiceTeamOnly, g_Config.m_RcVoiceVolume);
+	dbg_msg("voicechat", "mix: distance=%d stereo=%d listener=%s unpositioned=%d%% spectators=%d%% other_teams=%d%% super=%d%% volume=%d%%",
+		g_Config.m_RcVoiceSpatial, g_Config.m_RcVoiceStereo, g_Config.m_RcVoiceListenerMode ? "camera" : "character",
+		g_Config.m_RcVoiceUnpositionedVolume, g_Config.m_RcVoiceSpectatorVolume, g_Config.m_RcVoiceOtherTeamVolume,
+		g_Config.m_RcVoiceSuperVolume, g_Config.m_RcVoiceVolume);
 
 	// A leftover from a crashed session has no client id and no track.
 	if(pSelf->m_Connected && pSelf->m_pRoom)
@@ -579,7 +1160,7 @@ void CRCVoiceChat::ConStatus(IConsole::IResult *pResult, void *pUserData)
 			char aDistance[24] = "-";
 			if(HasPosition)
 			{
-				const float Distance = length(pSelf->GameClient()->m_aClients[ClientId].m_RenderPos - Listener) / 32.0f;
+				const float Distance = length(VoicePlayerPosition(pSelf->GameClient(), ClientId, pSelf->Client()->IntraGameTick(g_Config.m_ClDummy)) - Listener) / 32.0f;
 				str_format(aDistance, sizeof(aDistance), "%.1ft", Distance);
 			}
 			int Tracks = 0;
@@ -624,7 +1205,7 @@ void CRCVoiceChat::ConPurge(IConsole::IResult *pResult, void *pUserData)
 {
 	CRCVoiceChat *pSelf = (CRCVoiceChat *)pUserData;
 	const int Removed = pSelf->PurgeStaleParticipants();
-	log_trace("voicechat", "removed %d stale participant(s), %d left", Removed, (int)pSelf->m_vParticipants.size());
+	log_trace("voicechat", "removed %d stale participant(s), %d left", Removed, (int)pSelf->Participants().size());
 }
 
 int CRCVoiceChat::PurgeStaleParticipants()
@@ -658,62 +1239,55 @@ void CRCVoiceChat::ConMuteList(IConsole::IResult *pResult, void *pUserData)
 		dbg_msg("voicechat", "  %s", Name.c_str());
 }
 
-// Nick is the only stable mute key: identity is random per connection.
-static std::string TrimMuteName(const char *pName)
+void CRCVoiceChat::ConUserSettings(IConsole::IResult *pResult, void *pUserData)
 {
-	if(pName == nullptr)
-		return {};
-	std::string Name = pName;
-	const auto First = Name.find_first_not_of(" \t");
-	if(First == std::string::npos)
-		return {};
-	const auto Last = Name.find_last_not_of(" \t");
-	return Name.substr(First, Last - First + 1);
+	auto *pSelf = static_cast<CRCVoiceChat *>(pUserData);
+	if(!pSelf->SetUserSettings(pResult->GetString(0), pResult->GetInteger(1), pResult->GetInteger(2) != 0))
+		pSelf->SetLastError("invalid voice user name");
 }
 
-static std::string MuteKeyOf(const std::string &Name)
+CRCVoiceChat::SUserSettings CRCVoiceChat::UserSettings(const char *pName) const
 {
-	std::string Key = Name;
-	for(char &c : Key)
-		if(c >= 'A' && c <= 'Z')
-			c = (char)(c - 'A' + 'a');
-	return Key;
+	std::lock_guard<std::mutex> Lock(m_UserSettingsLock);
+	return m_UserSettings.Get(pName);
+}
+
+std::vector<CRCVoiceChat::SUserSettings> CRCVoiceChat::SavedUsers() const
+{
+	std::lock_guard<std::mutex> Lock(m_UserSettingsLock);
+	return m_UserSettings.All();
+}
+
+bool CRCVoiceChat::SetUserSettings(const char *pName, int Volume, bool Muted)
+{
+	std::lock_guard<std::mutex> Lock(m_UserSettingsLock);
+	return m_UserSettings.Save(pName, Volume, Muted);
+}
+
+void CRCVoiceChat::ForgetUser(const char *pName)
+{
+	std::lock_guard<std::mutex> Lock(m_UserSettingsLock);
+	m_UserSettings.Remove(pName);
 }
 
 void CRCVoiceChat::MuteName(const char *pName)
 {
-	const std::string Name = TrimMuteName(pName);
-	if(Name.empty())
-		return;
-	std::lock_guard<std::mutex> Lock(m_MuteLock);
-	if(!m_MutedNameSet.insert(MuteKeyOf(Name)).second)
-	{
-		log_trace("voicechat", "'%s' is already muted", Name.c_str());
-		return;
-	}
-	m_vMutedNames.push_back(Name);
-	log_trace("voicechat", "muted voice of '%s'", Name.c_str());
+	std::lock_guard<std::mutex> Lock(m_UserSettingsLock);
+	const auto Settings = m_UserSettings.Get(pName);
+	m_UserSettings.Save(pName, Settings.m_Volume, true);
 }
 
 void CRCVoiceChat::UnmuteName(const char *pName)
 {
-	const std::string Name = TrimMuteName(pName);
-	if(Name.empty())
-		return;
-	std::lock_guard<std::mutex> Lock(m_MuteLock);
-	if(m_MutedNameSet.erase(MuteKeyOf(Name)) == 0)
-		return;
-	std::erase_if(m_vMutedNames, [&](const std::string &Entry) { return MuteKeyOf(Entry) == MuteKeyOf(Name); });
-	log_trace("voicechat", "unmuted voice of '%s'", Name.c_str());
+	std::lock_guard<std::mutex> Lock(m_UserSettingsLock);
+	const auto Settings = m_UserSettings.Get(pName);
+	if(Settings.m_Muted)
+		m_UserSettings.Save(pName, Settings.m_Volume, false);
 }
 
 bool CRCVoiceChat::IsNameMuted(const char *pName) const
 {
-	const std::string Name = TrimMuteName(pName);
-	if(Name.empty())
-		return false;
-	std::lock_guard<std::mutex> Lock(m_MuteLock);
-	return m_MutedNameSet.find(MuteKeyOf(Name)) != m_MutedNameSet.end();
+	return UserSettings(pName).m_Muted;
 }
 
 void CRCVoiceChat::ToggleNameMute(const char *pName)
@@ -726,21 +1300,23 @@ void CRCVoiceChat::ToggleNameMute(const char *pName)
 
 std::vector<std::string> CRCVoiceChat::MutedNames() const
 {
-	std::lock_guard<std::mutex> Lock(m_MuteLock);
-	return m_vMutedNames;
+	std::vector<std::string> Result;
+	for(const auto &Settings : SavedUsers())
+		if(Settings.m_Muted)
+			Result.push_back(Settings.m_Name);
+	return Result;
 }
 
 void CRCVoiceChat::ConfigSaveCallback(IConfigManager *pConfigManager, void *pUserData)
 {
 	CRCVoiceChat *pThis = (CRCVoiceChat *)pUserData;
-	std::lock_guard<std::mutex> Lock(pThis->m_MuteLock);
-	for(const std::string &Name : pThis->m_vMutedNames)
+	for(const auto &Settings : pThis->SavedUsers())
 	{
 		char aEscaped[512];
 		char *pDst = aEscaped;
-		str_escape(&pDst, Name.c_str(), aEscaped + sizeof(aEscaped));
+		str_escape(&pDst, Settings.m_Name.c_str(), aEscaped + sizeof(aEscaped));
 		char aLine[600];
-		str_format(aLine, sizeof(aLine), "rc_voice_mute_name \"%s\"", aEscaped);
+		str_format(aLine, sizeof(aLine), "rc_voice_user \"%s\" %d %d", aEscaped, Settings.m_Volume, (int)Settings.m_Muted);
 		pConfigManager->WriteLine(aLine, ConfigDomain::RCLIENT);
 	}
 }
@@ -750,15 +1326,23 @@ void CRCVoiceChat::SetLastError(const char *pError)
 	{
 		std::lock_guard<std::mutex> Lock(m_ErrorLock);
 		str_copy(m_aLastError, pError != nullptr ? pError : "", sizeof(m_aLastError));
+		if(!pError || !pError[0])
+			m_aAudioError[0] = '\0';
 	}
 	if(pError != nullptr && pError[0] != '\0')
 		log_warn("voicechat", "%s", pError);
 }
 
+void CRCVoiceChat::SetAudioError(const char *pError)
+{
+	std::lock_guard<std::mutex> Lock(m_ErrorLock);
+	str_copy(m_aAudioError, pError ? pError : "", sizeof(m_aAudioError));
+}
+
 std::string CRCVoiceChat::LastError() const
 {
 	std::lock_guard<std::mutex> Lock(m_ErrorLock);
-	return m_aLastError;
+	return m_aAudioError[0] ? m_aAudioError : m_aLastError;
 }
 
 bool CRCVoiceChat::Muted() const
@@ -775,14 +1359,38 @@ void CRCVoiceChat::SetMuted(bool Muted)
 	g_Config.m_RcVoiceMuted = Muted ? 1 : 0;
 #ifdef CONF_LIVEKIT
 	m_FullMuted = Muted;
+	if(Muted)
+		m_PttTail.Cancel();
 	ApplyMicState();
+#endif
+}
+
+bool CRCVoiceChat::Deafened() const
+{
+#ifdef CONF_LIVEKIT
+	return m_Deafened;
+#else
+	return g_Config.m_RcVoiceDeafened != 0;
+#endif
+}
+
+void CRCVoiceChat::SetDeafened(bool Deafened)
+{
+	g_Config.m_RcVoiceDeafened = Deafened ? 1 : 0;
+#ifdef CONF_LIVEKIT
+	if(m_Deafened.exchange(Deafened) == Deafened)
+		return;
+	std::lock_guard<std::mutex> Lock(m_AudioActivityLock);
+	for(auto &[Id, pAudio] : m_mAudioActivity)
+		pAudio->Clear();
+	++m_OutputGeneration;
 #endif
 }
 
 bool CRCVoiceChat::Transmitting() const
 {
 #ifdef CONF_LIVEKIT
-	return m_Connected && !m_Reconnecting && m_MicReady && !m_MicFailed && m_Transmitting && m_PttHeld && !m_FullMuted;
+	return !m_MicrophoneTesting && m_Connected && !m_Reconnecting && m_MicReady && !m_MicFailed && m_Transmitting && PttActive() && !m_FullMuted && !m_Cancelled;
 #else
 	return false;
 #endif
@@ -790,45 +1398,42 @@ bool CRCVoiceChat::Transmitting() const
 
 #ifdef CONF_LIVEKIT
 
-void CRCVoiceChat::ConnectThread(std::string Url, std::string Token, int LocalClientId,
+void CRCVoiceChat::ConnectThread(int LocalClientId,
 	std::string MicDevice, std::string PlayoutDevice, std::shared_ptr<IHttpRequest> pTokenRequest, std::string RoomName)
 {
 	try
 	{
-		if(pTokenRequest)
-		{
-			pTokenRequest->Wait();
-			if(m_Cancelled)
-			{
-				m_Connecting = false;
-				return;
-			}
-			if(pTokenRequest->State() != EHttpState::DONE)
-				throw std::runtime_error("token endpoint request failed (network, TLS, timeout or response too large)");
-			if(pTokenRequest->StatusCode() < 200 || pTokenRequest->StatusCode() >= 300)
-				throw std::runtime_error("token endpoint returned HTTP " + std::to_string(pTokenRequest->StatusCode()));
-			std::unique_ptr<json_value, decltype(&json_value_free)> pJson(pTokenRequest->ResultJson(), json_value_free);
-			if(!pJson || pJson->type != json_object)
-				throw std::runtime_error("invalid token endpoint response: expected a JSON object");
-			const json_value *pUrl = json_object_get(pJson.get(), "server_url");
-			const json_value *pToken = json_object_get(pJson.get(), "participant_token");
-			if(pUrl->type != json_string || pToken->type != json_string ||
-				pUrl->u.string.length == 0 || pUrl->u.string.length > 255 ||
-				pToken->u.string.length == 0 || pToken->u.string.length > 8192)
-				throw std::runtime_error("invalid token endpoint response: expected server_url and participant_token strings");
-			Url.assign(pUrl->u.string.ptr, pUrl->u.string.length);
-			Token.assign(pToken->u.string.ptr, pToken->u.string.length);
-			if((!str_startswith(Url.c_str(), "wss://") && !str_startswith(Url.c_str(), "ws://")) ||
-				Url.find_first_of(std::string("\0\r\n", 3)) != std::string::npos || Token.find_first_of(std::string("\0\r\n", 3)) != std::string::npos)
-				throw std::runtime_error("invalid token endpoint credentials");
-		}
+		if(!pTokenRequest)
+			throw std::runtime_error("voice token request is unavailable");
+		pTokenRequest->Wait();
 		if(m_Cancelled)
 		{
-			m_Connecting = false;
+			ConnectThreadFinish();
 			return;
 		}
-		if(Url.empty() || Token.empty())
-			throw std::runtime_error("missing voice server URL or token");
+		if(pTokenRequest->State() != EHttpState::DONE)
+			throw std::runtime_error("token endpoint request failed (network, TLS, timeout or response too large)");
+		if(pTokenRequest->StatusCode() < 200 || pTokenRequest->StatusCode() >= 300)
+			throw std::runtime_error("token endpoint returned HTTP " + std::to_string(pTokenRequest->StatusCode()));
+		std::unique_ptr<json_value, decltype(&json_value_free)> pJson(pTokenRequest->ResultJson(), json_value_free);
+		if(!pJson || pJson->type != json_object)
+			throw std::runtime_error("invalid token endpoint response: expected a JSON object");
+		const json_value *pUrl = json_object_get(pJson.get(), "server_url");
+		const json_value *pToken = json_object_get(pJson.get(), "participant_token");
+		if(!pUrl || !pToken || pUrl->type != json_string || pToken->type != json_string ||
+			pUrl->u.string.length == 0 || pUrl->u.string.length > 255 ||
+			pToken->u.string.length == 0 || pToken->u.string.length > 8192)
+			throw std::runtime_error("invalid token endpoint response: expected server_url and participant_token strings");
+		const std::string Url(pUrl->u.string.ptr, pUrl->u.string.length);
+		const std::string Token(pToken->u.string.ptr, pToken->u.string.length);
+		if((!str_startswith(Url.c_str(), "wss://") && !str_startswith(Url.c_str(), "ws://")) ||
+			Url.find_first_of(std::string("\0\r\n", 3)) != std::string::npos || Token.find_first_of(std::string("\0\r\n", 3)) != std::string::npos)
+			throw std::runtime_error("invalid token endpoint credentials");
+		if(m_Cancelled)
+		{
+			ConnectThreadFinish();
+			return;
+		}
 		// Expired tokens crash Room::connect() inside the SDK.
 		{
 			const long long Now = (long long)std::time(nullptr);
@@ -837,9 +1442,9 @@ void CRCVoiceChat::ConnectThread(std::string Url, std::string Token, int LocalCl
 				const long long Expiry = VoiceLogic::TokenExpiry(Token);
 				char aError[192];
 				if(Expiry > 0)
-					str_format(aError, sizeof(aError), "voice token expired %lld minutes ago, generate a new one with local_token.py", (Now - Expiry) / 60);
+					str_copy(aError, "token endpoint returned an expired or expiring token; reconnect and check server time");
 				else
-					str_copy(aError, "voice token is not a usable JWT, generate a new one with local_token.py");
+					str_copy(aError, "token endpoint returned an unusable JWT; check the voice server");
 				throw std::runtime_error(aError);
 			}
 		}
@@ -853,15 +1458,14 @@ void CRCVoiceChat::ConnectThread(std::string Url, std::string Token, int LocalCl
 		Options.join_retries = 0;
 		if(!m_pRoom->connect(Url, Token, Options))
 			throw std::runtime_error("room connection failed");
-		if(pTokenRequest && m_pRoom->roomInfo().name != RoomName)
+		if(m_pRoom->roomInfo().name != RoomName)
 			throw std::runtime_error("token endpoint returned a token for a different room");
 		if(m_Cancelled)
 		{
-			m_Connecting = false;
+			ConnectThreadFinish();
 			return;
 		}
 		m_Connected = true;
-		m_ConnectedClientId = LocalClientId;
 		m_ConnectedRoom = m_pRoom->roomInfo().name;
 		m_MetadataClientId = -1;
 		m_ConnectFailures = 0;
@@ -875,9 +1479,6 @@ void CRCVoiceChat::ConnectThread(std::string Url, std::string Token, int LocalCl
 			m_LocalIdentity = Identity;
 		}
 
-		// Not inside an SDK callback, so remoteParticipants() is safe here.
-		m_Delegate.SnapshotParticipants(*m_pRoom);
-
 		// After connect: Room::connect() owns the FFI client while it runs.
 		StartAudioProcessing();
 		try
@@ -887,14 +1488,16 @@ void CRCVoiceChat::ConnectThread(std::string Url, std::string Token, int LocalCl
 				throw std::runtime_error("local participant is unavailable");
 			try
 			{
-				if(pLocal->metadata() != std::to_string(LocalClientId))
-					pLocal->setMetadata(std::to_string(LocalClientId));
+				// Do not read Participant::metadata() here: SDK room events may
+				// update the referenced string concurrently with this worker.
+				pLocal->setMetadata(std::to_string(LocalClientId));
 				m_MetadataClientId = LocalClientId;
 			}
-			catch(const std::exception &)
+			catch(const std::exception &Ex)
 			{
 				m_MetadataClientId = -1;
-				SetLastError("cannot update voice metadata: the token needs can_update_own_metadata");
+				const std::string Error = std::string("could not update voice client id: ") + Ex.what();
+				SetLastError(Error.c_str());
 			}
 			if(!m_Cancelled && m_Connected && m_pMicSource)
 			{
@@ -941,15 +1544,23 @@ void CRCVoiceChat::ConnectThread(std::string Url, std::string Token, int LocalCl
 	}
 	if(m_Cancelled)
 		m_Connected = false;
-	m_Connecting = false;
+	ConnectThreadFinish();
+}
+
+bool CRCVoiceChat::PttActive() const
+{
+	return m_PttHeld || m_PttTail.Active(VoiceNowMs());
 }
 
 void CRCVoiceChat::ApplyMicState()
 {
+	// Cleanup owns the track until FinishReset() reaps its worker.
+	if(m_ResetPending)
+		return;
 	std::lock_guard<std::mutex> Lock(m_MicLock);
 	if(!m_pMicTrack)
 		return;
-	const bool Transmit = m_MicReady && !m_MicFailed && m_Connected && !m_Cancelled && !m_Reconnecting && m_PttHeld && !m_FullMuted;
+	const bool Transmit = m_MicReady && !m_MicFailed && m_Connected && !m_Cancelled && !m_Reconnecting && PttActive() && !m_FullMuted;
 	if(Transmit == m_Transmitting)
 		return;
 	try
@@ -971,17 +1582,60 @@ void CRCVoiceChat::ApplyMicState()
 	}
 }
 
-void CRCVoiceChat::ResetConnection()
+void CRCVoiceChat::RequestReset()
 {
 	m_Cancelled = true;
 	m_PttHeld = false;
+	m_PttTail.Cancel();
 	m_Connected = false;
 	if(m_pTokenRequest)
 		m_pTokenRequest->Abort();
-	if(m_Thread.joinable())
-		m_Thread.join();
+	m_ResetPending = true;
+}
+
+void CRCVoiceChat::FinishReset()
+{
 	m_pTokenRequest.reset();
+	if(m_ResetThread.joinable())
+		m_ResetThread.join();
+	m_Connected = false;
+	m_Reconnecting = false;
+	m_ReconnectingSince = 0.0f;
+	m_ConnectedRoom.clear();
+	m_MetadataClientId = -1;
+	m_MetadataRequestedClientId = -1;
+	m_MetadataRetry.Reset();
+	m_StatsPingMs = -1;
+	m_NextStatsRequest = 0.0f;
+	m_LastPingUpdate = -1.0f;
+	m_PingMs = -1;
+	m_MicrophoneTesting = false;
+	m_MicrophoneTestListen = false;
+	m_MicrophoneTestLevel = 0.0f;
+	m_MicrophoneTestLastVisible = -1.0f;
+	SetAudioError("");
+	m_vParticipants.clear();
+	m_ActiveSpeakerIdentities.clear();
+	m_mClientIds.clear();
+	{
+		std::lock_guard<std::mutex> Lock(m_EventLock);
+		m_vEvents.clear();
+		m_LocalIdentity.clear();
+	}
+	m_ResetPending = false;
+}
+
+void CRCVoiceChat::ReleaseSession()
+{
+	// Setup has finished; stop audio and await SDK workers before destroying
+	// their room. This cleanup runs off the game thread during play.
 	StopAudio();
+	if(m_StatsThread.joinable())
+		m_StatsThread.join();
+	m_StatsBusy = false;
+	if(m_MetadataThread.joinable())
+		m_MetadataThread.join();
+	m_MetadataBusy = false;
 	{
 		std::lock_guard<std::mutex> Lock(m_MicLock);
 		if(m_pMicTrack)
@@ -1011,18 +1665,47 @@ void CRCVoiceChat::ResetConnection()
 		ma_engine_uninit(&m_AudioEngine);
 	m_EngineInitialized = false;
 	m_Delegate.Reset();
-	m_Connected = false;
-	m_Connecting = false;
-	m_Reconnecting = false;
-	m_ConnectedRoom.clear();
-	m_ConnectedClientId = -1;
-	m_MetadataClientId = -1;
 	m_LimiterGain = 1.0f;
-	m_vParticipants.clear();
-	m_mClientIds.clear();
-	std::lock_guard<std::mutex> Lock(m_EventLock);
-	m_vEvents.clear();
-	m_LocalIdentity.clear();
+	m_ResetBusy = false;
+}
+
+void CRCVoiceChat::ConnectThreadFinish()
+{
+	// Publish completion only. Cleanup touches game-thread participant state;
+	// OnUpdate/ResetConnection/OnShutdown joins us before releasing the SDK.
+	m_Connecting = false;
+}
+
+void CRCVoiceChat::ResetConnection()
+{
+	RequestReset();
+	// SDK calls, device shutdown and metadata may block. Only join workers
+	// that have published completion; OnUpdate polls the rest.
+	if(m_Connecting || m_ResetBusy)
+		return;
+	if(m_Thread.joinable())
+		m_Thread.join();
+	if(m_ResetThread.joinable())
+	{
+		FinishReset();
+		return;
+	}
+	if(!m_pRoom && !m_EngineInitialized && !m_BuffersInitialized && !m_AudioThread.joinable() && !m_MetadataThread.joinable() && !m_StatsThread.joinable())
+	{
+		FinishReset();
+		return;
+	}
+	m_StopAudio = true;
+	m_ResetBusy = true;
+	try
+	{
+		m_ResetThread = std::thread(&CRCVoiceChat::ReleaseSession, this);
+	}
+	catch(const std::exception &Ex)
+	{
+		m_ResetBusy = false;
+		SetLastError(Ex.what());
+	}
 }
 
 int CRCVoiceChat::LocalClientId() const
@@ -1039,32 +1722,59 @@ void CRCVoiceChat::UpdateMetadata()
 {
 	if(!m_Connected || m_Cancelled || !m_pRoom)
 		return;
+
+	// Reap the finished worker. Never wait for a running one: setMetadata is a
+	// blocking FFI request and the swap would freeze the frame.
+	if(m_MetadataThread.joinable())
+	{
+		if(m_MetadataBusy)
+			return;
+		m_MetadataThread.join();
+		if(m_MetadataClientId == m_MetadataRequestedClientId)
+			m_MetadataRetry.Reset();
+		else
+			m_MetadataRetry.OnFailure(m_MetadataRequestedClientId, Client()->GlobalTime());
+	}
+
 	const int LocalId = LocalClientId();
-	if(LocalId < 0 || LocalId == m_MetadataClientId)
-		return;
-	// Throttle, a dummy swap switches the player within a frame or two.
-	if(Client()->GlobalTime() < m_LastMetadataSync + 2.0f)
+	if(m_Reconnecting || LocalId < 0 || LocalId == m_MetadataClientId ||
+		!m_MetadataRetry.CanAttempt(LocalId, Client()->GlobalTime()))
 		return;
 
-	m_LastMetadataSync = Client()->GlobalTime();
-	m_MetadataClientId = LocalId;
+	// Successful swaps remain immediate. Only retrying a failed ID is delayed.
+	m_MetadataRequestedClientId = LocalId;
+	m_MetadataBusy = true;
+	try
+	{
+		m_MetadataThread = std::thread(&CRCVoiceChat::MetadataThread, this, LocalId);
+	}
+	catch(const std::exception &Ex)
+	{
+		m_MetadataBusy = false;
+		m_MetadataRetry.OnFailure(LocalId, Client()->GlobalTime());
+		const std::string Error = std::string("could not start voice metadata update: ") + Ex.what();
+		SetLastError(Error.c_str());
+	}
+}
+
+void CRCVoiceChat::MetadataThread(int ClientId)
+{
 	try
 	{
 		auto pLocal = m_pRoom->localParticipant().lock();
 		if(!pLocal)
-		{
-			m_MetadataClientId = -1;
-			return;
-		}
-		pLocal->setMetadata(std::to_string(LocalId));
-		log_trace("voicechat", "voice metadata set to client id %d", LocalId);
+			throw std::runtime_error("local voice participant is unavailable");
+		pLocal->setMetadata(std::to_string(ClientId));
+		m_MetadataClientId = ClientId;
+		log_trace("voicechat", "voice metadata set to client id %d", ClientId);
 	}
 	catch(const std::exception &Ex)
 	{
 		m_MetadataClientId = -1;
-		SetLastError("cannot update voice metadata: the token needs can_update_own_metadata");
-		log_warn("voicechat", "could not update client id metadata: %s", Ex.what());
+		const std::string Error = std::string("could not update voice client id: ") + Ex.what();
+		SetLastError(Error.c_str());
 	}
+	m_MetadataBusy = false;
 }
 
 void CRCVoiceChat::PushEvent(SEvent Event)
@@ -1105,6 +1815,7 @@ void CRCVoiceChat::ProcessEvents()
 						      [&](const SParticipant &P) { return P.m_Identity == Ev.m_Identity; }),
 				m_vParticipants.end());
 			m_mClientIds.erase(Ev.m_Identity);
+			m_ActiveSpeakerIdentities.erase(Ev.m_Identity);
 			break;
 		case EEventType::Snapshot:
 			for(const auto &Identity : Ev.m_vIdentities)
@@ -1119,6 +1830,10 @@ void CRCVoiceChat::ProcessEvents()
 		case EEventType::Disconnected:
 			m_vParticipants.clear();
 			m_mClientIds.clear();
+			m_ActiveSpeakerIdentities.clear();
+			break;
+		case EEventType::ActiveSpeakers:
+			m_ActiveSpeakerIdentities = std::unordered_set<std::string>(Ev.m_vIdentities.begin(), Ev.m_vIdentities.end());
 			break;
 		}
 	}
@@ -1151,11 +1866,20 @@ void CRCVoiceChat::RecordAudioActivity(const std::string &TrackId, const livekit
 		return;
 	std::lock_guard<std::mutex> Lock(m_AudioActivityLock);
 	auto It = m_mAudioActivity.find(TrackId);
-	if(It == m_mAudioActivity.end() || It->second->m_Muted || It->second->m_TargetGains == vec2(0.0f, 0.0f) ||
-		!m_Connected || m_Cancelled || m_Reconnecting || m_StopAudio)
+	if(It == m_mAudioActivity.end() || !m_Connected || m_Cancelled || m_Reconnecting || m_StopAudio)
 		return;
 	auto &Audio = *It->second;
 	const auto Now = std::chrono::steady_clock::now();
+	// Detect activity before local mute/volume filters discard the samples.
+	// Room active-speaker events can arrive noticeably later than the audio.
+	if(!Audio.m_Muted && std::any_of(Frame.data().begin(), Frame.data().end(), [](std::int16_t Sample) { return Sample != 0; }))
+	{
+		if(Now >= Audio.m_SoundUntil)
+			Audio.m_SoundStartedAt = Now;
+		Audio.m_SoundUntil = Now + std::chrono::milliseconds(300);
+	}
+	if(Audio.m_Muted || Audio.m_TargetGains == vec2(0.0f, 0.0f) || m_Deafened)
+		return;
 	if(Now - Audio.m_BufferTime > std::chrono::milliseconds(60))
 		Audio.Clear();
 	Audio.m_BufferTime = Now;
@@ -1184,8 +1908,6 @@ void CRCVoiceChat::RecordAudioActivity(const std::string &TrackId, const livekit
 		if(Count > Available)
 			ReadBuffer(Audio.m_Buffer, nullptr, Count - Available);
 		WriteBuffer(Audio.m_Buffer, aConverted.data(), Count);
-		if(std::any_of(aConverted.begin(), aConverted.begin() + Count, [](float Sample) { return Sample != 0.0f; }))
-			Audio.m_SoundUntil = Now + std::chrono::milliseconds(200);
 		pInput += InputFrames * Channels;
 		Remaining -= InputFrames;
 	}
@@ -1219,11 +1941,7 @@ void CRCVoiceChat::UpdateTalking()
 	const bool Receiving = m_Connected && !m_Reconnecting && !m_Cancelled;
 	const vec2 Listener = VoiceListenerPosition();
 	const int LocalId = LocalClientId();
-	const int FilterMode = std::clamp(g_Config.m_RcVoiceFilterUnpositioned,
-		static_cast<int>(VoiceLogic::POSITION_FILTER_OFF), static_cast<int>(VoiceLogic::POSITION_FILTER_ALL));
-	const bool TeamOnly = g_Config.m_RcVoiceTeamOnly != 0;
-	const int MyTeam = LocalId >= 0 ? GameClient()->m_Teams.Team(LocalId) : -1;
-	const bool MyTeamValid = MyTeam != TEAM_FLOCK && MyTeam != TEAM_SUPER;
+	const int MyTeam = LocalId >= 0 && LocalId < MAX_CLIENTS ? GameClient()->m_Teams.Team(LocalId) : -1;
 
 	std::lock_guard<std::mutex> Lock(m_AudioActivityLock);
 	for(auto &[TrackId, pAudio] : m_mAudioActivity)
@@ -1233,7 +1951,7 @@ void CRCVoiceChat::UpdateTalking()
 		const bool Active = Id >= 0 && Id < MAX_CLIENTS && GameClient()->m_aClients[Id].m_Active;
 		// Server stops sending a character outside the network clip radius.
 		const bool HasPosition = Active && GameClient()->m_Snap.m_aCharacters[Id].m_Active;
-		const vec2 Delta = HasPosition ? GameClient()->m_aClients[Id].m_RenderPos - Listener : vec2(0.0f, 0.0f);
+		const vec2 Delta = HasPosition ? VoicePlayerPosition(GameClient(), Id, Client()->IntraGameTick(g_Config.m_ClDummy)) - Listener : vec2(0.0f, 0.0f);
 
 		// Cached name, so mutes work before the client id is known.
 		if(Active)
@@ -1242,37 +1960,37 @@ void CRCVoiceChat::UpdateTalking()
 		{
 			const auto It = std::find_if(m_vParticipants.begin(), m_vParticipants.end(),
 				[&](const SParticipant &P) { return P.m_Identity == Audio.m_Identity; });
-			Audio.m_Name = It != m_vParticipants.end() ? It->m_Name : std::string();
+			Audio.m_Name = It != m_vParticipants.end() ? ParticipantName(*It) : std::string();
 		}
 
-		// Spectators have no character, so the position filter checks them separately.
+		// Spectators without a character have their own non-spatial volume.
 		const bool IsSpectator = Active && GameClient()->m_aClients[Id].m_Team == TEAM_SPECTATORS;
-		bool TeamMismatch = false;
-		if(TeamOnly && MyTeamValid && Active && !IsSpectator)
-		{
-			const int TheirTeam = GameClient()->m_Teams.Team(Id);
-			TeamMismatch = TheirTeam != TEAM_FLOCK && TheirTeam != TEAM_SUPER && TheirTeam != MyTeam;
-		}
-
 		VoiceLogic::SParticipantMix Mix;
 		Mix.SessionActive = Receiving;
+		Mix.Deafened = m_Deafened;
 		Mix.TrackMuted = Audio.m_Muted;
-		Mix.NameMuted = IsNameMuted(Audio.m_Name.c_str());
+		const auto Settings = UserSettings(Audio.m_Name.c_str());
+		Mix.NameMuted = Settings.m_Muted;
+		Mix.UserVolume = Settings.m_Volume;
 		// -1 means unknown and must not mute everyone.
 		Mix.IsLocal = Id >= 0 && Id == LocalId;
 		Mix.HasPosition = HasPosition;
 		Mix.IsSpectator = IsSpectator;
-		Mix.TeamOnly = TeamOnly;
-		Mix.MyTeamValid = MyTeamValid;
-		Mix.TeamMismatch = TeamMismatch;
-		Mix.FilterMode = FilterMode;
+		Mix.MyTeam = MyTeam;
+		Mix.TheirTeam = Active ? GameClient()->m_Teams.Team(Id) : -1;
+		Mix.SuperTeam = GameClient()->m_Teams.TeamSuper();
+		Mix.OtherTeamVolume = g_Config.m_RcVoiceOtherTeamVolume;
+		Mix.SuperVolume = g_Config.m_RcVoiceSuperVolume;
+		Mix.UnpositionedVolume = g_Config.m_RcVoiceUnpositionedVolume;
+		Mix.SpectatorVolume = g_Config.m_RcVoiceSpectatorVolume;
+		Mix.MasterVolume = g_Config.m_RcVoiceVolume;
 
 		const VoiceLogic::EMuteReason Reason = VoiceLogic::MuteReasonOf(Mix);
 		const bool Mute = Reason != VoiceLogic::MUTE_NONE;
 		Audio.m_MuteReason = Reason;
-		const vec2 Gains = Mute ? vec2(0.0f, 0.0f) : VoiceLogic::VoiceGains(HasPosition, g_Config.m_RcVoiceSpatial, false, Delta,
+		const vec2 Gains = Mute ? vec2(0.0f, 0.0f) : VoiceLogic::VoiceGains(HasPosition, g_Config.m_RcVoiceSpatial, VoiceLogic::ParticipantVolume(Mix), Delta,
 										g_Config.m_RcVoiceMinVolume, g_Config.m_RcVoiceMinRadius, g_Config.m_RcVoiceRadius,
-										g_Config.m_RcVoiceVolume, g_Config.m_RcVoiceStereoWidth, g_Config.m_RcVoiceStereoRadius);
+										g_Config.m_RcVoiceVolume, g_Config.m_RcVoiceStereoWidth, g_Config.m_RcVoiceStereoRadius, VoiceLogic::TeamVolume(Mix), Mix.UserVolume, g_Config.m_RcVoiceStereo);
 		if(Gains == vec2(0.0f, 0.0f) || Audio.m_TargetGains == vec2(0.0f, 0.0f))
 		{
 			Audio.Clear();
@@ -1285,7 +2003,10 @@ void CRCVoiceChat::UpdateTalking()
 	// Roll track reasons up to the participant: first muted track explains it.
 	for(auto &P : m_vParticipants)
 	{
+		const bool WasSpeaking = P.m_Speaking;
+		auto StartedAt = Now;
 		P.m_Talking = false;
+		P.m_Speaking = false;
 		P.m_MuteReason = VoiceLogic::MUTE_NONE;
 		bool HasTrack = false;
 		bool AnyAudible = false;
@@ -1295,6 +2016,12 @@ void CRCVoiceChat::UpdateTalking()
 			if(Activity.m_Identity != P.m_Identity)
 				continue;
 			HasTrack = true;
+			P.m_LastSoundUntil = std::max(P.m_LastSoundUntil, Activity.m_SoundUntil);
+			if(Now < Activity.m_SoundUntil)
+			{
+				P.m_Speaking = true;
+				StartedAt = std::min(StartedAt, Activity.m_SoundStartedAt);
+			}
 			if(Activity.m_MuteReason == VoiceLogic::MUTE_NONE)
 				AnyAudible = true;
 			else if(P.m_MuteReason == VoiceLogic::MUTE_NONE)
@@ -1310,6 +2037,9 @@ void CRCVoiceChat::UpdateTalking()
 			P.m_MuteReason = VoiceLogic::MUTE_NO_TRACK;
 		}
 		P.m_Talking = P.m_Talking && Receiving;
+		P.m_Speaking = P.m_Speaking && Receiving;
+		if(P.m_Speaking && !WasSpeaking)
+			P.m_SpeakingStartedAt = StartedAt;
 	}
 }
 
@@ -1334,7 +2064,7 @@ vec2 CRCVoiceChat::VoiceListenerPosition() const
 	{
 		const int Id = pGame->m_Snap.m_SpecInfo.m_Active ? pGame->m_Snap.m_SpecInfo.m_SpectatorId : LocalClientId();
 		if(Id >= 0 && Id < MAX_CLIENTS && pGame->m_aClients[Id].m_Active && pGame->m_Snap.m_aCharacters[Id].m_Active)
-			return pGame->m_aClients[Id].m_RenderPos;
+			return VoicePlayerPosition(pGame, Id, Client()->IntraGameTick(g_Config.m_ClDummy));
 	}
 	return pGame->m_Camera.m_Center;
 }

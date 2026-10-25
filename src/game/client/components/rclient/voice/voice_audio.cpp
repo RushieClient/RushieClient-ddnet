@@ -107,7 +107,8 @@ CRCVoiceChat::SAudioActivity::~SAudioActivity()
 void CRCVoiceChat::SAudioActivity::Clear()
 {
 	ma_pcm_rb_reset(&m_Buffer);
-	m_SoundUntil = {};
+	// Incoming speech activity survives local playback clears and mutes.
+	m_LastSample = 0.0f;
 	if(m_SourceRate)
 		ma_data_converter_reset(&m_Converter);
 }
@@ -144,7 +145,12 @@ ma_result CRCVoiceChat::ReadTrack(ma_data_source *pSource, void *pOutput, ma_uin
 		const ma_uint32 Read = ReadBuffer(Audio.m_Buffer, aMono.data(), Count);
 		if(Read)
 			Audio.m_LastSample = aMono[Read - 1];
-		std::fill(aMono.begin() + Read, aMono.begin() + Count, Audio.m_LastSample);
+		// Fade an underrun to zero instead of holding a DC sample indefinitely.
+		for(ma_uint32 i = Read; i < Count; ++i)
+		{
+			Audio.m_LastSample *= 0.95f;
+			aMono[i] = Audio.m_LastSample;
+		}
 		ma_channel_converter_process_pcm_frames(&Audio.m_StereoConverter, aStereo.data(), aMono.data(), Count);
 		ma_gainer_process_pcm_frames(&Audio.m_Gainer, aStereo.data(), aStereo.data(), Count);
 		if(pOutput)
@@ -172,7 +178,11 @@ std::string CRCVoiceChat::AudioDeviceId(ma_backend Backend, const ma_device_info
 	case ma_backend_winmm: Size = sizeof(Device.id.winmm); break;
 	case ma_backend_jack: Size = sizeof(Device.id.jack); break;
 	case ma_backend_null: Size = sizeof(Device.id.nullbackend); break;
-	default: Size = std::strlen(reinterpret_cast<const char *>(pId)); break;
+	default:
+		Size = 0;
+		while(Size < sizeof(Device.id) && reinterpret_cast<const char *>(pId)[Size])
+			++Size;
+		break;
 	}
 	char aHash[SHA256_MAXSTRSIZE];
 	sha256_str(sha256(pId, Size), aHash, sizeof(aHash));
@@ -196,7 +206,21 @@ std::vector<CRCVoiceChat::SDevice> CRCVoiceChat::AudioDevices(bool Capture)
 	return vDevices;
 }
 
-void CRCVoiceChat::OpenVoiceDevice(ma_device &Device, const std::string &Id, bool Capture)
+bool CRCVoiceChat::AudioDeviceAvailable(const std::string &Id, bool Capture)
+{
+	std::lock_guard<std::mutex> Lock(m_AudioContextLock);
+	ma_device_info *pOutputs, *pInputs;
+	ma_uint32 Outputs, Inputs;
+	if(Id.empty() || ma_context_get_devices(&m_AudioContext, &pOutputs, &Outputs, &pInputs, &Inputs) != MA_SUCCESS)
+		return false;
+	const ma_device_info *pDevices = Capture ? pInputs : pOutputs;
+	for(ma_uint32 i = 0; i < (Capture ? Inputs : Outputs); ++i)
+		if(Id == AudioDeviceId(m_AudioContext.backend, pDevices[i]) || Id == std::string("sdl:") + pDevices[i].name)
+			return true;
+	return false;
+}
+
+bool CRCVoiceChat::OpenVoiceDevice(ma_device &Device, const std::string &Id, bool Capture)
 {
 	std::lock_guard<std::mutex> Lock(m_AudioContextLock);
 	ma_device_info *pOutputs, *pInputs;
@@ -221,7 +245,7 @@ void CRCVoiceChat::OpenVoiceDevice(ma_device &Device, const std::string &Id, boo
 	Config.sampleRate = 48000;
 	Config.periodSizeInFrames = 480;
 	Config.periods = 2;
-	Config.wasapi.noAutoStreamRouting = MA_TRUE;
+	Config.wasapi.noAutoStreamRouting = pSelected ? MA_TRUE : MA_FALSE;
 	Config.capture.format = Config.playback.format = ma_format_s16;
 	Config.capture.channels = 1;
 	Config.playback.channels = 2;
@@ -231,6 +255,13 @@ void CRCVoiceChat::OpenVoiceDevice(ma_device &Device, const std::string &Id, boo
 	Config.notificationCallback = DeviceNotification;
 	Config.pUserData = this;
 	CheckAudio(ma_device_init(&m_AudioContext, &Config, &Device), Capture ? "open voice microphone" : "open voice output");
+	// Snapshot latency before start: automatic routing may later mutate the
+	// backend's device fields from its own thread.
+	if(Capture)
+		m_CaptureDelayMs = VoiceLogic::DeviceDelayMs(Device.capture.internalPeriodSizeInFrames, Device.capture.internalPeriods, Device.capture.internalSampleRate);
+	else
+		m_OutputDelayMs = VoiceLogic::DeviceDelayMs(Device.playback.internalPeriodSizeInFrames, Device.playback.internalPeriods, Device.playback.internalSampleRate);
+	return !Id.empty() && !pSelected;
 }
 
 void CRCVoiceChat::DeviceCallback(ma_device *pDevice, void *pOutput, const void *pInput, ma_uint32 Frames)
@@ -241,7 +272,7 @@ void CRCVoiceChat::DeviceCallback(ma_device *pDevice, void *pOutput, const void 
 	std::unique_lock<std::mutex> Lock(pVoice->m_DeviceBufferLock, std::try_to_lock);
 	if(!Lock || pVoice->m_StopAudio)
 		return;
-	if(pOutput)
+	if(pOutput && !pVoice->m_OutputFailed)
 		ReadBuffer(pVoice->m_OutputBuffer, pOutput, Frames);
 	if(pInput && !pVoice->m_MicFailed)
 	{
@@ -258,9 +289,25 @@ void CRCVoiceChat::DeviceNotification(const ma_device_notification *pNotificatio
 	if(!pVoice->m_StopAudio && (pNotification->type == ma_device_notification_type_stopped || pNotification->type == ma_device_notification_type_interruption_began))
 	{
 		if(pNotification->pDevice->type == ma_device_type_capture)
+		{
 			pVoice->m_MicFailed = true;
+			pVoice->m_MicReady = false;
+			pVoice->m_PttHeld = false;
+			pVoice->m_PttTail.Cancel();
+		}
 		else
 			pVoice->m_OutputFailed = true;
+	}
+	if(pNotification->type == ma_device_notification_type_rerouted)
+	{
+		if(pNotification->pDevice->type == ma_device_type_capture)
+		{
+			pVoice->m_PttHeld = false;
+			pVoice->m_PttTail.Cancel();
+			++pVoice->m_MicGeneration;
+		}
+		else
+			++pVoice->m_OutputGeneration;
 	}
 }
 
@@ -268,6 +315,10 @@ void CRCVoiceChat::StartAudio(const std::string &MicDevice, const std::string &P
 {
 	m_MicFailed = m_OutputFailed = false;
 	m_MicReady = false;
+	m_SessionMicDevice = MicDevice;
+	m_SessionPlayoutDevice = PlayoutDevice;
+	m_CaptureFallback = m_OutputFallback = false;
+	m_NextAudioRecovery = std::chrono::steady_clock::now() + std::chrono::seconds(2);
 	ma_engine_config Config = ma_engine_config_init();
 	Config.noDevice = MA_TRUE;
 	Config.channels = 2;
@@ -283,52 +334,89 @@ void CRCVoiceChat::StartAudio(const std::string &MicDevice, const std::string &P
 		CheckAudio(CaptureBufferResult, "initialize capture buffer");
 	}
 	m_BuffersInitialized = true;
-	OpenVoiceDevice(m_OutputDevice, PlayoutDevice, false);
-	m_OutputInitialized = true;
-	m_DeviceDelayMs = VoiceLogic::DeviceDelayMs(m_OutputDevice.playback.internalPeriodSizeInFrames, m_OutputDevice.playback.internalPeriods, m_OutputDevice.playback.internalSampleRate);
+	m_StopAudio = false;
 	try
 	{
-		OpenVoiceDevice(m_CaptureDevice, MicDevice, true);
+		m_OutputFallback = OpenVoiceDevice(m_OutputDevice, PlayoutDevice, false);
+		m_OutputInitialized = true;
+		CheckAudio(ma_device_start(&m_OutputDevice), "start voice output");
+	}
+	catch(const std::exception &Ex)
+	{
+		m_OutputFailed = true;
+		SetAudioError(Ex.what());
+		log_warn("voicechat", "audio output unavailable: %s", Ex.what());
+		if(m_OutputInitialized)
+			ma_device_uninit(&m_OutputDevice);
+		m_OutputInitialized = false;
+	}
+	try
+	{
+		m_CaptureFallback = OpenVoiceDevice(m_CaptureDevice, MicDevice, true);
 		m_CaptureInitialized = true;
-		m_DeviceDelayMs += VoiceLogic::DeviceDelayMs(m_CaptureDevice.capture.internalPeriodSizeInFrames, m_CaptureDevice.capture.internalPeriods, m_CaptureDevice.capture.internalSampleRate);
 		CheckAudio(ma_device_start(&m_CaptureDevice), "start voice microphone");
 	}
 	catch(const std::exception &Ex)
 	{
 		m_MicFailed = true;
-		SetLastError(Ex.what());
+		SetAudioError(Ex.what());
 		log_warn("voicechat", "microphone unavailable: %s", Ex.what());
 		if(m_CaptureInitialized)
 			ma_device_uninit(&m_CaptureDevice);
 		m_CaptureInitialized = false;
 	}
-	m_StopAudio = false;
-	CheckAudio(ma_device_start(&m_OutputDevice), "start voice output");
+	UpdateDeviceDelay();
 	// FFI objects follow, Room::connect() owns the client while it runs.
 }
 
-void CRCVoiceChat::StartAudioProcessing()
+void CRCVoiceChat::MicrophoneTestThread(std::string MicDevice, std::string PlayoutDevice)
 {
+	try
+	{
+		StartAudio(MicDevice, PlayoutDevice);
+		if(m_MicFailed)
+			throw std::runtime_error("microphone is unavailable");
+		if(!m_Cancelled)
+		{
+			StartAudioProcessing(true);
+			if(m_MicFailed)
+				throw std::runtime_error("microphone processing is unavailable");
+			StartAudioThread();
+		}
+	}
+	catch(const std::exception &Ex)
+	{
+		m_Cancelled = true;
+		SetLastError(Ex.what());
+	}
+	ConnectThreadFinish();
+}
+
+void CRCVoiceChat::StartAudioProcessing(bool MicrophoneTest)
+{
+	// Keep the published source even when capture is unavailable. A recovered
+	// device feeds the same track without leaving or republishing in the room.
+	if(!MicrophoneTest && !m_pMicSource)
+		m_pMicSource = std::make_shared<livekit::AudioSource>(48000, 1, 0);
 	if(m_MicFailed)
 		return;
 	try
 	{
 		livekit::AudioProcessingModule::Options Options;
-		Options.echo_cancellation = true;
+		// A monitoring test must not try to cancel the voice being monitored.
+		Options.echo_cancellation = !MicrophoneTest;
 		Options.noise_suppression = true;
 		Options.auto_gain_control = true;
 		Options.high_pass_filter = true;
 		m_pAudioProcessing = std::make_unique<livekit::AudioProcessingModule>(Options);
-		m_pMicSource = std::make_shared<livekit::AudioSource>(48000, 1, 0);
 		log_trace("voicechat", "microphone processing ready");
 	}
 	catch(const std::exception &Ex)
 	{
 		m_MicFailed = true;
-		SetLastError(Ex.what());
+		SetAudioError(Ex.what());
 		log_warn("voicechat", "microphone processing unavailable: %s", Ex.what());
 		m_pAudioProcessing.reset();
-		m_pMicSource.reset();
 	}
 }
 
@@ -346,10 +434,12 @@ void CRCVoiceChat::MixAudio(std::int16_t *pOutput)
 		std::lock_guard<std::mutex> Lock(m_AudioActivityLock);
 		const auto Now = std::chrono::steady_clock::now();
 		for(auto &[Id, pAudio] : m_mAudioActivity)
-			if(!m_Connected || m_Cancelled || m_Reconnecting || pAudio->m_Muted || Now - pAudio->m_BufferTime > std::chrono::milliseconds(60))
+			if(!m_Connected || m_Cancelled || m_Reconnecting || m_Deafened || pAudio->m_Muted || Now - pAudio->m_BufferTime > std::chrono::milliseconds(60))
 				pAudio->Clear();
 		CheckAudio(ma_engine_read_pcm_frames(&m_AudioEngine, aMix.data(), 480, nullptr), "mix voice audio");
 	}
+	if(m_Deafened)
+		aMix.fill(0.0f);
 
 	float Peak = 0.0f;
 	for(float Sample : aMix)
@@ -363,8 +453,113 @@ void CRCVoiceChat::MixAudio(std::int16_t *pOutput)
 		m_LimiterGain = std::min(Target, m_LimiterGain + (Target - m_LimiterGain) * 0.05f);
 
 	for(float &Sample : aMix)
-		Sample = std::tanh(Sample * m_LimiterGain);
+		Sample = std::isfinite(Sample) ? std::tanh(Sample * m_LimiterGain) : 0.0f;
 	ma_pcm_f32_to_s16(pOutput, aMix.data(), aMix.size(), ma_dither_mode_none);
+}
+
+void CRCVoiceChat::UpdateDeviceDelay()
+{
+	m_DeviceDelayMs = 0;
+	if(m_OutputInitialized && !m_OutputFailed)
+		m_DeviceDelayMs += m_OutputDelayMs;
+	if(m_CaptureInitialized && !m_MicFailed)
+		m_DeviceDelayMs += m_CaptureDelayMs;
+}
+
+bool CRCVoiceChat::RestoreVoiceDevice(bool Capture)
+{
+	auto &Device = Capture ? m_CaptureDevice : m_OutputDevice;
+	bool &Initialized = Capture ? m_CaptureInitialized : m_OutputInitialized;
+	bool &Fallback = Capture ? m_CaptureFallback : m_OutputFallback;
+	const auto &Id = Capture ? m_SessionMicDevice : m_SessionPlayoutDevice;
+	if(Capture)
+	{
+		m_MicReady = false;
+		m_PttHeld = false;
+		m_PttTail.Cancel();
+		m_pAudioProcessing.reset();
+	}
+	// Device callbacks only publish flags. Stop/init/start must run here,
+	// outside those callbacks and outside the game/render thread.
+	if(Initialized)
+		ma_device_uninit(&Device);
+	Initialized = false;
+	if(m_StopAudio || m_Cancelled)
+		return false;
+	try
+	{
+		Fallback = OpenVoiceDevice(Device, Id, Capture);
+		Initialized = true;
+		{
+			std::lock_guard<std::mutex> Lock(m_DeviceBufferLock);
+			ma_pcm_rb_reset(Capture ? &m_CaptureBuffer : &m_OutputBuffer);
+		}
+		if(Capture)
+		{
+			++m_MicGeneration;
+			m_MicFailed = false;
+			StartAudioProcessing(m_MicrophoneTesting);
+			if(m_MicFailed || !m_pAudioProcessing)
+				throw std::runtime_error("microphone processing unavailable");
+		}
+		else
+		{
+			++m_OutputGeneration;
+			m_OutputFailed = false;
+			std::lock_guard<std::mutex> Lock(m_AudioActivityLock);
+			for(auto &[TrackId, pAudio] : m_mAudioActivity)
+				pAudio->Clear();
+		}
+		UpdateDeviceDelay();
+		CheckAudio(ma_device_start(&Device), Capture ? "restart voice microphone" : "restart voice output");
+		if(Capture)
+		{
+			std::lock_guard<std::mutex> Lock(m_MicLock);
+			m_MicReady = !m_MicrophoneTesting && m_pMicTrack && !m_MicFailed;
+		}
+		log_trace("voicechat", "%s device restored%s", Capture ? "microphone" : "output", Fallback ? " (system default fallback)" : "");
+		return true;
+	}
+	catch(const std::exception &Ex)
+	{
+		if(Capture)
+		{
+			m_MicFailed = true;
+			m_pAudioProcessing.reset();
+		}
+		else
+			m_OutputFailed = true;
+		SetAudioError(Ex.what());
+		log_trace("voicechat", "%s device recovery failed: %s", Capture ? "microphone" : "output", Ex.what());
+		if(Initialized)
+			ma_device_uninit(&Device);
+		Initialized = false;
+		return false;
+	}
+}
+
+void CRCVoiceChat::RecoverAudioDevices()
+{
+	const auto Now = std::chrono::steady_clock::now();
+	if(m_StopAudio || m_Cancelled || Now < m_NextAudioRecovery)
+		return;
+	m_NextAudioRecovery = Now + std::chrono::seconds(2);
+	if(m_OutputInitialized && ma_device_get_state(&m_OutputDevice) != ma_device_state_started)
+		m_OutputFailed = true;
+	if(m_CaptureInitialized && ma_device_get_state(&m_CaptureDevice) != ma_device_state_started)
+	{
+		m_MicFailed = true;
+		m_MicReady = false;
+		m_PttHeld = false;
+		m_PttTail.Cancel();
+	}
+	if(m_OutputFailed || (m_OutputFallback && AudioDeviceAvailable(m_SessionPlayoutDevice, false)))
+		RestoreVoiceDevice(false);
+	if(m_MicFailed || (m_CaptureFallback && AudioDeviceAvailable(m_SessionMicDevice, true)))
+		RestoreVoiceDevice(true);
+	UpdateDeviceDelay();
+	if(!m_MicFailed && !m_OutputFailed)
+		SetAudioError("");
 }
 
 void CRCVoiceChat::AudioThread()
@@ -377,10 +572,9 @@ void CRCVoiceChat::AudioThread()
 		unsigned OutputGeneration = m_OutputGeneration, MicGeneration = m_MicGeneration;
 		while(!m_StopAudio)
 		{
-			if(m_OutputFailed)
-				throw std::runtime_error("voice output device stopped or disconnected");
 			if(m_MicFailed && m_pAudioProcessing)
 				DisableMicrophone("microphone device stopped or disconnected");
+			RecoverAudioDevices();
 			ma_uint32 OutputFrames, CaptureFrames;
 			bool HaveMicrophone = false;
 			{
@@ -397,10 +591,10 @@ void CRCVoiceChat::AudioThread()
 				}
 				OutputFrames = ma_pcm_rb_available_read(&m_OutputBuffer);
 				CaptureFrames = ma_pcm_rb_available_read(&m_CaptureBuffer);
-				if(m_pAudioProcessing && CaptureFrames >= 480)
+				if(m_pAudioProcessing && !m_MicFailed && CaptureFrames >= 480)
 					HaveMicrophone = ReadBuffer(m_CaptureBuffer, Microphone.data().data(), 480) == 480;
 			}
-			if(OutputFrames < 960)
+			if(!m_MicrophoneTesting && !m_OutputFailed && OutputFrames < 960)
 			{
 				MixAudio(aOutput.data());
 				bool Queued = false;
@@ -426,9 +620,27 @@ void CRCVoiceChat::AudioThread()
 			{
 				try
 				{
-					m_pAudioProcessing->setStreamDelayMs(m_DeviceDelayMs + int(OutputFrames + CaptureFrames) / 48);
+					if(!m_MicrophoneTesting)
+						m_pAudioProcessing->setStreamDelayMs(m_DeviceDelayMs + int(OutputFrames + CaptureFrames) / 48);
 					m_pAudioProcessing->processStream(Microphone);
-					if(Transmitting() && !m_Cancelled && MicGeneration == m_MicGeneration)
+					if(m_MicrophoneTesting)
+					{
+						ApplyMicGain(Microphone.data().data(), Microphone.data().size(), m_MicGain.load());
+						m_MicrophoneTestLevel = VoiceLogic::MicrophonePeak(Microphone.data().data(), Microphone.data().size());
+						if(m_MicrophoneTestListen && !m_Cancelled && !m_OutputFailed)
+						{
+							for(size_t i = 0; i < 480; ++i)
+								aOutput[i * 2] = aOutput[i * 2 + 1] = Microphone.data()[i];
+							std::lock_guard<std::mutex> Lock(m_DeviceBufferLock);
+							if(m_MicrophoneTestListen && !m_Cancelled && OutputGeneration == m_OutputGeneration)
+							{
+								if(ma_pcm_rb_available_write(&m_OutputBuffer) < 480)
+									ma_pcm_rb_reset(&m_OutputBuffer);
+								WriteBuffer(m_OutputBuffer, aOutput.data(), 480);
+							}
+						}
+					}
+					else if(Transmitting() && !m_Cancelled && MicGeneration == m_MicGeneration)
 					{
 						ApplyMicGain(Microphone.data().data(), Microphone.data().size(), m_MicGain.load());
 						m_pMicSource->captureFrame(Microphone, 20);
@@ -455,12 +667,15 @@ void CRCVoiceChat::DisableMicrophone(const char *pError)
 {
 	m_MicFailed = true;
 	m_MicReady = false;
+	m_PttHeld = false;
+	m_PttTail.Cancel();
+	m_MicrophoneTestLevel = 0.0f;
 	m_pAudioProcessing.reset();
 	if(m_CaptureInitialized)
 		ma_device_stop(&m_CaptureDevice);
 	std::lock_guard<std::mutex> Lock(m_DeviceBufferLock);
 	ma_pcm_rb_reset(&m_CaptureBuffer);
-	SetLastError(pError);
+	SetAudioError(pError);
 	log_warn("voicechat", "microphone processing failed: %s", pError);
 }
 

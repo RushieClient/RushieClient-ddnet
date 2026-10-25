@@ -107,6 +107,8 @@ namespace FontIcon
 	inline const char *const RC_ANGLES_UP = "\uF102";
 	inline const char *const RC_TWITCH = "\uF1E8";
 	inline const char *const RC_DISCORD = "\uF392";
+	inline const char *const RC_HEADPHONES = "\uF025";
+
 }
 
 #endif

@@ -1570,6 +1570,7 @@ float CRClient::GetScoreboardHeight(bool IsDefaultRender, bool IsBigger, int Cli
 	constexpr float ItemSpacing = 2.0f;
 	constexpr float ButtonHeight = 17.5f;
 	constexpr float QuickActionHeight = 25.0f + ItemSpacing * 2.0f; // height of one quick-action row including spacing
+	constexpr float VoiceControlsHeight = 2.0f * (ButtonHeight + ItemSpacing * 2.0f);
 
 	const int LocalId = GameClient()->m_aLocalIds[g_Config.m_ClDummy];
 	const int LocalTeam = GameClient()->m_Teams.Team(LocalId);
@@ -1598,6 +1599,10 @@ float CRClient::GetScoreboardHeight(bool IsDefaultRender, bool IsBigger, int Cli
 		ScoreboardHeight += QuickActionHeight * 2.0f; // friend/mute/emote + tracker/team/war
 	}
 	ScoreboardHeight += ButtonRows * (ButtonHeight + ItemSpacing * 2.0f);
+	const bool IsLocal = ClientId == GameClient()->m_aLocalIds[0] ||
+			     (Client()->DummyConnected() && ClientId == GameClient()->m_aLocalIds[1]);
+	if(ClientId >= 0 && !IsLocal)
+		ScoreboardHeight += VoiceControlsHeight;
 
 	if(ExtraButtonRows != 0)
 		ScoreboardHeight += ItemSpacing * 4.0f;

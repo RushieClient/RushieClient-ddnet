@@ -183,6 +183,7 @@ void CGameClient::OnConsoleInit()
 					      &m_WarList, // TClient
 					      &m_StatusBar, // TClient
 					      &m_InfoMessages,
+					      &m_RcVoiceChat, // RClient: draw beneath chat input
 					      &m_Chat,
 					      &m_Broadcast,
 					      &m_ImportantAlert,
@@ -192,7 +193,6 @@ void CGameClient::OnConsoleInit()
 					      &m_Scoreboard,
 					      &m_Statboard,
 					      &m_RcAdminPanel, // RClient
-					      &m_RcVoiceChat, // RClient
 					      &m_Motd,
 					      &m_Menus,
 					      &m_Tooltips,
