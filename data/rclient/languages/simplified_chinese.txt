@@ -83,7 +83,7 @@ Enable scoreboard mouse
 
 [RClient]
 Always show quick actions in popup
-== 始终在弹窗中显示快捷操作
+== 在弹窗中显示快捷操作
 
 [RClient]
 Freeze inputs when popup opened
@@ -91,7 +91,7 @@ Freeze inputs when popup opened
 
 [RClient]
 Show friend's heart in scoreboard
-== 在计分板显示好友的红心
+== 在计分板显示好友红心
 
 [RClient]
 Heart size
@@ -127,19 +127,19 @@ Show step effects
 
 [RClient]
 Off
-== 关闭
+== 禁用
 
 [RClient]
 Others
-== 其他人
+== 他人
 
 [RClient]
 Everyone
-== 所有人
+== 全体
 
 [RClient]
 Own
-== 自己
+== 自身
 
 [RClient]
 Remove hammer hit effect
@@ -151,7 +151,7 @@ Default
 
 [RClient]
 Visual
-== 移除视觉
+== 视觉
 
 [RClient]
 Full
@@ -291,7 +291,7 @@ Disable for Chat
 
 [RClient]
 Disable for Edge info
-== 禁止作用在边缘跳信息
+== 禁止作用在边缘信息
 
 [RClient]
 Disable for Info messages
@@ -307,7 +307,7 @@ Above/Below Player
 
 [RClient]
 Notify when above player
-== 当顶部有玩家时通知
+== 当在玩家顶部时通知
 
 [RClient]
 Notify when same pos as player
@@ -315,7 +315,7 @@ Notify when same pos as player
 
 [RClient]
 Notify when below player
-== 当底部有玩家时通知
+== 当在玩家底部时通知
 
 [RClient]
 Text pos x
@@ -331,7 +331,7 @@ Spectator
 
 [RClient]
 Enable spectator movement
-== 启动旁观移动
+== 启用旁观移动
 
 [RClient]
 Spectator Speed
@@ -375,7 +375,7 @@ Show mouse when open chat
 
 [RClient]
 Enable chat scroll
-== 启动聊天滚动
+== 启用聊天滚动
 
 [RClient]
 Show scroll bar
@@ -383,7 +383,7 @@ Show scroll bar
 
 [RClient]
 Enable highlight players in chat
-== 启用战争列表玩家颜色
+== 启用聊天中的高光标记玩家功能
 
 [RClient]
 Chat Filter Mode
@@ -419,19 +419,19 @@ Full Word Replacement
 
 [RClient]
 Filter Chat
-== 聊天过滤器
+== 过滤聊天
 
 [RClient]
 Filter Nameplates
-== 名称栏过滤器
+== 过滤昵称栏
 
 [RClient]
 Filter Scoreboard
-== 计分板过滤器
+== 过滤计分板
 
 [RClient]
 Filter Info messages
-== 信息消息过滤器
+== 过滤信息消息
 
 [RClient]
 Use auto translate
@@ -475,7 +475,7 @@ Google backends
 
 [RClient]
 Nameplates
-== 名称栏
+== 昵称栏
 
 [RClient]
 Hook
@@ -495,7 +495,7 @@ Hook Detection
 
 [RClient]
 All
-== 全部
+== 全体
 
 [RClient]
 Hook size
@@ -503,7 +503,7 @@ Hook size
 
 [RClient]
 Hook shift on invis
-== 固定钩锁图标
+== 使钩锁图标允许偏移
 
 [RClient]
 Fire Detection
@@ -511,11 +511,11 @@ Fire Detection
 
 [RClient]
 Others(*)
-== 其他人(*)
+== 他人(*)
 
 [RClient]
 All(*)
-== 所有人(*)
+== 全体(*)
 
 [RClient]
 Fire size
@@ -523,7 +523,7 @@ Fire size
 
 [RClient]
 Fire shift on invis
-== 固定开火图标
+== 使开火图标允许偏移
 
 [RClient]
 Use preinput for fire
@@ -534,7 +534,7 @@ Use preinput for fire
 
 [RClient]
 Weapons in nameplates
-== 显示武器在名称栏
+== 显示武器在昵称栏
 
 [RClient]
 Weapons size
@@ -570,15 +570,15 @@ NonActive
 
 [RClient]
 Spec
-== 旁观时
+== 在旁观时
 
 [RClient]
 Play sound when moved and window non active
-== 在窗口不活跃时被移动时播放音效
+== 当在窗口未活跃时被移动播放音效
 
 [RClient]
 Choose sound non active
-== 选择不活跃时的音效
+== 选择未活跃时的音效
 
 [RClient]
 Grenade
@@ -590,15 +590,15 @@ Notify when moved in spec
 
 [RClient]
 Play sound when moved in spec
-== 当在旁观时被移动时播放音效
+== 当在旁观时被移动播放音效
 
 [RClient]
 Choose sound in spec
-== 选择音效
+== 选择在旁观时的音效
 
 [RClient]
 Show text when moved in spec
-== 当在旁观时被移动时显示文本
+== 当在旁观时被移动显示文本
 
 [RClient]
 Remove text on any input
@@ -618,11 +618,11 @@ Detect other clients
 
 [RClient]
 Show client type in nameplates
-== 在名称栏显示客户端类型
+== 在昵称栏显示客户端类型
 
 [RClient]
 Only you
-== 只有你
+== 自身
 
 [RClient]
 Show client type in scoreboard
@@ -630,7 +630,7 @@ Show client type in scoreboard
 
 [RClient]
 Icons size in nameplates
-== 图标在名称栏的大小
+== 图标在昵称栏的大小
 
 [RClient]
 Icons size in scoreboard
@@ -650,7 +650,7 @@ Toggle deepfly
 
 [RClient]
 Deepfly on rmb
-== deepfly 作用在右键
+== Deepfly 作用在右键
 
 [RClient]
 Toggle 45 degrees
@@ -678,11 +678,11 @@ Hide window from capture when RCON opened
 
 [RClient]
 Edge info
-== 边缘跳信息
+== 边缘信息
 
 [RClient]
 Toggle Edge info
-== 开关边缘跳信息
+== 开关边缘信息
 
 [RClient]
 Show coordinates info
@@ -694,23 +694,23 @@ Show jump info
 
 [RClient]
 Edge info X pos
-== 边缘跳信息的 X 坐标
+== 边缘信息的 X 坐标
 
 [RClient]
 Edge info Y pos
-== 边缘跳信息的 Y 坐标
+== 边缘信息的 Y 坐标
 
 [RClient]
 Above Freeze color
-== 将落入冻结时的颜色
+== 在冻结上的颜色
 
 [RClient]
 Above Kill color
-== 将落入死亡时的颜色
+== 在死亡上的颜色
 
 [RClient]
 Above Save color
-== 将落入安全时的颜色
+== 在安全上的颜色
 
 [RClient]
 Show checkpoint
@@ -730,7 +730,7 @@ Swap Timer
 
 [RClient]
 Enable swap timer
-== 启动换位计时器
+== 启用换位计时器
 
 [RClient]
 Swap timer on left side
@@ -778,15 +778,15 @@ Show open second client button
 
 [RClient]
 Show Save Count
-== 显示存档数
+== 显示存档
 
 [RClient]
 Sort Scoreboard
-== 排序计分板
+== 计分板的排序
 
 [RClient]
 Sort Spectator
-== 排序旁观者
+== 旁观者模式的排序
 
 [RClient]
 Reset RClient chatbinds
@@ -822,7 +822,7 @@ Name:
 
 [RClient]
 Command:
-== 指令:
+== 命令:
 
 [RClient]
 Override Selected
@@ -838,7 +838,7 @@ Remove Bind
 
 [RClient]
 The command is ran in console not chat
-== 指令会在控制台运行而非聊天栏
+== 命令会在控制台运行而非聊天栏
 
 [RClient]
 Use left mouse to select
@@ -850,11 +850,11 @@ Use right mouse to swap with selected
 
 [RClient]
 Use middle mouse select without copy
-== 使用鼠标中间选择而不复制
+== 使用鼠标中键选择而不复制
 
 [RClient]
 Use %plnick% for replacing with nickname
-== 使用 %plnick% 以替代名称
+== 使用 %plnick% 以替代昵称
 
 [RClient]
 Use %plid% for replacing with client id
@@ -958,7 +958,7 @@ Gun fire volume
 
 [RClient]
 Fix cl_show_others_alpha in spec
-== 修复在旁观中的 cl_show_others_alpha (其他队伍透明度)
+== 修改在旁观中的 cl_show_others_alpha (透明度)
 
 [RClient]
 Confirm
@@ -970,132 +970,186 @@ Deny
 
 [RClient]
 idea from BestClient
-== 
+== idea from BestClient
 
 [RClient]
 by qxdFox/Entity Client
-== 
+== by qxdFox/Entity Client
 
 [RClient]
 Discord RPC
-== 
+== Discord RPC
 
 [RClient]
 Steam
-== 
-
-[RClient]
-Fix language commands
-== 
+== Steam
 
 [RClient]
 *
-== 
+== *
 
 [RClient]
 ^
-== 
+== ^
 
 [RClient]
 ru
-== 
+== ru
 
 [RClient]
 en
-== 
-
-ftapi (not work)
-== 
-
-libretranslate (need key)
-== 
-
-googlegtx (maybe work)
-== 
-
-fedilab (not work)
-== 
-
-bing (works on upd)
-== 
-
-duckduckgo (works on upd))
-== 
+== en
 
 [RClient]
 Send in menu info when inactive
-== 
+== 当在窗口未活跃时显示菜单图标
 
 [RClient]
 Wake up
-== 
+== Wake up
 
 [RClient]
 Tag
-== 
+== Tag
 
 [RClient]
 by +KZ/Kaizo Client
-== 
+== by +KZ/Kaizo Client
 
 [RClient]
 Pseudo fly
-== 
+== Pseudo fly
 
 [RClient]
 Echo 45 degrees
-== 
+== 提示 45 度
 
 [RClient]
 Echo small sens
-== 
+== 提示低灵敏度
 
 [RClient]
 Left jump
-== 
+== 左跳
 
 [RClient]
 Right jump
-== 
+== 右跳
 
 [RClient]
 Only windows
-== 
+== 仅限 windows
 
 [RClient]
 Monitor(win7-11)
-== 
+== Monitor(win7-11)
 
 [RClient]
 Exclude(win10-11)
-== 
+== Exclude(win10-11)
 
 [RClient]
 Hud
-== 
+== Hud
 
 [RClient]
 Set camera to player when try unspec
-== 
+== 当尝试退出 Spec 时重置视角
 
 [RClient]
 File
-== 
+== File
 
 [RClient]
 /load
-== 
+== /load
 
 [RClient]
 Bind Hud Editor
-== 
+== Hud 编辑器
 
 [RClient]
 Continue hook line after hit block
-== 
+== 当钩锁辅助线被物块阻挡时继续显示
 
 [RClient]
 Continue hook line after hit player
+== 当钩锁辅助线被玩家阻挡时继续显示
+
+[RClient]
+Discord
+== Discord
+
+[RClient]
+Website
+== Website
+
+[RClient]
+Github
+== Github
+
+[RClient]
+Name
+== 名称
+
+[RClient]
+Command
+== 命令
+
+[RClient]
+Volume
+== 
+
+[RClient]
+Unmute voice
+== 
+
+[RClient]
+Mute voice
+== 
+
+[RClient]
+Back
+== 
+
+[RClient]
+Voice users
+== 
+
+[RClient]
+Connected
+== 
+
+[RClient]
+Saved
+== 
+
+[RClient]
+No connected users
+== 
+
+[RClient]
+No saved users
+== 
+
+[RClient]
+Select a user
+== 
+
+[RClient]
+Remove
+== 
+
+[RClient]
+Save
+== 
+
+[RClient]
+Allow click on players in /spec
+== 
+
+[RClient]
+Can send spec target pos in !sendpos
 == 
 
 [RClient]
@@ -1123,6 +1177,300 @@ name-team
 == 
 
 [RClient]
+Fix language commands
+== 
+
+ftapi (not work)
+== 
+
+libretranslate (need key)
+== 
+
+googlegtx (maybe work)
+== 
+
+fedilab (not work)
+== 
+
+bing (works on upd)
+== 
+
+duckduckgo (works on upd))
+== 
+
+[RClient]
+Show voice headphones
+== 
+
+[RClient]
+Show ramp * VelX speed
+== 
+
+[RClient]
+Voice chat
+== 
+
+[RClient]
+Full ai vibecoded
+== 
+
+[RClient]
+General
+== 
+
+[RClient]
+Devices
+== 
+
+[RClient]
+Sound
+== 
+
+[RClient]
+Advanced
+== 
+
+[RClient]
+HUD
+== 
+
+[RClient]
+Distance
+== 
+
+[RClient]
+Stereo
+== 
+
+[RClient]
+System default
+== 
+
+[RClient]
+Saved device unavailable (system default)
+== 
+
+[RClient]
+Microphone
+== 
+
+[RClient]
+Speakers / headphones
+== 
+
+[RClient]
+Auto connect on server join
+== 
+
+[RClient]
+Microphone volume (%)
+== 
+
+[RClient]
+Headphone volume (%)
+== 
+
+[RClient]
+Mute my microphone
+== 
+
+[RClient]
+Mute headphones
+== 
+
+[RClient]
+Show voice indicator
+== 
+
+[RClient]
+Show voice status and ping
+== 
+
+[RClient]
+Show voice overlay
+== 
+
+[RClient]
+Show players
+== 
+
+[RClient]
+Speaking
+== 
+
+[RClient]
+Show players muted by me
+== 
+
+[RClient]
+Show player skins
+== 
+
+[RClient]
+Show player direction
+== 
+
+[RClient]
+Background
+== 
+
+[RClient]
+Per player
+== 
+
+[RClient]
+Shared
+== 
+
+[RClient]
+Overlay background
+== 
+
+[RClient]
+Talk (hold)
+== 
+
+[RClient]
+Mic mute
+== 
+
+[RClient]
+Incoming voice mute
+== 
+
+[RClient]
+PTT release delay (ms)
+== 
+
+[RClient]
+Keep sending briefly after releasing the talk key to preserve word endings. 0 disables the delay.
+== 
+
+[RClient]
+Refresh voice devices
+== 
+
+[RClient]
+Device changes apply on next voice connection
+== 
+
+[RClient]
+Disconnect voice to test the microphone
+== 
+
+[RClient]
+Stop microphone test
+== 
+
+[RClient]
+Start microphone test
+== 
+
+[RClient]
+Listen to yourself
+== 
+
+[RClient]
+Microphone level
+== 
+
+[RClient]
+Local playback only. Use headphones.
+== 
+
+[RClient]
+Players without a position (%)
+== 
+
+[RClient]
+Spectator voice volume (%)
+== 
+
+[RClient]
+Other teams voice volume (%)
+== 
+
+[RClient]
+TEAM_SUPER voice volume (%)
+== 
+
+[RClient]
+Fade voice with distance
+== 
+
+[RClient]
+Full volume until (tiles)
+== 
+
+[RClient]
+Nearby voices stay at full volume. Fading starts after this distance.
+== 
+
+[RClient]
+Minimum volume from (tiles)
+== 
+
+[RClient]
+At this distance and farther, voices stay at the minimum volume.
+== 
+
+[RClient]
+Minimum volume (%)
+== 
+
+[RClient]
+Volume of distant players after fading. Set to 0% to mute them.
+== 
+
+[RClient]
+Stereo (left/right)
+== 
+
+[RClient]
+Stereo strength (%)
+== 
+
+[RClient]
+Left/right distance (tiles)
+== 
+
+[RClient]
+Custom room (name@server)
+== 
+
+[RClient]
+Custom room name
+== 
+
+[RClient]
+Empty name uses the game server room
+== 
+
+[RClient]
+Room changes apply on next voice connection
+== 
+
+[RClient]
+Player volume and mute
+== 
+
+[RClient]
+Microphone test active
+== 
+
+[RClient]
+Disconnect voice
+== 
+
+[RClient]
+Cancel connecting
+== 
+
+[RClient]
+Connect voice
+== 
+
+[RClient]
 Auto login rcon on dummy
 == 
 
@@ -1139,18 +1487,6 @@ Play sound on action
 == 
 
 [RClient]
-Discord
-== 
-
-[RClient]
-Website
-== 
-
-[RClient]
-Github
-== 
-
-[RClient]
 Config Files
 == 
 
@@ -1162,16 +1498,47 @@ Integration
 Enable Discord Integration
 == 
 
-[RClient]
-Name
-== 
-
-[RClient]
-Command
+Crash Client
 == 
 
 [RClient]
 RClient \\/
+== 
+
+[RClient]
+Disconnecting...
+== 
+
+[RClient]
+Connecting...
+== 
+
+[RClient]
+Connection queued...
+== 
+
+[RClient]
+Reconnecting...
+== 
+
+[RClient]
+Disconnected
+== 
+
+[RClient]
+Audio output unavailable, retrying...
+== 
+
+[RClient]
+Microphone unavailable, retrying...
+== 
+
+[RClient]
++%d more
+== 
+
+[RClient]
+Voice: off
 == 
 
 [RClient]
@@ -1184,4 +1551,12 @@ Find Skin DDstats
 
 [RClient]
 Copy Skin DDstats
+== 
+
+[RClient]
+Utilities
+== 
+
+[RClient]
+Send your pos
 == 

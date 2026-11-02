@@ -1582,8 +1582,6 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 				Column.HSplitTop(LineSize, &Button, &Column);
 				Ui()->DoScrollbarOption(&g_Config.m_RcVoicePttReleaseDelay, &g_Config.m_RcVoicePttReleaseDelay, &Button, RCLocalize("PTT release delay (ms)", "RClient"), 0, 1000, &CUi::ms_LinearScrollbarScale, 0);
 				GameClient()->m_Tooltips.DoToolTip(&g_Config.m_RcVoicePttReleaseDelay, &Button, RCLocalize("Keep sending briefly after releasing the talk key to preserve word endings. 0 disables the delay.", "RClient"));
-				Column.HSplitTop(LineSize, &Label, &Column);
-				Ui()->DoLabel(&Label, RCLocalize("Connect, then hold the talk key to speak.", "RClient"), EditBoxFontSize, TEXTALIGN_ML);
 			}
 		}
 		else if(s_CurVoiceTab == VOICE_TAB_DEVICES)
@@ -1620,15 +1618,13 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 				else
 					Voice.StartMicrophoneTest();
 			}
-			Column.HSplitTop(LineSize, &Button, &Column);
-			static CButtonContainer s_ListenToMicrophone;
 			if(Testing)
 			{
+				Column.HSplitTop(LineSize, &Button, &Column);
+				static CButtonContainer s_ListenToMicrophone;
 				if(DoButton_CheckBox(&s_ListenToMicrophone, RCLocalize("Listen to yourself", "RClient"), Voice.MicrophoneTestListening(), &Button))
 					Voice.SetMicrophoneTestListening(!Voice.MicrophoneTestListening());
 			}
-			else
-				Ui()->DoLabel(&Button, RCLocalize("Start the test to hear yourself", "RClient"), EditBoxFontSize, TEXTALIGN_ML);
 			Column.HSplitTop(LineSize, &Label, &Column);
 			Ui()->DoLabel(&Label, RCLocalize("Microphone level", "RClient"), FontSize, TEXTALIGN_ML);
 			CUIRect Meter, Fill;
@@ -1650,8 +1646,6 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 			Column.HSplitTop(MarginSmall, nullptr, &Column);
 			if(SubTab == 0)
 			{
-				Column.HSplitTop(LineSize, &Label, &Column);
-				Ui()->DoLabel(&Label, RCLocalize("100% is normal volume; 0% is muted.", "RClient"), EditBoxFontSize, TEXTALIGN_ML);
 				Column.HSplitTop(LineSize, &Button, &Column);
 				Ui()->DoScrollbarOption(&g_Config.m_RcVoiceUnpositionedVolume, &g_Config.m_RcVoiceUnpositionedVolume, &Button, RCLocalize("Players without a position (%)", "RClient"), 0, 200, &CUi::ms_LinearScrollbarScale, 0);
 				Column.HSplitTop(LineSize, &Button, &Column);

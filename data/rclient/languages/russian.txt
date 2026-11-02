@@ -1062,12 +1062,108 @@ Bind Hud Editor
 == Бинд худ едитора
 
 [RClient]
+Continue hook line after hit block
+== Продолжать хуклайн после блока
+
+[RClient]
+Continue hook line after hit player
+== Продолжать хуклайн после игрока
+
+[RClient]
+Microphone volume (%)
+== Громкость микрофона (%)
+
+[RClient]
+Refresh voice devices
+== Обновить список устройств
+
+[RClient]
+System default
+== Системное устройство
+
+[RClient]
+Saved device unavailable (system default)
+== Устройство недоступно (системное)
+
+[RClient]
+Device changes apply on next voice connection
+== Устройства применятся при следующем подключении войсчата
+
+[RClient]
+General
+== Общее
+
+[RClient]
+Devices
+== Устройства
+
+[RClient]
+Volume
+== Громкость
+
+[RClient]
+Distance
+== Дистанция
+
+[RClient]
+Stereo
+== Стерео
+
+[RClient]
+Room changes apply on next voice connection
+== Комната применится при следующем подключении
+
+[RClient]
+Unmute voice
+== Анмут войса
+
+[RClient]
+Mute voice
+== Мут войса
+
+[RClient]
 Rcon
 == 
 
 [RClient]
+Back
+== Назад
+
+[RClient]
+Voice users
+== Войс юзеры
+
+[RClient]
+Connected
+== Подключенные
+
+[RClient]
+Saved
+== Сохраненные
+
+[RClient]
+No connected users
+== Нет подключенных юзеров
+
+[RClient]
+No saved users
+== Нет сохраненных юзеров
+
+[RClient]
+Select a user
+== Выбери юзера
+
+[RClient]
+Remove
+== Удалить
+
+[RClient]
+Save
+== Сохранить
+
+[RClient]
 Popup
-== 
+== Всплывающее меню
 
 [RClient]
 idea from BestClient
@@ -1083,6 +1179,38 @@ Discord RPC
 
 [RClient]
 Steam
+== 
+
+[RClient]
+Allow click on players in /spec
+== Разрешить кликать на игроков в /spec
+
+[RClient]
+Can send spec target pos in !sendpos
+== !sendpos отправляет позицию игрока в спеке
+
+[RClient]
+name-team-score
+== 
+
+[RClient]
+id-team-score
+== 
+
+[RClient]
+id-score
+== 
+
+[RClient]
+id-team
+== 
+
+[RClient]
+id
+== 
+
+[RClient]
+name-team
 == 
 
 [RClient]
@@ -1120,6 +1248,10 @@ duckduckgo (works on upd))
 == 
 
 [RClient]
+Show voice headphones
+== Показывать значок наушников войсчата
+
+[RClient]
 Wake up
 == 
 
@@ -1129,11 +1261,11 @@ by +KZ/Kaizo Client
 
 [RClient]
 Left jump
-== 
+== Прыжок влево
 
 [RClient]
 Right jump
-== 
+== Прыжок вправо
 
 [RClient]
 Monitor(win7-11)
@@ -1144,145 +1276,280 @@ Exclude(win10-11)
 == 
 
 [RClient]
-Continue hook line after hit block
-== Продолжать хуклайн после блока
+Show ramp * VelX speed
+== Показывать скорость ramp * VelX
 
 [RClient]
-Continue hook line after hit player
-== Продолжать хуклайн после игрока
+Voice chat
+== Войсчат
 
 [RClient]
-name-team-score
+Full ai vibecoded
 == 
 
 [RClient]
-id-team-score
-== 
-
-[RClient]
-id-score
-== 
-
-[RClient]
-id-team
-== 
-
-[RClient]
-id
-== 
-
-[RClient]
-name-team
-== 
-
-[RClient]
-RClient \\/
-== 
-
-[RClient]
-Positional voice audio
-== Позиционный голос
-
-[RClient]
-Mute participants without an in-game position
-== Не слышать участников без игровой позиции
-
-[RClient]
-Minimum voice volume
-== Минимальная громкость голоса
-
-[RClient]
-Minimum volume distance (tiles)
-== Расстояние минимальной громкости (тайлы)
-
-[RClient]
-Voice cutoff radius (tiles)
-== Радиус слышимости голоса (тайлы)
-
-[RClient]
-Voice volume (%)
-== Громкость голосов (%)
-
-[RClient]
-Microphone volume (%)
-== Громкость микрофона (%)
-
-[RClient]
-Voice stereo width (%)
-== Ширина стерео голоса (%)
-
-[RClient]
-Voice stereo radius (tiles)
-== Радиус стерео голоса (тайлы)
-
-[RClient]
-Refresh voice devices
-== Обновить список устройств
-
-[RClient]
-System default
-== Системное устройство
-
-[RClient]
-Saved device unavailable (system default)
-== Устройство недоступно (системное)
-
-[RClient]
-Voice microphone
-== Микрофон войсчата
-
-[RClient]
-Voice output device
-== Устройство воспроизведения
-
-[RClient]
-Device changes apply on next voice connection
-== Устройства применятся при следующем подключении войсчата
-
-[RClient]
-General
-== Общее
-
-[RClient]
-Audio
+Sound
 == Звук
 
 [RClient]
-Connection
-== Подключение
+Advanced
+== Дополнительно
 
 [RClient]
-Devices
-== Устройства
+HUD
+== 
 
 [RClient]
-Volume
-== Громкость
+Microphone
+== Микрофон
 
 [RClient]
-Distance
-== Дистанция
+Speakers / headphones
+== Динамики / наушники
 
 [RClient]
-Stereo
-== Стерео
+Auto connect on server join
+== Автоподключение при входе на сервер
 
 [RClient]
-Room
-== Комната
+Headphone volume (%)
+== Громкость наушников (%)
 
 [RClient]
-Access
-== Доступ
+Mute my microphone
+== Отключить мой микрофон
 
 [RClient]
-Room selection requires a token endpoint
-== Для выбора комнаты нужен сервер выдачи токенов
+Mute headphones
+== Отключить звук в наушниках
 
 [RClient]
-Room changes apply on next voice connection
-== Комната применится при следующем подключении
+Show voice indicator
+== Показывать индикатор голоса
 
 [RClient]
-Empty endpoint uses manual URL and token
-== Пустой адрес выдачи токенов — ручные URL и токен
+Show voice status and ping
+== Показывать статус и пинг войсчата
+
+[RClient]
+Show voice overlay
+== Показывать оверлей войсчата
+
+[RClient]
+Show players
+== Показывать игроков
+
+[RClient]
+Speaking
+== Говорящие
+
+[RClient]
+Show players muted by me
+== Показывать игроков, которых я замутил
+
+[RClient]
+Show player skins
+== Показывать скины игроков
+
+[RClient]
+Show player direction
+== Показывать направление на игрока
+
+[RClient]
+Background
+== Фон
+
+[RClient]
+Per player
+== Для каждого игрока
+
+[RClient]
+Shared
+== Общий
+
+[RClient]
+Overlay background
+== Фон оверлея
+
+[RClient]
+Talk (hold)
+== Говорить (удерживать)
+
+[RClient]
+Mic mute
+== Мут микрофона
+
+[RClient]
+Incoming voice mute
+== Мут входящего войса
+
+[RClient]
+PTT release delay (ms)
+== Задержка после отпускания PTT (мс)
+
+[RClient]
+Keep sending briefly after releasing the talk key to preserve word endings. 0 disables the delay.
+== Продолжать передачу после отпускания кнопки разговора, чтобы не обрезать окончания слов. 0 отключает задержку.
+
+[RClient]
+Disconnect voice to test the microphone
+== Отключись от войсчата для проверки микрофона
+
+[RClient]
+Stop microphone test
+== Остановить проверку микрофона
+
+[RClient]
+Start microphone test
+== Начать проверку микрофона
+
+[RClient]
+Listen to yourself
+== Слушать себя
+
+[RClient]
+Microphone level
+== Уровень микрофона
+
+[RClient]
+Local playback only. Use headphones.
+== Звук слышен только тебе. Используй наушники.
+
+[RClient]
+Players without a position (%)
+== Игроки без координат (%)
+
+[RClient]
+Spectator voice volume (%)
+== Громкость голоса спектаторов (%)
+
+[RClient]
+Other teams voice volume (%)
+== Громкость голоса других команд (%)
+
+[RClient]
+TEAM_SUPER voice volume (%)
+== Громкость голоса TEAM_SUPER (%)
+
+[RClient]
+Fade voice with distance
+== Уменьшать громкость с расстоянием
+
+[RClient]
+Full volume until (tiles)
+== Полная громкость до (тайлов)
+
+[RClient]
+Nearby voices stay at full volume. Fading starts after this distance.
+== Голоса рядом слышны на полной громкости. После этого расстояния звук начинает затихать.
+
+[RClient]
+Minimum volume from (tiles)
+== Минимальная громкость от (тайлов)
+
+[RClient]
+At this distance and farther, voices stay at the minimum volume.
+== На этом расстоянии и дальше голоса слышны на минимальной громкости.
+
+[RClient]
+Minimum volume (%)
+== Минимальная громкость (%)
+
+[RClient]
+Volume of distant players after fading. Set to 0% to mute them.
+== Громкость далёких игроков после затухания. Поставь 0%, чтобы их не слышать.
+
+[RClient]
+Stereo (left/right)
+== Стерео (лево/право)
+
+[RClient]
+Stereo strength (%)
+== Сила стерео (%)
+
+[RClient]
+Left/right distance (tiles)
+== Дистанция лево/право (тайлы)
+
+[RClient]
+Custom room (name@server)
+== Своя комната (имя@сервер)
+
+[RClient]
+Custom room name
+== Название своей комнаты
+
+[RClient]
+Empty name uses the game server room
+== Пустое название комната игрового сервера
+
+[RClient]
+Player volume and mute
+== Громкость и мут игроков
+
+[RClient]
+Microphone test active
+== Идёт проверка микрофона
+
+[RClient]
+Disconnect voice
+== Отключиться от войсчата
+
+[RClient]
+Cancel connecting
+== Отменить подключение
+
+[RClient]
+Connect voice
+== Подключиться к войсчату
+
+Crash Client
+== Вызвать сбой клиента
+
+[RClient]
+RClient \\/
+== RClient \\/
+
+[RClient]
+Disconnecting...
+== Отключение...
+
+[RClient]
+Connecting...
+== Подключение...
+
+[RClient]
+Connection queued...
+== Подключение в очереди...
+
+[RClient]
+Reconnecting...
+== Переподключение...
+
+[RClient]
+Disconnected
+== Отключён
+
+[RClient]
+Audio output unavailable, retrying...
+== Аудиовыход недоступен, повторная попытка...
+
+[RClient]
+Microphone unavailable, retrying...
+== Микрофон недоступен, повторная попытка...
+
+[RClient]
++%d more
+== Ещё +%d
+
+[RClient]
+Voice: off
+== Войсчат: выкл
+
+[RClient]
+Utilities
+== Утилиты
+
+[RClient]
+Send your pos
+== Отправить свою позицию
