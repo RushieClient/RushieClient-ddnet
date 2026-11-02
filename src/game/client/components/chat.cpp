@@ -570,12 +570,12 @@ void CChat::EnableMode(int Team)
 			   Client()->State() == IClient::STATE_DEMOPLAYBACK) &&
 			g_Config.m_RcChatShowMouse)
 		{
-			const vec2 OldMousePos = Ui()->MousePos();
+			const vec2 OldMousePos = Ui()->UpdatedMousePos();
 
 			m_MouseUnlocked = true;
 			if(m_LastMousePos == std::nullopt)
 			{
-				SetUiMousePos(Ui()->Screen()->Center());
+				SetUiMousePos(vec2(Graphics()->WindowWidth(), Graphics()->WindowHeight()) / 2.0f);
 			}
 			else
 			{
@@ -1354,6 +1354,7 @@ void CChat::OnRender()
 	if(Client()->State() != IClient::STATE_ONLINE && Client()->State() != IClient::STATE_DEMOPLAYBACK)
 		return;
 
+	const CUi::CScopedScreenAspect AspectScope(Ui(), g_Config.m_RcCustomAspectDisable & RcAspectDisable::CHAT);
 	// send pending chat messages
 	if(m_PendingChatCounter > 0 && m_LastChatSend + time_freq() < time())
 	{
@@ -1370,7 +1371,7 @@ void CChat::OnRender()
 	}
 
 	const float Height = 300.0f;
-	const float Width = Height * (g_Config.m_RcCustomAspectDisable & RcAspectDisable::CHAT ? Graphics()->ScreenAspectReal() : Graphics()->ScreenAspect());
+	const float Width = Height * Ui()->ScreenAspect();
 	if(m_LastRenderWidth != Width)
 	{
 		m_LastRenderWidth = Width;
@@ -1918,26 +1919,23 @@ bool CChat::OnCursorMove(float x, float y, IInput::ECursorType CursorType)
 }
 void CChat::SetUiMousePos(vec2 Pos)
 {
-	const vec2 WindowSize = vec2(Graphics()->WindowWidth(), Graphics()->WindowHeight());
-	const CUIRect *pScreen = Ui()->Screen();
-
 	const vec2 UpdatedMousePos = Ui()->UpdatedMousePos();
-	Pos = Pos / vec2(pScreen->w, pScreen->h) * WindowSize;
 	Ui()->OnCursorMove(Pos.x - UpdatedMousePos.x, Pos.y - UpdatedMousePos.y);
 }
 void CChat::LockMouse()
 {
+	const vec2 OldMousePos = Ui()->UpdatedMousePos();
 	Ui()->ClosePopupMenus();
 	m_MouseUnlocked = false;
 	if(m_LastMousePos == std::nullopt)
 	{
-		SetUiMousePos(Ui()->Screen()->Center());
+		SetUiMousePos(vec2(Graphics()->WindowWidth(), Graphics()->WindowHeight()) / 2.0f);
 	}
 	else
 	{
 		SetUiMousePos(m_LastMousePos.value());
 	}
-	m_LastMousePos = Ui()->MousePos();
+	m_LastMousePos = OldMousePos;
 }
 
 void CChat::OnReset()

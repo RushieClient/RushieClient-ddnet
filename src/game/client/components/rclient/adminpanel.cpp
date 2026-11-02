@@ -300,13 +300,15 @@ void CAdminPanel::OnRender()
 			GameClient()->m_Controls.m_aMousePos[g_Config.m_ClDummy].x += Speed * FrameTime;
 	}
 
+	const CUi::CScopedScreenAspect AspectScope(Ui(), g_Config.m_RcCustomAspectDisable & (RcAspectDisable::ALL | RcAspectDisable::ADMINPANEL));
 	Ui()->StartCheck();
 	Ui()->Update();
 
 	float ClosestDist = 15.0f;
 	m_HoveredPlayerId = -1;
 	const float ScreenHeight = 300.0f;
-	const float ScreenWidth = ScreenHeight * (g_Config.m_RcCustomAspectDisable & RcAspectDisable::ADMINPANEL ? Graphics()->ScreenAspectReal() : Graphics()->ScreenAspect());
+	const float ScreenWidth = ScreenHeight * Ui()->ScreenAspect();
+	Graphics()->MapScreenToSize(ScreenWidth, ScreenHeight);
 	float WorldWidth = 0.0f, WorldHeight = 0.0f;
 	Graphics()->CalcScreenParams(Graphics()->ScreenAspect(), GameClient()->m_Camera.m_Zoom, &WorldWidth, &WorldHeight);
 	const vec2 CameraCenter = GameClient()->m_Camera.m_Center;
@@ -363,7 +365,7 @@ void CAdminPanel::RenderPlayerPanelPopUp()
 	CUIRect Base, Label, ButtonToggle, UpperButton, LowerButton;
 
 	m_PopupHeight = 300.0f;
-	m_PopupWidth = 300.0f * (g_Config.m_RcCustomAspectDisable & RcAspectDisable::ADMINPANEL ? Graphics()->ScreenAspectReal() : Graphics()->ScreenAspect());
+	m_PopupWidth = m_PopupHeight * Ui()->ScreenAspect();
 
 	if(!m_PlayerPopup.m_LastConfirm)
 	{
@@ -879,7 +881,7 @@ void CAdminPanel::RenderPlayerPanelPlayersList()
 	CUIRect Base, Label, OneButton;
 
 	const float ScreenHeight = 300.0f;
-	const float ScreenWidth = ScreenHeight * (g_Config.m_RcCustomAspectDisable & RcAspectDisable::ADMINPANEL ? Graphics()->ScreenAspectReal() : Graphics()->ScreenAspect());
+	const float ScreenWidth = ScreenHeight * Ui()->ScreenAspect();
 
 	Base.h = ScreenHeight / 1.5 - 10.0f;
 	Base.w = 20.0f;

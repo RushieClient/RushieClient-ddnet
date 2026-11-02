@@ -1006,8 +1006,7 @@ void CScoreboard::OnRender()
 		return;
 	}
 
-	Ui()->m_RcForceRealAspect = g_Config.m_RcCustomAspectDisable & RcAspectDisable::SCOREBOARD;
-
+	const CUi::CScopedScreenAspect AspectScope(Ui(), g_Config.m_RcCustomAspectDisable & (RcAspectDisable::ALL | RcAspectDisable::SCOREBOARD));
 	if(!GameClient()->m_Menus.IsActive() && !GameClient()->m_Chat.IsActive())
 	{
 		Ui()->StartCheck();
@@ -1188,7 +1187,6 @@ void CScoreboard::OnRender()
 		Ui()->FinishCheck();
 	}
 
-	Ui()->m_RcForceRealAspect = false;
 }
 
 bool CScoreboard::IsActive() const

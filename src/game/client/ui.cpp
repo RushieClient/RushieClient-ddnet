@@ -454,10 +454,29 @@ float CUi::ButtonColorMul(const void *pId)
 	return ButtonColorMulDefault();
 }
 
+CUi::CScopedScreenAspect::CScopedScreenAspect(CUi *pUi, bool RealAspect) :
+	m_pUi(pUi),
+	m_PreviousAspect(pUi->m_RcScreenAspect)
+{
+	m_pUi->m_RcScreenAspect = RealAspect ? pUi->Graphics()->ScreenAspectReal() : pUi->Graphics()->ScreenAspect();
+}
+
+CUi::CScopedScreenAspect::~CScopedScreenAspect()
+{
+	m_pUi->m_RcScreenAspect = m_PreviousAspect;
+}
+
+float CUi::ScreenAspect() const
+{
+	if(m_RcScreenAspect > 0.0f)
+		return m_RcScreenAspect;
+	return g_Config.m_RcCustomAspectDisable & RcAspectDisable::ALL ? Graphics()->ScreenAspectReal() : Graphics()->ScreenAspect();
+}
+
 const CUIRect *CUi::Screen()
 {
 	m_Screen.h = 600.0f;
-	m_Screen.w = (m_RcForceRealAspect || g_Config.m_RcCustomAspectDisable & RcAspectDisable::ALL ? Graphics()->ScreenAspectReal() : Graphics()->ScreenAspect()) * m_Screen.h;
+	m_Screen.w = m_Screen.h * ScreenAspect();
 	return &m_Screen;
 }
 

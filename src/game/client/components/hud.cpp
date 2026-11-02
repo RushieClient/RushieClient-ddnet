@@ -170,7 +170,7 @@ void CHud::RenderPauseNotification()
 		const char *pText = Localize("Game paused");
 		float FontSize = 20.0f;
 		float w = TextRender()->TextWidth(FontSize, pText, -1, -1.0f);
-		TextRender()->Text(150.0f * Graphics()->ScreenAspect() + -w / 2.0f, 50.0f, FontSize, pText, -1.0f);
+		TextRender()->Text(m_Width / 2.0f - w / 2.0f, 50.0f, FontSize, pText, -1.0f);
 	}
 }
 
@@ -526,7 +526,7 @@ void CHud::RenderWarmupTimer()
 
 	const float FontSize = 20.0f;
 	const char *pTitle = Localize("Warmup");
-	TextRender()->Text(150.0f * Graphics()->ScreenAspect() - TextRender()->TextWidth(FontSize, pTitle) / 2.0f, 50.0f, FontSize, pTitle);
+	TextRender()->Text(m_Width / 2.0f - TextRender()->TextWidth(FontSize, pTitle) / 2.0f, 50.0f, FontSize, pTitle);
 
 	const int Seconds = GameClient()->m_Snap.m_pGameInfoObj->m_WarmupTimer / Client()->GameTickSpeed();
 	char aWarmupTime[16];
@@ -541,7 +541,7 @@ void CHud::RenderWarmupTimer()
 		str_format(aWarmupTime, sizeof(aWarmupTime), "%d", Seconds);
 		TextWidth = TextRender()->TextWidth(FontSize, aWarmupTime);
 	}
-	TextRender()->Text(150.0f * Graphics()->ScreenAspect() - TextWidth / 2.0f, 75.0f, FontSize, aWarmupTime);
+	TextRender()->Text(m_Width / 2.0f - TextWidth / 2.0f, 75.0f, FontSize, aWarmupTime);
 }
 
 void CHud::RenderTextInfo()
@@ -791,7 +791,7 @@ void CHud::RenderConnectionWarning()
 	{
 		const char *pText = Localize("Connection Problems…");
 		float w = TextRender()->TextWidth(24, pText, -1, -1.0f);
-		TextRender()->Text(150 * Graphics()->ScreenAspect() - w / 2, 50, 24, pText, -1.0f);
+		TextRender()->Text(m_Width / 2.0f - w / 2, 50, 24, pText, -1.0f);
 	}
 }
 
@@ -2063,8 +2063,9 @@ void CHud::OnRender()
 
 	if(!GameClient()->m_Snap.m_pGameInfoObj)
 		return;
-	m_Width = 300.0f * (g_Config.m_RcCustomAspectDisable & RcAspectDisable::HUD ? Graphics()->ScreenAspectReal() : Graphics()->ScreenAspect());
+	const CUi::CScopedScreenAspect AspectScope(Ui(), g_Config.m_RcCustomAspectDisable & RcAspectDisable::HUD);
 	m_Height = 300.0f;
+	m_Width = m_Height * Ui()->ScreenAspect();
 	if(m_LastWidth != m_Width)
 	{
 		m_LastWidth = m_Width;
@@ -2199,7 +2200,7 @@ void CHud::RenderDDRaceEffects()
 
 			TextRender()->TextColor(1, 1, 1, Alpha);
 			CTextCursor Cursor;
-			Cursor.SetPosition(vec2(150 * Graphics()->ScreenAspect() - TextRender()->TextWidth(12, aBuf) / 2, 20));
+			Cursor.SetPosition(vec2(m_Width / 2.0f - TextRender()->TextWidth(12, aBuf) / 2, 20));
 			Cursor.m_FontSize = 12.0f;
 			TextRender()->RecreateTextContainer(m_DDRaceEffectsTextContainerIndex, &Cursor, aBuf);
 			if(m_FinishTimeDiff != 0.0f && m_DDRaceEffectsTextContainerIndex.Valid())
@@ -2217,7 +2218,7 @@ void CHud::RenderDDRaceEffects()
 					TextRender()->TextColor(1.0f, 0.5f, 0.5f, Alpha); // red
 				}
 				CTextCursor DiffCursor;
-				DiffCursor.SetPosition(vec2(150 * Graphics()->ScreenAspect() - TextRender()->TextWidth(10, aBuf) / 2, 34));
+				DiffCursor.SetPosition(vec2(m_Width / 2.0f - TextRender()->TextWidth(10, aBuf) / 2, 34));
 				DiffCursor.m_FontSize = 10.0f;
 				TextRender()->AppendTextContainer(m_DDRaceEffectsTextContainerIndex, &DiffCursor, aBuf);
 			}
@@ -2258,7 +2259,7 @@ void CHud::RenderDDRaceEffects()
 				TextRender()->TextColor(1, 1, 1, Alpha); // white
 
 			CTextCursor Cursor;
-			Cursor.SetPosition(vec2(150 * Graphics()->ScreenAspect() - TextRender()->TextWidth(10, aBuf) / 2, 20));
+			Cursor.SetPosition(vec2(m_Width / 2.0f - TextRender()->TextWidth(10, aBuf) / 2, 20));
 			Cursor.m_FontSize = 10.0f;
 			TextRender()->RecreateTextContainer(m_DDRaceEffectsTextContainerIndex, &Cursor, aBuf);
 

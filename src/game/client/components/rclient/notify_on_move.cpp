@@ -148,8 +148,9 @@ void CNotifyOnMove::OnRender()
 				float T = m_SpecNotifyAnim;
 				float Phase = (T < 0.5f) ? (2.0f * T * T) : (1.0f - std::pow(-2.0f * T + 2.0f, 2) / 2.0f);
 
+				const CUi::CScopedScreenAspect AspectScope(Ui(), g_Config.m_RcCustomAspectDisable & RcAspectDisable::NOTIFYINSPEC);
 				float MHeight = 300.0f;
-				float MWidth = MHeight * (g_Config.m_RcCustomAspectDisable & RcAspectDisable::NOTIFYINSPEC ? Graphics()->ScreenAspectReal() : Graphics()->ScreenAspect());
+				float MWidth = MHeight * Ui()->ScreenAspect();
 				Graphics()->MapScreenToSize(MWidth, MHeight);
 				CUIRect NotifyBox;
 				NotifyBox.w = 60.0f;

@@ -272,7 +272,7 @@ void CHudEditor::OnRender()
 	if(!IsActive())
 		return;
 
-	Ui()->m_RcForceRealAspect = true;
+	const CUi::CScopedScreenAspect AspectScope(Ui(), true);
 	Ui()->StartCheck();
 
 	Ui()->m_RcUpdateInputs = false;
@@ -358,7 +358,6 @@ void CHudEditor::OnRender()
 
 	RenderTools()->RenderCursor(Ui()->MousePos(), 24.0f);
 	Ui()->FinishCheck();
-	Ui()->m_RcForceRealAspect = false;
 }
 
 bool CHudEditor::OnInput(const IInput::CEvent &Event)

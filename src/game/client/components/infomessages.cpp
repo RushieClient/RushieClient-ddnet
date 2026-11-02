@@ -457,8 +457,9 @@ void CInfoMessages::OnRender()
 	if(Client()->State() != IClient::STATE_ONLINE && Client()->State() != IClient::STATE_DEMOPLAYBACK)
 		return;
 
+	const CUi::CScopedScreenAspect AspectScope(Ui(), g_Config.m_RcCustomAspectDisable & RcAspectDisable::INFOMESSAGES);
 	const float Height = 1.5f * 400.0f * 3.0f;
-	const float Width = Height * (g_Config.m_RcCustomAspectDisable & RcAspectDisable::INFOMESSAGES ? Graphics()->ScreenAspectReal() : Graphics()->ScreenAspect());
+	const float Width = Height * Ui()->ScreenAspect();
 
 	Graphics()->MapScreenToSize(Width, Height);
 	Graphics()->SetColor(1.0f, 1.0f, 1.0f, 1.0f);

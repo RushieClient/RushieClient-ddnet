@@ -85,6 +85,7 @@ void CEdgeHelper::OnRender()
 	if(!IsActive())
 		return;
 
+	const CUi::CScopedScreenAspect AspectScope(Ui(), g_Config.m_RcCustomAspectDisable & RcAspectDisable::EDGEINFO);
 	RenderEdgeHelper();
 }
 
@@ -93,7 +94,7 @@ void CEdgeHelper::RenderEdgeHelper()
 	CUIRect Base, EdgeInfo, JumpInfo;
 
 	float MHeight = 300.0f;
-	float MWidth = MHeight * (g_Config.m_RcCustomAspectDisable & RcAspectDisable::EDGEINFO ? Graphics()->ScreenAspectReal() : Graphics()->ScreenAspect());
+	float MWidth = MHeight * Ui()->ScreenAspect();
 
 	Base.h = MHeight / (g_Config.m_RcEdgeInfoJump && g_Config.m_RcEdgeInfoCords ? 6 : 12);
 	Base.w = MWidth / 5;

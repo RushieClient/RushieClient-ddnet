@@ -83,7 +83,7 @@ void CAboveBelowPlayer::OnRender()
 	if(!MLinesNum)
 		return;
 
-	Ui()->m_RcForceRealAspect = g_Config.m_RcCustomAspectDisable & RcAspectDisable::NOTIFYINSPEC;
+	const CUi::CScopedScreenAspect AspectScope(Ui(), g_Config.m_RcCustomAspectDisable & (RcAspectDisable::ALL | RcAspectDisable::ABOVEBELOWPL));
 	Ui()->MapScreen();
 	const CUIRect *pScreen = Ui()->Screen();
 	const float LineSize = 20.0f;
@@ -96,7 +96,6 @@ void CAboveBelowPlayer::OnRender()
 	Line.h = LineHeight;
 	Line.x = (pScreen->w - Line.w) * g_Config.m_RcNotifyWhenPosPlayerPosX / 100.0f;
 	Line.y = (pScreen->h - Line.h) * g_Config.m_RcNotifyWhenPosPlayerPosY / 100.0f;
-	Ui()->m_RcForceRealAspect = false;
 
 	if(m_PlayerAbove || m_AboveAnim > m_HideAnim)
 	{

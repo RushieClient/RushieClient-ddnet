@@ -1169,10 +1169,9 @@ bool CGameConsole::DoButton(const CUIRect &Rect, const char *pIcon, vec2 MousePo
 
 void CGameConsole::OnRender()
 {
-	Ui()->m_RcForceRealAspect = g_Config.m_RcCustomAspectDisable & RcAspectDisable::CONSOLE;
+	const CUi::CScopedScreenAspect AspectScope(Ui(), g_Config.m_RcCustomAspectDisable & (RcAspectDisable::ALL | RcAspectDisable::CONSOLE));
 	CUIRect Screen = *Ui()->Screen();
 	CInstance *pConsole = CurrentConsole();
-	Ui()->m_RcForceRealAspect = false;
 
 	const float MaxConsoleHeight = Screen.h * 3 / 5.0f;
 	float Progress = (Client()->GlobalTime() - (m_StateChangeEnd - m_StateChangeDuration)) / m_StateChangeDuration;
@@ -1217,7 +1216,6 @@ void CGameConsole::OnRender()
 	const ColorRGBA aBackgroundColors[NUM_CONSOLETYPES] = {ColorRGBA(0.2f, 0.2f, 0.2f, 0.9f), ColorRGBA(0.4f, 0.2f, 0.2f, 0.9f)};
 	const ColorRGBA aBorderColors[NUM_CONSOLETYPES] = {ColorRGBA(0.1f, 0.1f, 0.1f, 0.9f), ColorRGBA(0.2f, 0.1f, 0.1f, 0.9f)};
 
-	Ui()->m_RcForceRealAspect = g_Config.m_RcCustomAspectDisable & RcAspectDisable::CONSOLE;
 	Ui()->MapScreen();
 
 	// background
@@ -1694,8 +1692,6 @@ void CGameConsole::OnRender()
 		const char *pClientVersion = CLIENT_NAME " " CLIENT_RELEASE_VERSION;
 		TextRender()->Text(ButtonBar.x + ButtonBar.w - TextRender()->TextWidth(FONT_SIZE, pClientVersion) - 10.0f, FONT_SIZE / 2.0f + FONT_SIZE * 1.5f, FONT_SIZE, pClientVersion);
 	}
-
-	Ui()->m_RcForceRealAspect = false;
 }
 
 void CGameConsole::OnMessage(int MsgType, void *pRawMsg)

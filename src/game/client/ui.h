@@ -464,6 +464,7 @@ private:
 	std::function<void()> m_OnBackButtonPressedFunction;
 
 	CUIRect m_Screen;
+	float m_RcScreenAspect = 0.0f;
 
 	std::vector<CUIRect> m_vClips;
 	void UpdateClipping();
@@ -619,12 +620,24 @@ public:
 	constexpr float ButtonColorMulDefault() const { return 1.0f; }
 	float ButtonColorMul(const void *pId);
 
+	float ScreenAspect() const;
 	const CUIRect *Screen();
 	void MapScreen();
 	float PixelSize();
 
 	// RClient
-	bool m_RcForceRealAspect = false;
+	class CScopedScreenAspect
+	{
+		CUi *m_pUi;
+		float m_PreviousAspect;
+
+	public:
+		CScopedScreenAspect(CUi *pUi, bool RealAspect);
+		~CScopedScreenAspect();
+		CScopedScreenAspect(const CScopedScreenAspect &) = delete;
+		CScopedScreenAspect &operator=(const CScopedScreenAspect &) = delete;
+	};
+
 	bool m_RcUpdateInputs = true;
 
 	void ClipEnable(const CUIRect *pRect);
