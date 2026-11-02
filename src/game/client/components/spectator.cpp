@@ -667,7 +667,7 @@ void CSpectator::SpectateClosest()
 	int ClosestDistance = std::numeric_limits<int>::max();
 	for(int ClientId = 0; ClientId < MAX_CLIENTS; ClientId++)
 	{
-		if(ClientId == SpectatorId || !Snap.m_aCharacters[ClientId].m_Active || !Snap.m_apPlayerInfos[ClientId] || Snap.m_apPlayerInfos[ClientId]->m_Team == TEAM_SPECTATORS)
+		if(ClientId == SpectatorId || (!Snap.m_aCharacters[ClientId].m_Active && !g_Config.m_RcSpecClosestInSpec) || !Snap.m_apPlayerInfos[ClientId] || Snap.m_apPlayerInfos[ClientId]->m_Team == TEAM_SPECTATORS)
 			continue;
 
 		if(Client()->State() != IClient::STATE_DEMOPLAYBACK && ClientId == Snap.m_LocalClientId)

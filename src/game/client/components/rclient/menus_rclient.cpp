@@ -783,6 +783,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	DoLine_KeyReader(Column, s_ReaderButtonSpecGoRight, s_ClearButtonSpecGoRight, RCLocalize("Spec go Right", "RClient"), "+rc_spec_go_right");
 	DoLine_KeyReader(Column, s_ReaderButtonSpecGoUp, s_ClearButtonSpecGoUp, RCLocalize("Spec go Up", "RClient"), "+rc_spec_go_up");
 	DoLine_KeyReader(Column, s_ReaderButtonSpecGoDown, s_ClearButtonSpecGoDown, RCLocalize("Spec go Down", "RClient"), "+rc_spec_go_down");
+	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcSpecClosestInSpec, RCLocalize("Allow click on players in /spec", "RClient"), &g_Config.m_RcSpecClosestInSpec, &Column, LineSize);
 
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
 	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;
