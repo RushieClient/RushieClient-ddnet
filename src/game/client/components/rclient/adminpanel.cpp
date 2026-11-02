@@ -277,7 +277,8 @@ bool CAdminPanel::OnInput(const IInput::CEvent &Event)
 	if(m_PlayerPopup.m_Visible && CLineInput::GetActiveInput() != nullptr)
 		Ui()->OnInput(Event);
 
-	return true;
+	return m_PlayerPopup.m_Visible || Event.m_Key == KEY_MOUSE_1 || Event.m_Key == KEY_MOUSE_2 ||
+	       Event.m_Key == KEY_W || Event.m_Key == KEY_A || Event.m_Key == KEY_S || Event.m_Key == KEY_D;
 }
 
 void CAdminPanel::OnRender()
