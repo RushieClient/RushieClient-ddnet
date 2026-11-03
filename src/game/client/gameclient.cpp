@@ -1180,12 +1180,7 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker, int Conn, bool Dumm
 		return;
 	}
 
-	if(MsgId == NETMSGTYPE_SV_CHAT && g_Config.m_RcEnableSwapTimer)
-	{
-		CNetMsg_Sv_Chat *pMsg = (CNetMsg_Sv_Chat *)pRawMsg;
-		if(pMsg->m_ClientId == -1)
-			m_RcSwapTimer.GameClientMessage(MsgId, pRawMsg, Dummy);
-	}
+	m_RcSwapTimer.GameClientMessage(MsgId, pRawMsg, Dummy);
 
 	if(Dummy)
 	{

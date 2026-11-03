@@ -32,11 +32,24 @@ int CSwapTimer::FindClientId(const char *pName) const
 	return ClientId;
 }
 
-void CSwapTimer::AddNewSwapEntry(int FromClientId, int ToClientId)
+void CSwapTimer::AddNewSwapEntry(int FromClientId, int ToClientId, int Delay)
 {
 	if(FromClientId < 0 || ToClientId < 0 || FromClientId == ToClientId)
 		return;
-	m_vSwapList.push_back({FromClientId, ToClientId, Client()->GameTick(0)});
+	for(auto &Swap : m_vSwapList)
+	{
+		if(Swap.m_FromClientId != FromClientId)
+			continue;
+		if(Swap.m_ToClientId == ToClientId)
+		{
+			if(Delay >= 0)
+				Swap.m_Delay = Delay;
+			return;
+		}
+		Swap = {FromClientId, ToClientId, Client()->GameTick(0), Delay >= 0 ? Delay : g_Config.m_SvSaveSwapGamesDelay};
+		return;
+	}
+	m_vSwapList.push_back({FromClientId, ToClientId, Client()->GameTick(0), Delay >= 0 ? Delay : g_Config.m_SvSaveSwapGamesDelay});
 }
 
 void CSwapTimer::RemoveSwapEntryId(int FromClientId, int ToClientId)
@@ -53,17 +66,12 @@ void CSwapTimer::RemoveSwapEntryId(int FromClientId, int ToClientId)
 
 void CSwapTimer::RemoveSwapEntrySwapped(int ToClientId, int FromClientId)
 {
-	const int LocalId0 = GameClient()->m_aLocalIds[0];
-	const int LocalId1 = GameClient()->m_aLocalIds[1];
-	if(ToClientId != LocalId0 && ToClientId != LocalId1 && FromClientId != LocalId0 && FromClientId != LocalId1)
-		return;
 	for(size_t i = 0; i < m_vSwapList.size(); i++)
 	{
-		if((FromClientId == m_vSwapList[i].m_FromClientId && ToClientId == m_vSwapList[i].m_ToClientId) ||
-			(FromClientId == m_vSwapList[i].m_ToClientId && ToClientId == m_vSwapList[i].m_FromClientId))
+		if(FromClientId == m_vSwapList[i].m_FromClientId || ToClientId == m_vSwapList[i].m_FromClientId)
 		{
 			m_vSwapList.erase(m_vSwapList.begin() + i);
-			return;
+			i--;
 		}
 	}
 }
@@ -81,7 +89,7 @@ void CSwapTimer::RemoveSwapEntryIdAll(int ClientId)
 	}
 }
 
-void CSwapTimer::OnMessage(int MsgType, void *pRawMsg)
+void CSwapTimer::GameClientMessage(int MsgType, void *pRawMsg, bool Dummy)
 {
 	if(GameClient()->m_SuppressEvents)
 		return;
@@ -108,17 +116,7 @@ void CSwapTimer::OnMessage(int MsgType, void *pRawMsg)
 		const CNetMsg_Sv_RaceFinish *pMsg = static_cast<CNetMsg_Sv_RaceFinish *>(pRawMsg);
 		RemoveSwapEntryIdAll(pMsg->m_ClientId);
 	}
-}
-
-void CSwapTimer::GameClientMessage(int MsgType, void *pRawMsg, bool Dummy)
-{
-	if(GameClient()->m_SuppressEvents)
-		return;
-
-	if(!g_Config.m_RcEnableSwapTimer)
-		return;
-
-	if(MsgType == NETMSGTYPE_SV_CHAT)
+	else if(MsgType == NETMSGTYPE_SV_CHAT)
 	{
 		CNetMsg_Sv_Chat *pMsg = (CNetMsg_Sv_Chat *)pRawMsg;
 		if(pMsg->m_ClientId == -1)
@@ -134,9 +132,8 @@ void CSwapTimer::GameClientMessage(int MsgType, void *pRawMsg, bool Dummy)
 				char aName[16];
 				str_truncate(aName, sizeof(aName), pMsg->m_pMessage, pStart - pMsg->m_pMessage);
 				int ClientIdName = FindClientId(aName);
-				if((ClientIdName == GameClient()->m_aLocalIds[0] || ClientIdName == GameClient()->m_aLocalIds[1]) && Dummy)
-					return;
-				AddNewSwapEntry(ClientIdName, GameClient()->m_aLocalIds[g_Config.m_ClDummy ^ (int)Dummy]);
+				const int Delay = str_toint(pStart + str_length(" has requested to swap with you. To complete the swap process please wait "));
+				AddNewSwapEntry(ClientIdName, GameClient()->m_aLocalIds[g_Config.m_ClDummy ^ (int)Dummy], Delay);
 			}
 
 			if(str_utf8_find_nocase(pMsg->m_pMessage, "You have requested to swap with "))
@@ -152,9 +149,6 @@ void CSwapTimer::GameClientMessage(int MsgType, void *pRawMsg, bool Dummy)
 				str_truncate(aName, sizeof(aName), pStart + pStartLen, pEnd - pStart - pStartLen);
 
 				int ClientIdName = FindClientId(aName);
-				if((ClientIdName == GameClient()->m_aLocalIds[0] || ClientIdName == GameClient()->m_aLocalIds[1]) && Dummy)
-					return;
-
 				AddNewSwapEntry(GameClient()->m_aLocalIds[g_Config.m_ClDummy ^ (int)Dummy], ClientIdName);
 			}
 
@@ -184,7 +178,6 @@ void CSwapTimer::GameClientMessage(int MsgType, void *pRawMsg, bool Dummy)
 
 				RemoveSwapEntryId(GameClient()->m_aLocalIds[g_Config.m_ClDummy ^ (int)Dummy], FindClientId(aName));
 			}
-			// *** : [D] Voix has swapped with Voix.
 			if(str_utf8_find_nocase(pMsg->m_pMessage, " has swapped with "))
 			{
 				const char *pStart = str_find(pMsg->m_pMessage, " has swapped with ");
@@ -214,6 +207,18 @@ void CSwapTimer::OnRender()
 		return;
 	}
 
+	for(size_t i = 0; i < m_vSwapList.size();)
+	{
+		const auto &Swap = m_vSwapList[i];
+		const int Seconds = (Client()->GameTick(0) - Swap.m_SwapTick) / Client()->GameTickSpeed();
+		if(!GameClient()->m_aClients[Swap.m_FromClientId].m_Active ||
+			!GameClient()->m_aClients[Swap.m_ToClientId].m_Active ||
+			Seconds >= Swap.m_Delay + g_Config.m_SvSwapTimeout)
+			m_vSwapList.erase(m_vSwapList.begin() + i);
+		else
+			i++;
+	}
+
 	if(m_vSwapList.empty())
 		return;
 
@@ -232,30 +237,13 @@ void CSwapTimer::OnRender()
 
 	for(size_t i = 0; i < m_vSwapList.size(); i++)
 	{
-		if(!GameClient()->m_aClients[m_vSwapList[i].m_FromClientId].m_Active)
-		{
-			RemoveSwapEntryIdAll(m_vSwapList[i].m_FromClientId);
-			continue;
-		}
-
-		if(!GameClient()->m_aClients[m_vSwapList[i].m_ToClientId].m_Active)
-		{
-			RemoveSwapEntryIdAll(m_vSwapList[i].m_ToClientId);
-			continue;
-		}
-
 		CUIRect Line;
 		if(i != 0)
 			Base.HSplitBottom(Margin, &Base, nullptr);
 		Base.HSplitBottom(LineSize, &Base, &Line);
 		const int Seconds = (Client()->GameTick(0) - m_vSwapList[i].m_SwapTick) / Client()->GameTickSpeed();
-		const int SwapTime = g_Config.m_SvSaveSwapGamesDelay - Seconds;
-		const int ExpTime = g_Config.m_SvSwapTimeout - Seconds;
-		if(ExpTime < 0.0f)
-		{
-			RemoveSwapEntryId(m_vSwapList[i].m_FromClientId, m_vSwapList[i].m_ToClientId);
-			continue;
-		}
+		const int SwapTime = m_vSwapList[i].m_Delay - Seconds;
+		const int ExpTime = m_vSwapList[i].m_Delay + g_Config.m_SvSwapTimeout - Seconds;
 
 		char aBuf[128];
 		if(SwapTime > 0.0f)

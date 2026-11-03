@@ -9,10 +9,11 @@ class CSwapTimer : public CComponent
 		int m_FromClientId;
 		int m_ToClientId;
 		int m_SwapTick;
+		int m_Delay;
 	};
 	std::vector<SSwapList> m_vSwapList;
 
-	void AddNewSwapEntry(int FromClientId, int ToClientId);
+	void AddNewSwapEntry(int FromClientId, int ToClientId, int Delay = -1);
 	void RemoveSwapEntrySwapped(int ToClientId, int FromClientId);
 	void RemoveSwapEntryId(int FromClientId, int ToClientId);
 	void RemoveSwapEntryIdAll(int ClientId);
@@ -22,11 +23,10 @@ class CSwapTimer : public CComponent
 public:
 	CSwapTimer();
 	int Sizeof() const override { return sizeof(*this); }
-	void OnMessage(int MsgType, void *pRawMsg) override;
 	void OnReset() override;
 	void OnRender() override;
 
 	void GameClientMessage(int MsgType, void *pRawMsg, bool Dummy);
 };
 
-#endif // GAME_CLIENT_COMPONENTS_RCLIENT_SWAPTIMER_H
+#endif
