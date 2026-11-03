@@ -730,6 +730,16 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 		g_Config.m_RcCustomAspectDisable ^= RcAspectDisable::CHAT;
 
 	Column.HSplitTop(LineSize, &Button, &Column);
+	static int s_AspectDisableVoiceIndicator = 0;
+	if(DoButton_CheckBox(&s_AspectDisableVoiceIndicator, RCLocalize("Disable for Voice indicator", "RClient"), g_Config.m_RcCustomAspectDisable & RcAspectDisable::VOICEINDICATOR, &Button))
+		g_Config.m_RcCustomAspectDisable ^= RcAspectDisable::VOICEINDICATOR;
+
+	Column.HSplitTop(LineSize, &Button, &Column);
+	static int s_AspectDisableVoiceOverlay = 0;
+	if(DoButton_CheckBox(&s_AspectDisableVoiceOverlay, RCLocalize("Disable for Voice overlay", "RClient"), g_Config.m_RcCustomAspectDisable & RcAspectDisable::VOICEOVERLAY, &Button))
+		g_Config.m_RcCustomAspectDisable ^= RcAspectDisable::VOICEOVERLAY;
+
+	Column.HSplitTop(LineSize, &Button, &Column);
 	static int s_AspectDisableEdgeinfo = 0;
 	if(DoButton_CheckBox(&s_AspectDisableEdgeinfo, RCLocalize("Disable for Edge info", "RClient"), g_Config.m_RcCustomAspectDisable & RcAspectDisable::EDGEINFO, &Button))
 		g_Config.m_RcCustomAspectDisable ^= RcAspectDisable::EDGEINFO;
@@ -757,10 +767,6 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcNotifyWhenAbovePosPlayer, RCLocalize("Notify when above player", "RClient"), &g_Config.m_RcNotifyWhenAbovePosPlayer, &Column, LineSize);
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcNotifyWhenSamePosPlayer, RCLocalize("Notify when same pos as player", "RClient"), &g_Config.m_RcNotifyWhenSamePosPlayer, &Column, LineSize);
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcNotifyWhenBelowPosPlayer, RCLocalize("Notify when below player", "RClient"), &g_Config.m_RcNotifyWhenBelowPosPlayer, &Column, LineSize);
-	Column.HSplitTop(LineSize, &Button, &Column);
-	Ui()->DoScrollbarOption(&g_Config.m_RcNotifyWhenPosPlayerPosX, &g_Config.m_RcNotifyWhenPosPlayerPosX, &Button, RCLocalize("Text pos x", "RClient"), 0, 100, &CUi::ms_LinearScrollbarScale, 0);
-	Column.HSplitTop(LineSize, &Button, &Column);
-	Ui()->DoScrollbarOption(&g_Config.m_RcNotifyWhenPosPlayerPosY, &g_Config.m_RcNotifyWhenPosPlayerPosY, &Button, RCLocalize("Text pos y", "RClient"), 0, 100, &CUi::ms_LinearScrollbarScale, 0);
 
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
 	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;
@@ -1269,10 +1275,6 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 					{0, 1, 2},
 					g_Config.m_RcSoundOnMoveInSpec);
 				DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcTextOnMoveInSpec, RCLocalize("Show text when moved in spec", "RClient"), &g_Config.m_RcTextOnMoveInSpec, &Column, LineSize);
-				Column.HSplitTop(LineSize, &Button, &Column);
-				Ui()->DoScrollbarOption(&g_Config.m_RcTextOnMoveInSpecPosX, &g_Config.m_RcTextOnMoveInSpecPosX, &Button, RCLocalize("Text pos x", "RClient"), 0, 100, &CUi::ms_LinearScrollbarScale, 0);
-				Column.HSplitTop(LineSize, &Button, &Column);
-				Ui()->DoScrollbarOption(&g_Config.m_RcTextOnMoveInSpecPosY, &g_Config.m_RcTextOnMoveInSpecPosY, &Button, RCLocalize("Text pos y", "RClient"), 0, 100, &CUi::ms_LinearScrollbarScale, 0);
 				DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcTextOnMoveInSpecRemoveOnInput, RCLocalize("Remove text on any input", "RClient"), &g_Config.m_RcTextOnMoveInSpecRemoveOnInput, &Column, LineSize);
 			}
 		}
@@ -1388,10 +1390,6 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	DoLine_KeyReader(Column, s_ReaderButtonEdgeInfo, s_ClearButtonEdgeInfo, RCLocalize("Toggle Edge info", "RClient"), "rc_toggle_edge_info");
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcEdgeInfoCords, RCLocalize("Show coordinates info", "RClient"), &g_Config.m_RcEdgeInfoCords, &Column, LineSize);
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcEdgeInfoJump, RCLocalize("Show jump info", "RClient"), &g_Config.m_RcEdgeInfoJump, &Column, LineSize);
-	Column.HSplitTop(LineSize, &Button, &Column);
-	Ui()->DoScrollbarOption(&g_Config.m_RcEdgeInfoPosX, &g_Config.m_RcEdgeInfoPosX, &Button, RCLocalize("Edge info X pos", "RClient"), 0, 100, &CUi::ms_LinearScrollbarScale, 0);
-	Column.HSplitTop(LineSize, &Button, &Column);
-	Ui()->DoScrollbarOption(&g_Config.m_RcEdgeInfoPosY, &g_Config.m_RcEdgeInfoPosY, &Button, RCLocalize("Edge info Y pos", "RClient"), 0, 100, &CUi::ms_LinearScrollbarScale, 0);
 	static CButtonContainer s_EdgeInfoFreezeColor, s_EdgeInfoKillColor, s_EdgeInfoSafeColor;
 	DoButton_ColorPickerAutoVMargin(&s_EdgeInfoFreezeColor, RCLocalize("Above Freeze color", "RClient"), &g_Config.m_RcEdgeInfoColorFreeze, color_cast<ColorRGBA>(ColorHSLA(DefaultConfig::RcEdgeInfoColorFreeze)), &Column, LineSize, false);
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
@@ -1443,8 +1441,6 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcEnableSwapTimer, RCLocalize("Enable swap timer", "RClient"), &g_Config.m_RcEnableSwapTimer, &Column, LineSize);
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcEnableSwapTimerOnLeftSide, RCLocalize("Swap timer on left side", "RClient"), &g_Config.m_RcEnableSwapTimerOnLeftSide, &Column, LineSize);
-	Column.HSplitTop(LineSize, &Button, &Column);
-	Ui()->DoScrollbarOption(&g_Config.m_RcEnableSwapTimerPosY, &g_Config.m_RcEnableSwapTimerPosY, &Button, RCLocalize("Swap timer pos y", "RClient"), 0, 200, &CUi::ms_LinearScrollbarScale, 0);
 
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
 	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;

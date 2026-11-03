@@ -1045,7 +1045,7 @@ void CChat::OnPrepareLines(float y, float x)
 	int64_t Now = time();
 	float LineWidth = (IsScoreBoardOpen ? std::max(85.0f, FontSize * 85.0f / 6.0f) : g_Config.m_ClChatWidth) - (RealMsgPaddingX * 1.5f) - RealMsgPaddingTee;
 
-	float HeightLimit = IsScoreBoardOpen ? 180.0f : (m_PrevShowChat ? 50.0f : 200.0f) + g_Config.m_RcChatPosY;
+	float HeightLimit = IsScoreBoardOpen ? 180.0f : (m_PrevShowChat ? 50.0f : 200.0f) + GameClient()->m_RcHudEditor.GetElementPosition(CHudEditor::ELEM_CHAT).y;
 	float Begin = x;
 	float TextBegin = Begin + RealMsgPaddingX / 2.0f;
 	int OffsetType = IsScoreBoardOpen ? 1 : 0;
@@ -1379,10 +1379,11 @@ void CChat::OnRender()
 	}
 	Graphics()->MapScreenToSize(Width, Height);
 
-	float x = 5.0f + g_Config.m_RcChatPosX;
+	const ivec2 ChatOffset = GameClient()->m_RcHudEditor.GetElementPosition(CHudEditor::ELEM_CHAT);
+	float x = 5.0f + ChatOffset.x;
 
 	// TClient
-	float y = Height - (20.0f * FontSize() / 6.0f + (g_Config.m_TcStatusBar ? g_Config.m_TcStatusBarHeight : 0.0f)) + g_Config.m_RcChatPosY;
+	float y = Height - (20.0f * FontSize() / 6.0f + (g_Config.m_TcStatusBar ? g_Config.m_TcStatusBarHeight : 0.0f)) + ChatOffset.y;
 	// float y = 300.0f - 20.0f * FontSize() / 6.0f;
 
 	float ScaledFontSize = FontSize() * (8.0f / 6.0f);
@@ -1484,7 +1485,7 @@ void CChat::OnRender()
 	bool IsScoreBoardOpen = GameClient()->m_Scoreboard.IsActive() && (Graphics()->ScreenAspect() > 1.7f); // only assume scoreboard when screen ratio is widescreen(something around 16:9)
 
 	int64_t Now = time();
-	float HeightLimit = IsScoreBoardOpen ? 180.0f : (m_PrevShowChat ? 50.0f : 200.0f) + g_Config.m_RcChatPosY;
+	float HeightLimit = IsScoreBoardOpen ? 180.0f : (m_PrevShowChat ? 50.0f : 200.0f) + ChatOffset.y;
 	int OffsetType = IsScoreBoardOpen ? 1 : 0;
 
 	float RealMsgPaddingX = MessagePaddingX();

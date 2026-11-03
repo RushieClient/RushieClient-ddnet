@@ -98,8 +98,9 @@ void CEdgeHelper::RenderEdgeHelper()
 
 	Base.h = MHeight / (g_Config.m_RcEdgeInfoJump && g_Config.m_RcEdgeInfoCords ? 6 : 12);
 	Base.w = MWidth / 5;
-	Base.x = (MWidth - Base.w) * (g_Config.m_RcEdgeInfoPosX / 100.0f);
-	Base.y = (MHeight - Base.h) * (g_Config.m_RcEdgeInfoPosY / 100.0f);
+	const ivec2 Offset = GameClient()->m_RcHudEditor.GetElementPosition(CHudEditor::ELEM_EDGEINFO);
+	Base.x = (MWidth - Base.w) * 0.5f + Offset.x;
+	Base.y = (MHeight - Base.h) * 0.75f + Offset.y;
 
 	Graphics()->MapScreenToSize(MWidth, MHeight);
 

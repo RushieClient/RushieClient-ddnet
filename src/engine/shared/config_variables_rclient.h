@@ -66,8 +66,6 @@ MACRO_CONFIG_COL(RcEdgeInfoColorKill, rc_edge_info_color_kill, 65461, CFGFLAG_CL
 MACRO_CONFIG_COL(RcEdgeInfoColorSafe, rc_edge_info_color_safe, 5594535, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Safe color in edge info")
 MACRO_CONFIG_INT(RcEdgeInfoCords, rc_edge_info_cords, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show upper panel of edge info")
 MACRO_CONFIG_INT(RcEdgeInfoJump, rc_edge_info_jump, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show lower panel of edge info")
-MACRO_CONFIG_INT(RcEdgeInfoPosX, rc_edge_info_pos_x, 50, 0, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Change edge info pos x")
-MACRO_CONFIG_INT(RcEdgeInfoPosY, rc_edge_info_pos_y, 75, 0, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Change edge info pos y")
 
 // Hud
 MACRO_CONFIG_INT(RcShowhudPlayerCheckpoint, rc_showhud_player_checkpoint, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show checkpoint in hud")
@@ -120,8 +118,6 @@ MACRO_CONFIG_INT(RcNotifyOnMoveInSpec, rc_notify_on_move_in_spec, 0, 0, 1, CFGFL
 MACRO_CONFIG_INT(RcTextOnMoveInSpec, rc_text_on_move_in_spec, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show text when someone moves u when u spectate")
 MACRO_CONFIG_INT(RcPlayOnMoveInSpec, rc_play_on_move_in_spec, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Play sound when someone moves u when u spectate")
 MACRO_CONFIG_INT(RcSoundOnMoveInSpec, rc_sound_on_move_in_spec, 0, 0, 2, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Choose sound when spectate (0-WakeUp, 1-Grenade boom, 2-msg tag")
-MACRO_CONFIG_INT(RcTextOnMoveInSpecPosX, rc_text_on_move_in_spec_pos_x, 50, 0, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show text when someone moves u when u spectate")
-MACRO_CONFIG_INT(RcTextOnMoveInSpecPosY, rc_text_on_move_in_spec_pos_y, 50, 0, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show text when someone moves u when u spectate")
 MACRO_CONFIG_INT(RcTextOnMoveInSpecRemoveOnInput, rc_text_on_move_in_spec_remove_on_input, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Remove text in spec when any input")
 MACRO_CONFIG_INT(RcSendInMenuInfoWhenInactive, rc_send_in_menu_info_when_inactive, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Remove text in spec when any input")
 
@@ -163,8 +159,6 @@ MACRO_CONFIG_INT(RcSpecClosestInSpec, rc_spec_closest_in_spec, 0, 0, 1, CFGFLAG_
 MACRO_CONFIG_INT(RcNotifyWhenAbovePosPlayer, rc_notify_when_above_pos_player, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Appear text that u above player")
 MACRO_CONFIG_INT(RcNotifyWhenSamePosPlayer, rc_notify_when_same_pos_player, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Appear text that u same pos player")
 MACRO_CONFIG_INT(RcNotifyWhenBelowPosPlayer, rc_notify_when_below_pos_player, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Appear text that u below player")
-MACRO_CONFIG_INT(RcNotifyWhenPosPlayerPosX, rc_notify_when_pos_player_pos_x, 50, 0, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Appear text when u above/same/below pos player")
-MACRO_CONFIG_INT(RcNotifyWhenPosPlayerPosY, rc_notify_when_pos_player_pos_y, 75, 0, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Appear text when u above/same/below pos player")
 
 // Helping features
 MACRO_CONFIG_INT(RcAutoLockTeam, rc_auto_lock_team, 0, 0, 2, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Auto lock team when join(1-Empty, 2-Any)")
@@ -178,7 +172,6 @@ MACRO_CONFIG_INT(RcSpectatorSortId, rc_spectator_sort_id, 0, 0, 2, CFGFLAG_CLIEN
 //Swap Timer
 MACRO_CONFIG_INT(RcEnableSwapTimer, rc_enable_swap_timer, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Enable swap timer")
 MACRO_CONFIG_INT(RcEnableSwapTimerOnLeftSide, rc_enable_swap_timer_on_left_side, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Swap timer on left side")
-MACRO_CONFIG_INT(RcEnableSwapTimerPosY, rc_enable_swap_timer_pos_y, 50, 0, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Swap timer y")
 
 // Recharge Bars
 MACRO_CONFIG_INT(RcShowRechargeBars, rc_show_recharge_bars, 0, 0, 1, CFGFLAG_SAVE | CFGFLAG_CLIENT, "Show weapon cooldown bars")
@@ -207,28 +200,6 @@ MACRO_CONFIG_INT(RcEnableHighlightChat, rc_enable_highlight_chat, 1, 0, 1, CFGFL
 
 // Weapon Slots
 MACRO_CONFIG_INT(RcWeaponSlots, rc_weapon_slots, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Slots for weapons")
-
-// Hud Editor
-MACRO_CONFIG_INT(RcHudTimerPosX, rc_hud_timer_pos_x, 0, -600, 600, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Game timer X offset in HUD units from center")
-MACRO_CONFIG_INT(RcHudTimerPosY, rc_hud_timer_pos_y, 0, -600, 600, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Game timer Y position in HUD units from top")
-MACRO_CONFIG_INT(RcHudSpectatorCountPosX, rc_hud_spectator_count_pos_x, 0, -600, 600, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Game timer X offset in HUD units from center")
-MACRO_CONFIG_INT(RcHudSpectatorCountPosY, rc_hud_spectator_count_pos_y, 0, -600, 600, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Game timer Y position in HUD units from top")
-MACRO_CONFIG_INT(RcHudDummyActionsPosX, rc_hud_dummy_actions_pos_x, 0, -600, 600, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Game timer X offset in HUD units from center")
-MACRO_CONFIG_INT(RcHudDummyActionsPosY, rc_hud_dummy_actions_pos_y, 0, -600, 600, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Game timer Y position in HUD units from top")
-MACRO_CONFIG_INT(RcHudPlayerMovementPosX, rc_hud_player_movement_pos_x, 0, -600, 600, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Game timer X offset in HUD units from center")
-MACRO_CONFIG_INT(RcHudPlayerMovementPosY, rc_hud_player_movement_pos_y, 0, -600, 600, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Game timer Y position in HUD units from top")
-MACRO_CONFIG_INT(RcHudPlayerStatePosX, rc_hud_player_state_pos_x, 0, -600, 600, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Player state X offset in HUD units from left")
-MACRO_CONFIG_INT(RcHudPlayerStatePosY, rc_hud_player_state_pos_y, 0, -600, 600, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Player state Y offset in HUD units from top")
-MACRO_CONFIG_INT(RcHudFrozenHudPosX, rc_hud_frozen_hud_pos_x, 0, -600, 600, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Player state X offset in HUD units from left")
-MACRO_CONFIG_INT(RcHudFrozenHudPosY, rc_hud_frozen_hud_pos_y, 0, -600, 600, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Player state Y offset in HUD units from top")
-MACRO_CONFIG_INT(RcHudFrozenTextPosX, rc_hud_frozen_text_pos_x, 0, -600, 600, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Player state X offset in HUD units from left")
-MACRO_CONFIG_INT(RcHudFrozenTextPosY, rc_hud_frozen_text_pos_y, 0, -600, 600, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Player state Y offset in HUD units from top")
-MACRO_CONFIG_INT(RcHudFpsTextPosX, rc_hud_fps_text_pos_x, 0, -600, 600, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Player state X offset in HUD units from left")
-MACRO_CONFIG_INT(RcHudFpsTextPosY, rc_hud_fps_text_pos_y, 0, -600, 600, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Player state Y offset in HUD units from top")
-MACRO_CONFIG_INT(RcHudLastTextPosX, rc_hud_last_text_pos_x, 0, -600, 600, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Player state X offset in HUD units from left")
-MACRO_CONFIG_INT(RcHudLastTextPosY, rc_hud_last_text_pos_y, 0, -600, 600, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Player state Y offset in HUD units from top")
-MACRO_CONFIG_INT(RcChatPosX, rc_chat_pos_x, 0, -600, 600, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Chat X position in HUD units from left")
-MACRO_CONFIG_INT(RcChatPosY, rc_chat_pos_y, 0, -600, 600, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Chat Y offset in HUD units from bottom")
 
 // Hook Coll
 MACRO_CONFIG_INT(RcContinueHookLine, rc_continue_hook_line, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Continue hookline after hit")

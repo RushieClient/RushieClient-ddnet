@@ -751,7 +751,8 @@ static void StripStr(const char *pIn, char *pOut, const char *pEnd)
 
 void CTClient::RenderMiniVoteHud()
 {
-	CUIRect View = {0.0f, 60.0f, 70.0f, 35.0f};
+	const ivec2 Offset = GameClient()->m_RcHudEditor.GetElementPosition(CHudEditor::ELEM_VOTING);
+	CUIRect View = {(float)Offset.x, 60.0f + Offset.y, 70.0f, 35.0f};
 	View.Draw(ColorRGBA(0.0f, 0.0f, 0.0f, 0.4f), IGraphics::CORNER_R, 3.0f);
 	View.Margin(3.0f, &View);
 

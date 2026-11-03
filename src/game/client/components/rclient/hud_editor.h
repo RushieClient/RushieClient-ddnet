@@ -8,9 +8,8 @@
 
 class CHudEditor : public CComponent
 {
-	static void ConToggleHudEditor(IConsole::IResult *pResult, void *pUserData);
-
-	enum
+public:
+	enum EElement
 	{
 		ELEM_NONE = -1,
 		ELEM_CHAT,
@@ -23,8 +22,21 @@ class CHudEditor : public CComponent
 		ELEM_FROZENTEXT,
 		ELEM_FPSTEXT,
 		ELEM_LASTTEXT,
+		ELEM_VOICEINDICATOR,
+		ELEM_VOICEOVERLAY,
+		ELEM_VOTING,
+		ELEM_ABOVEBELOW,
+		ELEM_NOTIFYONMOVE,
+		ELEM_EDGEINFO,
+		ELEM_SWAPTIMER,
 		ELEM_COUNT,
 	};
+
+private:
+	static void ConToggleHudEditor(IConsole::IResult *pResult, void *pUserData);
+	static void ConHudPos(IConsole::IResult *pResult, void *pUserData);
+	static void ConHudReset(IConsole::IResult *pResult, void *pUserData);
+	static void ConfigSaveCallback(class IConfigManager *pConfigManager, void *pUserData);
 
 	// To add a new element: add an ELEM_ index, one entry to m_aElements in
 	// the constructor and a position computation in ComputeElementBox().
@@ -32,8 +44,8 @@ class CHudEditor : public CComponent
 	struct SElement
 	{
 		const char *m_pName;
-		int *m_pConfigX = nullptr;
-		int *m_pConfigY = nullptr;
+		const char *m_pId;
+		ivec2 m_Position = ivec2(0, 0);
 	};
 
 	SElement m_aElements[ELEM_COUNT];
@@ -42,6 +54,9 @@ class CHudEditor : public CComponent
 
 	void ComputeElementBox(int Idx);
 	void RenderElementSettings(int Idx);
+	int FindElement(const char *pId) const;
+	void SetElementPosition(int Idx, ivec2 Position);
+	void PrintElementPosition(int Idx) const;
 
 	std::optional<vec2> m_LastMousePos;
 	void SetUiMousePos(vec2 Pos);
@@ -70,6 +85,7 @@ public:
 
 	void SetActive(bool Active);
 	bool IsActive() const { return m_Active; }
+	ivec2 GetElementPosition(EElement Element) const { return m_aElements[Element].m_Position; }
 };
 
 #endif // GAME_CLIENT_COMPONENTS_RCLIENT_HUD_EDITOR_H

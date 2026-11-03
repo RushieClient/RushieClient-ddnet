@@ -325,14 +325,15 @@ void CRCVoiceChat::RenderStatusHud()
 		GameClient()->m_Chat.IsActive() || m_MicrophoneTesting)
 		return;
 
-	// Match the chat input's coordinates. This component renders before chat.
+	const CUi::CScopedScreenAspect AspectScope(Ui(), g_Config.m_RcCustomAspectDisable & RcAspectDisable::VOICEINDICATOR);
 	const float Height = 300.0f;
-	const float Width = Height * (g_Config.m_RcCustomAspectDisable & RcAspectDisable::CHAT ? Graphics()->ScreenAspectReal() : Graphics()->ScreenAspect());
+	const float Width = Height * Ui()->ScreenAspect();
 	Graphics()->MapScreenToSize(Width, Height);
 	const float FontSize = GameClient()->m_Chat.FontSize();
 	const float Size = FontSize;
-	const float X = 5.0f + g_Config.m_RcChatPosX;
-	const float Y = Height - (20.0f * FontSize / 6.0f + (g_Config.m_TcStatusBar ? g_Config.m_TcStatusBarHeight : 0.0f)) + g_Config.m_RcChatPosY;
+	const ivec2 Offset = GameClient()->m_RcHudEditor.GetElementPosition(CHudEditor::ELEM_VOICEINDICATOR);
+	const float X = 5.0f + Offset.x;
+	const float Y = Height - (20.0f * FontSize / 6.0f + (g_Config.m_TcStatusBar ? g_Config.m_TcStatusBarHeight : 0.0f)) + Offset.y;
 	const bool Ready = m_Connected && !m_Reconnecting && !m_ResetPending && m_MicReady && !m_MicFailed;
 	const bool Muted = g_Config.m_RcVoiceMuted != 0;
 	ColorRGBA Color = Ready ? ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f) : ColorRGBA(0.6f, 0.6f, 0.6f, 1.0f);
@@ -428,10 +429,12 @@ void CRCVoiceChat::RenderParticipantsOverlay()
 			return false;
 		return A.m_Identity < B.m_Identity;
 	});
+	const CUi::CScopedScreenAspect AspectScope(Ui(), g_Config.m_RcCustomAspectDisable & RcAspectDisable::VOICEOVERLAY);
 	const float Height = 300.0f;
-	Graphics()->MapScreenToSize(Height * Graphics()->ScreenAspect(), Height);
-	const float X = 5.0f;
-	float Y = 90.0f;
+	Graphics()->MapScreenToSize(Height * Ui()->ScreenAspect(), Height);
+	const ivec2 Offset = GameClient()->m_RcHudEditor.GetElementPosition(CHudEditor::ELEM_VOICEOVERLAY);
+	const float X = 5.0f + Offset.x;
+	float Y = 90.0f + Offset.y;
 	constexpr float Scale = 0.6f;
 	const float RowHeight = 16.0f * Scale;
 	const float FontSize = 7.0f * Scale;

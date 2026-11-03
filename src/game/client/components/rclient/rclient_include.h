@@ -17,6 +17,8 @@ namespace RcAspectDisable
 		ADMINPANEL = 1 << 9,
 		NOTIFYINSPEC = 1 << 10,
 		ABOVEBELOWPL = 1 << 11,
+		VOICEINDICATOR = 1 << 12,
+		VOICEOVERLAY = 1 << 13,
 	};
 }
 

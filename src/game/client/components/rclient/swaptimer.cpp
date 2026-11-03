@@ -226,8 +226,9 @@ void CSwapTimer::OnRender()
 	CUIRect Base;
 	Base.w = Screen.w / 4.0f;
 	Base.h = 12.0f * SwapSize;
-	Base.x = g_Config.m_RcEnableSwapTimerOnLeftSide ? 0.0f : (Screen.w - Base.w);
-	Base.y = (Screen.h - Base.h) * g_Config.m_RcEnableSwapTimerPosY / 100.0f;
+	const ivec2 Offset = GameClient()->m_RcHudEditor.GetElementPosition(CHudEditor::ELEM_SWAPTIMER);
+	Base.x = (g_Config.m_RcEnableSwapTimerOnLeftSide ? 0.0f : (Screen.w - Base.w)) + Offset.x * 2.0f;
+	Base.y = (Screen.h - Base.h) * 0.5f + Offset.y * 2.0f;
 
 	for(size_t i = 0; i < m_vSwapList.size(); i++)
 	{

@@ -2,39 +2,127 @@
 
 #include "rclient_include.h"
 
+#include <base/log.h>
 #include <base/time.h>
 
+#include <engine/config.h>
 #include <engine/console.h>
 #include <engine/graphics.h>
 #include <engine/shared/config.h>
 
 #include <game/client/gameclient.h>
 
+#include <algorithm>
+
 namespace
 {
 	constexpr float BOX_WIDTH = 60.0f;
 	constexpr float BOX_HEIGHT = 14.0f;
 	constexpr float SMALL_MARGIN = 2.0f;
+	constexpr int MIN_OFFSET = -600;
+	constexpr int MAX_OFFSET = 600;
 }
 
 CHudEditor::CHudEditor()
 {
-	m_aElements[ELEM_CHAT] = {"Chat", &g_Config.m_RcChatPosX, &g_Config.m_RcChatPosY};
-	m_aElements[ELEM_HUDTIMER] = {"Hud Timer", &g_Config.m_RcHudTimerPosX, &g_Config.m_RcHudTimerPosY};
-	m_aElements[ELEM_DUMACTIONS] = {"DumActions", &g_Config.m_RcHudDummyActionsPosX, &g_Config.m_RcHudDummyActionsPosY};
-	m_aElements[ELEM_PLPOS] = {"Pl Pos", &g_Config.m_RcHudPlayerMovementPosX, &g_Config.m_RcHudPlayerMovementPosY};
-	m_aElements[ELEM_SPECCOUNT] = {"SpecCount", &g_Config.m_RcHudSpectatorCountPosX, &g_Config.m_RcHudSpectatorCountPosY};
-	m_aElements[ELEM_PLAYERSTATE] = {"PlayerState", &g_Config.m_RcHudPlayerStatePosX, &g_Config.m_RcHudPlayerStatePosY};
-	m_aElements[ELEM_FROZENHUD] = {"FrozenHud", &g_Config.m_RcHudFrozenHudPosX, &g_Config.m_RcHudFrozenHudPosY};
-	m_aElements[ELEM_FROZENTEXT] = {"FrozenText", &g_Config.m_RcHudFrozenTextPosX, &g_Config.m_RcHudFrozenTextPosY};
-	m_aElements[ELEM_FPSTEXT] = {"FpsText", &g_Config.m_RcHudFpsTextPosX, &g_Config.m_RcHudFpsTextPosY};
-	m_aElements[ELEM_LASTTEXT] = {"LastText", &g_Config.m_RcHudLastTextPosX, &g_Config.m_RcHudLastTextPosY};
+	m_aElements[ELEM_CHAT] = {"Chat", "chat"};
+	m_aElements[ELEM_HUDTIMER] = {"Hud Timer", "timer"};
+	m_aElements[ELEM_DUMACTIONS] = {"DumActions", "dummy_actions"};
+	m_aElements[ELEM_PLPOS] = {"Pl Pos", "player_movement"};
+	m_aElements[ELEM_SPECCOUNT] = {"SpecCount", "spectator_count"};
+	m_aElements[ELEM_PLAYERSTATE] = {"PlayerState", "player_state"};
+	m_aElements[ELEM_FROZENHUD] = {"FrozenHud", "frozen_hud"};
+	m_aElements[ELEM_FROZENTEXT] = {"FrozenText", "frozen_text"};
+	m_aElements[ELEM_FPSTEXT] = {"FpsText", "fps"};
+	m_aElements[ELEM_LASTTEXT] = {"LastText", "last"};
+	m_aElements[ELEM_VOICEINDICATOR] = {"Voice Indicator", "voice_indicator"};
+	m_aElements[ELEM_VOICEOVERLAY] = {"Voice Overlay", "voice_overlay"};
+	m_aElements[ELEM_VOTING] = {"Voting", "voting"};
+	m_aElements[ELEM_ABOVEBELOW] = {"Above/Below", "above_below"};
+	m_aElements[ELEM_NOTIFYONMOVE] = {"Notify on Move", "notify_on_move"};
+	m_aElements[ELEM_EDGEINFO] = {"Edge Info", "edge_info"};
+	m_aElements[ELEM_SWAPTIMER] = {"Swap Timer", "swap_timer"};
 	CHudEditor::OnReset();
 }
 
 void CHudEditor::OnConsoleInit()
 {
+	ConfigManager()->RegisterCallback(ConfigSaveCallback, this, ConfigDomain::RCLIENT);
 	Console()->Register("rc_toggle_hud_editor", "", CFGFLAG_CLIENT, ConToggleHudEditor, this, "Toggle hud editor");
+	Console()->Register("rc_hud_pos", "?s[element] i[x] i[y]", CFGFLAG_CLIENT, ConHudPos, this, "Set HUD offsets (-600 to 600). Omit coordinates to show an element's position, or all arguments to list elements");
+	Console()->Register("rc_hud_reset", "?s[element]", CFGFLAG_CLIENT, ConHudReset, this, "Reset HUD offsets for one element, or all elements if omitted");
+}
+
+int CHudEditor::FindElement(const char *pId) const
+{
+	for(int i = 0; i < ELEM_COUNT; ++i)
+	{
+		if(str_comp_nocase(m_aElements[i].m_pId, pId) == 0)
+			return i;
+	}
+	log_error("hud_editor", "Unknown HUD element '%s'. Use rc_hud_pos to list elements.", pId);
+	return ELEM_NONE;
+}
+
+void CHudEditor::SetElementPosition(int Idx, ivec2 Position)
+{
+	m_aElements[Idx].m_Position = ivec2(std::clamp(Position.x, MIN_OFFSET, MAX_OFFSET), std::clamp(Position.y, MIN_OFFSET, MAX_OFFSET));
+}
+
+void CHudEditor::PrintElementPosition(int Idx) const
+{
+	const SElement &Element = m_aElements[Idx];
+	log_info("hud_editor", "rc_hud_pos %s %d %d", Element.m_pId, Element.m_Position.x, Element.m_Position.y);
+}
+
+void CHudEditor::ConHudPos(IConsole::IResult *pResult, void *pUserData)
+{
+	CHudEditor *pSelf = static_cast<CHudEditor *>(pUserData);
+	if(pResult->NumArguments() == 0)
+	{
+		for(int i = 0; i < ELEM_COUNT; ++i)
+			pSelf->PrintElementPosition(i);
+		return;
+	}
+
+	const int Idx = pSelf->FindElement(pResult->GetString(0));
+	if(Idx == ELEM_NONE)
+		return;
+	if(pResult->NumArguments() == 2)
+	{
+		log_error("hud_editor", "Usage: rc_hud_pos <element> [<x> <y>]");
+		return;
+	}
+	if(pResult->NumArguments() == 3)
+		pSelf->SetElementPosition(Idx, ivec2(pResult->GetInteger(1), pResult->GetInteger(2)));
+	else
+		pSelf->PrintElementPosition(Idx);
+}
+
+void CHudEditor::ConHudReset(IConsole::IResult *pResult, void *pUserData)
+{
+	CHudEditor *pSelf = static_cast<CHudEditor *>(pUserData);
+	if(pResult->NumArguments() == 0)
+	{
+		for(SElement &Element : pSelf->m_aElements)
+			Element.m_Position = ivec2(0, 0);
+		return;
+	}
+
+	const int Idx = pSelf->FindElement(pResult->GetString(0));
+	if(Idx != ELEM_NONE)
+		pSelf->SetElementPosition(Idx, ivec2(0, 0));
+}
+
+void CHudEditor::ConfigSaveCallback(IConfigManager *pConfigManager, void *pUserData)
+{
+	const CHudEditor *pSelf = static_cast<CHudEditor *>(pUserData);
+	for(const SElement &Element : pSelf->m_aElements)
+	{
+		char aBuf[128];
+		str_format(aBuf, sizeof(aBuf), "rc_hud_pos %s %d %d", Element.m_pId, Element.m_Position.x, Element.m_Position.y);
+		pConfigManager->WriteLine(aBuf, ConfigDomain::RCLIENT);
+	}
 }
 
 void CHudEditor::OnReset()
@@ -110,6 +198,7 @@ inline float CHudEditor::GetMovementInformationBoxHeight()
 
 void CHudEditor::ComputeElementBox(int Idx)
 {
+	const ivec2 Offset = m_aElements[Idx].m_Position;
 	CUIRect *pScreen = GameClient()->m_RClient.GetRealScreen();
 	const float RealAspect = Graphics()->ScreenAspectReal();
 	float MWidth = 300.0f * RealAspect;
@@ -121,20 +210,20 @@ void CHudEditor::ComputeElementBox(int Idx)
 	case ELEM_CHAT:
 	{
 		const float FontSize = g_Config.m_ClChatFontSize / 10.0f;
-		Pos.x = (5.0f + g_Config.m_RcChatPosX) * 2.0f;
-		Pos.y = (MHeight - (20.0f * FontSize / 6.0f + (g_Config.m_TcStatusBar ? g_Config.m_TcStatusBarHeight : 0.0f)) + g_Config.m_RcChatPosY - FontSize * (8.0f / 6.0f)) * 2.0f;
+		Pos.x = (5.0f + Offset.x) * 2.0f;
+		Pos.y = (MHeight - (20.0f * FontSize / 6.0f + (g_Config.m_TcStatusBar ? g_Config.m_TcStatusBarHeight : 0.0f)) + Offset.y - FontSize * (8.0f / 6.0f)) * 2.0f;
 		break;
 	}
 	case ELEM_HUDTIMER:
-		Pos.x = (MWidth / 2.0f + g_Config.m_RcHudTimerPosX) * 2.0f - BOX_WIDTH / 2.0f;
-		Pos.y = (2.0f + g_Config.m_RcHudTimerPosY) * 2.0f + BOX_HEIGHT / 2.0f;
+		Pos.x = (MWidth / 2.0f + Offset.x) * 2.0f - BOX_WIDTH / 2.0f;
+		Pos.y = (2.0f + Offset.y) * 2.0f + BOX_HEIGHT / 2.0f;
 		break;
 	case ELEM_DUMACTIONS:
 	{
 		const float BoxHeight = 13.0f * 2 + 3.0f + (g_Config.m_RcShowhudAdvancedDummyActions ? 13.0f * 2 : 0.0f); // 13.0f - icon, 3.0f - spacing(once)
 		const float BoxWidth = 16.0f;
-		Pos.x = (MWidth - BoxWidth + g_Config.m_RcHudDummyActionsPosX) * 2 + (BoxWidth - BOX_WIDTH) / 2;
-		Pos.y = (285.0f - BoxHeight - 4 + g_Config.m_RcHudDummyActionsPosY) * 2;
+		Pos.x = (MWidth - BoxWidth + Offset.x) * 2 + (BoxWidth - BOX_WIDTH) / 2;
+		Pos.y = (285.0f - BoxHeight - 4 + Offset.y) * 2;
 
 		if(g_Config.m_ClShowhudPlayerPosition || g_Config.m_ClShowhudPlayerSpeed || g_Config.m_ClShowhudPlayerAngle)
 		{
@@ -158,8 +247,8 @@ void CHudEditor::ComputeElementBox(int Idx)
 	{
 		const float BoxHeight = GetMovementInformationBoxHeight();
 		const float BoxWidth = 62.0f;
-		Pos.x = (MWidth - BoxWidth + g_Config.m_RcHudPlayerMovementPosX) * 2 + (BoxWidth * 2 - BOX_WIDTH) / 2;
-		Pos.y = (285.0f - BoxHeight - 4.0f + g_Config.m_RcHudPlayerMovementPosY) * 2;
+		Pos.x = (MWidth - BoxWidth + Offset.x) * 2 + (BoxWidth * 2 - BOX_WIDTH) / 2;
+		Pos.y = (285.0f - BoxHeight - 4.0f + Offset.y) * 2;
 		if(g_Config.m_ClShowhudScore)
 		{
 			Pos.y -= 56.0f * 2;
@@ -190,29 +279,29 @@ void CHudEditor::ComputeElementBox(int Idx)
 			StartY = StartY - 29.0f - (g_Config.m_RcShowhudAdvancedDummyActions ? 13.0f * 2 : 0.0f) - 4; // dummy actions height and padding
 		}
 
-		Pos.x = (StartX + g_Config.m_RcHudSpectatorCountPosX) * 2.0f - BOX_WIDTH / 2;
-		Pos.y = (StartY + g_Config.m_RcHudSpectatorCountPosY) * 2.0f + BoxHeight / 2.0f;
+		Pos.x = (StartX + Offset.x) * 2.0f - BOX_WIDTH / 2;
+		Pos.y = (StartY + Offset.y) * 2.0f + BoxHeight / 2.0f;
 		break;
 	}
 	case ELEM_PLAYERSTATE:
 	{
 		const bool HasHealth = GameClient()->m_GameInfo.m_HudHealthArmor && g_Config.m_ClShowhudHealthAmmo;
 		const bool HasAmmo = GameClient()->m_GameInfo.m_HudAmmo && g_Config.m_ClShowhudHealthAmmo;
-		Pos.x = (5.0f + g_Config.m_RcHudPlayerStatePosX) * 2.0f;
-		Pos.y = (5.0f + 12.0f + (HasHealth ? 24.0f : 0.0f) + (HasAmmo ? 12.0f : 0.0f) + g_Config.m_RcHudPlayerStatePosY) * 2.0f;
+		Pos.x = (5.0f + Offset.x) * 2.0f;
+		Pos.y = (5.0f + 12.0f + (HasHealth ? 24.0f : 0.0f) + (HasAmmo ? 12.0f : 0.0f) + Offset.y) * 2.0f;
 		break;
 	}
 	case ELEM_FROZENHUD:
 	{
-		float StartPos = (MWidth / 2.0f + 38.0f * (MWidth / MHeight) / 1.78f + g_Config.m_RcHudFrozenHudPosX) * 2.0f;
+		float StartPos = (MWidth / 2.0f + 38.0f * (MWidth / MHeight) / 1.78f + Offset.x) * 2.0f;
 		Pos.x = StartPos;
-		Pos.y = g_Config.m_RcHudFrozenHudPosY * 2.0f;
+		Pos.y = Offset.y * 2.0f;
 		break;
 	}
 	case ELEM_FROZENTEXT:
 	{
-		Pos.x = (MWidth / 2.0f + g_Config.m_RcHudFrozenTextPosX) * 2.0f - BOX_WIDTH / 2.0f;
-		Pos.y = (12.0f + g_Config.m_RcHudFrozenTextPosY) * 2.0f + BOX_HEIGHT / 2.0f - SMALL_MARGIN;
+		Pos.x = (MWidth / 2.0f + Offset.x) * 2.0f - BOX_WIDTH / 2.0f;
+		Pos.y = (12.0f + Offset.y) * 2.0f + BOX_HEIGHT / 2.0f - SMALL_MARGIN;
 		break;
 	}
 	case ELEM_FPSTEXT:
@@ -226,19 +315,53 @@ void CHudEditor::ComputeElementBox(int Idx)
 		static const float s_aTextWidth[5] = {s_TextWidth0, s_TextWidth00, s_TextWidth000, s_TextWidth0000, s_TextWidth00000};
 		int DigitIndex = GetDigitsIndex(FramesPerSecond, 4);
 
-		Pos.x = (MWidth - 10 - s_aTextWidth[DigitIndex] + g_Config.m_RcHudFpsTextPosX) * 2.0f;
-		Pos.y = (5 + g_Config.m_RcHudFpsTextPosY) * 2.0f + BOX_HEIGHT;
+		Pos.x = (MWidth - 10 - s_aTextWidth[DigitIndex] + Offset.x) * 2.0f;
+		Pos.y = (5 + Offset.y) * 2.0f + BOX_HEIGHT;
 		break;
 	}
 	case ELEM_LASTTEXT:
 	{
 		float FontSize = g_Config.m_TcNotifyWhenLastSize;
-		float XPos = std::clamp((g_Config.m_TcNotifyWhenLastX / 100.0f) * MWidth, 1.0f, MWidth - FontSize) + g_Config.m_RcHudLastTextPosX;
-		float YPos = std::clamp((g_Config.m_TcNotifyWhenLastY / 100.0f) * MHeight, 1.0f, MHeight - FontSize) + g_Config.m_RcHudLastTextPosY;
+		float XPos = std::clamp((g_Config.m_TcNotifyWhenLastX / 100.0f) * MWidth, 1.0f, MWidth - FontSize) + Offset.x;
+		float YPos = std::clamp((g_Config.m_TcNotifyWhenLastY / 100.0f) * MHeight, 1.0f, MHeight - FontSize) + Offset.y;
 		Pos.x = XPos * 2.0f;
 		Pos.y = YPos * 2.0f;
 		break;
 	}
+	case ELEM_VOICEINDICATOR:
+	{
+		const float FontSize = GameClient()->m_Chat.FontSize();
+		Pos.x = (5.0f + Offset.x) * 2.0f;
+		Pos.y = (MHeight - (20.0f * FontSize / 6.0f + (g_Config.m_TcStatusBar ? g_Config.m_TcStatusBarHeight : 0.0f)) + Offset.y) * 2.0f;
+		break;
+	}
+	case ELEM_VOICEOVERLAY:
+		Pos.x = (5.0f + Offset.x) * 2.0f;
+		Pos.y = (90.0f + Offset.y) * 2.0f;
+		break;
+	case ELEM_VOTING:
+		Pos.x = Offset.x * 2.0f;
+		Pos.y = (60.0f + Offset.y) * 2.0f;
+		break;
+	case ELEM_ABOVEBELOW:
+		Pos.x = (pScreen->w - pScreen->w / 6.0f) * 0.5f + Offset.x * 2.0f;
+		Pos.y = (pScreen->h - 20.0f) * 0.75f + Offset.y * 2.0f;
+		break;
+	case ELEM_NOTIFYONMOVE:
+		Pos.x = ((MWidth - 60.0f) * 0.5f + Offset.x) * 2.0f;
+		Pos.y = ((MHeight - 12.0f) * 0.5f + Offset.y) * 2.0f;
+		break;
+	case ELEM_EDGEINFO:
+	{
+		const float Height = MHeight / (g_Config.m_RcEdgeInfoJump && g_Config.m_RcEdgeInfoCords ? 6 : 12);
+		Pos.x = ((MWidth - MWidth / 5.0f) * 0.5f + Offset.x) * 2.0f;
+		Pos.y = ((MHeight - Height) * 0.75f + Offset.y) * 2.0f;
+		break;
+	}
+	case ELEM_SWAPTIMER:
+		Pos.x = (g_Config.m_RcEnableSwapTimerOnLeftSide ? 0.0f : pScreen->w * 0.75f) + Offset.x * 2.0f;
+		Pos.y = (pScreen->h - 12.0f) * 0.5f + Offset.y * 2.0f;
+		break;
 	default:
 		return;
 	}
@@ -254,8 +377,7 @@ void CHudEditor::RenderElementSettings(int Idx)
 	CUIRect ResetButton = {Box.x, Box.y + Box.h + SMALL_MARGIN, Box.w, 12.0f};
 	if(GameClient()->m_Menus.DoButton_Menu(&m_aResetButtons[Idx], "Reset", 0, &ResetButton))
 	{
-		*Element.m_pConfigX = 0;
-		*Element.m_pConfigY = 0;
+		SetElementPosition(Idx, ivec2(0, 0));
 	}
 
 	CUIRect PosLabel = {Box.x, Box.y + (Box.h + SMALL_MARGIN) * 2, Box.w, 12.0f};
@@ -263,7 +385,7 @@ void CHudEditor::RenderElementSettings(int Idx)
 	str_format(aBuf, sizeof(aBuf), "x: %.0f, y: %.0f", PosLabel.x, PosLabel.y);
 	Ui()->DoLabel(&PosLabel, aBuf, 12.0f, TEXTALIGN_MC);
 	PosLabel.y = Box.y + (Box.h + SMALL_MARGIN) * 3;
-	str_format(aBuf, sizeof(aBuf), "cx: %i, cy: %i", *Element.m_pConfigX, *Element.m_pConfigY);
+	str_format(aBuf, sizeof(aBuf), "cx: %i, cy: %i", Element.m_Position.x, Element.m_Position.y);
 	Ui()->DoLabel(&PosLabel, aBuf, 12.0f, TEXTALIGN_MC);
 }
 
@@ -321,7 +443,7 @@ void CHudEditor::OnRender()
 			if(m_aBoxes[i].Inside(Ui()->MousePos()))
 			{
 				m_DragElement = i;
-				m_DragPos = vec2(*m_aElements[i].m_pConfigX, *m_aElements[i].m_pConfigY);
+				m_DragPos = vec2(m_aElements[i].m_Position.x, m_aElements[i].m_Position.y);
 				m_TimeLatestPressedNeed = time_get() + time_freq() * 0.25f;
 				break;
 			}
@@ -348,10 +470,10 @@ void CHudEditor::OnRender()
 	}
 	else if(m_DragElement != ELEM_NONE)
 	{
-		const SElement &Element = m_aElements[m_DragElement];
 		m_DragPos += ConfDelta;
-		*Element.m_pConfigX = round_to_int(m_DragPos.x);
-		*Element.m_pConfigY = round_to_int(m_DragPos.y);
+		m_DragPos.x = std::clamp(m_DragPos.x, (float)MIN_OFFSET, (float)MAX_OFFSET);
+		m_DragPos.y = std::clamp(m_DragPos.y, (float)MIN_OFFSET, (float)MAX_OFFSET);
+		SetElementPosition(m_DragElement, ivec2(round_to_int(m_DragPos.x), round_to_int(m_DragPos.y)));
 	}
 
 	m_MouseWasPressed = Pressed;
