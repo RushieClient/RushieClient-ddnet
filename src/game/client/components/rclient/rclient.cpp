@@ -240,6 +240,8 @@ void CRClient::OnConsoleInit()
 	Console()->Register("rc_crash_client", "?s[yes]", CFGFLAG_CLIENT, ConCrashClientFunc, this, "Use %plnick% %plid% for binds");
 	Console()->Register("rc_say_notranslate", "r[message]", CFGFLAG_CLIENT, ConRcSayNoTranslate, this, "Say in chat");
 	Console()->Register("rc_send_my_pos", "", CFGFLAG_CLIENT, ConRcSendMyPos, this, "Sends your pos in chat");
+	Console()->Register("rc_add_favorite_map", "s[mapname] ?s[mappernick] ?s[community] ?i[timestamp]", CFGFLAG_CLIENT, ConAddFavoriteMap, this, "Add map in favorites");
+	Console()->Register("rc_remove_favorite_map", "s[mapname]", CFGFLAG_CLIENT, ConRemoveFavoriteMap, this, "Remove map from favorites");
 	Console()->Chain("rc_message_filter_mode", ConchainResetCensorListCache, this);
 	Console()->Chain("rc_message_filter_multiply_change_word_on_full_match", ConchainResetCensorListCache, this);
 	Console()->Chain("rc_message_filter_word_on_full_match", ConchainResetCensorListCache, this);
@@ -326,6 +328,11 @@ void CRClient::ConfigSaveCallback(IConfigManager *pConfigManager, void *pUserDat
 	for(ChatThings::STranslateLangs Item : pSelf->m_LatestLangsList)
 	{
 		str_format(aBuf, sizeof(aBuf), "rc_translate_add_language %s", Item.m_LangCode);
+		pConfigManager->WriteLine(aBuf, ConfigDomain::RCLIENT);
+	}
+	for(SFavoritesMaps m_Map : pSelf->m_SFavoritesMaps)
+	{
+		str_format(aBuf, sizeof(aBuf), "rc_add_favorite_map \"%s\" \"%s\" \"%s\" %s", m_Map.m_MapName.c_str(), m_Map.m_MapperNickname.c_str(), m_Map.m_Community.c_str(), std::to_string(m_Map.m_FavoriteTime).c_str());
 		pConfigManager->WriteLine(aBuf, ConfigDomain::RCLIENT);
 	}
 }
@@ -2541,4 +2548,66 @@ void CRClient::RcSendMyPos()
 	{
 		GameClient()->m_Chat.SendChat(0, "Im in spec", true);
 	}
+}
+
+// Favorites maps
+void CRClient::ConAddFavoriteMap(IConsole::IResult *pResult, void *pUserData)
+{
+	CRClient *pThis = static_cast<CRClient *>(pUserData);
+	int Count = pResult->NumArguments();
+	const char *pMapName = pResult->GetString(0);
+	const char *pMapperNick = Count > 1 ? pResult->GetString(1) : "";
+	const char *pCommunity = Count > 2 ? pResult->GetString(2) : "";
+	int64_t Timestamp = Count > 3 ? pResult->GetInteger(3) : -1;
+	pThis->AddFavoriteMap(pMapName, pMapperNick, pCommunity, Timestamp);
+
+}
+
+void CRClient::ConRemoveFavoriteMap(IConsole::IResult *pResult, void *pUserData)
+{
+	CRClient *pThis = static_cast<CRClient *>(pUserData);
+	const char *pMapName = pResult->GetString(0);
+	pThis->RemoveFavoriteMap(pMapName);
+
+}
+
+void CRClient::AddFavoriteMap(const char *MapName, const char *MapperNick, const char *Community, uint64_t Timestamp)
+{
+	SFavoritesMaps Map;
+	Map.m_MapName = MapName;
+	Map.m_MapperNickname = MapperNick;
+	Map.m_Community = Community;
+	if(Timestamp == -1)
+		Map.m_FavoriteTime = time_timestamp();
+	else
+		Map.m_FavoriteTime = Timestamp;
+	m_SFavoritesMaps.push_back(Map);
+}
+
+void CRClient::RemoveFavoriteMap(const char *MapName, uint64_t Timestamp)
+{
+	for(auto It = m_SFavoritesMaps.begin(); It != m_SFavoritesMaps.end();)
+	{
+		if(It->m_MapName == MapName && (Timestamp == -1 ? true : It->m_FavoriteTime == Timestamp))
+			It = m_SFavoritesMaps.erase(It);
+		else
+			++It;
+	}
+}
+
+void CRClient::RemoveFavoriteMapByIndex(int Index)
+{
+	if(Index >= 0 && Index < static_cast<int>(m_SFavoritesMaps.size()))
+		m_SFavoritesMaps.erase(m_SFavoritesMaps.begin() + Index);
+}
+
+bool CRClient::IsMapFavorite(const char *MapName)
+{
+	for(auto It = m_SFavoritesMaps.begin(); It != m_SFavoritesMaps.end();)
+	{
+		if(It->m_MapName == MapName)
+			return true;
+		++It;
+	}
+	return false;
 }

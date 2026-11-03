@@ -81,6 +81,11 @@ void CMenus::RenderSettingsRClient(CUIRect MainView)
 		RenderSettingsRClientVoiceUsers(MainView);
 		return;
 	}
+	if(m_FavoritesMapsPage)
+	{
+		RenderSettingsRClientFavoritesMaps(MainView);
+		return;
+	}
 	static int s_CurCustomTab = 0;
 
 	CUIRect TabBar, Button;
@@ -146,6 +151,7 @@ void CMenus::RenderSettingsRClientVoiceUsers(CUIRect MainView)
 		m_VoiceUsersPage = false;
 		return;
 	}
+	Header.VSplitRight(80.0f, &Header, nullptr);
 	Ui()->DoLabel(&Header, RCLocalize("Voice users", "RClient"), 18.0f, TEXTALIGN_MC);
 	MainView.HSplitTop(Margin, nullptr, &MainView);
 
@@ -2082,6 +2088,13 @@ void CMenus::RenderSettingsRClientInfo(CUIRect MainView)
 	{
 		GameClient()->m_RClient.RcCrashClient();
 	}
+	RightView.HSplitBottom(MarginSmall, &RightView, nullptr);
+	RightView.HSplitBottom(LineSize, &RightView, &Button);
+	static CButtonContainer s_FavoriteMapsList;
+	if(DoButton_Menu(&s_FavoriteMapsList, RCLocalize("Favorite Maps"), 0, &Button))
+	{
+		m_FavoritesMapsPage = true;
+	}
 }
 
 CUi::EPopupMenuFunctionResult CMenusRClientConfirmAspect::Render(void *pContext, CUIRect View, bool Active)
@@ -2296,4 +2309,187 @@ void CMenus::RenderSettingsRClientSpecWheel(CUIRect MainView)
 
 	LeftView.HSplitBottom(LineSize, &LeftView, &Label);
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_TcResetBindWheelMouse, RCLocalize("Reset position of mouse when opening specwheel", "RClient"), &g_Config.m_TcResetBindWheelMouse, &Label, LineSize);
+}
+
+void CMenus::RenderSettingsRClientFavoritesMaps(CUIRect MainView)
+{
+	CUIRect Header, BackButton;
+	MainView.HSplitTop(LineSize, &Header, &MainView);
+	Header.VSplitLeft(80.0f, &BackButton, &Header);
+	static CButtonContainer s_BackButton;
+	if(DoButton_Menu(&s_BackButton, RCLocalize("Back", "RClient"), 0, &BackButton))
+	{
+		m_FavoritesMapsPage = false;
+		return;
+	}
+	Header.VSplitRight(80.0f, &Header, nullptr);
+	Ui()->DoLabel(&Header, RCLocalize("Favorite Maps", "RClient"), 18.0f, TEXTALIGN_MC);
+	MainView.HSplitTop(Margin, nullptr, &MainView);
+
+	const auto &vMaps = GameClient()->m_RClient.FavoriteMaps();
+	static CListBox s_ListBox;
+	static int s_SelectedMap = -1;
+	s_SelectedMap = std::clamp(s_SelectedMap, -1, static_cast<int>(vMaps.size()) - 1);
+
+	static CLineInputBuffered<128> s_MapInput;
+	static CLineInputBuffered<256> s_MapperInput;
+	static CLineInputBuffered<128> s_CommunityInput;
+	CUIRect Controls, Details;
+	MainView.HSplitBottom(24.0f, &MainView, &Controls);
+	MainView.HSplitBottom(Margin, &MainView, nullptr);
+
+	char aDetail[512];
+	str_format(aDetail, sizeof(aDetail), "%s: DDRaceNetwork", RCLocalize("Community"));
+	const float DetailsWidth = std::ceil(TextRender()->TextWidth(FontSize, aDetail)) + Margin * 2.0f + 1.0f;
+	MainView.VSplitRight(DetailsWidth, &MainView, &Details);
+	MainView.VSplitRight(Margin, &MainView, nullptr);
+
+	SLabelProperties Props;
+	Props.m_EllipsisAtEnd = true;
+	Props.m_EnableWidthCheck = false;
+
+	CUIRect Name, Mapper, Community, Date;
+	MainView.HSplitTop(28.0f, &Header, &MainView);
+	Header.Draw(ColorRGBA(0.0f, 0.0f, 0.0f, 0.3f), IGraphics::CORNER_T, 5.0f);
+	Header.VSplitRight(s_ListBox.ScrollbarWidthMax(), &Header, nullptr);
+	Header.VMargin(4.0f, &Header);
+	const float CellPadding = 8.0f;
+	const float CommunityWidth = std::ceil(std::max(TextRender()->TextWidth(EditBoxFontSize, RCLocalize("Community")), TextRender()->TextWidth(EditBoxFontSize, "DDRaceNetwork"))) + CellPadding + 1.0f;
+	const float DateWidth = std::ceil(TextRender()->TextWidth(EditBoxFontSize, "8888-88-88 88:88")) + CellPadding + 1.0f;
+	const float MapperWidth = DateWidth;
+
+	Header.VSplitRight(DateWidth, &Header, &Date);
+	Header.VSplitRight(CommunityWidth, &Header, &Community);
+	Header.VSplitRight(MapperWidth, &Name, &Mapper);
+	Name.VMargin(4.0f, &Name);
+	Mapper.VMargin(4.0f, &Mapper);
+	Community.VMargin(4.0f, &Community);
+	Date.VMargin(4.0f, &Date);
+	Props.m_MaxWidth = Name.w;
+	Ui()->DoLabel(&Name, RCLocalize("Map"), EditBoxFontSize, TEXTALIGN_ML, Props);
+	Props.m_MaxWidth = Mapper.w;
+	Ui()->DoLabel(&Mapper, RCLocalize("Mapper"), EditBoxFontSize, TEXTALIGN_ML, Props);
+	Props.m_MaxWidth = Community.w;
+	Ui()->DoLabel(&Community, RCLocalize("Community"), EditBoxFontSize, TEXTALIGN_ML, Props);
+	Props.m_MaxWidth = Date.w;
+	Ui()->DoLabel(&Date, RCLocalize("Added"), EditBoxFontSize, TEXTALIGN_ML, Props);
+
+	s_ListBox.SetActive(!s_MapInput.IsActive() && !s_MapperInput.IsActive() && !s_CommunityInput.IsActive());
+	s_ListBox.DoStart(32.0f, static_cast<int>(vMaps.size()), 1, 3, s_SelectedMap, &MainView, true, IGraphics::CORNER_B, true);
+	for(const auto &Map : vMaps)
+	{
+		const CListboxItem Item = s_ListBox.DoNextItem(&Map);
+		if(!Item.m_Visible)
+			continue;
+
+		CUIRect Row = Item.m_Rect;
+		Row.VMargin(4.0f, &Row);
+		Row.VSplitRight(DateWidth, &Row, &Date);
+		Row.VSplitRight(CommunityWidth, &Row, &Community);
+		Row.VSplitRight(MapperWidth, &Name, &Mapper);
+		Name.VMargin(4.0f, &Name);
+		Mapper.VMargin(4.0f, &Mapper);
+		Community.VMargin(4.0f, &Community);
+		Date.VMargin(4.0f, &Date);
+
+		char aTime[32] = "-";
+		if(Map.m_FavoriteTime >= 0)
+			str_timestamp_ex(Map.m_FavoriteTime, aTime, sizeof(aTime), "%Y-%m-%d %H:%M");
+
+		Props.m_MaxWidth = Name.w;
+		Ui()->DoLabel(&Name, Map.m_MapName.c_str(), FontSize, TEXTALIGN_ML, Props);
+		Props.m_MaxWidth = Mapper.w;
+		if(Ui()->DoLabel(&Mapper, Map.m_MapperNickname.empty() ? "-" : Map.m_MapperNickname.c_str(), EditBoxFontSize, TEXTALIGN_ML, Props).m_Truncated && !Map.m_MapperNickname.empty())
+			GameClient()->m_Tooltips.DoToolTip(&Map, &Mapper, Map.m_MapperNickname.c_str());
+		Props.m_MaxWidth = Community.w;
+		Ui()->DoLabel(&Community, Map.m_Community.empty() ? "-" : Map.m_Community.c_str(), EditBoxFontSize, TEXTALIGN_ML, Props);
+		Props.m_MaxWidth = Date.w;
+		Ui()->DoLabel(&Date, aTime, EditBoxFontSize, TEXTALIGN_ML, Props);
+	}
+	s_SelectedMap = s_ListBox.DoEnd();
+	if(vMaps.empty())
+		Ui()->DoLabel(&MainView, RCLocalize("No favorite maps yet"), FontSize, TEXTALIGN_MC);
+
+	Details.Draw(ColorRGBA(0.0f, 0.0f, 0.0f, 0.15f), IGraphics::CORNER_ALL, 5.0f);
+	Details.Margin(Margin, &Details);
+	const bool HasSelection = s_SelectedMap >= 0 && s_SelectedMap < static_cast<int>(vMaps.size());
+	const auto *pSelectedMap = HasSelection ? &vMaps[s_SelectedMap] : nullptr;
+	CUIRect InfoRow;
+	Props.m_MaxWidth = Details.w;
+	Details.HSplitTop(LineSize, &InfoRow, &Details);
+	str_format(aDetail, sizeof(aDetail), "%s: %s", RCLocalize("MapName"), HasSelection ? pSelectedMap->m_MapName.c_str() : "-");
+	if(Ui()->DoLabel(&InfoRow, aDetail, FontSize, TEXTALIGN_ML, Props).m_Truncated && HasSelection)
+	{
+		Ui()->DoButtonLogic(pSelectedMap->m_MapName.c_str(), 0, &InfoRow, BUTTONFLAG_NONE);
+		GameClient()->m_Tooltips.DoToolTip(pSelectedMap->m_MapName.c_str(), &InfoRow, pSelectedMap->m_MapName.c_str());
+	}
+	Details.HSplitTop(LineSize, &InfoRow, &Details);
+	str_format(aDetail, sizeof(aDetail), "%s: %s", RCLocalize("Mapper"), HasSelection && !pSelectedMap->m_MapperNickname.empty() ? pSelectedMap->m_MapperNickname.c_str() : "-");
+	if(Ui()->DoLabel(&InfoRow, aDetail, FontSize, TEXTALIGN_ML, Props).m_Truncated && HasSelection && !pSelectedMap->m_MapperNickname.empty())
+	{
+		Ui()->DoButtonLogic(pSelectedMap->m_MapperNickname.c_str(), 0, &InfoRow, BUTTONFLAG_NONE);
+		GameClient()->m_Tooltips.DoToolTip(pSelectedMap->m_MapperNickname.c_str(), &InfoRow, pSelectedMap->m_MapperNickname.c_str());
+	}
+	Details.HSplitTop(LineSize, &InfoRow, &Details);
+	str_format(aDetail, sizeof(aDetail), "%s: %s", RCLocalize("Community"), HasSelection && !pSelectedMap->m_Community.empty() ? pSelectedMap->m_Community.c_str() : "-");
+	Ui()->DoLabel(&InfoRow, aDetail, FontSize, TEXTALIGN_ML, Props);
+	Details.HSplitTop(LineSize, &InfoRow, &Details);
+	char aTime[32] = "-";
+	if(HasSelection && pSelectedMap->m_FavoriteTime >= 0)
+		str_timestamp_ex(pSelectedMap->m_FavoriteTime, aTime, sizeof(aTime), "%Y-%m-%d %H:%M");
+	str_format(aDetail, sizeof(aDetail), "%s: %s", RCLocalize("Added"), aTime);
+	Ui()->DoLabel(&InfoRow, aDetail, FontSize, TEXTALIGN_ML, Props);
+
+	static CButtonContainer s_MapButton, s_CopyMapButton, s_CopyMapCommandButton, s_RemoveButton;
+	CUIRect Button;
+	Details.HSplitTop(MarginSmall, nullptr, &Details);
+	Details.HSplitTop(24.0f, &Button, &Details);
+	const bool CanChangeMap = HasSelection && Client()->State() == IClient::STATE_ONLINE;
+	const std::string MapCommand = HasSelection ? "/map " + pSelectedMap->m_MapName : "";
+	if(DoButton_Menu(&s_MapButton, RCLocalize("Switch Map"), CanChangeMap ? 0 : -1, &Button))
+		GameClient()->m_Chat.SendChat(0, MapCommand.c_str(), true);
+	Details.HSplitTop(MarginSmall, nullptr, &Details);
+	Details.HSplitTop(24.0f, &Button, &Details);
+	if(DoButton_Menu(&s_CopyMapButton, RCLocalize("Copy Map"), HasSelection ? 0 : -1, &Button))
+		Input()->SetClipboardText(pSelectedMap->m_MapName.c_str());
+	Details.HSplitTop(MarginSmall, nullptr, &Details);
+	Details.HSplitTop(24.0f, &Button, &Details);
+	if(DoButton_Menu(&s_CopyMapCommandButton, RCLocalize("Copy /map"), HasSelection ? 0 : -1, &Button))
+		Input()->SetClipboardText(MapCommand.c_str());
+	CUIRect RemoveButton;
+	Details.HSplitBottom(24.0f, &Details, &RemoveButton);
+	Details.HSplitBottom(MarginSmall, &Details, nullptr);
+	Details.HSplitBottom(LineSize, nullptr, &Button);
+	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_RcShowFavoriteMapIcon, RCLocalize("Show icon in server list"), &g_Config.m_RcShowFavoriteMapIcon, &Button, LineSize);
+	if(DoButton_Menu(&s_RemoveButton, RCLocalize("Remove selected"), HasSelection ? 0 : -1, &RemoveButton))
+	{
+		GameClient()->m_RClient.RemoveFavoriteMapByIndex(s_SelectedMap);
+		s_SelectedMap = -1;
+	}
+
+	CUIRect MapInput, MapperInput, CommunityInput, AddButton;
+	Controls.VSplitRight(80.0f, &Controls, &AddButton);
+	Controls.VSplitRight(MarginSmall, &Controls, nullptr);
+	const float InputWidth = (Controls.w - MarginSmall * 2.0f) / 3.0f;
+	Controls.VSplitLeft(InputWidth, &MapInput, &Controls);
+	Controls.VSplitLeft(MarginSmall, nullptr, &Controls);
+	Controls.VSplitLeft(InputWidth, &MapperInput, &Controls);
+	Controls.VSplitLeft(MarginSmall, nullptr, &CommunityInput);
+	s_MapInput.SetEmptyText(RCLocalize("Map"));
+	s_MapperInput.SetEmptyText(RCLocalize("Mapper"));
+	s_CommunityInput.SetEmptyText(RCLocalize("Community"));
+	Ui()->DoEditBox(&s_MapInput, &MapInput, EditBoxFontSize);
+	Ui()->DoEditBox(&s_MapperInput, &MapperInput, EditBoxFontSize);
+	Ui()->DoEditBox(&s_CommunityInput, &CommunityInput, EditBoxFontSize);
+	static CButtonContainer s_AddButton;
+	const bool CanAdd = *str_utf8_skip_whitespaces(s_MapInput.GetString()) != '\0';
+	if(DoButton_Menu(&s_AddButton, RCLocalize("Add"), CanAdd ? 0 : -1, &AddButton))
+	{
+		GameClient()->m_RClient.AddFavoriteMap(s_MapInput.GetString(), s_MapperInput.GetString(), s_CommunityInput.GetString());
+		s_SelectedMap = static_cast<int>(vMaps.size()) - 1;
+		s_ListBox.ScrollToSelected();
+		s_MapInput.Clear();
+		s_MapperInput.Clear();
+		s_CommunityInput.Clear();
+	}
 }

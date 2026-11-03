@@ -891,6 +891,7 @@ private:
 
 	// RClient: found in menus_rclient.cpp
 	bool m_VoiceUsersPage = false;
+	bool m_FavoritesMapsPage = false;
 	void RenderSettingsRClient(CUIRect MainView);
 	void RenderSettingsRClientVoiceUsers(CUIRect MainView);
 	void RenderSettingsRClientSettings(CUIRect MainView);
@@ -898,6 +899,7 @@ private:
 	void RenderSettingsRClientChatBinds(CUIRect MainView);
 	void RenderSettingsRClientInfo(CUIRect MainView);
 	void RenderSettingsRClientSpecWheel(CUIRect MainView);
+	void RenderSettingsRClientFavoritesMaps(CUIRect MainView);
 
 	// TClient
 	const CWarType *m_pRemoveWarType = nullptr;

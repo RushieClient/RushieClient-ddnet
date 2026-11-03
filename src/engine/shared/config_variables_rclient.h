@@ -23,6 +23,7 @@ MACRO_CONFIG_INT(RcDeepFlyOnRMB, rc_deep_fly_on_rmb, 0, 0, 1, CFGFLAG_CLIENT | C
 MACRO_CONFIG_INT(RcUseRushieMasterServerMirrors, rc_use_rushie_master_server_mirrors, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Use Rushie master server mirrors")
 MACRO_CONFIG_INT(RcUseBestClientMasterServerMirrors, rc_use_bestclient_master_server_mirrors, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Use BestClient master server mirrors")
 MACRO_CONFIG_INT(RcFilterOnlyEmptyServers, rc_filter_only_empty_servers, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Use master server mirrors")
+MACRO_CONFIG_INT(RcShowFavoriteMapIcon, rc_show_favorite_map_icon, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show favorite map icons in the server list")
 
 // Chat Filter
 MACRO_CONFIG_INT(RcMessageFilterMode, rc_message_filter_mode, 0, 0, 3, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Message filter mode(0-off,1-partial,2-full,3-both")

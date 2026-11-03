@@ -138,6 +138,18 @@ class CRClient : public CComponent
 	// Send Pos
 	static void ConRcSendMyPos(IConsole::IResult *pResult, void *pUserData);
 
+	// Favorite Maps
+	struct SFavoritesMaps
+	{
+		std::string m_MapName;
+		std::string m_MapperNickname;
+		std::string m_Community;
+		int64_t m_FavoriteTime;
+	};
+	std::vector<SFavoritesMaps> m_SFavoritesMaps;
+	static void ConAddFavoriteMap(IConsole::IResult *pResult, void *pUserData);
+	static void ConRemoveFavoriteMap(IConsole::IResult *pResult, void *pUserData);
+
 public:
 	CRClient();
 	int Sizeof() const override { return sizeof(*this); }
@@ -287,6 +299,13 @@ public:
 
 	// Send Pos
 	void RcSendMyPos();
+
+	// Favorite Maps
+	const std::vector<SFavoritesMaps> &FavoriteMaps() const { return m_SFavoritesMaps; }
+	void AddFavoriteMap(const char *MapName, const char *MapperNick, const char *Community, uint64_t Timestamp = -1);
+	void RemoveFavoriteMap(const char *MapName, uint64_t Timestamp = -1);
+	void RemoveFavoriteMapByIndex(int Index);
+	bool IsMapFavorite(const char *MapName);
 };
 
 #endif // GAME_CLIENT_COMPONENTS_RCLIENT_RCLIENT_H

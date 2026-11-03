@@ -112,6 +112,7 @@ void CMenus::RenderServerbrowserServerList(CUIRect View, bool &WasListboxItemAct
 		UI_ELEM_MAP_2,
 		UI_ELEM_MAP_3,
 		UI_ELEM_FINISH_ICON,
+		UI_ELEM_MAP_FAVORITE_ICON,
 		UI_ELEM_PLAYERS,
 		UI_ELEM_FRIEND_ICON,
 		UI_ELEM_PING,
@@ -403,6 +404,14 @@ void CMenus::RenderServerbrowserServerList(CUIRect View, bool &WasListboxItemAct
 						Icon.Margin(2.0f, &Icon);
 						RenderBrowserIcons(*pUiElement->Rect(UI_ELEM_FINISH_ICON), &Icon, TextRender()->DefaultTextColor(), TextRender()->DefaultTextOutlineColor(), FontIcon::FLAG_CHECKERED, TEXTALIGN_MC);
 					}
+				}
+
+				if(g_Config.m_RcShowFavoriteMapIcon && GameClient()->m_RClient.IsMapFavorite(pItem->m_aMap))
+				{
+					CUIRect Icon;
+					Button.VSplitLeft(Button.h, &Icon, &Button);
+					Icon.Margin(2.0f, &Icon);
+					RenderBrowserIcons(*pUiElement->Rect(UI_ELEM_MAP_FAVORITE_ICON), &Icon, ColorRGBA(1.0f, 0.85f, 0.3f, 1.0f), TextRender()->DefaultTextOutlineColor(), FontIcon::STAR, TEXTALIGN_MC);
 				}
 
 				SLabelProperties Props;

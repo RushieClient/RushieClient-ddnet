@@ -724,6 +724,21 @@ void CMenus::RenderServerInfo(CUIRect MainView)
 		}
 	}
 
+	// RClient favorite map
+	{
+		CUIRect Button;
+		bool IsFavorite = GameClient()->m_RClient.IsMapFavorite(CurrentServerInfo.m_aMap);
+		ServerInfo.HSplitBottom(20.0f, &ServerInfo, &Button);
+		static int s_AddFavMapButton = 0;
+		if(DoButton_CheckBox(&s_AddFavMapButton, Localize("Favorite Map"), IsFavorite, &Button))
+		{
+			if(IsFavorite)
+				GameClient()->m_RClient.RemoveFavoriteMap(CurrentServerInfo.m_aMap);
+			else
+				GameClient()->m_RClient.AddFavoriteMap(CurrentServerInfo.m_aMap, "", pCommunity->Name(), time_timestamp());
+		}
+	}
+
 	GameInfo.Draw(ColorRGBA(1.0f, 1.0f, 1.0f, 0.25f), IGraphics::CORNER_ALL, 10.0f);
 	GameInfo.Margin(10.0f, &GameInfo);
 
