@@ -196,6 +196,10 @@ class CChat : public CComponent
 		}
 		return Count;
 	}
+	bool m_RcSearchOpened = false;
+	int m_SearchMatchCount = 0;
+	void FindSearchMatch(int Direction = 0);
+	bool MatchesSearch(const CLine &Line) const;
 
 	class CChatPopupContext : public SPopupMenuId
 	{
