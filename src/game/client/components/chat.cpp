@@ -923,6 +923,8 @@ void CChat::AddLine(int ClientId, int Team, const char *pLine)
 	}
 
 	m_CurrentLine = (m_CurrentLine + 1) % MAX_LINES;
+	if(m_HistoryScrollOffset > 0)
+		m_HistoryScrollOffset = std::min(m_HistoryScrollOffset + 1, MAX_LINES - 1);
 
 	CLine &CurrentLine = m_aLines[m_CurrentLine];
 	CurrentLine.Reset(*this);
