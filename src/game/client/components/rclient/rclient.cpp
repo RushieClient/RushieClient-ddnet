@@ -17,7 +17,7 @@
 #include <game/localization.h>
 #include <game/version.h>
 
-static constexpr const char *RCLIENT_INFO_URL = "https://server.rushie.qzz.io/version";
+static constexpr const char *RCLIENT_INFO_URL = "https://updates.rushie.qzz.io/api/get/version?channel=" RCLIENT_UPDATE_CHANNEL;
 
 namespace ChatThings
 {

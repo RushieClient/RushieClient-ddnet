@@ -48,6 +48,7 @@ class CUpdater : public IUpdater
 	int m_Percent GUARDED_BY(m_Lock);
 	char m_aClientExecTmp[64];
 	char m_aServerExecTmp[64];
+	char m_aUpdateVersion[64];
 
 	std::forward_list<std::pair<std::string, bool>> m_FileJobs;
 	std::shared_ptr<CUpdaterFetchTask> m_pCurrentTask;

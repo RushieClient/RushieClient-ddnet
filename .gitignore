@@ -95,7 +95,8 @@ versionsrv
 generated
 target
 
-/build*
+/build*/
+build/
 /integration_test/*
 /source_date_epoch
 
@@ -113,7 +114,7 @@ target
 .vs
 .vscode
 compile_commands.json
-cmake-build-*/*
+cmake-build-*/
 cscope.files
 cscope.out
 out
@@ -121,24 +122,56 @@ tags
 # don't ignore this, it's used for the vscode workspace that ddnet provides
 !ddnet-cmake-tools-kits.json
 
+/.zcode/
+/.zcodeignore
+/check_tu.cmd
+
+/docs/VOICE-CHAT.md
+/docs/VOICE-CHAT-IDEAS.md
+/tests/voice/probe_connect.cpp
+/tests/voice/probe_connect_audio.cpp
+/tests/voice/probe_connect_thread.cpp
+/voice_server/server.py
+
+__pycache__/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.venv/
+venv/
+
+.env
+.env.*
+!.env.example
+!.env.sample
+!.env.template
+
 # tidy-alphabetical-start
 *.a
-*.cmd
-*.csv
 *.dll
 *.dmg
 *.dtb
 *.dylib
 *.exe
+*.exp
 *.fifo
 *.filters
+*.idb
+*.ilk
+*.iobj
+*.ipch
+*.ipdb
+*.lib
 *.lnk
 *.log
+*.log.*
+*.obj
 *.opensdf
-*.patch
+*.pch
 *.pdb
 *.prefs
 *.pyc
+*.pyo
 *.res
 *.sdf
 *.sln
@@ -152,6 +185,7 @@ tags
 *.tar.gz
 *.tar.xz
 *.teehistorian
+*.tlog/
 *.tmp
 *.user
 *.vcxproj

@@ -23,7 +23,7 @@
 
 class CUpdaterFetchTask : public IHttpRequest::IProgressCallback
 {
-	char m_aBuf[256];
+	char m_aBuf[2048];
 	CUpdater *m_pUpdater;
 	std::shared_ptr<IHttpRequest> m_pHttpRequest;
 
@@ -78,16 +78,18 @@ static void UrlEncodePath(const char *pIn, char *pOut, size_t OutSize)
 	pOut[WriteIndex] = '\0';
 }
 
-static const char *GetUpdaterUrl(char *pBuf, int BufSize, const char *pFile)
+static const char *GetUpdaterUrl(char *pBuf, int BufSize, const char *pFile, const char *pVersion)
 {
 	if(!str_comp(pFile, "update.json"))
 	{
-		str_copy(pBuf, "https://updates.rushie.qzz.io/api/get/updates", BufSize);
+		str_copy(pBuf, "https://updates.rushie.qzz.io/api/get/updates?channel=" RCLIENT_UPDATE_CHANNEL, BufSize);
 		return pBuf;
 	}
 	char aBuf[1024];
 	UrlEncodePath(pFile, aBuf, sizeof(aBuf));
-	str_format(pBuf, BufSize, "https://updates.rushie.qzz.io/latest/" PLAT_URL_OS "/%s", aBuf);
+	char aVersion[192];
+	UrlEncodePath(pVersion, aVersion, sizeof(aVersion));
+	str_format(pBuf, BufSize, "https://updates.rushie.qzz.io/latest/" RCLIENT_UPDATE_CHANNEL "/" PLAT_URL_OS "/%s?version=%s", aBuf, aVersion);
 	return pBuf;
 }
 
@@ -129,7 +131,7 @@ CUpdaterFetchTask::CUpdaterFetchTask(CUpdater *pUpdater, const char *pFile, cons
 {
 	char aDestination[IO_MAX_PATH_LENGTH];
 	FormatUpdaterDestPath(aDestination, sizeof(aDestination), pFile, pDestPath);
-	m_pHttpRequest = CreateHttpRequest(GetUpdaterUrl(m_aBuf, sizeof(m_aBuf), pFile));
+	m_pHttpRequest = CreateHttpRequest(GetUpdaterUrl(m_aBuf, sizeof(m_aBuf), pFile, pUpdater->m_aUpdateVersion));
 	m_pHttpRequest->WriteToFile(pUpdater->m_pStorage, aDestination, -2);
 	m_pHttpRequest->SetProgressCallback(this);
 }
@@ -160,6 +162,7 @@ CUpdater::CUpdater()
 	m_State = CLEAN;
 	m_Percent = 0;
 	m_pCurrentTask = nullptr;
+	m_aUpdateVersion[0] = '\0';
 
 	m_ClientUpdate = m_ServerUpdate = m_ClientFetched = m_ServerFetched = false;
 
@@ -342,7 +345,16 @@ void CUpdater::ParseUpdate()
 		return;
 	}
 
-	// if we're already downloading a file, or it's been deleted in the latest version, we skip it if it comes up again
+	// Keep all file downloads on the version selected by this manifest.
+	const char *pLatestVersion = json_string_get(json_object_get(json_array_get(pVersions, 0), "version"));
+	if(!pLatestVersion)
+	{
+		json_value_free(pVersions);
+		return;
+	}
+	str_copy(m_aUpdateVersion, pLatestVersion);
+
+	// Skip files already queued or removed by a more recent manifest entry.
 	std::unordered_set<std::string> SkipSet;
 
 	for(int i = 0; i < json_array_length(pVersions); i++)
@@ -431,6 +443,7 @@ void CUpdater::RunningUpdate()
 			m_pCurrentTask->HttpRequest()->State() == EHttpState::ABORTED)
 		{
 			SetCurrentState(IUpdater::FAIL);
+			return;
 		}
 	}
 
