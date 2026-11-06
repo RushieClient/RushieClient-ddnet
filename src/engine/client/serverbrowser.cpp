@@ -1653,6 +1653,8 @@ void CServerBrowser::LoadDDNetServers()
 
 	// Remove unknown elements from exclude lists
 	CleanFilters();
+	ValidateServerlistType();
+	m_CommunityCache.Update(true);
 }
 
 void CServerBrowser::UpdateServerFilteredPlayers(CServerInfo *pInfo) const
@@ -1900,13 +1902,6 @@ void CCommunityCache::Update(bool Force)
 	const unsigned CommunitiesHash = m_pServerBrowser->CurrentCommunitiesHash();
 	const bool TypeChanged = m_LastType != m_pServerBrowser->GetCurrentType();
 	const bool CurrentCommunitiesChanged = m_LastType == m_pServerBrowser->GetCurrentType() && m_SelectedCommunitiesHash != CommunitiesHash;
-	if(CurrentCommunitiesChanged && m_pServerBrowser->GetCurrentType() >= IServerBrowser::TYPE_FAVORITE_COMMUNITY_1 && m_pServerBrowser->GetCurrentType() <= IServerBrowser::TYPE_FAVORITE_COMMUNITY_5)
-	{
-		// Favorite community was changed while its type is active,
-		// refresh to get correct serverlist for updated community.
-		m_pServerBrowser->Refresh(m_pServerBrowser->GetCurrentType(), true);
-	}
-
 	if(!Force && m_InfoSha256 == m_pServerBrowser->DDNetInfoSha256() &&
 		!CurrentCommunitiesChanged && !TypeChanged)
 	{
@@ -1965,6 +1960,13 @@ void CCommunityCache::Update(bool Force)
 	}
 
 	m_pServerBrowser->CleanFilters();
+
+	if(CurrentCommunitiesChanged && m_pServerBrowser->GetCurrentType() >= IServerBrowser::TYPE_FAVORITE_COMMUNITY_1 && m_pServerBrowser->GetCurrentType() <= IServerBrowser::TYPE_FAVORITE_COMMUNITY_5)
+	{
+		// Favorite community was changed while its type is active,
+		// refresh to get correct serverlist for updated community.
+		m_pServerBrowser->Refresh(m_pServerBrowser->GetCurrentType(), true);
+	}
 }
 
 void CFavoriteCommunityFilterList::Add(const char *pCommunityId)
