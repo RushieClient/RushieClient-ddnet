@@ -42,6 +42,7 @@ CHudEditor::CHudEditor()
 	m_aElements[ELEM_NOTIFYONMOVE] = {"Notify on Move", "notify_on_move"};
 	m_aElements[ELEM_EDGEINFO] = {"Edge Info", "edge_info"};
 	m_aElements[ELEM_SWAPTIMER] = {"Swap Timer", "swap_timer"};
+	m_aElements[ELEM_LOCALTIME] = {"Local Time", "local_time"};
 	CHudEditor::OnReset();
 }
 
@@ -361,6 +362,10 @@ void CHudEditor::ComputeElementBox(int Idx)
 	case ELEM_SWAPTIMER:
 		Pos.x = (g_Config.m_RcEnableSwapTimerOnLeftSide ? 0.0f : pScreen->w * 0.75f) + Offset.x * 2.0f;
 		Pos.y = (pScreen->h - 12.0f) * 0.5f + Offset.y * 2.0f;
+		break;
+	case ELEM_LOCALTIME:
+		Pos.x = ((MWidth / 7.0f) * 3.0f - 5.0f + Offset.x) * 2.0f - BOX_WIDTH;
+		Pos.y = 12.5f + Offset.y * 2.0f - BOX_HEIGHT / 2.0f;
 		break;
 	default:
 		return;

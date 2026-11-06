@@ -2003,17 +2003,19 @@ void CHud::RenderSpectatorHud()
 
 void CHud::RenderLocalTime(float x)
 {
-	if(!g_Config.m_ClShowLocalTimeAlways && !GameClient()->m_Scoreboard.IsActive())
+	if(!g_Config.m_ClShowLocalTimeAlways && !GameClient()->m_Scoreboard.IsActive() && !GameClient()->m_RcHudEditor.IsActive())
 		return;
 
+	const ivec2 Offset = GameClient()->m_RcHudEditor.GetElementPosition(CHudEditor::ELEM_LOCALTIME);
+	x += Offset.x;
 	const bool Seconds = g_Config.m_TcShowLocalTimeSeconds; // TClient
 
 	char aTimeStr[16];
 	str_timestamp_format(aTimeStr, sizeof(aTimeStr), Seconds ? "%H:%M.%S" : "%H:%M");
 	const float Width = std::round(TextRender()->TextBoundingBox(5.0f, aTimeStr).m_W);
 
-	Graphics()->DrawRect(x - (Width + 15.0f), 0.0f, Width + 10.0f, 12.5f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.4f), IGraphics::CORNER_B, 3.75f);
-	TextRender()->Text(x - (Width + 10.0f), (12.5f - 5.f) / 2.f, 5.0f, aTimeStr, -1.0f);
+	Graphics()->DrawRect(x - (Width + 15.0f), Offset.y, Width + 10.0f, 12.5f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.4f), Offset.y > 0 ? IGraphics::CORNER_ALL : IGraphics::CORNER_B, 3.75f);
+	TextRender()->Text(x - (Width + 10.0f), (12.5f - 5.f) / 2.f + Offset.y, 5.0f, aTimeStr, -1.0f);
 
 	// Graphics()->DrawRect(x - 30.0f, 0.0f, 25.0f, 12.5f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.4f), IGraphics::CORNER_B, 3.75f);
 	// TextRender()->Text(x - 25.0f, (12.5f - 5.f) / 2.f, 5.0f, aTimeStr, -1.0f);
