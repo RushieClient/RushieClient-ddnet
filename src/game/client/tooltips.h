@@ -22,6 +22,7 @@ public:
 	float m_FontSize;
 	bool m_Truncated;
 	bool m_OnScreen; // used to know if the tooltip should be rendered.
+	float m_FadeTime = 0.75f;
 };
 
 class CUi;
