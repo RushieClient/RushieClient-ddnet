@@ -1186,7 +1186,6 @@ void CScoreboard::OnRender()
 
 		Ui()->FinishCheck();
 	}
-
 }
 
 bool CScoreboard::IsActive() const

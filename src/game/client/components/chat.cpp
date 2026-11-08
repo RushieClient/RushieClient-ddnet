@@ -1763,7 +1763,7 @@ void CChat::OnRender()
 			if(Line.m_QuadContainerIndex != -1)
 			{
 				Graphics()->SetColor(color_cast<ColorRGBA>(ColorHSLA(g_Config.m_ClChatBackgroundColor, true)).WithMultipliedAlpha(Blend));
-				
+
 				if(g_Config.m_RcEnableHighlightChat)
 				{
 					if(GameClient()->m_RClient.IsNeedHighlightPlayer(Line.m_aName))

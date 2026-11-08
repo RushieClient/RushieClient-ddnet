@@ -1835,7 +1835,6 @@ void CHud::RenderMovementInformation()
 		RenderMovementInformationTextContainer(m_aPlayerPositionContainers[1], TextRender()->DefaultTextColor(), RightX, y);
 		y += MOVEMENT_INFORMATION_LINE_HEIGHT;
 
-
 		char aBuf[64];
 		if(ShowDummyInfo && g_Config.m_TcShowhudDummyPosition)
 		{

@@ -2560,7 +2560,6 @@ void CRClient::ConAddFavoriteMap(IConsole::IResult *pResult, void *pUserData)
 	const char *pCommunity = Count > 2 ? pResult->GetString(2) : "";
 	int64_t Timestamp = Count > 3 ? pResult->GetInteger(3) : -1;
 	pThis->AddFavoriteMap(pMapName, pMapperNick, pCommunity, Timestamp);
-
 }
 
 void CRClient::ConRemoveFavoriteMap(IConsole::IResult *pResult, void *pUserData)
@@ -2568,7 +2567,6 @@ void CRClient::ConRemoveFavoriteMap(IConsole::IResult *pResult, void *pUserData)
 	CRClient *pThis = static_cast<CRClient *>(pUserData);
 	const char *pMapName = pResult->GetString(0);
 	pThis->RemoveFavoriteMap(pMapName);
-
 }
 
 void CRClient::AddFavoriteMap(const char *MapName, const char *MapperNick, const char *Community, int64_t Timestamp)

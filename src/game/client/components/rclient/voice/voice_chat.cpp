@@ -1,22 +1,23 @@
 #include "voice_chat.h"
 
-#include "voice_chat_logic.h"
-
 #include "base/net.h"
 #include "base/str.h"
-#include <base/log.h>
 #include "engine/client.h"
-#include <engine/font_icons.h>
 #include "engine/textrender.h"
-#include <game/client/components/rclient/rclient_include.h>
-#include <game/client/animstate.h>
 #include "game/client/gameclient.h"
 #include "game/client/ui.h"
 #include "game/client/ui_rect.h"
 #include "game/localization.h"
 #include "game/teamscore.h"
+#include "voice_chat_logic.h"
 
+#include <base/log.h>
+
+#include <engine/font_icons.h>
 #include <engine/shared/config.h>
+
+#include <game/client/animstate.h>
+#include <game/client/components/rclient/rclient_include.h>
 
 #include <algorithm>
 #include <cmath>
@@ -52,7 +53,8 @@ static vec2 VoicePlayerPosition(const CGameClient *pGame, int ClientId, float In
 
 CRCVoiceChat::CRCVoiceChat()
 #ifdef CONF_LIVEKIT
-	: m_Delegate(this)
+	:
+	m_Delegate(this)
 #endif
 {
 }
@@ -1996,9 +1998,7 @@ void CRCVoiceChat::UpdateTalking()
 		const VoiceLogic::EMuteReason Reason = VoiceLogic::MuteReasonOf(Mix);
 		const bool Mute = Reason != VoiceLogic::MUTE_NONE;
 		Audio.m_MuteReason = Reason;
-		const vec2 Gains = Mute ? vec2(0.0f, 0.0f) : VoiceLogic::VoiceGains(HasPosition, g_Config.m_RcVoiceSpatial, VoiceLogic::ParticipantVolume(Mix), Delta,
-										g_Config.m_RcVoiceMinVolume, g_Config.m_RcVoiceMinRadius, g_Config.m_RcVoiceRadius,
-										g_Config.m_RcVoiceVolume, g_Config.m_RcVoiceStereoWidth, g_Config.m_RcVoiceStereoRadius, VoiceLogic::TeamVolume(Mix), Mix.UserVolume, g_Config.m_RcVoiceStereo);
+		const vec2 Gains = Mute ? vec2(0.0f, 0.0f) : VoiceLogic::VoiceGains(HasPosition, g_Config.m_RcVoiceSpatial, VoiceLogic::ParticipantVolume(Mix), Delta, g_Config.m_RcVoiceMinVolume, g_Config.m_RcVoiceMinRadius, g_Config.m_RcVoiceRadius, g_Config.m_RcVoiceVolume, g_Config.m_RcVoiceStereoWidth, g_Config.m_RcVoiceStereoRadius, VoiceLogic::TeamVolume(Mix), Mix.UserVolume, g_Config.m_RcVoiceStereo);
 		if(Gains == vec2(0.0f, 0.0f) || Audio.m_TargetGains == vec2(0.0f, 0.0f))
 		{
 			Audio.Clear();

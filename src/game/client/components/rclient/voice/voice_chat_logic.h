@@ -1,5 +1,12 @@
-#ifndef GAME_CLIENT_COMPONENTS_RCLIENT_VOICE_CHAT_LOGIC_H
-#define GAME_CLIENT_COMPONENTS_RCLIENT_VOICE_CHAT_LOGIC_H
+#ifndef GAME_CLIENT_COMPONENTS_RCLIENT_VOICE_VOICE_CHAT_LOGIC_H
+#define GAME_CLIENT_COMPONENTS_RCLIENT_VOICE_VOICE_CHAT_LOGIC_H
+
+#include <base/math.h>
+#include <base/vmath.h>
+
+#include <engine/shared/protocol.h>
+
+#include <game/teamscore.h>
 
 #include <algorithm>
 #include <atomic>
@@ -10,11 +17,6 @@
 #include <map>
 #include <string>
 #include <vector>
-
-#include <base/math.h>
-#include <base/vmath.h>
-#include <engine/shared/protocol.h>
-#include <game/teamscore.h>
 
 // Pure helpers of the RClient voice chat, unit tested without engine or SDK.
 namespace VoiceLogic
@@ -323,7 +325,7 @@ namespace VoiceLogic
 		const auto Padding = Input.find('=');
 		if(Input.size() % 4 == 1 ||
 			(Padding != std::string::npos && (Input.size() % 4 != 0 || Input.size() - Padding > 2 ||
-				Input.find_first_not_of('=', Padding) != std::string::npos)))
+								 Input.find_first_not_of('=', Padding) != std::string::npos)))
 			return {};
 		std::string Encoded;
 		Encoded.reserve(Input.size() + 4);
@@ -446,4 +448,4 @@ namespace VoiceLogic
 	}
 }
 
-#endif // GAME_CLIENT_COMPONENTS_RCLIENT_VOICE_CHAT_LOGIC_H
+#endif // GAME_CLIENT_COMPONENTS_RCLIENT_VOICE_VOICE_CHAT_LOGIC_H

@@ -280,7 +280,6 @@ void CEmoticon::OnRender()
 		m_SelectedEyeEmote = -1;
 
 	RenderTools()->RenderCursor(ScreenCenter + m_SelectorMouse, 24.0f, aAnimationPhase[0]);
-
 }
 
 void CEmoticon::Emote(int Emoticon)

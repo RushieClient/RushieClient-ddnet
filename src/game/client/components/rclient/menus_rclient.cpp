@@ -1434,7 +1434,6 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 	Column.HSplitTop(MarginSmall, &Button, &Column);
 	DoLine_KeyReader(Column, s_ReaderButtonHudEditor, s_ClearButtonHudEditor, RCLocalize("Bind Hud Editor", "RClient"), "rc_toggle_hud_editor");
 
-
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
 	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;
 
@@ -1740,7 +1739,6 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 			else
 				VoiceChat.Connect();
 		}
-
 	}
 
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);

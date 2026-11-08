@@ -325,7 +325,6 @@ void CSpecWheel::OnRender()
 	// Graphics()->QuadsEnd();
 
 	RenderTools()->RenderCursor(GameClient()->m_Emoticon.m_SelectorMouse + vec2(Screen.w, Screen.h) / 2.0f, 24.0f, aAnimationPhase[0]);
-
 }
 
 void CSpecWheel::ExecuteBind(int Bind)

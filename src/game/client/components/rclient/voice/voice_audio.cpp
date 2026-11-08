@@ -9,9 +9,9 @@
 #include "voice_chat.h"
 #undef MINIAUDIO_IMPLEMENTATION
 
+#include "base/hash.h"
 #include "voice_chat_logic.h"
 
-#include "base/hash.h"
 #include <base/log.h>
 
 #include <algorithm>
@@ -88,7 +88,8 @@ void CRCVoiceChat::SAudioActivity::Init(ma_engine *pEngine)
 	CheckAudio(ma_channel_converter_init(&StereoConfig, nullptr, &m_StereoConverter), "initialize voice stereo converter");
 	m_Initialized = 4;
 	CheckAudio(ma_sound_init_from_data_source(pEngine, &m_Source.m_Base,
-		MA_SOUND_FLAG_NO_SPATIALIZATION | MA_SOUND_FLAG_NO_PITCH, nullptr, &m_Sound), "initialize voice sound");
+			   MA_SOUND_FLAG_NO_SPATIALIZATION | MA_SOUND_FLAG_NO_PITCH, nullptr, &m_Sound),
+		"initialize voice sound");
 	m_Initialized = 5;
 	CheckAudio(ma_sound_start(&m_Sound), "start voice sound");
 }

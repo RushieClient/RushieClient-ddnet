@@ -1,7 +1,14 @@
-#ifndef GAME_CLIENT_COMPONENTS_RCLIENT_VOICE_CHAT_H
-#define GAME_CLIENT_COMPONENTS_RCLIENT_VOICE_CHAT_H
+#ifndef GAME_CLIENT_COMPONENTS_RCLIENT_VOICE_VOICE_CHAT_H
+#define GAME_CLIENT_COMPONENTS_RCLIENT_VOICE_VOICE_CHAT_H
 
 #include "voice_chat_logic.h"
+
+#include <base/dbg.h>
+
+#include <engine/config.h>
+#include <engine/console.h>
+
+#include <game/client/component.h>
 
 #include <array>
 #include <atomic>
@@ -14,13 +21,9 @@
 #include <unordered_set>
 #include <utility>
 #include <vector>
-
-#include <base/dbg.h>
-#include <engine/config.h>
-#include <engine/console.h>
-#include <game/client/component.h>
 #ifdef CONF_LIVEKIT
 #include <engine/http.h>
+
 #include <future>
 
 // Before miniaudio.h: these change the layout of ma_engine, a member of
@@ -388,10 +391,7 @@ private:
 			const std::string TrackId = Event.track->sid();
 			const std::string TrackName = Event.publication ? Event.publication->name() : Event.track->name();
 			m_pVoice->AddAudioTrack(TrackId, Identity, Event.publication ? Event.publication->muted() : Event.track->muted());
-			Room.setOnAudioFrameCallback(Identity, TrackName,
-				[pVoice = m_pVoice, TrackId](const livekit::AudioFrame &Frame) {
-					pVoice->RecordAudioActivity(TrackId, Frame);
-				}, livekit::AudioStream::Options{2});
+			Room.setOnAudioFrameCallback(Identity, TrackName, [pVoice = m_pVoice, TrackId](const livekit::AudioFrame &Frame) { pVoice->RecordAudioActivity(TrackId, Frame); }, livekit::AudioStream::Options{2});
 		}
 
 		void onTrackUnsubscribed(livekit::Room &Room, const livekit::TrackUnsubscribedEvent &Event) override
@@ -566,4 +566,4 @@ public:
 	std::string LastError() const;
 };
 
-#endif // GAME_CLIENT_COMPONENTS_RCLIENT_VOICE_CHAT_H
+#endif // GAME_CLIENT_COMPONENTS_RCLIENT_VOICE_VOICE_CHAT_H
