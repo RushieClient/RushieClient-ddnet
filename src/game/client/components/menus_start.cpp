@@ -29,7 +29,7 @@ void CMenusStart::RenderStartMenu(CUIRect MainView)
 	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_BANNER].m_Id);
 	Graphics()->QuadsBegin();
 	Graphics()->SetColor(1, 1, 1, 1);
-	IGraphics::CQuadItem QuadItem(MainView.w / 2 - 170, 60, 360, 103);
+	IGraphics::CQuadItem QuadItem(MainView.w / 2 - 170, 60, 360, 120);
 	Graphics()->QuadsDrawTL(&QuadItem, 1);
 	Graphics()->QuadsEnd();
 
