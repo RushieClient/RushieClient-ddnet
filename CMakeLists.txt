@@ -653,6 +653,10 @@ endif()
 if(LIVEKIT AND TARGET_OS MATCHES "^(android|ios|emscripten)$")
   set(LIVEKIT OFF) # no livekit binaries for these platforms in rushie-libs
 endif()
+if(LIVEKIT AND MINGW)
+  message(STATUS "Voice chat (LiveKit) disabled with MinGW: the bundled SDK requires MSVC")
+  set(LIVEKIT OFF)
+endif()
 if(LIVEKIT AND MSVC AND CMAKE_BUILD_TYPE STREQUAL "Debug")
   # livekit.dll links the release CRT, Debug builds use /MTd. The debug CRT changes
   # std::string/std::vector layout and Room::connect() takes them by value.

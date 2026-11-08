@@ -24,7 +24,7 @@ jobs:
           - name: ubuntu-22.04
             os: ubuntu-22.04
             cmake-path: /usr/bin/
-            cmake-args: -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DDISCORD=ON -DDISCORD_DYNAMIC=ON -DWEBSOCKETS=OFF -DPREFER_BUNDLED_LIBS=ON -DAUTOUPDATE=ON
+            cmake-args: -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DDISCORD=ON -DDISCORD_DYNAMIC=ON -DWEBSOCKETS=OFF -DPREFER_BUNDLED_LIBS=ON -DAUTOUPDATE=ON -DCURL_LIBRARY=/usr/lib/x86_64-linux-gnu/libcurl.so -DCURL_INCLUDEDIR=/usr/include/x86_64-linux-gnu
             cmake-args-release: -DIPO=ON
             cmake-init-env: CXXFLAGS= 
             package-file: "*-linux_x86_64.tar.xz"
@@ -58,6 +58,7 @@ jobs:
             libavcodec-dev
             libavformat-dev
             libavutil-dev
+            libcurl4-openssl-dev
             libfreetype6-dev
             libglew-dev
             libnotify-dev

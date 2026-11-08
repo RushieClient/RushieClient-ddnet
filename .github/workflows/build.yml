@@ -23,14 +23,14 @@ jobs:
         include:
         - name: ubuntu-latest-fancy
           os: ubuntu-latest
-          cmake-args: -G Ninja
+          cmake-args: -G Ninja -DCURL_LIBRARY=/usr/lib/x86_64-linux-gnu/libcurl.so -DCURL_INCLUDEDIR=/usr/include/x86_64-linux-gnu
           cmake-args-release: -DIPO=ON
           cmake-init-env: CXXFLAGS=-Werror
           package-file: "*-linux_x86_64.tar.xz"
         - name: ubuntu-22.04
           os: ubuntu-22.04
           cmake-path: /usr/bin/
-          cmake-args: -G "Unix Makefiles" -DTEST_MYSQL=ON -DPRECOMPILE_HEADERS=OFF
+          cmake-args: -G "Unix Makefiles" -DTEST_MYSQL=ON -DPRECOMPILE_HEADERS=OFF -DCURL_LIBRARY=/usr/lib/x86_64-linux-gnu/libcurl.so -DCURL_INCLUDEDIR=/usr/include/x86_64-linux-gnu
           cmake-args-release: -DIPO=ON
           cmake-init-env: CXXFLAGS=-Werror
           gtest-env: GTEST_FILTER=-*SQLite*
@@ -74,6 +74,7 @@ jobs:
           libavcodec-dev
           libavformat-dev
           libavutil-dev
+          libcurl4-openssl-dev
           libfreetype6-dev
           libglew-dev
           libnotify-dev

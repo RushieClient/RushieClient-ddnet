@@ -786,7 +786,9 @@ TEST(VoiceChat, TokenExpiryRequiresIntegerAndThreeSegments)
 {
 	EXPECT_EQ(VoiceLogic::TokenExpiry("a.eyJleHAiOjEwMDB4fQ.c"), 0); // {"exp":1000x}
 	EXPECT_EQ(VoiceLogic::TokenExpiry("a.eyJleHAiOjEwMDAuNX0.c"), 0); // {"exp":1000.5}
-	EXPECT_EQ(VoiceLogic::TokenExpiry(std::string(TEST_TOKEN) + ".extra"), 0);
+	std::string ExtraSegmentToken(TEST_TOKEN);
+	ExtraSegmentToken.append(".extra");
+	EXPECT_EQ(VoiceLogic::TokenExpiry(ExtraSegmentToken), 0);
 	EXPECT_TRUE(VoiceLogic::TokenUnusable(TEST_TOKEN, std::numeric_limits<long long>::max()));
 }
 
