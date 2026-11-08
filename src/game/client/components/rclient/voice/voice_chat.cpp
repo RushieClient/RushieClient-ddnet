@@ -1,14 +1,14 @@
 #include "voice_chat.h"
 
-#include "base/net.h"
-#include "base/str.h"
-#include "engine/client.h"
-#include "engine/textrender.h"
-#include "game/client/gameclient.h"
-#include "game/client/ui.h"
-#include "game/client/ui_rect.h"
-#include "game/localization.h"
-#include "game/teamscore.h"
+#include <base/net.h>
+#include <base/str.h>
+#include <engine/client.h>
+#include <engine/textrender.h>
+#include <game/client/gameclient.h>
+#include <game/client/ui.h>
+#include <game/client/ui_rect.h>
+#include <game/localization.h>
+#include <game/teamscore.h>
 #include "voice_chat_logic.h"
 
 #include <base/log.h>
