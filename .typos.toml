@@ -11,10 +11,12 @@ extend-exclude = [
 	"memcheck.supp",
 	"scripts/android/files/res",
 	"src/engine/external",
+	"src/game/client/components/rclient/external/miniaudio.h",
 
 	# tests with invalid words
 	"src/test/windows_test.cpp",
 	"src/test/str_test.cpp",
+	"src/test/voice_chat_test.cpp",
 ]
 
 [default]

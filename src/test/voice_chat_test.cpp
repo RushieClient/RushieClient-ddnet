@@ -528,14 +528,20 @@ TEST(VoiceChat, DistanceAndStereoSwitchesAreIndependent)
 			const float Volume = Distance ? 0.75f : 1.0f;
 			EXPECT_NEAR(Near.x * Near.x + Near.y * Near.y, Volume * Volume, 1e-5f);
 			if(Stereo)
+			{
 				EXPECT_GT(Near.y, Near.x);
+			}
 			else
+			{
 				EXPECT_FLOAT_EQ(Near.x, Near.y);
+			}
 
 			const vec2 Far = VoiceLogic::VoiceGains(true, Distance, 100, vec2(8000.0f, 0.0f), 0, 10, 50, 100, 100, 25, 100, 100, Stereo);
 			EXPECT_NEAR(Far.x * Far.x + Far.y * Far.y, Distance ? 0.0f : 1.0f, 1e-5f);
 			if(!Stereo)
+			{
 				EXPECT_FLOAT_EQ(Far.x, Far.y);
+			}
 		}
 }
 
