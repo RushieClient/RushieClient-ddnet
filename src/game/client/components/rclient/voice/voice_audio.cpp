@@ -9,9 +9,9 @@
 #include "voice_chat.h"
 #undef MINIAUDIO_IMPLEMENTATION
 
-#include <base/hash.h>
 #include "voice_chat_logic.h"
 
+#include <base/hash.h>
 #include <base/log.h>
 
 #include <algorithm>
