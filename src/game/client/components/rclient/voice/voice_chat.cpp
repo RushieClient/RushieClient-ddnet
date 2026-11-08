@@ -26,6 +26,11 @@
 #include <stdexcept>
 #include <utility>
 
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wthread-safety-negative"
+#endif
+
 #ifdef CONF_LIVEKIT
 #include <engine/shared/json.h>
 #include <engine/shared/jsonwriter.h>
@@ -502,9 +507,9 @@ void CRCVoiceChat::RenderParticipantsOverlay()
 			else
 				TeeInfo.Apply(GameClient()->m_Skins.Find("default"));
 			TeeInfo.m_Size = 14.0f * Scale;
-			vec2 Offset;
-			CRenderTools::GetRenderTeeOffsetToRenderedTee(CAnimState::GetIdle(), &TeeInfo, Offset);
-			RenderTools()->RenderTee(CAnimState::GetIdle(), &TeeInfo, EMOTE_NORMAL, vec2(1.0f, 0.0f), vec2(ContentX + 7.0f * Scale, Y + Rect.h / 2.0f + Offset.y));
+			vec2 TeeOffset;
+			CRenderTools::GetRenderTeeOffsetToRenderedTee(CAnimState::GetIdle(), &TeeInfo, TeeOffset);
+			RenderTools()->RenderTee(CAnimState::GetIdle(), &TeeInfo, EMOTE_NORMAL, vec2(1.0f, 0.0f), vec2(ContentX + 7.0f * Scale, Y + Rect.h / 2.0f + TeeOffset.y));
 			ContentX += 18.0f * Scale;
 		}
 		CUIRect Name{ContentX, Y, NameWidth, Rect.h};
@@ -2112,3 +2117,7 @@ int CRCVoiceChat::ClientIdOf(const std::string &Identity) const
 	return -1;
 #endif
 }
+
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#endif

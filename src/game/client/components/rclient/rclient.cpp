@@ -2571,7 +2571,7 @@ void CRClient::ConRemoveFavoriteMap(IConsole::IResult *pResult, void *pUserData)
 
 }
 
-void CRClient::AddFavoriteMap(const char *MapName, const char *MapperNick, const char *Community, uint64_t Timestamp)
+void CRClient::AddFavoriteMap(const char *MapName, const char *MapperNick, const char *Community, int64_t Timestamp)
 {
 	SFavoritesMaps Map;
 	Map.m_MapName = MapName;
@@ -2584,11 +2584,11 @@ void CRClient::AddFavoriteMap(const char *MapName, const char *MapperNick, const
 	m_SFavoritesMaps.push_back(Map);
 }
 
-void CRClient::RemoveFavoriteMap(const char *MapName, uint64_t Timestamp)
+void CRClient::RemoveFavoriteMap(const char *MapName, int64_t Timestamp)
 {
 	for(auto It = m_SFavoritesMaps.begin(); It != m_SFavoritesMaps.end();)
 	{
-		if(It->m_MapName == MapName && (Timestamp == -1 ? true : It->m_FavoriteTime == Timestamp))
+		if(It->m_MapName == MapName && ((Timestamp == -1) || (It->m_FavoriteTime == Timestamp)))
 			It = m_SFavoritesMaps.erase(It);
 		else
 			++It;

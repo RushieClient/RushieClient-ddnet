@@ -302,8 +302,8 @@ public:
 
 	// Favorite Maps
 	const std::vector<SFavoritesMaps> &FavoriteMaps() const { return m_SFavoritesMaps; }
-	void AddFavoriteMap(const char *MapName, const char *MapperNick, const char *Community, uint64_t Timestamp = -1);
-	void RemoveFavoriteMap(const char *MapName, uint64_t Timestamp = -1);
+	void AddFavoriteMap(const char *MapName, const char *MapperNick, const char *Community, int64_t Timestamp = -1);
+	void RemoveFavoriteMap(const char *MapName, int64_t Timestamp = -1);
 	void RemoveFavoriteMapByIndex(int Index);
 	bool IsMapFavorite(const char *MapName);
 };

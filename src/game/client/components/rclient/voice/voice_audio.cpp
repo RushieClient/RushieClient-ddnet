@@ -24,6 +24,11 @@
 #include <utility>
 #include <vector>
 
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wthread-safety-negative"
+#endif
+
 void CRCVoiceChat::CheckAudio(ma_result Result, const char *pOperation)
 {
 	if(Result != MA_SUCCESS)
@@ -696,5 +701,9 @@ void CRCVoiceChat::StopAudio()
 	}
 	m_BuffersInitialized = false;
 }
+
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#endif
 
 #endif

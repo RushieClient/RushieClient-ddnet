@@ -46,7 +46,19 @@
 #define MA_ENABLE_WASAPI
 #define MA_ENABLE_WINMM
 
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wformat-nonliteral"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wduplicated-branches"
+#endif
 #include "../external/miniaudio.h"
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#elif defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif
 
 #include <livekit/livekit.h>
 #endif
