@@ -31,6 +31,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Download Ubuntu artifact
+        continue-on-error: true
         uses: actions/download-artifact@v4
         with:
           name: ${{ env.BUILD_PREFIX }}-ubuntu-22.04
@@ -40,6 +41,7 @@ jobs:
           run-id: ${{ github.event.inputs.run_id }}
 
       - name: Download Windows artifact
+        continue-on-error: true
         uses: actions/download-artifact@v4
         with:
           name: ${{ env.BUILD_PREFIX }}-windows-latest
@@ -49,6 +51,7 @@ jobs:
           run-id: ${{ github.event.inputs.run_id }}
 
       - name: Download macOS artifact
+        continue-on-error: true
         uses: actions/download-artifact@v4
         with:
           name: ${{ env.BUILD_PREFIX }}-macOS-latest
@@ -58,6 +61,7 @@ jobs:
           run-id: ${{ github.event.inputs.run_id }}
 
       - name: Download Android artifact
+        continue-on-error: true
         uses: actions/download-artifact@v4
         with:
           name: ${{ env.BUILD_PREFIX }}-android
@@ -80,6 +84,8 @@ jobs:
 
       - name: Rename and Move Artifacts
         run: |
+          mkdir -p ./artifacts
+          shopt -s nullglob
           declare -a multi_ext=("tar.gz" "tar.bz2" "tar.xz" "tar.Z")
 
           for dir in ./artifacts/*/ ; do
@@ -114,6 +120,7 @@ jobs:
           ls -R ./artifacts
 
       - name: Upload Ubuntu
+        if: ${{ hashFiles(format('artifacts/{0}-ubuntu.tar.xz', env.CLIENT_NAME)) != '' }}
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -125,6 +132,7 @@ jobs:
           
 
       - name: Upload Windows
+        if: ${{ hashFiles(format('artifacts/{0}-windows.zip', env.CLIENT_NAME)) != '' }}
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -135,6 +143,7 @@ jobs:
           asset_content_type: application/zip
 
       - name: Upload macOS
+        if: ${{ hashFiles(format('artifacts/{0}-macOS.dmg', env.CLIENT_NAME)) != '' }}
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -145,6 +154,7 @@ jobs:
           asset_content_type: application/dmg
 
       - name: Upload Android
+        if: ${{ hashFiles(format('artifacts/{0}-android.apk', env.CLIENT_NAME)) != '' }}
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
