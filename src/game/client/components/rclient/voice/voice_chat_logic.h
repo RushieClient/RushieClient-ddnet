@@ -221,40 +221,40 @@ namespace VoiceLogic
 
 	struct SParticipantMix
 	{
-		bool SessionActive = true;
-		bool Deafened = false;
-		bool TrackMuted = false;
-		bool NameMuted = false;
-		bool IsLocal = false;
-		bool HasPosition = false;
-		bool IsSpectator = false;
-		int MyTeam = -1;
-		int TheirTeam = -1;
-		int SuperTeam = TEAM_SUPER;
-		int OtherTeamVolume = 100;
-		int SuperVolume = 100;
-		int UnpositionedVolume = 50;
-		int SpectatorVolume = 100;
-		int MasterVolume = 100;
-		int UserVolume = 100;
+		bool m_SessionActive = true;
+		bool m_Deafened = false;
+		bool m_TrackMuted = false;
+		bool m_NameMuted = false;
+		bool m_IsLocal = false;
+		bool m_HasPosition = false;
+		bool m_IsSpectator = false;
+		int m_MyTeam = -1;
+		int m_TheirTeam = -1;
+		int m_SuperTeam = TEAM_SUPER;
+		int m_OtherTeamVolume = 100;
+		int m_SuperVolume = 100;
+		int m_UnpositionedVolume = 50;
+		int m_SpectatorVolume = 100;
+		int m_MasterVolume = 100;
+		int m_UserVolume = 100;
 	};
 
 	inline int ParticipantVolume(const SParticipantMix &Mix)
 	{
-		return Mix.HasPosition ? 100 : std::clamp(Mix.IsSpectator ? Mix.SpectatorVolume : Mix.UnpositionedVolume, 0, 200);
+		return Mix.m_HasPosition ? 100 : std::clamp(Mix.m_IsSpectator ? Mix.m_SpectatorVolume : Mix.m_UnpositionedVolume, 0, 200);
 	}
 
 	inline int TeamVolume(const SParticipantMix &Mix)
 	{
-		if(Mix.IsSpectator)
+		if(Mix.m_IsSpectator)
 			return 100;
-		if(Mix.TheirTeam == Mix.SuperTeam)
-			return std::clamp(Mix.SuperVolume, 0, 200);
+		if(Mix.m_TheirTeam == Mix.m_SuperTeam)
+			return std::clamp(Mix.m_SuperVolume, 0, 200);
 		// Team 0 is a collection of individuals, not a shared voice team.
 		// Unknown teams use the other-team setting until metadata is available.
-		if(Mix.MyTeam > TEAM_FLOCK && Mix.MyTeam < Mix.SuperTeam && Mix.MyTeam == Mix.TheirTeam)
+		if(Mix.m_MyTeam > TEAM_FLOCK && Mix.m_MyTeam < Mix.m_SuperTeam && Mix.m_MyTeam == Mix.m_TheirTeam)
 			return 100;
-		return std::clamp(Mix.OtherTeamVolume, 0, 200);
+		return std::clamp(Mix.m_OtherTeamVolume, 0, 200);
 	}
 
 	// Shown next to a muted participant in the HUD.
@@ -273,20 +273,20 @@ namespace VoiceLogic
 
 	inline EMuteReason MuteReasonOf(const SParticipantMix &Mix)
 	{
-		if(!Mix.SessionActive)
+		if(!Mix.m_SessionActive)
 			return MUTE_SESSION;
-		if(Mix.Deafened)
+		if(Mix.m_Deafened)
 			return MUTE_DEAFENED;
-		if(Mix.TrackMuted)
+		if(Mix.m_TrackMuted)
 			return MUTE_TRACK;
-		if(Mix.NameMuted)
+		if(Mix.m_NameMuted)
 			return MUTE_NAME;
-		if(Mix.IsLocal)
+		if(Mix.m_IsLocal)
 			return MUTE_LOCAL;
 
 		if(TeamVolume(Mix) == 0)
 			return MUTE_TEAM;
-		if(Mix.MasterVolume <= 0 || Mix.UserVolume <= 0 || ParticipantVolume(Mix) == 0)
+		if(Mix.m_MasterVolume <= 0 || Mix.m_UserVolume <= 0 || ParticipantVolume(Mix) == 0)
 			return MUTE_VOLUME;
 
 		return MUTE_NONE;

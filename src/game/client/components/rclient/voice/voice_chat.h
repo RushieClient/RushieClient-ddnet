@@ -84,8 +84,8 @@ public:
 		bool m_Talking = false;
 		int m_MuteReason = 0; // VoiceLogic::EMuteReason, MUTE_NONE means audible
 		bool m_Speaking = false; // Incoming audio activity, including locally muted voices.
-		std::chrono::steady_clock::time_point m_SpeakingStartedAt{};
-		std::chrono::steady_clock::time_point m_LastSoundUntil{};
+		std::chrono::steady_clock::time_point m_SpeakingStartedAt;
+		std::chrono::steady_clock::time_point m_LastSoundUntil;
 	};
 
 	struct SDevice
@@ -181,7 +181,7 @@ private:
 	std::vector<SEvent> m_vEvents;
 	std::vector<SParticipant> m_vParticipants;
 	std::string m_LocalIdentity; // filters our own leftover session
-	std::unordered_map<std::string, int> m_mClientIds;
+	std::unordered_map<std::string, int> m_MClientIds;
 	struct SAudioActivity
 	{
 		struct SSource
@@ -193,8 +193,8 @@ private:
 		std::string m_Name; // Cached, refreshed by UpdateTalking.
 		bool m_Muted = false;
 		int m_MuteReason = 0; // VoiceLogic::EMuteReason
-		std::chrono::steady_clock::time_point m_SoundUntil{};
-		std::chrono::steady_clock::time_point m_SoundStartedAt{};
+		std::chrono::steady_clock::time_point m_SoundUntil;
+		std::chrono::steady_clock::time_point m_SoundStartedAt;
 		vec2 m_TargetGains{0.0f, 0.0f};
 		vec2 m_AppliedGains{0.0f, 0.0f};
 		ma_pcm_rb m_Buffer{}; // 60 ms of mono PCM at 48 kHz.
@@ -204,7 +204,7 @@ private:
 		ma_data_converter m_Converter{};
 		unsigned m_Initialized = 0;
 		float m_LastSample = 0.0f;
-		std::chrono::steady_clock::time_point m_BufferTime{};
+		std::chrono::steady_clock::time_point m_BufferTime;
 		int m_SourceRate = 0;
 		int m_SourceChannels = 0;
 		void Init(ma_engine *pEngine);
@@ -212,7 +212,7 @@ private:
 		void Clear();
 	};
 	std::mutex m_AudioActivityLock;
-	std::unordered_map<std::string, std::unique_ptr<SAudioActivity>> m_mAudioActivity; // Keyed by track SID; stable node addresses.
+	std::unordered_map<std::string, std::unique_ptr<SAudioActivity>> m_MAudioActivity; // Keyed by track SID; stable node addresses.
 	void AddAudioTrack(const std::string &TrackId, const std::string &Identity, bool Muted);
 	static void CheckAudio(ma_result Result, const char *pOperation);
 	static ma_result ReadTrack(ma_data_source *pSource, void *pOutput, ma_uint64 Frames, ma_uint64 *pRead);
@@ -236,7 +236,7 @@ private:
 	static void DeviceNotification(const ma_device_notification *pNotification);
 	void StartAudio(const std::string &MicDevice, const std::string &PlayoutDevice);
 	void StartAudioProcessing(bool MicrophoneTest = false);
-	void MicrophoneTestThread(std::string MicDevice, std::string PlayoutDevice);
+	void MicrophoneTestThread(const std::string& MicDevice, const std::string& PlayoutDevice);
 	void StartAudioThread();
 	void AudioThread();
 	void DisableMicrophone(const char *pError);
@@ -401,7 +401,7 @@ private:
 			const std::string TrackName = Event.publication ? Event.publication->name() : Event.track->name();
 			Room.clearOnAudioFrameCallback(Event.participant->identity(), TrackName);
 			std::lock_guard<std::mutex> Lock(m_pVoice->m_AudioActivityLock);
-			m_pVoice->m_mAudioActivity.erase(Event.track->sid());
+			m_pVoice->m_MAudioActivity.erase(Event.track->sid());
 			++m_pVoice->m_OutputGeneration;
 		}
 
@@ -424,7 +424,7 @@ private:
 	};
 
 	void ConnectThread(int LocalClientId,
-		std::string MicDevice, std::string PlayoutDevice, std::shared_ptr<IHttpRequest> pTokenRequest, std::string RoomName);
+		const std::string& MicDevice, const std::string& PlayoutDevice, const std::shared_ptr<IHttpRequest>& pTokenRequest, const std::string& RoomName);
 
 	// ResetConnection joins the setup thread before replacing SDK objects.
 	std::unique_ptr<livekit::Room> m_pRoom;
@@ -477,7 +477,7 @@ private:
 	std::string m_SessionPlayoutDevice;
 	bool m_CaptureFallback = false;
 	bool m_OutputFallback = false;
-	std::chrono::steady_clock::time_point m_NextAudioRecovery{};
+	std::chrono::steady_clock::time_point m_NextAudioRecovery;
 	bool m_AudioInitialized = false;
 	std::mutex m_AudioContextLock;
 	std::unordered_set<std::string> m_DeviceWarnings;

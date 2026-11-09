@@ -735,7 +735,7 @@ void CMenus::RenderServerInfo(CUIRect MainView)
 			if(IsFavorite)
 				GameClient()->m_RClient.RemoveFavoriteMap(CurrentServerInfo.m_aMap);
 			else
-				GameClient()->m_RClient.AddFavoriteMap(CurrentServerInfo.m_aMap, "", pCommunity->Name(), time_timestamp());
+				GameClient()->m_RClient.AddFavoriteMap(CurrentServerInfo.m_aMap, "", pCommunity ? pCommunity->Name() : "", time_timestamp());
 		}
 	}
 

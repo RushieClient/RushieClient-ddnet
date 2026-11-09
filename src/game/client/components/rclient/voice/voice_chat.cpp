@@ -319,8 +319,9 @@ void CRCVoiceChat::PingThread()
 			}
 		}
 	}
-	catch(const std::exception &)
+	catch(const std::exception &Ex)
 	{
+		log_debug("voicechat", "could not retrieve connection stats: %s", Ex.what());
 	}
 	m_StatsPingMs = Ping;
 	m_StatsBusy = false;
@@ -1160,7 +1161,7 @@ void CRCVoiceChat::ConStatus(IConsole::IResult *pResult, void *pUserData)
 	{
 		const vec2 Listener = pSelf->VoiceListenerPosition();
 		std::lock_guard<std::mutex> Lock(pSelf->m_AudioActivityLock);
-		dbg_msg("voicechat", "participants: %d (tracks: %d)", (int)pSelf->m_vParticipants.size(), (int)pSelf->m_mAudioActivity.size());
+		dbg_msg("voicechat", "participants: %d (tracks: %d)", (int)pSelf->m_vParticipants.size(), (int)pSelf->m_MAudioActivity.size());
 		for(const auto &P : pSelf->m_vParticipants)
 		{
 			const int ClientId = pSelf->ClientIdOf(P.m_Identity);
@@ -1174,7 +1175,7 @@ void CRCVoiceChat::ConStatus(IConsole::IResult *pResult, void *pUserData)
 				str_format(aDistance, sizeof(aDistance), "%.1ft", Distance);
 			}
 			int Tracks = 0;
-			for(const auto &Entry : pSelf->m_mAudioActivity)
+			for(const auto &Entry : pSelf->m_MAudioActivity)
 				if(Entry.second->m_Identity == P.m_Identity)
 					++Tracks;
 
@@ -1226,7 +1227,7 @@ int CRCVoiceChat::PurgeStaleParticipants()
 	const auto Removed = std::erase_if(m_vParticipants, [&](const SParticipant &P) {
 		if(ClientIdOf(P.m_Identity) >= 0)
 			return false;
-		return std::none_of(m_mAudioActivity.begin(), m_mAudioActivity.end(),
+		return std::none_of(m_MAudioActivity.begin(), m_MAudioActivity.end(),
 			[&](const auto &Entry) { return Entry.second->m_Identity == P.m_Identity; });
 	});
 	return (int)Removed;
@@ -1391,7 +1392,7 @@ void CRCVoiceChat::SetDeafened(bool Deafened)
 	if(m_Deafened.exchange(Deafened) == Deafened)
 		return;
 	std::lock_guard<std::mutex> Lock(m_AudioActivityLock);
-	for(auto &[Id, pAudio] : m_mAudioActivity)
+	for(auto &[Id, pAudio] : m_MAudioActivity)
 		pAudio->Clear();
 	++m_OutputGeneration;
 #endif
@@ -1409,7 +1410,7 @@ bool CRCVoiceChat::Transmitting() const
 #ifdef CONF_LIVEKIT
 
 void CRCVoiceChat::ConnectThread(int LocalClientId,
-	std::string MicDevice, std::string PlayoutDevice, std::shared_ptr<IHttpRequest> pTokenRequest, std::string RoomName)
+	const std::string& MicDevice, const std::string& PlayoutDevice, const std::shared_ptr<IHttpRequest>& pTokenRequest, const std::string& RoomName)
 {
 	try
 	{
@@ -1626,7 +1627,7 @@ void CRCVoiceChat::FinishReset()
 	SetAudioError("");
 	m_vParticipants.clear();
 	m_ActiveSpeakerIdentities.clear();
-	m_mClientIds.clear();
+	m_MClientIds.clear();
 	{
 		std::lock_guard<std::mutex> Lock(m_EventLock);
 		m_vEvents.clear();
@@ -1654,8 +1655,9 @@ void CRCVoiceChat::ReleaseSession()
 			{
 				m_pMicTrack->mute();
 			}
-			catch(const std::exception &)
+			catch(const std::exception &Ex)
 			{
+				log_debug("voicechat", "could not mute microphone during cleanup: %s", Ex.what());
 			}
 		}
 		m_pMicTrack.reset();
@@ -1669,7 +1671,7 @@ void CRCVoiceChat::ReleaseSession()
 	m_pRoom.reset();
 	{
 		std::lock_guard<std::mutex> Lock(m_AudioActivityLock);
-		m_mAudioActivity.clear();
+		m_MAudioActivity.clear();
 	}
 	if(m_EngineInitialized)
 		ma_engine_uninit(&m_AudioEngine);
@@ -1817,14 +1819,14 @@ void CRCVoiceChat::ProcessEvents()
 				m_vParticipants.push_back({Ev.m_Identity, Ev.m_Name, false});
 			else
 				It->m_Name = Ev.m_Name;
-			m_mClientIds[Ev.m_Identity] = VoiceLogic::ParseClientId(Ev.m_Metadata);
+			m_MClientIds[Ev.m_Identity] = VoiceLogic::ParseClientId(Ev.m_Metadata);
 			break;
 		}
 		case EEventType::ParticipantLeft:
 			m_vParticipants.erase(std::remove_if(m_vParticipants.begin(), m_vParticipants.end(),
 						      [&](const SParticipant &P) { return P.m_Identity == Ev.m_Identity; }),
 				m_vParticipants.end());
-			m_mClientIds.erase(Ev.m_Identity);
+			m_MClientIds.erase(Ev.m_Identity);
 			m_ActiveSpeakerIdentities.erase(Ev.m_Identity);
 			break;
 		case EEventType::Snapshot:
@@ -1839,7 +1841,7 @@ void CRCVoiceChat::ProcessEvents()
 			break;
 		case EEventType::Disconnected:
 			m_vParticipants.clear();
-			m_mClientIds.clear();
+			m_MClientIds.clear();
 			m_ActiveSpeakerIdentities.clear();
 			break;
 		case EEventType::ActiveSpeakers:
@@ -1860,7 +1862,7 @@ void CRCVoiceChat::AddAudioTrack(const std::string &TrackId, const std::string &
 		pAudio->m_Identity = Identity;
 		pAudio->m_Muted = Muted;
 		pAudio->Init(&m_AudioEngine);
-		m_mAudioActivity[TrackId] = std::move(pAudio);
+		m_MAudioActivity[TrackId] = std::move(pAudio);
 	}
 	catch(const std::exception &Ex)
 	{
@@ -1875,8 +1877,8 @@ void CRCVoiceChat::RecordAudioActivity(const std::string &TrackId, const livekit
 	if(Rate < 8000 || Rate > 192000 || Channels < 1 || Channels > 8 || Frame.data().empty() || Frame.data().size() % Channels != 0)
 		return;
 	std::lock_guard<std::mutex> Lock(m_AudioActivityLock);
-	auto It = m_mAudioActivity.find(TrackId);
-	if(It == m_mAudioActivity.end() || !m_Connected || m_Cancelled || m_Reconnecting || m_StopAudio)
+	auto It = m_MAudioActivity.find(TrackId);
+	if(It == m_MAudioActivity.end() || !m_Connected || m_Cancelled || m_Reconnecting || m_StopAudio)
 		return;
 	auto &Audio = *It->second;
 	const auto Now = std::chrono::steady_clock::now();
@@ -1926,8 +1928,8 @@ void CRCVoiceChat::RecordAudioActivity(const std::string &TrackId, const livekit
 void CRCVoiceChat::SetAudioMuted(const std::string &TrackId, bool Muted)
 {
 	std::lock_guard<std::mutex> Lock(m_AudioActivityLock);
-	auto It = m_mAudioActivity.find(TrackId);
-	if(It != m_mAudioActivity.end())
+	auto It = m_MAudioActivity.find(TrackId);
+	if(It != m_MAudioActivity.end())
 	{
 		It->second->m_Muted = Muted;
 		It->second->Clear();
@@ -1940,7 +1942,7 @@ void CRCVoiceChat::SetAudioMuted(const std::string &TrackId, bool Muted)
 void CRCVoiceChat::ClearAudioActivity(const std::string &Identity)
 {
 	std::lock_guard<std::mutex> Lock(m_AudioActivityLock);
-	std::erase_if(m_mAudioActivity, [&](const auto &Entry) { return Entry.second->m_Identity == Identity; });
+	std::erase_if(m_MAudioActivity, [&](const auto &Entry) { return Entry.second->m_Identity == Identity; });
 	++m_OutputGeneration;
 }
 
@@ -1954,7 +1956,7 @@ void CRCVoiceChat::UpdateTalking()
 	const int MyTeam = LocalId >= 0 && LocalId < MAX_CLIENTS ? GameClient()->m_Teams.Team(LocalId) : -1;
 
 	std::lock_guard<std::mutex> Lock(m_AudioActivityLock);
-	for(auto &[TrackId, pAudio] : m_mAudioActivity)
+	for(auto &[TrackId, pAudio] : m_MAudioActivity)
 	{
 		auto &Audio = *pAudio;
 		const int Id = ClientIdOf(Audio.m_Identity);
@@ -1976,29 +1978,29 @@ void CRCVoiceChat::UpdateTalking()
 		// Spectators without a character have their own non-spatial volume.
 		const bool IsSpectator = Active && GameClient()->m_aClients[Id].m_Team == TEAM_SPECTATORS;
 		VoiceLogic::SParticipantMix Mix;
-		Mix.SessionActive = Receiving;
-		Mix.Deafened = m_Deafened;
-		Mix.TrackMuted = Audio.m_Muted;
+		Mix.m_SessionActive = Receiving;
+		Mix.m_Deafened = m_Deafened;
+		Mix.m_TrackMuted = Audio.m_Muted;
 		const auto Settings = UserSettings(Audio.m_Name.c_str());
-		Mix.NameMuted = Settings.m_Muted;
-		Mix.UserVolume = Settings.m_Volume;
+		Mix.m_NameMuted = Settings.m_Muted;
+		Mix.m_UserVolume = Settings.m_Volume;
 		// -1 means unknown and must not mute everyone.
-		Mix.IsLocal = Id >= 0 && Id == LocalId;
-		Mix.HasPosition = HasPosition;
-		Mix.IsSpectator = IsSpectator;
-		Mix.MyTeam = MyTeam;
-		Mix.TheirTeam = Active ? GameClient()->m_Teams.Team(Id) : -1;
-		Mix.SuperTeam = GameClient()->m_Teams.TeamSuper();
-		Mix.OtherTeamVolume = g_Config.m_RcVoiceOtherTeamVolume;
-		Mix.SuperVolume = g_Config.m_RcVoiceSuperVolume;
-		Mix.UnpositionedVolume = g_Config.m_RcVoiceUnpositionedVolume;
-		Mix.SpectatorVolume = g_Config.m_RcVoiceSpectatorVolume;
-		Mix.MasterVolume = g_Config.m_RcVoiceVolume;
+		Mix.m_IsLocal = Id >= 0 && Id == LocalId;
+		Mix.m_HasPosition = HasPosition;
+		Mix.m_IsSpectator = IsSpectator;
+		Mix.m_MyTeam = MyTeam;
+		Mix.m_TheirTeam = Active ? GameClient()->m_Teams.Team(Id) : -1;
+		Mix.m_SuperTeam = GameClient()->m_Teams.TeamSuper();
+		Mix.m_OtherTeamVolume = g_Config.m_RcVoiceOtherTeamVolume;
+		Mix.m_SuperVolume = g_Config.m_RcVoiceSuperVolume;
+		Mix.m_UnpositionedVolume = g_Config.m_RcVoiceUnpositionedVolume;
+		Mix.m_SpectatorVolume = g_Config.m_RcVoiceSpectatorVolume;
+		Mix.m_MasterVolume = g_Config.m_RcVoiceVolume;
 
 		const VoiceLogic::EMuteReason Reason = VoiceLogic::MuteReasonOf(Mix);
 		const bool Mute = Reason != VoiceLogic::MUTE_NONE;
 		Audio.m_MuteReason = Reason;
-		const vec2 Gains = Mute ? vec2(0.0f, 0.0f) : VoiceLogic::VoiceGains(HasPosition, g_Config.m_RcVoiceSpatial, VoiceLogic::ParticipantVolume(Mix), Delta, g_Config.m_RcVoiceMinVolume, g_Config.m_RcVoiceMinRadius, g_Config.m_RcVoiceRadius, g_Config.m_RcVoiceVolume, g_Config.m_RcVoiceStereoWidth, g_Config.m_RcVoiceStereoRadius, VoiceLogic::TeamVolume(Mix), Mix.UserVolume, g_Config.m_RcVoiceStereo);
+		const vec2 Gains = Mute ? vec2(0.0f, 0.0f) : VoiceLogic::VoiceGains(HasPosition, g_Config.m_RcVoiceSpatial, VoiceLogic::ParticipantVolume(Mix), Delta, g_Config.m_RcVoiceMinVolume, g_Config.m_RcVoiceMinRadius, g_Config.m_RcVoiceRadius, g_Config.m_RcVoiceVolume, g_Config.m_RcVoiceStereoWidth, g_Config.m_RcVoiceStereoRadius, VoiceLogic::TeamVolume(Mix), Mix.m_UserVolume, g_Config.m_RcVoiceStereo);
 		if(Gains == vec2(0.0f, 0.0f) || Audio.m_TargetGains == vec2(0.0f, 0.0f))
 		{
 			Audio.Clear();
@@ -2018,7 +2020,7 @@ void CRCVoiceChat::UpdateTalking()
 		P.m_MuteReason = VoiceLogic::MUTE_NONE;
 		bool HasTrack = false;
 		bool AnyAudible = false;
-		for(const auto &Entry : m_mAudioActivity)
+		for(const auto &Entry : m_MAudioActivity)
 		{
 			const auto &Activity = *Entry.second;
 			if(Activity.m_Identity != P.m_Identity)
@@ -2111,8 +2113,8 @@ std::vector<CRCVoiceChat::SDevice> CRCVoiceChat::PlayoutDevices()
 int CRCVoiceChat::ClientIdOf(const std::string &Identity) const
 {
 #ifdef CONF_LIVEKIT
-	auto It = m_mClientIds.find(Identity);
-	return It != m_mClientIds.end() ? It->second : -1;
+	auto It = m_MClientIds.find(Identity);
+	return It != m_MClientIds.end() ? It->second : -1;
 #else
 	return -1;
 #endif

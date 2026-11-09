@@ -375,7 +375,7 @@ void CRCVoiceChat::StartAudio(const std::string &MicDevice, const std::string &P
 	// FFI objects follow, Room::connect() owns the client while it runs.
 }
 
-void CRCVoiceChat::MicrophoneTestThread(std::string MicDevice, std::string PlayoutDevice)
+void CRCVoiceChat::MicrophoneTestThread(const std::string& MicDevice, const std::string& PlayoutDevice)
 {
 	try
 	{
@@ -439,7 +439,7 @@ void CRCVoiceChat::MixAudio(std::int16_t *pOutput)
 	{
 		std::lock_guard<std::mutex> Lock(m_AudioActivityLock);
 		const auto Now = std::chrono::steady_clock::now();
-		for(auto &[Id, pAudio] : m_mAudioActivity)
+		for(auto &[Id, pAudio] : m_MAudioActivity)
 			if(!m_Connected || m_Cancelled || m_Reconnecting || m_Deafened || pAudio->m_Muted || Now - pAudio->m_BufferTime > std::chrono::milliseconds(60))
 				pAudio->Clear();
 		CheckAudio(ma_engine_read_pcm_frames(&m_AudioEngine, aMix.data(), 480, nullptr), "mix voice audio");
@@ -513,7 +513,7 @@ bool CRCVoiceChat::RestoreVoiceDevice(bool Capture)
 			++m_OutputGeneration;
 			m_OutputFailed = false;
 			std::lock_guard<std::mutex> Lock(m_AudioActivityLock);
-			for(auto &[TrackId, pAudio] : m_mAudioActivity)
+			for(auto &[TrackId, pAudio] : m_MAudioActivity)
 				pAudio->Clear();
 		}
 		UpdateDeviceDelay();
