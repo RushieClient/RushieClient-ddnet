@@ -375,7 +375,7 @@ void CRCVoiceChat::StartAudio(const std::string &MicDevice, const std::string &P
 	// FFI objects follow, Room::connect() owns the client while it runs.
 }
 
-void CRCVoiceChat::MicrophoneTestThread(const std::string& MicDevice, const std::string& PlayoutDevice)
+void CRCVoiceChat::MicrophoneTestThread(const std::string &MicDevice, const std::string &PlayoutDevice)
 {
 	try
 	{

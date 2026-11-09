@@ -1410,7 +1410,7 @@ bool CRCVoiceChat::Transmitting() const
 #ifdef CONF_LIVEKIT
 
 void CRCVoiceChat::ConnectThread(int LocalClientId,
-	const std::string& MicDevice, const std::string& PlayoutDevice, const std::shared_ptr<IHttpRequest>& pTokenRequest, const std::string& RoomName)
+	const std::string &MicDevice, const std::string &PlayoutDevice, const std::shared_ptr<IHttpRequest> &pTokenRequest, const std::string &RoomName)
 {
 	try
 	{

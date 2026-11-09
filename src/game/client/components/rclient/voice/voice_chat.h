@@ -236,7 +236,7 @@ private:
 	static void DeviceNotification(const ma_device_notification *pNotification);
 	void StartAudio(const std::string &MicDevice, const std::string &PlayoutDevice);
 	void StartAudioProcessing(bool MicrophoneTest = false);
-	void MicrophoneTestThread(const std::string& MicDevice, const std::string& PlayoutDevice);
+	void MicrophoneTestThread(const std::string &MicDevice, const std::string &PlayoutDevice);
 	void StartAudioThread();
 	void AudioThread();
 	void DisableMicrophone(const char *pError);
@@ -424,7 +424,7 @@ private:
 	};
 
 	void ConnectThread(int LocalClientId,
-		const std::string& MicDevice, const std::string& PlayoutDevice, const std::shared_ptr<IHttpRequest>& pTokenRequest, const std::string& RoomName);
+		const std::string &MicDevice, const std::string &PlayoutDevice, const std::shared_ptr<IHttpRequest> &pTokenRequest, const std::string &RoomName);
 
 	// ResetConnection joins the setup thread before replacing SDK objects.
 	std::unique_ptr<livekit::Room> m_pRoom;

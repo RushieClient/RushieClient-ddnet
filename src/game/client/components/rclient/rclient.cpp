@@ -330,7 +330,7 @@ void CRClient::ConfigSaveCallback(IConfigManager *pConfigManager, void *pUserDat
 		str_format(aBuf, sizeof(aBuf), "rc_translate_add_language %s", Item.m_LangCode);
 		pConfigManager->WriteLine(aBuf, ConfigDomain::RCLIENT);
 	}
-	for(const SFavoritesMaps& MMap : pSelf->m_SFavoritesMaps)
+	for(const SFavoritesMaps &MMap : pSelf->m_SFavoritesMaps)
 	{
 		str_format(aBuf, sizeof(aBuf), "rc_add_favorite_map \"%s\" \"%s\" \"%s\" %s", MMap.m_MapName.c_str(), MMap.m_MapperNickname.c_str(), MMap.m_Community.c_str(), std::to_string(MMap.m_FavoriteTime).c_str());
 		pConfigManager->WriteLine(aBuf, ConfigDomain::RCLIENT);
