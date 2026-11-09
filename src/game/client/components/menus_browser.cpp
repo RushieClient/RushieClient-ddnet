@@ -1797,7 +1797,7 @@ void CMenus::RenderServerbrowserFriends(CUIRect View)
 
 					if(WarPlayer.ServerInfo())
 					{
-						GameClient()->m_Tooltips.DoToolTip(WarPlayer.ListItemId(), &Rect, Localize("Click to select server. Double click to join your friend."));
+						Ui()->DoToolTip(WarPlayer.ListItemId(), &Rect, Localize("Click to select server. Double click to join your friend."));
 					}
 
 					// Compare unsorted server id of the friend with the unsorted id of the currently selected server
@@ -1830,7 +1830,7 @@ void CMenus::RenderServerbrowserFriends(CUIRect View)
 						const vec2 TeeRenderPos = vec2(Skin.x + Skin.w / 2.0f, Skin.y + Skin.h * 0.55f + OffsetToMid.y);
 						RenderTools()->RenderTee(pIdleState, &TeeInfo, WarPlayer.IsAfk() ? EMOTE_BLINK : EMOTE_NORMAL, vec2(1.0f, 0.0f), TeeRenderPos);
 						Ui()->DoButtonLogic(WarPlayer.SkinTooltipId(), 0, &Skin, BUTTONFLAG_NONE);
-						GameClient()->m_Tooltips.DoToolTip(WarPlayer.SkinTooltipId(), &Skin, WarPlayer.Skin());
+						Ui()->DoToolTip(WarPlayer.SkinTooltipId(), &Skin, WarPlayer.Skin());
 					}
 					else if(WarPlayer.Skin7(protocol7::SKINPART_BODY)[0] != '\0')
 					{
@@ -1870,7 +1870,7 @@ void CMenus::RenderServerbrowserFriends(CUIRect View)
 								InfoLabel.VSplitLeft(2.0f, nullptr, &InfoLabel);
 								m_CommunityIcons.Render(pIcon, CommunityIcon, true);
 								Ui()->DoButtonLogic(WarPlayer.CommunityTooltipId(), 0, &CommunityIcon, BUTTONFLAG_NONE);
-								GameClient()->m_Tooltips.DoToolTip(WarPlayer.CommunityTooltipId(), &CommunityIcon, pCommunity->Name());
+								Ui()->DoToolTip(WarPlayer.CommunityTooltipId(), &CommunityIcon, pCommunity->Name());
 							}
 						}
 
@@ -1901,7 +1901,7 @@ void CMenus::RenderServerbrowserFriends(CUIRect View)
 							str_copy(m_aRemoveWarType, pType->m_aWarName);
 							ButtonResult = 0;
 						}
-						GameClient()->m_Tooltips.DoToolTip(WarPlayer.RemoveButtonId(), &RemoveButton, "Click to remove this clan from your warlist.");
+						Ui()->DoToolTip(WarPlayer.RemoveButtonId(), &RemoveButton, "Click to remove this clan from your warlist.");
 					}
 
 					// handle click and double click on item

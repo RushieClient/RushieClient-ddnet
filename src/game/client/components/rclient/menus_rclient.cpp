@@ -287,7 +287,7 @@ void CMenus::RenderSettingsRClientVoiceUsers(CUIRect MainView)
 		const ColorRGBA MuteColor = Settings.m_Muted ? ColorRGBA(1.0f, 0.35f, 0.35f, 0.6f) : ColorRGBA(0.35f, 0.85f, 0.35f, 0.6f);
 		if(DoButton_Menu(&Ids.m_Mute, aVolumeLabel, 0, &MuteButton, BUTTONFLAG_LEFT, nullptr, IGraphics::CORNER_ALL, 5.0f, 0.0f, MuteColor))
 			Voice.SetUserSettings(Row.m_Name.c_str(), Volume, !Settings.m_Muted);
-		GameClient()->m_Tooltips.DoToolTip(&Ids.m_Mute, &MuteButton, Settings.m_Muted ? RCLocalize("Unmute voice", "RClient") : RCLocalize("Mute voice", "RClient"));
+		Ui()->DoToolTip(&Ids.m_Mute, &MuteButton, Settings.m_Muted ? RCLocalize("Unmute voice", "RClient") : RCLocalize("Mute voice", "RClient"));
 	}
 	const int NewSelected = ListBox.DoEnd();
 	if(NewSelected >= 0 && (size_t)NewSelected < vRows.size())
@@ -1582,7 +1582,7 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 				DoLine_KeyReader(Column, s_aVoiceBindReaders[2], s_aVoiceBindClearButtons[2], RCLocalize("Incoming voice mute", "RClient"), "rc_voice_toggle_deafen");
 				Column.HSplitTop(LineSize, &Button, &Column);
 				Ui()->DoScrollbarOption(&g_Config.m_RcVoicePttReleaseDelay, &g_Config.m_RcVoicePttReleaseDelay, &Button, RCLocalize("PTT release delay (ms)", "RClient"), 0, 1000, &CUi::ms_LinearScrollbarScale, 0);
-				GameClient()->m_Tooltips.DoToolTip(&g_Config.m_RcVoicePttReleaseDelay, &Button, RCLocalize("Keep sending briefly after releasing the talk key to preserve word endings. 0 disables the delay.", "RClient"));
+				Ui()->DoToolTip(&g_Config.m_RcVoicePttReleaseDelay, &Button, RCLocalize("Keep sending briefly after releasing the talk key to preserve word endings. 0 disables the delay.", "RClient"));
 			}
 		}
 		else if(s_CurVoiceTab == VOICE_TAB_DEVICES)
@@ -1666,14 +1666,14 @@ void CMenus::RenderSettingsRClientSettings(CUIRect MainView)
 					g_Config.m_RcVoiceMinRadius = std::clamp(g_Config.m_RcVoiceMinRadius, 0, g_Config.m_RcVoiceRadius - 1);
 					if(Ui()->DoScrollbarOption(&g_Config.m_RcVoiceMinRadius, &g_Config.m_RcVoiceMinRadius, &Button, RCLocalize("Full volume until (tiles)", "RClient"), 0, 199, &CUi::ms_LinearScrollbarScale, 0))
 						g_Config.m_RcVoiceRadius = std::max(g_Config.m_RcVoiceRadius, g_Config.m_RcVoiceMinRadius + 1);
-					GameClient()->m_Tooltips.DoToolTip(&g_Config.m_RcVoiceMinRadius, &Button, RCLocalize("Nearby voices stay at full volume. Fading starts after this distance.", "RClient"));
+					Ui()->DoToolTip(&g_Config.m_RcVoiceMinRadius, &Button, RCLocalize("Nearby voices stay at full volume. Fading starts after this distance.", "RClient"));
 					Column.HSplitTop(LineSize, &Button, &Column);
 					if(Ui()->DoScrollbarOption(&g_Config.m_RcVoiceRadius, &g_Config.m_RcVoiceRadius, &Button, RCLocalize("Minimum volume from (tiles)", "RClient"), 1, 200, &CUi::ms_LinearScrollbarScale, 0))
 						g_Config.m_RcVoiceMinRadius = std::min(g_Config.m_RcVoiceMinRadius, g_Config.m_RcVoiceRadius - 1);
-					GameClient()->m_Tooltips.DoToolTip(&g_Config.m_RcVoiceRadius, &Button, RCLocalize("At this distance and farther, voices stay at the minimum volume.", "RClient"));
+					Ui()->DoToolTip(&g_Config.m_RcVoiceRadius, &Button, RCLocalize("At this distance and farther, voices stay at the minimum volume.", "RClient"));
 					Column.HSplitTop(LineSize, &Button, &Column);
 					Ui()->DoScrollbarOption(&g_Config.m_RcVoiceMinVolume, &g_Config.m_RcVoiceMinVolume, &Button, RCLocalize("Minimum volume (%)", "RClient"), 0, 100, &CUi::ms_LinearScrollbarScale, 0);
-					GameClient()->m_Tooltips.DoToolTip(&g_Config.m_RcVoiceMinVolume, &Button, RCLocalize("Volume of distant players after fading. Set to 0% to mute them.", "RClient"));
+					Ui()->DoToolTip(&g_Config.m_RcVoiceMinVolume, &Button, RCLocalize("Volume of distant players after fading. Set to 0% to mute them.", "RClient"));
 				}
 				else
 				{
@@ -2398,7 +2398,7 @@ void CMenus::RenderSettingsRClientFavoritesMaps(CUIRect MainView)
 		Ui()->DoLabel(&Name, Map.m_MapName.c_str(), FontSize, TEXTALIGN_ML, Props);
 		Props.m_MaxWidth = Mapper.w;
 		if(Ui()->DoLabel(&Mapper, Map.m_MapperNickname.empty() ? "-" : Map.m_MapperNickname.c_str(), EditBoxFontSize, TEXTALIGN_ML, Props).m_Truncated && !Map.m_MapperNickname.empty())
-			GameClient()->m_Tooltips.DoToolTip(&Map, &Mapper, Map.m_MapperNickname.c_str());
+			Ui()->DoToolTip(&Map, &Mapper, Map.m_MapperNickname.c_str());
 		Props.m_MaxWidth = Community.w;
 		Ui()->DoLabel(&Community, Map.m_Community.empty() ? "-" : Map.m_Community.c_str(), EditBoxFontSize, TEXTALIGN_ML, Props);
 		Props.m_MaxWidth = Date.w;
@@ -2419,14 +2419,14 @@ void CMenus::RenderSettingsRClientFavoritesMaps(CUIRect MainView)
 	if(Ui()->DoLabel(&InfoRow, aDetail, FontSize, TEXTALIGN_ML, Props).m_Truncated && HasSelection)
 	{
 		Ui()->DoButtonLogic(pSelectedMap->m_MapName.c_str(), 0, &InfoRow, BUTTONFLAG_NONE);
-		GameClient()->m_Tooltips.DoToolTip(pSelectedMap->m_MapName.c_str(), &InfoRow, pSelectedMap->m_MapName.c_str());
+		Ui()->DoToolTip(pSelectedMap->m_MapName.c_str(), &InfoRow, pSelectedMap->m_MapName.c_str());
 	}
 	Details.HSplitTop(LineSize, &InfoRow, &Details);
 	str_format(aDetail, sizeof(aDetail), "%s: %s", RCLocalize("Mapper"), HasSelection && !pSelectedMap->m_MapperNickname.empty() ? pSelectedMap->m_MapperNickname.c_str() : "-");
 	if(Ui()->DoLabel(&InfoRow, aDetail, FontSize, TEXTALIGN_ML, Props).m_Truncated && HasSelection && !pSelectedMap->m_MapperNickname.empty())
 	{
 		Ui()->DoButtonLogic(pSelectedMap->m_MapperNickname.c_str(), 0, &InfoRow, BUTTONFLAG_NONE);
-		GameClient()->m_Tooltips.DoToolTip(pSelectedMap->m_MapperNickname.c_str(), &InfoRow, pSelectedMap->m_MapperNickname.c_str());
+		Ui()->DoToolTip(pSelectedMap->m_MapperNickname.c_str(), &InfoRow, pSelectedMap->m_MapperNickname.c_str());
 	}
 	Details.HSplitTop(LineSize, &InfoRow, &Details);
 	str_format(aDetail, sizeof(aDetail), "%s: %s", RCLocalize("Community"), HasSelection && !pSelectedMap->m_Community.empty() ? pSelectedMap->m_Community.c_str() : "-");
