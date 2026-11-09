@@ -3759,7 +3759,6 @@ if((GTEST_FOUND OR DOWNLOAD_GTEST) AND SERVER)
     unix_test.cpp
     uuid_test.cpp
     vmath_test.cpp
-    voice_chat_test.cpp
     windows_test.cpp
     # tidy-alphabetical-end
   )
