@@ -1475,8 +1475,9 @@ void CMenus::RenderSettingsTClientWarList(CUIRect MainView)
 			{
 				EntryRect.VSplitRight(20.0f, &EntryRect, &ToolTip);
 				RenderFontIcon(ToolTip, FontIcon::COMMENT, 18.0f, TEXTALIGN_MC);
-				GameClient()->m_Tooltips.DoToolTip(&s_vItemIds[i], &ToolTip, pEntry->m_aReason);
-				GameClient()->m_Tooltips.SetFadeTime(&s_vItemIds[i], 0.0f);
+				CTooltip Tooltip(&s_vItemIds[i], ToolTip, pEntry->m_aReason, -1.0f, 14.0f, false);
+				Tooltip.m_FadeTime = 0.0f;
+				Ui()->DoToolTip(Tooltip);
 			}
 
 			EntryRect.HMargin(MarginExtraSmall, &EntryRect);
@@ -2396,7 +2397,7 @@ void CMenus::RenderSettingsTClientProfiles(CUIRect MainView)
 			Actions.HSplitTop(5.0f, nullptr, &Actions);
 
 			static int s_AllowDelete;
-			DoButton_CheckBoxAutoVMarginAndSet(&s_AllowDelete, Localizable("Enable Deleting"), &s_AllowDelete, &Actions, LineSize);
+			DoButton_CheckBoxAutoVMarginAndSet(&s_AllowDelete, TCLocalize("Enable Deleting"), &s_AllowDelete, &Actions, LineSize);
 			Actions.HSplitTop(5.0f, nullptr, &Actions);
 
 			if(s_AllowDelete)
